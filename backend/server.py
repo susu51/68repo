@@ -153,14 +153,17 @@ class Customer(BaseModel):
 
 # Utility Functions
 def hash_password(password: str) -> str:
-    # Bcrypt password length limit
-    if len(password.encode('utf-8')) > 72:
-        password = password[:72]
+    # Ensure password is not too long for bcrypt (72 bytes max)
+    password_bytes = password.encode('utf-8')
+    if len(password_bytes) > 72:
+        password = password[:60]  # Safe margin
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    if len(plain_password.encode('utf-8')) > 72:
-        plain_password = plain_password[:72]
+    # Same truncation for verification
+    password_bytes = plain_password.encode('utf-8')
+    if len(password_bytes) > 72:
+        plain_password = plain_password[:60]
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
