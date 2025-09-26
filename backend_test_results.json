@@ -1,0 +1,95 @@
+{
+  "summary": {
+    "total_tests": 14,
+    "passed_tests": 13,
+    "failed_tests": 1,
+    "success_rate": 92.85714285714286,
+    "timestamp": "2025-09-26T21:39:39.515435"
+  },
+  "test_results": [
+    {
+      "test": "Root API Endpoint",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:30.736742"
+    },
+    {
+      "test": "Send Verification Code",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:30.778655"
+    },
+    {
+      "test": "Verify Code (New User)",
+      "success": false,
+      "details": "Expected 200, got 400. Error: {'detail': 'Yanl\u0131\u015f do\u011frulama kodu'}",
+      "timestamp": "2025-09-26T21:39:31.830209"
+    },
+    {
+      "test": "Courier Registration",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:31.897581"
+    },
+    {
+      "test": "Send Code for Business",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:32.933549"
+    },
+    {
+      "test": "Business Registration",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:32.983208"
+    },
+    {
+      "test": "Send Code for Customer",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:34.018709"
+    },
+    {
+      "test": "Customer Registration",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:34.082202"
+    },
+    {
+      "test": "Get Profile",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:39.087981"
+    },
+    {
+      "test": "Get Pending Couriers",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:39.377561"
+    },
+    {
+      "test": "Approve Courier",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:39.411896"
+    },
+    {
+      "test": "Invalid Phone Format",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:39.446794"
+    },
+    {
+      "test": "Invalid Verification Code",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:39.484060"
+    },
+    {
+      "test": "Unauthorized Access",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T21:39:39.514795"
+    }
+  ]
+}
