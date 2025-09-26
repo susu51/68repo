@@ -705,7 +705,7 @@ const CourierDashboard = ({ user }) => {
 
   const toggleOnlineStatus = async () => {
     try {
-      const token = localStorage.getItem('delivertr_token');
+      const token = localStorage.getItem('delivertr_access_token');
       const response = await axios.post(`${API}/courier/toggle-online`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
