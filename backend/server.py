@@ -151,20 +151,16 @@ class Customer(BaseModel):
     city: str
     addresses: List[dict] = []
 
-# Utility Functions
+import hashlib
+
+# Simple password hashing (for demo purposes)
 def hash_password(password: str) -> str:
-    # Ensure password is not too long for bcrypt (72 bytes max)
-    password_bytes = password.encode('utf-8')
-    if len(password_bytes) > 72:
-        password = password[:60]  # Safe margin
-    return pwd_context.hash(password)
+    """Simple SHA-256 hash for demo purposes"""
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # Same truncation for verification
-    password_bytes = plain_password.encode('utf-8')
-    if len(password_bytes) > 72:
-        plain_password = plain_password[:60]
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify password against hash"""
+    return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
