@@ -605,6 +605,17 @@ const BusinessDashboard = ({ user }) => {
                     + İlk Ürününüzü Ekleyin
                   </Button>
                 </div>
+                
+                {/* Admin Panel Link - Demo için */}
+                <div className="mt-4 text-center">
+                  <a 
+                    href="/admin" 
+                    className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+                    data-testid="admin-panel-link"
+                  >
+                    🛠️ Admin Panel (Demo)
+                  </a>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
