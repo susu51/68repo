@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, File, UploadFile
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -12,8 +13,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import jwt
 from passlib.context import CryptContext
-import random
-import string
+import shutil
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -23,8 +23,15 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Create uploads directory
+UPLOAD_DIR = Path("/app/backend/uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
 # Create the main app without a prefix
 app = FastAPI(title="DeliverTR API", description="Türkiye Teslimat Platformu")
+
+# Serve uploaded files
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -35,19 +42,31 @@ security = HTTPBearer()
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'delivertr-secret-key-2024')
 ALGORITHM = "HS256"
 
+# Şehirler listesi
+CITIES = [
+    "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", 
+    "Artvin", "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", 
+    "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", 
+    "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", 
+    "Giresun", "Gümüşhane", "Hakkâri", "Hatay", "Isparta", "Mersin", "İstanbul", 
+    "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli", 
+    "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", 
+    "Muş", "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", 
+    "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", 
+    "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", 
+    "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", 
+    "Karabük", "Kilis", "Osmaniye", "Düzce"
+]
+
 # Auth Models
-class PhoneVerifyRequest(BaseModel):
-    phone: str
-
-class PhoneVerifyResponse(BaseModel):
-    success: bool
-    message: str
-    verification_id: Optional[str] = None
-
-class VerifyCodeRequest(BaseModel):
-    phone: str
-    code: str
-    verification_id: str
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str
+    user_type: str  # courier, business, customer
+    
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 class LoginResponse(BaseModel):
     access_token: str
@@ -57,45 +76,40 @@ class LoginResponse(BaseModel):
 
 # User Models
 class CourierRegister(BaseModel):
-    phone: str
+    email: EmailStr
+    password: str
     first_name: str
     last_name: str
     iban: str
     vehicle_type: str  # araba, motor, elektrikli_motor, bisiklet
+    vehicle_model: str
     license_class: str
-    license_photo_url: Optional[str] = None
-    vehicle_document_url: Optional[str] = None
-    profile_photo_url: Optional[str] = None
+    city: str
 
 class BusinessRegister(BaseModel):
-    phone: str
+    email: EmailStr
+    password: str
     business_name: str
     tax_number: str
     address: str
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    business_type: str  # restaurant, market, store
+    city: str
+    business_category: str  # gida, nakliye
+    description: Optional[str] = None
 
 class CustomerRegister(BaseModel):
-    phone: str
+    email: EmailStr
+    password: str
     first_name: str
     last_name: str
-    email: Optional[EmailStr] = None
-
-class Address(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    title: str
-    address: str
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    is_default: bool = False
+    city: str
 
 # Database Models
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    phone: str
+    email: str
+    password_hash: str
     user_type: str  # courier, business, customer
-    is_verified: bool = False
+    is_verified: bool = True  # Email verification için
     is_active: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
@@ -106,9 +120,11 @@ class Courier(BaseModel):
     last_name: str
     iban: str
     vehicle_type: str
+    vehicle_model: str
     license_class: str
+    city: str
     license_photo_url: Optional[str] = None
-    vehicle_document_url: Optional[str] = None
+    vehicle_photo_url: Optional[str] = None
     profile_photo_url: Optional[str] = None
     kyc_status: str = "pending"  # pending, approved, rejected
     kyc_notes: Optional[str] = None
@@ -121,9 +137,9 @@ class Business(BaseModel):
     business_name: str
     tax_number: str
     address: str
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    business_type: str
+    city: str
+    business_category: str  # gida, nakliye
+    description: Optional[str] = None
     is_open: bool = False
     opening_hours: Optional[dict] = None
     
@@ -132,12 +148,15 @@ class Customer(BaseModel):
     user_id: str
     first_name: str
     last_name: str
-    email: Optional[str] = None
-    addresses: List[Address] = []
+    city: str
+    addresses: List[dict] = []
 
 # Utility Functions
-def generate_verification_code():
-    return ''.join(random.choices(string.digits, k=6))
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -159,152 +178,154 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Geçersiz token")
 
-# Mock SMS Storage (In production, use Redis or proper cache)
-verification_store = {}
+# File Upload
+@api_router.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    """Dosya yükleme endpoint'i"""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Dosya seçilmedi")
+    
+    # Dosya türü kontrolü
+    allowed_types = ["image/jpeg", "image/png", "image/jpg"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Sadece JPEG, PNG dosyaları yüklenebilir")
+    
+    # Dosya adı oluştur
+    file_extension = file.filename.split(".")[-1]
+    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Dosyayı kaydet
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # URL döndür
+    file_url = f"/uploads/{unique_filename}"
+    return {"file_url": file_url}
 
 # Auth Endpoints
-@api_router.post("/auth/send-code", response_model=PhoneVerifyResponse)
-async def send_verification_code(request: PhoneVerifyRequest):
-    """Mock SMS gönderimi - gerçek uygulamada Twilio kullanılacak"""
-    if not request.phone.startswith('+90'):
-        raise HTTPException(status_code=400, detail="Geçerli Türkiye telefon numarası giriniz (+90...)")
+@api_router.post("/auth/login", response_model=LoginResponse)
+async def login(login_data: UserLogin):
+    """Kullanıcı girişi"""
+    # Kullanıcıyı bul
+    user = await db.users.find_one({"email": login_data.email})
+    if not user:
+        raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
-    # Generate verification code and ID
-    verification_code = generate_verification_code()
-    verification_id = str(uuid.uuid4())
+    # Şifre kontrolü
+    if not verify_password(login_data.password, user["password_hash"]):
+        raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
-    # Store verification (in production use Redis with TTL)
-    verification_store[verification_id] = {
-        'phone': request.phone,
-        'code': verification_code,
-        'created_at': datetime.now(timezone.utc),
-        'used': False
-    }
+    # Token oluştur
+    access_token = create_access_token(data={"sub": user["id"], "email": user["email"]})
     
-    # Mock SMS - gerçekte Twilio'ya gönderilecek
-    print(f"📱 SMS Mock: {request.phone} → Doğrulama kodu: {verification_code}")
+    # Kullanıcı verilerini al
+    user_data = {"email": user["email"], "user_type": user["user_type"]}
     
-    return PhoneVerifyResponse(
-        success=True,
-        message=f"Doğrulama kodu {request.phone} numarasına gönderildi",
-        verification_id=verification_id
+    if user["user_type"] == "courier":
+        courier = await db.couriers.find_one({"user_id": user["id"]})
+        if courier:
+            user_data.update({
+                "name": f"{courier.get('first_name', '')} {courier.get('last_name', '')}",
+                "kyc_status": courier.get("kyc_status", "pending"),
+                "city": courier.get("city", "")
+            })
+    elif user["user_type"] == "business":
+        business = await db.businesses.find_one({"user_id": user["id"]})
+        if business:
+            user_data.update({
+                "business_name": business.get("business_name", ""),
+                "city": business.get("city", ""),
+                "category": business.get("business_category", ""),
+                "is_approved": user.get("is_active", False)
+            })
+    elif user["user_type"] == "customer":
+        customer = await db.customers.find_one({"user_id": user["id"]})
+        if customer:
+            user_data.update({
+                "name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}",
+                "city": customer.get("city", "")
+            })
+    
+    return LoginResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user_type=user["user_type"],
+        user_data=user_data
     )
 
-@api_router.post("/auth/verify-code")
-async def verify_code(request: VerifyCodeRequest):
-    """Doğrulama kodu kontrolü"""
-    verification = verification_store.get(request.verification_id)
-    
-    if not verification:
-        raise HTTPException(status_code=400, detail="Geçersiz doğrulama ID'si")
-    
-    if verification['used']:
-        raise HTTPException(status_code=400, detail="Bu doğrulama kodu zaten kullanıldı")
-    
-    if verification['phone'] != request.phone:
-        raise HTTPException(status_code=400, detail="Telefon numarası eşleşmiyor")
-    
-    if verification['code'] != request.code:
-        raise HTTPException(status_code=400, detail="Yanlış doğrulama kodu")
-    
-    # Check expiry (10 minutes)
-    if datetime.now(timezone.utc) - verification['created_at'] > timedelta(minutes=10):
-        raise HTTPException(status_code=400, detail="Doğrulama kodu süresi doldu")
-    
-    # Mark as used
-    verification_store[request.verification_id]['used'] = True
-    
-    # Check if user exists
-    existing_user = await db.users.find_one({"phone": request.phone})
-    
-    if existing_user:
-        # Login existing user
-        access_token = create_access_token(data={"sub": existing_user["id"], "phone": existing_user["phone"]})
-        
-        # Get user profile based on type
-        user_data = {"phone": existing_user["phone"], "user_type": existing_user["user_type"]}
-        
-        if existing_user["user_type"] == "courier":
-            courier = await db.couriers.find_one({"user_id": existing_user["id"]})
-            if courier:
-                user_data.update({
-                    "name": f"{courier.get('first_name', '')} {courier.get('last_name', '')}",
-                    "kyc_status": courier.get("kyc_status", "pending")
-                })
-        elif existing_user["user_type"] == "business":
-            business = await db.businesses.find_one({"user_id": existing_user["id"]})
-            if business:
-                user_data.update({
-                    "business_name": business.get("business_name", ""),
-                    "is_approved": existing_user.get("is_active", False)
-                })
-        elif existing_user["user_type"] == "customer":
-            customer = await db.customers.find_one({"user_id": existing_user["id"]})
-            if customer:
-                user_data.update({
-                    "name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}"
-                })
-        
-        return LoginResponse(
-            access_token=access_token,
-            token_type="bearer",
-            user_type=existing_user["user_type"],
-            user_data=user_data
-        )
-    
-    return {"success": True, "message": "Telefon numarası doğrulandı", "is_new_user": True}
-
 # Registration Endpoints
-@api_router.post("/register/courier")
+@api_router.post("/register/courier", response_model=LoginResponse)
 async def register_courier(courier_data: CourierRegister):
     """Kurye kaydı"""
-    # Check if user already exists
-    existing_user = await db.users.find_one({"phone": courier_data.phone})
+    # E-posta kontrolü
+    existing_user = await db.users.find_one({"email": courier_data.email})
     if existing_user:
-        raise HTTPException(status_code=400, detail="Bu telefon numarası zaten kayıtlı")
+        raise HTTPException(status_code=400, detail="Bu e-posta adresi zaten kayıtlı")
     
-    # Create user
-    user = User(phone=courier_data.phone, user_type="courier")
+    # Şehir kontrolü
+    if courier_data.city not in CITIES:
+        raise HTTPException(status_code=400, detail="Geçersiz şehir seçimi")
+    
+    # Kullanıcı oluştur
+    password_hash = hash_password(courier_data.password)
+    user = User(
+        email=courier_data.email, 
+        password_hash=password_hash, 
+        user_type="courier"
+    )
     user_dict = user.dict()
     await db.users.insert_one(user_dict)
     
-    # Create courier profile
+    # Kurye profili oluştur
     courier = Courier(
         user_id=user.id,
         first_name=courier_data.first_name,
         last_name=courier_data.last_name,
         iban=courier_data.iban,
         vehicle_type=courier_data.vehicle_type,
+        vehicle_model=courier_data.vehicle_model,
         license_class=courier_data.license_class,
-        license_photo_url=courier_data.license_photo_url,
-        vehicle_document_url=courier_data.vehicle_document_url,
-        profile_photo_url=courier_data.profile_photo_url
+        city=courier_data.city
     )
     courier_dict = courier.dict()
     await db.couriers.insert_one(courier_dict)
     
-    # Generate token
-    access_token = create_access_token(data={"sub": user.id, "phone": user.phone})
+    # Token oluştur
+    access_token = create_access_token(data={"sub": user.id, "email": user.email})
     
     return LoginResponse(
         access_token=access_token,
         token_type="bearer",
         user_type="courier",
         user_data={
-            "phone": user.phone,
+            "email": user.email,
             "name": f"{courier.first_name} {courier.last_name}",
+            "city": courier.city,
             "kyc_status": "pending"
         }
     )
 
-@api_router.post("/register/business")
+@api_router.post("/register/business", response_model=LoginResponse)
 async def register_business(business_data: BusinessRegister):
     """İşletme kaydı"""
-    existing_user = await db.users.find_one({"phone": business_data.phone})
+    existing_user = await db.users.find_one({"email": business_data.email})
     if existing_user:
-        raise HTTPException(status_code=400, detail="Bu telefon numarası zaten kayıtlı")
+        raise HTTPException(status_code=400, detail="Bu e-posta adresi zaten kayıtlı")
     
-    user = User(phone=business_data.phone, user_type="business", is_active=True)
+    if business_data.city not in CITIES:
+        raise HTTPException(status_code=400, detail="Geçersiz şehir seçimi")
+    
+    if business_data.business_category not in ["gida", "nakliye"]:
+        raise HTTPException(status_code=400, detail="Geçersiz kategori seçimi")
+    
+    password_hash = hash_password(business_data.password)
+    user = User(
+        email=business_data.email, 
+        password_hash=password_hash, 
+        user_type="business", 
+        is_active=True
+    )
     user_dict = user.dict()
     await db.users.insert_one(user_dict)
     
@@ -313,34 +334,45 @@ async def register_business(business_data: BusinessRegister):
         business_name=business_data.business_name,
         tax_number=business_data.tax_number,
         address=business_data.address,
-        latitude=business_data.latitude,
-        longitude=business_data.longitude,
-        business_type=business_data.business_type
+        city=business_data.city,
+        business_category=business_data.business_category,
+        description=business_data.description
     )
     business_dict = business.dict()
     await db.businesses.insert_one(business_dict)
     
-    access_token = create_access_token(data={"sub": user.id, "phone": user.phone})
+    access_token = create_access_token(data={"sub": user.id, "email": user.email})
     
     return LoginResponse(
         access_token=access_token,
         token_type="bearer",
         user_type="business",
         user_data={
-            "phone": user.phone,
+            "email": user.email,
             "business_name": business.business_name,
+            "city": business.city,
+            "category": business.business_category,
             "is_approved": True
         }
     )
 
-@api_router.post("/register/customer")
+@api_router.post("/register/customer", response_model=LoginResponse)
 async def register_customer(customer_data: CustomerRegister):
     """Müşteri kaydı"""
-    existing_user = await db.users.find_one({"phone": customer_data.phone})
+    existing_user = await db.users.find_one({"email": customer_data.email})
     if existing_user:
-        raise HTTPException(status_code=400, detail="Bu telefon numarası zaten kayıtlı")
+        raise HTTPException(status_code=400, detail="Bu e-posta adresi zaten kayıtlı")
     
-    user = User(phone=customer_data.phone, user_type="customer", is_active=True)
+    if customer_data.city not in CITIES:
+        raise HTTPException(status_code=400, detail="Geçersiz şehir seçimi")
+    
+    password_hash = hash_password(customer_data.password)
+    user = User(
+        email=customer_data.email, 
+        password_hash=password_hash, 
+        user_type="customer", 
+        is_active=True
+    )
     user_dict = user.dict()
     await db.users.insert_one(user_dict)
     
@@ -348,20 +380,21 @@ async def register_customer(customer_data: CustomerRegister):
         user_id=user.id,
         first_name=customer_data.first_name,
         last_name=customer_data.last_name,
-        email=customer_data.email
+        city=customer_data.city
     )
     customer_dict = customer.dict()
     await db.customers.insert_one(customer_dict)
     
-    access_token = create_access_token(data={"sub": user.id, "phone": user.phone})
+    access_token = create_access_token(data={"sub": user.id, "email": user.email})
     
     return LoginResponse(
         access_token=access_token,
         token_type="bearer",
         user_type="customer",
         user_data={
-            "phone": user.phone,
-            "name": f"{customer.first_name} {customer.last_name}"
+            "email": user.email,
+            "name": f"{customer.first_name} {customer.last_name}",
+            "city": customer.city
         }
     )
 
@@ -373,7 +406,7 @@ async def get_profile(current_user_id: str = Depends(get_current_user)):
     if not user:
         raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
     
-    profile_data = {"phone": user["phone"], "user_type": user["user_type"]}
+    profile_data = {"email": user["email"], "user_type": user["user_type"]}
     
     if user["user_type"] == "courier":
         courier = await db.couriers.find_one({"user_id": current_user_id})
@@ -382,7 +415,11 @@ async def get_profile(current_user_id: str = Depends(get_current_user)):
                 "first_name": courier["first_name"],
                 "last_name": courier["last_name"],
                 "vehicle_type": courier["vehicle_type"],
+                "vehicle_model": courier["vehicle_model"],
+                "city": courier["city"],
                 "kyc_status": courier["kyc_status"],
+                "license_photo_url": courier.get("license_photo_url"),
+                "vehicle_photo_url": courier.get("vehicle_photo_url"),
                 "is_online": courier.get("is_online", False)
             })
     elif user["user_type"] == "business":
@@ -391,7 +428,9 @@ async def get_profile(current_user_id: str = Depends(get_current_user)):
             profile_data.update({
                 "business_name": business["business_name"],
                 "address": business["address"],
-                "business_type": business["business_type"],
+                "city": business["city"],
+                "business_category": business["business_category"],
+                "description": business.get("description"),
                 "is_open": business.get("is_open", False)
             })
     elif user["user_type"] == "customer":
@@ -400,11 +439,43 @@ async def get_profile(current_user_id: str = Depends(get_current_user)):
             profile_data.update({
                 "first_name": customer["first_name"],
                 "last_name": customer["last_name"],
-                "email": customer.get("email"),
+                "city": customer["city"],
                 "addresses": customer.get("addresses", [])
             })
     
     return profile_data
+
+# Update courier photos
+@api_router.put("/courier/update-photos")
+async def update_courier_photos(
+    license_photo_url: Optional[str] = None,
+    vehicle_photo_url: Optional[str] = None,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Kurye fotoğraflarını güncelle"""
+    user = await db.users.find_one({"id": current_user_id})
+    if not user or user["user_type"] != "courier":
+        raise HTTPException(status_code=403, detail="Sadece kuryeler fotoğraf güncelleyebilir")
+    
+    update_data = {}
+    if license_photo_url:
+        update_data["license_photo_url"] = license_photo_url
+    if vehicle_photo_url:
+        update_data["vehicle_photo_url"] = vehicle_photo_url
+    
+    if update_data:
+        await db.couriers.update_one(
+            {"user_id": current_user_id},
+            {"$set": update_data}
+        )
+    
+    return {"success": True, "message": "Fotoğraflar güncellendi"}
+
+# Şehirler listesi
+@api_router.get("/cities")
+async def get_cities():
+    """Türkiye şehirleri listesi"""
+    return {"cities": CITIES}
 
 # Admin Endpoints (KYC)
 @api_router.get("/admin/couriers/pending")
@@ -418,11 +489,13 @@ async def get_pending_couriers():
         courier_info = {
             "id": courier["id"],
             "name": f"{courier['first_name']} {courier['last_name']}",
-            "phone": user["phone"] if user else "",
+            "email": user["email"] if user else "",
             "vehicle_type": courier["vehicle_type"],
+            "vehicle_model": courier["vehicle_model"],
             "license_class": courier["license_class"],
+            "city": courier["city"],
             "license_photo_url": courier.get("license_photo_url"),
-            "vehicle_document_url": courier.get("vehicle_document_url"),
+            "vehicle_photo_url": courier.get("vehicle_photo_url"),
             "profile_photo_url": courier.get("profile_photo_url"),
             "created_at": user["created_at"] if user else None
         }
@@ -464,7 +537,7 @@ async def reject_courier(courier_id: str, notes: str):
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "DeliverTR API v1.0 - Türkiye Teslimat Platformu"}
+    return {"message": "DeliverTR API v2.0 - E-posta ile Kayıt Sistemi"}
 
 # Include the router in the main app
 app.include_router(api_router)

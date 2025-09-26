@@ -12,6 +12,7 @@ import { Badge } from "./components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import { Textarea } from "./components/ui/textarea";
+import { Label } from "./components/ui/label";
 import { toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -61,143 +62,12 @@ const useAuth = () => {
   return context;
 };
 
-// Phone Verification Component
-const PhoneVerification = ({ onVerified, onBack }) => {
-  const [phone, setPhone] = useState('+90');
-  const [code, setCode] = useState('');
-  const [verificationId, setVerificationId] = useState('');
-  const [step, setStep] = useState(1); // 1: phone, 2: code
-  const [loading, setLoading] = useState(false);
-
-  const sendCode = async () => {
-    if (phone.length < 13) {
-      toast.error('Geçerli telefon numarası giriniz');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post(`${API}/auth/send-code`, { phone });
-      setVerificationId(response.data.verification_id);
-      setStep(2);
-      toast.success('Doğrulama kodu gönderildi');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Hata oluştu');
-    }
-    setLoading(false);
-  };
-
-  const verifyCode = async () => {
-    if (code.length !== 6) {
-      toast.error('6 haneli doğrulama kodunu giriniz');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post(`${API}/auth/verify-code`, {
-        phone,
-        code,
-        verification_id: verificationId
-      });
-
-      if (response.data.is_new_user) {
-        onVerified({ phone, isNewUser: true });
-      } else {
-        onVerified({ 
-          phone, 
-          isNewUser: false, 
-          loginData: response.data 
-        });
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Doğrulama başarısız');
-    }
-    setLoading(false);
-  };
-
-  return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-orange-600">
-          {step === 1 ? 'Telefon Doğrulama' : 'Doğrulama Kodu'}
-        </CardTitle>
-        <CardDescription>
-          {step === 1 
-            ? 'Telefon numaranızı girin'
-            : `${phone} numarasına gönderilen 6 haneli kodu girin`
-          }
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {step === 1 ? (
-          <>
-            <Input
-              type="tel"
-              placeholder="+90 5XX XXX XX XX"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              maxLength={14}
-              data-testid="phone-input"
-            />
-            <Button 
-              onClick={sendCode} 
-              disabled={loading} 
-              className="w-full bg-orange-600 hover:bg-orange-700"
-              data-testid="send-code-btn"
-            >
-              {loading ? 'Gönderiliyor...' : 'Doğrulama Kodu Gönder'}
-            </Button>
-          </>
-        ) : (
-          <>
-            <Input
-              type="text"
-              placeholder="6 haneli kod"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').substring(0, 6))}
-              maxLength={6}
-              className="text-center text-2xl tracking-wider"
-              data-testid="verification-code-input"
-            />
-            <Button 
-              onClick={verifyCode} 
-              disabled={loading} 
-              className="w-full bg-orange-600 hover:bg-orange-700"
-              data-testid="verify-code-btn"
-            >
-              {loading ? 'Doğrulanıyor...' : 'Doğrula'}
-            </Button>
-            <Button 
-              onClick={() => setStep(1)} 
-              variant="ghost" 
-              className="w-full"
-              data-testid="back-to-phone-btn"
-            >
-              ← Telefon numarasını değiştir
-            </Button>
-          </>
-        )}
-        
-        {onBack && (
-          <Button onClick={onBack} variant="outline" className="w-full" data-testid="back-btn">
-            ← Ana Sayfa
-          </Button>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
-
-// Registration Components
-const CourierRegistration = ({ phone, onComplete }) => {
+// Login Component
+const LoginForm = ({ onRegisterClick }) => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
-    phone,
-    first_name: '',
-    last_name: '',
-    iban: '',
-    vehicle_type: '',
-    license_class: ''
+    email: '',
+    password: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -206,9 +76,209 @@ const CourierRegistration = ({ phone, onComplete }) => {
     setLoading(true);
 
     try {
+      const response = await axios.post(`${API}/auth/login`, formData);
+      login(response.data.access_token, {
+        email: formData.email,
+        user_type: response.data.user_type,
+        ...response.data.user_data
+      });
+      toast.success('Başarıyla giriş yaptınız!');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Giriş başarısız');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold text-orange-600">Giriş Yap</CardTitle>
+        <CardDescription>DeliverTR hesabınıza giriş yapın</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="email">E-posta</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="ornek@email.com"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              required
+              data-testid="login-email"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="password">Şifre</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Şifrenizi girin"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              required
+              data-testid="login-password"
+            />
+          </div>
+          
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-orange-600 hover:bg-orange-700"
+            data-testid="login-submit-btn"
+          >
+            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          </Button>
+        </form>
+        
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Hesabınız yok mu?{' '}
+            <button
+              onClick={onRegisterClick}
+              className="text-orange-600 hover:text-orange-700 font-medium"
+              data-testid="go-to-register-btn"
+            >
+              Kayıt Ol
+            </button>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// City selector component
+const CitySelector = ({ value, onChange, required = false }) => {
+  const cities = [
+    "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", 
+    "Artvin", "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", 
+    "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", 
+    "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", 
+    "Giresun", "Gümüşhane", "Hakkâri", "Hatay", "Isparta", "Mersin", "İstanbul", 
+    "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli", 
+    "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", 
+    "Muş", "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", 
+    "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", 
+    "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", 
+    "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", 
+    "Karabük", "Kilis", "Osmaniye", "Düzce"
+  ];
+
+  return (
+    <Select value={value} onValueChange={onChange} required={required}>
+      <SelectTrigger data-testid="city-select">
+        <SelectValue placeholder="Şehir seçin" />
+      </SelectTrigger>
+      <SelectContent>
+        {cities.map((city) => (
+          <SelectItem key={city} value={city}>
+            {city}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
+
+// File Upload Component
+const FileUpload = ({ label, onFileSelect, accept = "image/*", testId }) => {
+  const [uploading, setUploading] = useState(false);
+  const [fileUrl, setFileUrl] = useState('');
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post(`${API}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setFileUrl(response.data.file_url);
+      onFileSelect(response.data.file_url);
+      toast.success('Dosya başarıyla yüklendi');
+    } catch (error) {
+      toast.error('Dosya yükleme başarısız');
+    }
+    setUploading(false);
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+        <input
+          type="file"
+          accept={accept}
+          onChange={handleFileChange}
+          className="hidden"
+          id={testId}
+        />
+        <label htmlFor={testId} className="cursor-pointer">
+          {uploading ? (
+            <div className="text-blue-600">Yükleniyor...</div>
+          ) : fileUrl ? (
+            <div className="space-y-2">
+              <img src={`${BACKEND_URL}${fileUrl}`} alt="Preview" className="mx-auto max-h-20" />
+              <p className="text-green-600 text-sm">✓ Dosya yüklendi</p>
+            </div>
+          ) : (
+            <div className="text-gray-500">
+              📁 {label} için dosya seçin
+            </div>
+          )}
+        </label>
+      </div>
+    </div>
+  );
+};
+
+// Registration Components
+const CourierRegistration = ({ onComplete, onBack }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    first_name: '',
+    last_name: '',
+    iban: '',
+    vehicle_type: '',
+    vehicle_model: '',
+    license_class: '',
+    city: ''
+  });
+  const [licensePhotoUrl, setLicensePhotoUrl] = useState('');
+  const [vehiclePhotoUrl, setVehiclePhotoUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
       const response = await axios.post(`${API}/register/courier`, formData);
+      
+      // Update photos if uploaded
+      if (licensePhotoUrl || vehiclePhotoUrl) {
+        const token = response.data.access_token;
+        await axios.put(`${API}/courier/update-photos`, {
+          license_photo_url: licensePhotoUrl,
+          vehicle_photo_url: vehiclePhotoUrl
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+
       onComplete(response.data);
-      toast.success('Kurye kaydınız tamamlandı! Onay bekliyor.');
+      toast.success('Kurye kaydınız tamamlandı! KYC onayı bekliyor.');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
     }
@@ -224,71 +294,154 @@ const CourierRegistration = ({ phone, onComplete }) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>E-posta</Label>
+              <Input
+                type="email"
+                placeholder="ornek@email.com"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
+                data-testid="courier-email"
+              />
+            </div>
+            <div>
+              <Label>Şifre</Label>
+              <Input
+                type="password"
+                placeholder="Güvenli şifre"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+                data-testid="courier-password"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Adınız</Label>
+              <Input
+                placeholder="Adınız"
+                value={formData.first_name}
+                onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                required
+                data-testid="courier-first-name"
+              />
+            </div>
+            <div>
+              <Label>Soyadınız</Label>
+              <Input
+                placeholder="Soyadınız"
+                value={formData.last_name}
+                onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                required
+                data-testid="courier-last-name"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label>IBAN</Label>
             <Input
-              placeholder="Adınız"
-              value={formData.first_name}
-              onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+              placeholder="TR ile başlayan IBAN numarası"
+              value={formData.iban}
+              onChange={(e) => setFormData({...formData, iban: e.target.value})}
               required
-              data-testid="courier-first-name"
-            />
-            <Input
-              placeholder="Soyadınız"
-              value={formData.last_name}
-              onChange={(e) => setFormData({...formData, last_name: e.target.value})}
-              required
-              data-testid="courier-last-name"
+              data-testid="courier-iban"
             />
           </div>
           
-          <Input
-            placeholder="IBAN (TR ile başlayan)"
-            value={formData.iban}
-            onChange={(e) => setFormData({...formData, iban: e.target.value})}
-            required
-            data-testid="courier-iban"
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Araç Türü</Label>
+              <Select onValueChange={(value) => setFormData({...formData, vehicle_type: value})} required>
+                <SelectTrigger data-testid="courier-vehicle-select">
+                  <SelectValue placeholder="Araç türünüz" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="araba">Araba</SelectItem>
+                  <SelectItem value="motor">Motor</SelectItem>
+                  <SelectItem value="elektrikli_motor">Elektrikli Motor</SelectItem>
+                  <SelectItem value="bisiklet">Bisiklet</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Araç Modeli</Label>
+              <Input
+                placeholder="Örn: Honda Civic, Yamaha R25"
+                value={formData.vehicle_model}
+                onChange={(e) => setFormData({...formData, vehicle_model: e.target.value})}
+                required
+                data-testid="courier-vehicle-model"
+              />
+            </div>
+          </div>
           
-          <Select onValueChange={(value) => setFormData({...formData, vehicle_type: value})} required>
-            <SelectTrigger data-testid="courier-vehicle-select">
-              <SelectValue placeholder="Araç türünüz" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="araba">Araba</SelectItem>
-              <SelectItem value="motor">Motor</SelectItem>
-              <SelectItem value="elektrikli_motor">Elektrikli Motor</SelectItem>
-              <SelectItem value="bisiklet">Bisiklet</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Ehliyet Sınıfı</Label>
+              <Input
+                placeholder="A, A1, A2, B, C, D"
+                value={formData.license_class}
+                onChange={(e) => setFormData({...formData, license_class: e.target.value})}
+                required
+                data-testid="courier-license-class"
+              />
+            </div>
+            <div>
+              <Label>Şehir</Label>
+              <CitySelector 
+                value={formData.city}
+                onChange={(value) => setFormData({...formData, city: value})}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <FileUpload
+              label="Ehliyet Fotoğrafı"
+              onFileSelect={setLicensePhotoUrl}
+              testId="license-upload"
+            />
+            <FileUpload
+              label="Araç Fotoğrafı"
+              onFileSelect={setVehiclePhotoUrl}
+              testId="vehicle-upload"
+            />
+          </div>
           
-          <Input
-            placeholder="Ehliyet sınıfı (A, A1, A2, B, vb.)"
-            value={formData.license_class}
-            onChange={(e) => setFormData({...formData, license_class: e.target.value})}
-            required
-            data-testid="courier-license-class"
-          />
-          
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="w-full bg-orange-600 hover:bg-orange-700"
-            data-testid="courier-register-btn"
-          >
-            {loading ? 'Kaydediliyor...' : 'Kurye Kaydını Tamamla'}
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="flex-1 bg-orange-600 hover:bg-orange-700"
+              data-testid="courier-register-btn"
+            >
+              {loading ? 'Kaydediliyor...' : 'Kurye Kaydını Tamamla'}
+            </Button>
+            <Button onClick={onBack} variant="outline" className="flex-1">
+              ← Geri Dön
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>
   );
 };
 
-const BusinessRegistration = ({ phone, onComplete }) => {
+const BusinessRegistration = ({ onComplete, onBack }) => {
   const [formData, setFormData] = useState({
-    phone,
+    email: '',
+    password: '',
     business_name: '',
     tax_number: '',
     address: '',
-    business_type: ''
+    city: '',
+    business_category: '',
+    description: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -314,61 +467,123 @@ const BusinessRegistration = ({ phone, onComplete }) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            placeholder="İşletme adı"
-            value={formData.business_name}
-            onChange={(e) => setFormData({...formData, business_name: e.target.value})}
-            required
-            data-testid="business-name"
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>E-posta</Label>
+              <Input
+                type="email"
+                placeholder="isletme@email.com"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
+                data-testid="business-email"
+              />
+            </div>
+            <div>
+              <Label>Şifre</Label>
+              <Input
+                type="password"
+                placeholder="Güvenli şifre"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+                data-testid="business-password"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label>İşletme Adı</Label>
+            <Input
+              placeholder="İşletme adı"
+              value={formData.business_name}
+              onChange={(e) => setFormData({...formData, business_name: e.target.value})}
+              required
+              data-testid="business-name"
+            />
+          </div>
           
-          <Input
-            placeholder="Vergi numarası"
-            value={formData.tax_number}
-            onChange={(e) => setFormData({...formData, tax_number: e.target.value})}
-            required
-            data-testid="business-tax-number"
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Vergi Numarası</Label>
+              <Input
+                placeholder="Vergi numarası"
+                value={formData.tax_number}
+                onChange={(e) => setFormData({...formData, tax_number: e.target.value})}
+                required
+                data-testid="business-tax-number"
+              />
+            </div>
+            <div>
+              <Label>Şehir</Label>
+              <CitySelector 
+                value={formData.city}
+                onChange={(value) => setFormData({...formData, city: value})}
+                required
+              />
+            </div>
+          </div>
           
-          <Textarea
-            placeholder="İşletme adresi"
-            value={formData.address}
-            onChange={(e) => setFormData({...formData, address: e.target.value})}
-            required
-            data-testid="business-address"
-          />
+          <div>
+            <Label>İşletme Adresi</Label>
+            <Textarea
+              placeholder="İşletme adresi"
+              value={formData.address}
+              onChange={(e) => setFormData({...formData, address: e.target.value})}
+              required
+              data-testid="business-address"
+            />
+          </div>
           
-          <Select onValueChange={(value) => setFormData({...formData, business_type: value})} required>
-            <SelectTrigger data-testid="business-type-select">
-              <SelectValue placeholder="İşletme türü" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="restaurant">Restoran</SelectItem>
-              <SelectItem value="market">Market</SelectItem>
-              <SelectItem value="store">Mağaza</SelectItem>
-            </SelectContent>
-          </Select>
+          <div>
+            <Label>Ne satıyorsunuz?</Label>
+            <Select onValueChange={(value) => setFormData({...formData, business_category: value})} required>
+              <SelectTrigger data-testid="business-category-select">
+                <SelectValue placeholder="Kategori seçin" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gida">🍔 Gıda (Restoran, Cafe, Pastane)</SelectItem>
+                <SelectItem value="nakliye">📦 Nakliye (Kargo, Paket Teslimat)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>İşletme Açıklaması (Opsiyonel)</Label>
+            <Textarea
+              placeholder="İşletmeniz hakkında kısa bilgi..."
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              data-testid="business-description"
+            />
+          </div>
           
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700"
-            data-testid="business-register-btn"
-          >
-            {loading ? 'Kaydediliyor...' : 'İşletme Kaydını Tamamla'}
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              data-testid="business-register-btn"
+            >
+              {loading ? 'Kaydediliyor...' : 'İşletme Kaydını Tamamla'}
+            </Button>
+            <Button onClick={onBack} variant="outline" className="flex-1">
+              ← Geri Dön
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>
   );
 };
 
-const CustomerRegistration = ({ phone, onComplete }) => {
+const CustomerRegistration = ({ onComplete, onBack }) => {
   const [formData, setFormData] = useState({
-    phone,
+    email: '',
+    password: '',
     first_name: '',
     last_name: '',
-    email: ''
+    city: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -395,45 +610,82 @@ const CustomerRegistration = ({ phone, onComplete }) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              placeholder="Adınız"
-              value={formData.first_name}
-              onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+            <div>
+              <Label>E-posta</Label>
+              <Input
+                type="email"
+                placeholder="ornek@email.com"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
+                data-testid="customer-email"
+              />
+            </div>
+            <div>
+              <Label>Şifre</Label>
+              <Input
+                type="password"
+                placeholder="Güvenli şifre"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+                data-testid="customer-password"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Adınız</Label>
+              <Input
+                placeholder="Adınız"
+                value={formData.first_name}
+                onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                required
+                data-testid="customer-first-name"
+              />
+            </div>
+            <div>
+              <Label>Soyadınız</Label>
+              <Input
+                placeholder="Soyadınız"
+                value={formData.last_name}
+                onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                required
+                data-testid="customer-last-name"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label>Şehir</Label>
+            <CitySelector 
+              value={formData.city}
+              onChange={(value) => setFormData({...formData, city: value})}
               required
-              data-testid="customer-first-name"
-            />
-            <Input
-              placeholder="Soyadınız"
-              value={formData.last_name}
-              onChange={(e) => setFormData({...formData, last_name: e.target.value})}
-              required
-              data-testid="customer-last-name"
             />
           </div>
           
-          <Input
-            type="email"
-            placeholder="E-posta (opsiyonel)"
-            value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
-            data-testid="customer-email"
-          />
-          
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700"
-            data-testid="customer-register-btn"
-          >
-            {loading ? 'Kaydediliyor...' : 'Müşteri Kaydını Tamamla'}
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              data-testid="customer-register-btn"
+            >
+              {loading ? 'Kaydediliyor...' : 'Müşteri Kaydını Tamamla'}
+            </Button>
+            <Button onClick={onBack} variant="outline" className="flex-1">
+              ← Geri Dön
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>
   );
 };
 
-// Dashboard Components
+// Dashboard Components  
 const CourierDashboard = ({ user }) => {
   const { logout } = useAuth();
 
@@ -452,7 +704,10 @@ const CourierDashboard = ({ user }) => {
     <div className="min-h-screen bg-gray-50 p-4" data-testid="courier-dashboard">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Kurye Paneli</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Kurye Paneli</h1>
+            <p className="text-gray-600">{user.name} - {user.city}</p>
+          </div>
           <Button onClick={logout} variant="outline" data-testid="logout-btn">
             Çıkış Yap
           </Button>
@@ -525,11 +780,18 @@ const CourierDashboard = ({ user }) => {
 const BusinessDashboard = ({ user }) => {
   const { logout } = useAuth();
 
+  const getCategoryName = (category) => {
+    return category === 'gida' ? 'Gıda' : 'Nakliye';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4" data-testid="business-dashboard">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">İşletme Paneli</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{user.business_name}</h1>
+            <p className="text-gray-600">{getCategoryName(user.category)} • {user.city}</p>
+          </div>
           <Button onClick={logout} variant="outline" data-testid="logout-btn">
             Çıkış Yap
           </Button>
@@ -576,7 +838,9 @@ const BusinessDashboard = ({ user }) => {
         <Tabs defaultValue="orders" className="space-y-4">
           <TabsList>
             <TabsTrigger value="orders">Siparişler</TabsTrigger>
-            <TabsTrigger value="menu">Menü</TabsTrigger>
+            <TabsTrigger value="menu">
+              {user.category === 'gida' ? 'Menü' : 'Hizmetler'}
+            </TabsTrigger>
             <TabsTrigger value="settings">Ayarlar</TabsTrigger>
           </TabsList>
           
@@ -596,13 +860,20 @@ const BusinessDashboard = ({ user }) => {
           <TabsContent value="menu">
             <Card>
               <CardHeader>
-                <CardTitle>Ürün/Menü Yönetimi</CardTitle>
-                <CardDescription>Ürünlerinizi ekleyin ve yönetin</CardDescription>
+                <CardTitle>
+                  {user.category === 'gida' ? 'Menü Yönetimi' : 'Hizmet Yönetimi'}
+                </CardTitle>
+                <CardDescription>
+                  {user.category === 'gida' 
+                    ? 'Yemek menünüzü oluşturun ve yönetin'
+                    : 'Nakliye hizmetlerinizi tanımlayın'
+                  }
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <Button className="bg-blue-600 hover:bg-blue-700" data-testid="add-product-btn">
-                    + İlk Ürününüzü Ekleyin
+                    + {user.category === 'gida' ? 'İlk Yemeğinizi Ekleyin' : 'İlk Hizmetinizi Ekleyin'}
                   </Button>
                 </div>
                 
@@ -631,6 +902,14 @@ const BusinessDashboard = ({ user }) => {
                   <Input value={user.business_name} readOnly />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium mb-2">Kategori</label>
+                  <Input value={getCategoryName(user.category)} readOnly />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Şehir</label>
+                  <Input value={user.city} readOnly />
+                </div>
+                <div>
                   <label className="block text-sm font-medium mb-2">Çalışma Saatleri</label>
                   <div className="grid grid-cols-2 gap-4">
                     <Input placeholder="Açılış (09:00)" />
@@ -656,7 +935,10 @@ const CustomerDashboard = ({ user }) => {
     <div className="min-h-screen bg-gray-50 p-4" data-testid="customer-dashboard">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Hoş Geldin, {user.name}</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Hoş Geldin, {user.name}</h1>
+            <p className="text-gray-600">{user.city}</p>
+          </div>
           <Button onClick={logout} variant="outline" data-testid="logout-btn">
             Çıkış Yap
           </Button>
@@ -770,7 +1052,7 @@ const HomePage = ({ onAuthStart }) => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Restoranın, marketin veya mağazan var mı? 
+                Restoranın, marketin veya nakliye şirketin var mı? 
                 Hemen kayıt ol, satışa başla.
               </p>
             </CardContent>
@@ -820,43 +1102,26 @@ const HomePage = ({ onAuthStart }) => {
 
 const AuthPage = ({ onBack }) => {
   const { login } = useAuth();
-  const [step, setStep] = useState('phone'); // phone, register
+  const [step, setStep] = useState('login'); // login, register, user_type_selection, registration_form
   const [userType, setUserType] = useState('');
-  const [phoneData, setPhoneData] = useState(null);
-
-  const handleVerified = (data) => {
-    setPhoneData(data);
-    
-    if (!data.isNewUser) {
-      // Existing user - login
-      login(data.loginData.access_token, {
-        phone: data.phone,
-        user_type: data.loginData.user_type,
-        ...data.loginData.user_data
-      });
-    } else {
-      // New user - show registration options
-      setStep('register');
-    }
-  };
 
   const handleRegistrationComplete = (loginData) => {
     login(loginData.access_token, {
-      phone: phoneData.phone,
+      email: loginData.user_data.email,
       user_type: loginData.user_type,
       ...loginData.user_data
     });
   };
 
-  if (step === 'phone') {
+  if (step === 'login') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50 flex items-center justify-center p-4">
-        <PhoneVerification onVerified={handleVerified} onBack={onBack} />
+        <LoginForm onRegisterClick={() => setStep('user_type_selection')} />
       </div>
     );
   }
 
-  if (step === 'register') {
+  if (step === 'user_type_selection') {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-4xl mx-auto py-8">
@@ -865,96 +1130,110 @@ const AuthPage = ({ onBack }) => {
               Hangi rolde katılmak istiyorsun?
             </h1>
             <p className="text-gray-600">
-              Telefon: <strong>{phoneData?.phone}</strong>
+              DeliverTR ailesine katılmak için rolünüzü seçin
             </p>
           </div>
 
-          {!userType ? (
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-orange-500"
-                onClick={() => setUserType('courier')}
-                data-testid="select-courier-type"
-              >
-                <CardHeader className="text-center">
-                  <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl">🚗</span>
-                  </div>
-                  <CardTitle className="text-orange-600">Kurye</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-gray-600">
-                    Teslimat yaparak para kazan
-                  </p>
-                </CardContent>
-              </Card>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-orange-500"
+              onClick={() => {
+                setUserType('courier');
+                setStep('registration_form');
+              }}
+              data-testid="select-courier-type"
+            >
+              <CardHeader className="text-center">
+                <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🚗</span>
+                </div>
+                <CardTitle className="text-orange-600">Kurye</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-gray-600">
+                  Teslimat yaparak para kazan
+                </p>
+              </CardContent>
+            </Card>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-blue-500"
-                onClick={() => setUserType('business')}
-                data-testid="select-business-type"
-              >
-                <CardHeader className="text-center">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl">🏪</span>
-                  </div>
-                  <CardTitle className="text-blue-600">İşletme</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-gray-600">
-                    Ürünlerini sat, sipariş al
-                  </p>
-                </CardContent>
-              </Card>
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-blue-500"
+              onClick={() => {
+                setUserType('business');
+                setStep('registration_form');
+              }}
+              data-testid="select-business-type"
+            >
+              <CardHeader className="text-center">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🏪</span>
+                </div>
+                <CardTitle className="text-blue-600">İşletme</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-gray-600">
+                  Ürünlerini sat, sipariş al
+                </p>
+              </CardContent>
+            </Card>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-green-500"
-                onClick={() => setUserType('customer')}
-                data-testid="select-customer-type"
-              >
-                <CardHeader className="text-center">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl">📱</span>
-                  </div>
-                  <CardTitle className="text-green-600">Müşteri</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-gray-600">
-                    Sipariş ver, hızlı teslimat al
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            <div>
-              <Button 
-                onClick={() => setUserType('')} 
-                variant="ghost" 
-                className="mb-4"
-                data-testid="back-to-role-selection"
-              >
-                ← Rol seçimine geri dön
-              </Button>
-              
-              {userType === 'courier' && (
-                <CourierRegistration 
-                  phone={phoneData.phone} 
-                  onComplete={handleRegistrationComplete}
-                />
-              )}
-              {userType === 'business' && (
-                <BusinessRegistration 
-                  phone={phoneData.phone} 
-                  onComplete={handleRegistrationComplete}
-                />
-              )}
-              {userType === 'customer' && (
-                <CustomerRegistration 
-                  phone={phoneData.phone} 
-                  onComplete={handleRegistrationComplete}
-                />
-              )}
-            </div>
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-green-500"
+              onClick={() => {
+                setUserType('customer');
+                setStep('registration_form');
+              }}
+              data-testid="select-customer-type"
+            >
+              <CardHeader className="text-center">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📱</span>
+                </div>
+                <CardTitle className="text-green-600">Müşteri</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-gray-600">
+                  Sipariş ver, hızlı teslimat al
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-8">
+            <Button 
+              onClick={() => setStep('login')} 
+              variant="outline"
+              data-testid="back-to-login"
+            >
+              ← Giriş Sayfasına Dön
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 'registration_form') {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-4xl mx-auto py-8">
+          {userType === 'courier' && (
+            <CourierRegistration 
+              onComplete={handleRegistrationComplete}
+              onBack={() => setStep('user_type_selection')}
+            />
+          )}
+          {userType === 'business' && (
+            <BusinessRegistration 
+              onComplete={handleRegistrationComplete}
+              onBack={() => setStep('user_type_selection')}
+            />
+          )}
+          {userType === 'customer' && (
+            <CustomerRegistration 
+              onComplete={handleRegistrationComplete}
+              onBack={() => setStep('user_type_selection')}
+            />
           )}
         </div>
       </div>
