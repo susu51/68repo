@@ -517,42 +517,65 @@ class DeliverTRAPITester:
         return success
 
     def run_all_tests(self):
-        """Run all backend tests"""
-        print("🚀 Starting DeliverTR Backend API Tests")
-        print("=" * 50)
+        """Run all backend tests for Phone/SMS OTP Authentication"""
+        print("🚀 Starting DeliverTR Backend API Tests - Phone/SMS OTP Authentication")
+        print("=" * 70)
         
         # Test basic connectivity
         self.test_root_endpoint()
+        self.test_health_check()
         
-        # Test authentication flow
-        self.test_send_verification_code()
+        # Test phone format validation
+        self.test_phone_format_validation()
+        
+        # Test OTP request flow
+        self.test_otp_request_valid_phone()
         time.sleep(1)  # Brief pause between requests
-        self.test_verify_code_new_user()
+        self.test_otp_request_invalid_phone()
         
-        # Test registration endpoints
-        self.test_courier_registration()
+        # Test OTP verification flow
+        self.test_otp_verify_correct_code()
         time.sleep(1)
-        self.test_business_registration()
-        time.sleep(1)
-        self.test_customer_registration()
+        self.test_otp_verify_incorrect_code()
+        
+        # Test JWT token management
+        self.test_token_refresh()
         
         # Test authenticated endpoints
         self.test_get_profile()
+        self.test_update_profile()
         
-        # Test admin endpoints
-        self.test_admin_endpoints()
+        # Test role registration endpoints
+        self.test_courier_registration()
+        time.sleep(1)
+        self.test_business_registration_flow()
+        time.sleep(1)
+        self.test_customer_registration_flow()
         
-        # Test error handling
-        self.test_invalid_endpoints()
+        # Test rate limiting
+        self.test_rate_limiting()
+        
+        # Test logout
+        self.test_logout()
+        
+        # Test unauthorized access
+        self.test_unauthorized_access()
         
         # Print summary
-        print("\n" + "=" * 50)
-        print("📊 TEST SUMMARY")
-        print("=" * 50)
+        print("\n" + "=" * 70)
+        print("📊 TEST SUMMARY - Phone/SMS OTP Authentication")
+        print("=" * 70)
         print(f"Total Tests: {self.tests_run}")
         print(f"Passed: {self.tests_passed}")
         print(f"Failed: {self.tests_run - self.tests_passed}")
         print(f"Success Rate: {(self.tests_passed/self.tests_run)*100:.1f}%")
+        
+        # Print failed tests details
+        failed_tests = [test for test in self.test_results if not test['success']]
+        if failed_tests:
+            print("\n❌ FAILED TESTS:")
+            for test in failed_tests:
+                print(f"   - {test['test']}: {test['details']}")
         
         # Save detailed results
         with open('/app/backend_test_results.json', 'w') as f:
@@ -562,7 +585,8 @@ class DeliverTRAPITester:
                     "passed_tests": self.tests_passed,
                     "failed_tests": self.tests_run - self.tests_passed,
                     "success_rate": (self.tests_passed/self.tests_run)*100,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
+                    "test_type": "phone_sms_otp_authentication"
                 },
                 "test_results": self.test_results
             }, f, indent=2)
