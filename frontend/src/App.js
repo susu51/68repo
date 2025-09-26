@@ -721,7 +721,7 @@ const CourierDashboard = ({ user }) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         try {
-          const token = localStorage.getItem('delivertr_token');
+          const token = localStorage.getItem('delivertr_access_token');
           await axios.post(`${API}/courier/location/update`, {
             lat: position.coords.latitude,
             lon: position.coords.longitude,
