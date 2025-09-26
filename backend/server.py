@@ -16,6 +16,7 @@ import shutil
 import json
 import math
 import hashlib
+from enum import Enum
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -42,6 +43,19 @@ api_router = APIRouter(prefix="/api")
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'delivertr-secret-key-2024')
 ALGORITHM = "HS256"
 security = HTTPBearer()
+
+# Enums
+class OrderType(str, Enum):
+    FOOD = "food"
+    PACKAGE = "package"
+
+class PackagePriority(str, Enum):
+    NORMAL = "normal"
+    EXPRESS = "express"
+
+class DeliveryTimeSlot(str, Enum):
+    ASAP = "asap"
+    SCHEDULED = "scheduled"
 
 # WebSocket connection manager
 class ConnectionManager:
@@ -116,6 +130,43 @@ def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     
     return R * c
 
+# Pricing Calculator
+def calculate_delivery_price(distance_km: float, order_type: str, package_priority: str = "normal", weight_kg: float = 0) -> Dict[str, float]:
+    """Teslimat ücreti hesaplama"""
+    # Base prices
+    base_price = 12.0  # Base delivery fee
+    
+    # Per km pricing
+    price_per_km = 2.5 if order_type == "food" else 3.0
+    
+    # Distance cost
+    distance_cost = distance_km * price_per_km
+    
+    # Priority multiplier
+    priority_multiplier = 1.5 if package_priority == "express" else 1.0
+    
+    # Weight multiplier (for packages)
+    weight_multiplier = 1.0
+    if order_type == "package" and weight_kg > 5:
+        weight_multiplier = 1.0 + (weight_kg - 5) * 0.1  # 10% per kg over 5kg
+    
+    # Calculate total
+    subtotal = (base_price + distance_cost) * priority_multiplier * weight_multiplier
+    
+    # Platform commission (3%)
+    commission = subtotal * 0.03
+    
+    # Courier earning (85% of delivery fee after commission)
+    courier_earning = (subtotal - commission) * 0.85
+    
+    return {
+        "base_price": base_price,
+        "distance_cost": distance_cost,
+        "total_delivery_fee": round(subtotal, 2),
+        "commission": round(commission, 2),
+        "courier_earning": round(courier_earning, 2)
+    }
+
 # Simple password hashing (for demo purposes)
 def hash_password(password: str) -> str:
     """Simple SHA-256 hash for demo purposes"""
@@ -173,40 +224,110 @@ class UpdateLocationRequest(BaseModel):
     lon: float
     address: Optional[str] = None
 
-# Order Models
+# Product/Menu Models
+class MenuCategory(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    business_id: str
+    name: str
+    description: Optional[str] = None
+    display_order: int = 0
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MenuItem(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    business_id: str
+    category_id: str
+    name: str
+    description: Optional[str] = None
+    price: float
+    image_url: Optional[str] = None
+    preparation_time_minutes: int = 15  # Default prep time
+    is_available: bool = True
+    ingredients: Optional[List[str]] = []
+    allergens: Optional[List[str]] = []
+    tags: Optional[List[str]] = []  # vegetarian, spicy, etc.
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CreateCategoryRequest(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class CreateMenuItemRequest(BaseModel):
+    category_id: str
+    name: str
+    description: Optional[str] = None
+    price: float
+    image_url: Optional[str] = None
+    preparation_time_minutes: int = 15
+    ingredients: Optional[List[str]] = []
+    allergens: Optional[List[str]] = []
+    tags: Optional[List[str]] = []
+
+# Package Models
+class PackageDetails(BaseModel):
+    weight_kg: float
+    dimensions: Optional[str] = None  # "length x width x height cm"
+    is_fragile: bool = False
+    requires_cold_chain: bool = False
+    priority: PackagePriority = PackagePriority.NORMAL
+    floor_number: Optional[int] = None
+    special_instructions: Optional[str] = None
+
+# Enhanced Order Models
 class OrderItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    menu_item_id: Optional[str] = None  # For food orders
     name: str
     quantity: int
     unit_price: float
     total_price: float
-    notes: Optional[str] = None
+    special_instructions: Optional[str] = None
 
-class CreateOrderRequest(BaseModel):
+class CreateFoodOrderRequest(BaseModel):
     business_id: str
     delivery_address: Location
     items: List[OrderItem]
+    delivery_time_preference: DeliveryTimeSlot = DeliveryTimeSlot.ASAP
+    scheduled_time: Optional[datetime] = None
     order_notes: Optional[str] = None
-    delivery_fee: float = 15.0  # Default delivery fee
+
+class CreatePackageOrderRequest(BaseModel):
+    pickup_address: Location
+    delivery_address: Location
+    package_details: PackageDetails
+    recipient_name: str
+    recipient_phone: str
+    order_notes: Optional[str] = None
 
 class Order(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     customer_id: str
-    business_id: str
+    business_id: Optional[str] = None  # None for package orders
     courier_id: Optional[str] = None
     
-    # Order details
-    items: List[OrderItem]
-    order_notes: Optional[str] = None
+    # Order type and details
+    order_type: OrderType
+    items: Optional[List[OrderItem]] = []  # For food orders
+    package_details: Optional[PackageDetails] = None  # For package orders
+    
+    # Recipient info (for packages)
+    recipient_name: Optional[str] = None
+    recipient_phone: Optional[str] = None
     
     # Locations
     pickup_location: Location
     delivery_location: Location
     
+    # Timing
+    delivery_time_preference: DeliveryTimeSlot = DeliveryTimeSlot.ASAP
+    scheduled_time: Optional[datetime] = None
+    
     # Pricing
-    subtotal: float
+    subtotal: float = 0  # Item total (food orders only)
     delivery_fee: float
     commission: float  # %3 platform commission
+    courier_earning: float
     total: float
     
     # Status tracking
@@ -223,15 +344,34 @@ class Order(BaseModel):
 
 class CourierOrderResponse(BaseModel):
     id: str
-    business_name: str
+    business_name: Optional[str] = None
     business_address: str
     delivery_address: str
     distance_km: float
     estimated_earnings: float
-    order_type: str  # gida, nakliye
+    order_type: str
     estimated_delivery_time: int
     items_count: int
     created_at: datetime
+    package_info: Optional[str] = None  # For package orders
+
+# Courier Balance Models
+class CourierEarning(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    courier_id: str
+    order_id: str
+    amount: float
+    transaction_type: str = "delivery"  # delivery, bonus, penalty
+    description: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CourierBalance(BaseModel):
+    courier_id: str
+    total_earnings: float = 0
+    available_balance: float = 0
+    pending_balance: float = 0
+    total_deliveries: int = 0
+    last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 # User Models (existing + updates)
 class CourierRegister(BaseModel):
@@ -319,11 +459,9 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     try:
         while True:
             data = await websocket.receive_text()
-            # Handle incoming messages if needed
             message_data = json.loads(data)
             
             if message_data.get("type") == "location_update":
-                # Update courier location
                 await update_courier_location_in_db(
                     user_id, 
                     message_data.get("lat"), 
@@ -382,16 +520,21 @@ async def login(login_data: UserLogin):
     if user["user_type"] == "courier":
         courier = await db.couriers.find_one({"user_id": user["id"]})
         if courier:
+            # Get courier balance
+            balance = await db.courier_balances.find_one({"courier_id": courier["id"]})
+            
             user_data.update({
                 "name": f"{courier.get('first_name', '')} {courier.get('last_name', '')}",
                 "kyc_status": courier.get("kyc_status", "pending"),
                 "city": courier.get("city", ""),
-                "is_online": courier.get("is_online", False)
+                "is_online": courier.get("is_online", False),
+                "balance": balance.get("available_balance", 0) if balance else 0
             })
     elif user["user_type"] == "business":
         business = await db.businesses.find_one({"user_id": user["id"]})
         if business:
             user_data.update({
+                "business_id": business["id"],
                 "business_name": business.get("business_name", ""),
                 "city": business.get("city", ""),
                 "category": business.get("business_category", ""),
@@ -445,6 +588,11 @@ async def register_courier(courier_data: CourierRegister):
     courier_dict = courier.dict()
     await db.couriers.insert_one(courier_dict)
     
+    # Create initial balance
+    balance = CourierBalance(courier_id=courier.id)
+    balance_dict = balance.dict()
+    await db.courier_balances.insert_one(balance_dict)
+    
     access_token = create_access_token(data={"sub": user.id, "email": user.email})
     
     return LoginResponse(
@@ -455,7 +603,8 @@ async def register_courier(courier_data: CourierRegister):
             "email": user.email,
             "name": f"{courier.first_name} {courier.last_name}",
             "city": courier.city,
-            "kyc_status": "pending"
+            "kyc_status": "pending",
+            "balance": 0
         }
     )
 
@@ -502,6 +651,7 @@ async def register_business(business_data: BusinessRegister):
         user_type="business",
         user_data={
             "email": user.email,
+            "business_id": business.id,
             "business_name": business.business_name,
             "city": business.city,
             "category": business.business_category,
@@ -551,7 +701,247 @@ async def register_customer(customer_data: CustomerRegister):
         }
     )
 
-# Location Endpoints
+# Menu Management Endpoints
+@api_router.post("/menu/category")
+async def create_menu_category(
+    category_data: CreateCategoryRequest,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Menü kategorisi oluştur"""
+    user = await db.users.find_one({"id": current_user_id})
+    if not user or user["user_type"] != "business":
+        raise HTTPException(status_code=403, detail="Sadece işletmeler kategori oluşturabilir")
+    
+    business = await db.businesses.find_one({"user_id": current_user_id})
+    if not business:
+        raise HTTPException(status_code=404, detail="İşletme bulunamadı")
+    
+    # Get next display order
+    categories_count = await db.menu_categories.count_documents({"business_id": business["id"]})
+    
+    category = MenuCategory(
+        business_id=business["id"],
+        name=category_data.name,
+        description=category_data.description,
+        display_order=categories_count + 1
+    )
+    
+    category_dict = category.dict()
+    category_dict["created_at"] = category.created_at.isoformat()
+    
+    await db.menu_categories.insert_one(category_dict)
+    
+    return {"success": True, "category_id": category.id, "message": "Kategori oluşturuldu"}
+
+@api_router.post("/menu/item")
+async def create_menu_item(
+    item_data: CreateMenuItemRequest,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Menü öğesi oluştur"""
+    user = await db.users.find_one({"id": current_user_id})
+    if not user or user["user_type"] != "business":
+        raise HTTPException(status_code=403, detail="Sadece işletmeler ürün ekleyebilir")
+    
+    business = await db.businesses.find_one({"user_id": current_user_id})
+    if not business:
+        raise HTTPException(status_code=404, detail="İşletme bulunamadı")
+    
+    # Verify category belongs to business
+    category = await db.menu_categories.find_one({
+        "id": item_data.category_id,
+        "business_id": business["id"]
+    })
+    if not category:
+        raise HTTPException(status_code=404, detail="Kategori bulunamadı")
+    
+    item = MenuItem(
+        business_id=business["id"],
+        category_id=item_data.category_id,
+        name=item_data.name,
+        description=item_data.description,
+        price=item_data.price,
+        image_url=item_data.image_url,
+        preparation_time_minutes=item_data.preparation_time_minutes,
+        ingredients=item_data.ingredients or [],
+        allergens=item_data.allergens or [],
+        tags=item_data.tags or []
+    )
+    
+    item_dict = item.dict()
+    item_dict["created_at"] = item.created_at.isoformat()
+    
+    await db.menu_items.insert_one(item_dict)
+    
+    return {"success": True, "item_id": item.id, "message": "Ürün eklendi"}
+
+@api_router.get("/menu/business/{business_id}")
+async def get_business_menu(business_id: str):
+    """İşletme menüsünü getir"""
+    # Get categories
+    categories = await db.menu_categories.find({
+        "business_id": business_id,
+        "is_active": True
+    }).sort("display_order", 1).to_list(length=None)
+    
+    menu = []
+    for category in categories:
+        # Get items for this category
+        items = await db.menu_items.find({
+            "business_id": business_id,
+            "category_id": category["id"],
+            "is_available": True
+        }).to_list(length=None)
+        
+        category_data = {
+            "id": category["id"],
+            "name": category["name"],
+            "description": category.get("description"),
+            "items": items
+        }
+        menu.append(category_data)
+    
+    return {"menu": menu}
+
+@api_router.get("/menu/my-menu")
+async def get_my_menu(current_user_id: str = Depends(get_current_user)):
+    """Kendi menümü getir"""
+    user = await db.users.find_one({"id": current_user_id})
+    if not user or user["user_type"] != "business":
+        raise HTTPException(status_code=403, detail="Sadece işletmeler menü görebilir")
+    
+    business = await db.businesses.find_one({"user_id": current_user_id})
+    if not business:
+        raise HTTPException(status_code=404, detail="İşletme bulunamadı")
+    
+    return await get_business_menu(business["id"])
+
+# Enhanced Order Endpoints
+@api_router.post("/orders/create-food")
+async def create_food_order(
+    order_data: CreateFoodOrderRequest,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Yemek siparişi oluştur"""
+    user = await db.users.find_one({"id": current_user_id})
+    if not user or user["user_type"] != "customer":
+        raise HTTPException(status_code=403, detail="Sadece müşteriler sipariş oluşturabilir")
+    
+    # İşletme bilgilerini al
+    business = await db.businesses.find_one({"id": order_data.business_id})
+    if not business:
+        raise HTTPException(status_code=404, detail="İşletme bulunamadı")
+    
+    # Pickup location (business address)
+    business_location = business.get("location", {})
+    if not business_location:
+        business_location = {"lat": 41.0082, "lon": 28.9784}
+    
+    pickup_location = Location(
+        lat=business_location["lat"],
+        lon=business_location["lon"],
+        address=business["address"],
+        city=business["city"]
+    )
+    
+    # Calculate distance
+    distance = calculate_distance(
+        pickup_location.lat, pickup_location.lon,
+        order_data.delivery_address.lat, order_data.delivery_address.lon
+    )
+    
+    # Calculate totals
+    subtotal = sum(item.total_price for item in order_data.items)
+    pricing = calculate_delivery_price(distance, "food")
+    total = subtotal + pricing["total_delivery_fee"]
+    
+    # Create order
+    order = Order(
+        customer_id=current_user_id,
+        business_id=order_data.business_id,
+        order_type=OrderType.FOOD,
+        items=order_data.items,
+        pickup_location=pickup_location,
+        delivery_location=order_data.delivery_address,
+        delivery_time_preference=order_data.delivery_time_preference,
+        scheduled_time=order_data.scheduled_time,
+        subtotal=subtotal,
+        delivery_fee=pricing["total_delivery_fee"],
+        commission=pricing["commission"],
+        courier_earning=pricing["courier_earning"],
+        total=total
+    )
+    
+    order_dict = order.dict()
+    order_dict["created_at"] = order.created_at.isoformat()
+    
+    await db.orders.insert_one(order_dict)
+    
+    # Notify business
+    await manager.send_personal_message({
+        "type": "new_order",
+        "order_id": order.id,
+        "message": "Yeni yemek siparişi alındı!"
+    }, business["user_id"])
+    
+    return {"success": True, "order_id": order.id, "message": "Yemek siparişi oluşturuldu"}
+
+@api_router.post("/orders/create-package")
+async def create_package_order(
+    order_data: CreatePackageOrderRequest,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Paket siparişi oluştur"""
+    user = await db.users.find_one({"id": current_user_id})
+    if not user:
+        raise HTTPException(status_code=403, detail="Geçersiz kullanıcı")
+    
+    # Calculate distance
+    distance = calculate_distance(
+        order_data.pickup_address.lat, order_data.pickup_address.lon,
+        order_data.delivery_address.lat, order_data.delivery_address.lon
+    )
+    
+    # Calculate pricing
+    pricing = calculate_delivery_price(
+        distance, 
+        "package", 
+        order_data.package_details.priority,
+        order_data.package_details.weight_kg
+    )
+    
+    # Create order
+    order = Order(
+        customer_id=current_user_id,
+        business_id=None,  # No business for package orders
+        order_type=OrderType.PACKAGE,
+        package_details=order_data.package_details,
+        recipient_name=order_data.recipient_name,
+        recipient_phone=order_data.recipient_phone,
+        pickup_location=order_data.pickup_address,
+        delivery_location=order_data.delivery_address,
+        subtotal=0,  # No item subtotal for packages
+        delivery_fee=pricing["total_delivery_fee"],
+        commission=pricing["commission"],
+        courier_earning=pricing["courier_earning"],
+        total=pricing["total_delivery_fee"]
+    )
+    
+    order_dict = order.dict()
+    order_dict["created_at"] = order.created_at.isoformat()
+    
+    await db.orders.insert_one(order_dict)
+    
+    # Broadcast to nearby couriers
+    await manager.broadcast_to_couriers_in_area({
+        "type": "new_package_order",
+        "order_id": order.id,
+        "message": f"Yeni paket siparişi: {distance:.1f}km - ₺{pricing['courier_earning']}"
+    }, order_data.pickup_address.lat, order_data.pickup_address.lon)
+    
+    return {"success": True, "order_id": order.id, "message": "Paket siparişi oluşturuldu"}
+
+# Location Endpoints (existing)
 @api_router.post("/courier/location/update")
 async def update_courier_location(
     location_data: UpdateLocationRequest,
@@ -620,69 +1010,7 @@ async def update_business_location(
     
     return {"success": True, "message": "İşletme konumu güncellendi"}
 
-# Order Endpoints
-@api_router.post("/orders/create")
-async def create_order(
-    order_data: CreateOrderRequest,
-    current_user_id: str = Depends(get_current_user)
-):
-    """Yeni sipariş oluştur"""
-    user = await db.users.find_one({"id": current_user_id})
-    if not user or user["user_type"] != "customer":
-        raise HTTPException(status_code=403, detail="Sadece müşteriler sipariş oluşturabilir")
-    
-    # İşletme bilgilerini al
-    business = await db.businesses.find_one({"id": order_data.business_id})
-    if not business:
-        raise HTTPException(status_code=404, detail="İşletme bulunamadı")
-    
-    # Pickup location (business address)
-    business_location = business.get("location", {})
-    if not business_location:
-        # Default coordinates if not set
-        business_location = {"lat": 41.0082, "lon": 28.9784, "address": business["address"]}
-    
-    pickup_location = Location(
-        lat=business_location["lat"],
-        lon=business_location["lon"],
-        address=business["address"],
-        city=business["city"]
-    )
-    
-    # Calculate totals
-    subtotal = sum(item.total_price for item in order_data.items)
-    commission = subtotal * 0.03  # %3 platform commission
-    total = subtotal + order_data.delivery_fee
-    
-    # Create order
-    order = Order(
-        customer_id=current_user_id,
-        business_id=order_data.business_id,
-        items=order_data.items,
-        order_notes=order_data.order_notes,
-        pickup_location=pickup_location,
-        delivery_location=order_data.delivery_address,
-        subtotal=subtotal,
-        delivery_fee=order_data.delivery_fee,
-        commission=commission,
-        total=total
-    )
-    
-    order_dict = order.dict()
-    # Convert datetime to ISO string for MongoDB
-    order_dict["created_at"] = order.created_at.isoformat()
-    
-    await db.orders.insert_one(order_dict)
-    
-    # Notify business
-    await manager.send_personal_message({
-        "type": "new_order",
-        "order_id": order.id,
-        "message": "Yeni sipariş alındı!"
-    }, business["user_id"])
-    
-    return {"success": True, "order_id": order.id, "message": "Sipariş oluşturuldu"}
-
+# Order Management (existing + enhanced)
 @api_router.get("/orders/nearby-couriers")
 async def get_nearby_orders_for_courier(
     current_user_id: str = Depends(get_current_user)
@@ -703,9 +1031,9 @@ async def get_nearby_orders_for_courier(
     if not courier_location:
         return {"orders": [], "message": "Konum bilginizi paylaşın"}
     
-    # Get available orders (confirmed but not assigned)
+    # Get available orders
     available_orders = await db.orders.find({
-        "status": "confirmed",
+        "status": {"$in": ["confirmed", "ready"]},
         "courier_id": None
     }).to_list(length=50)
     
@@ -720,23 +1048,32 @@ async def get_nearby_orders_for_courier(
         )
         
         if distance <= 7:  # 7km radius
-            # Get business info
-            business = await db.businesses.find_one({"id": order["business_id"]})
+            # Get business info if food order
+            business_name = "Paket Teslimat"
+            if order.get("business_id"):
+                business = await db.businesses.find_one({"id": order["business_id"]})
+                business_name = business["business_name"] if business else "Bilinmeyen İşletme"
             
-            # Calculate estimated earnings (delivery fee - platform cut)
-            estimated_earnings = order["delivery_fee"] * 0.85  # Courier gets 85%
+            # Package info for display
+            package_info = None
+            if order["order_type"] == "package":
+                package_details = order.get("package_details", {})
+                package_info = f"{package_details.get('weight_kg', 0)}kg"
+                if package_details.get('priority') == 'express':
+                    package_info += " (Express)"
             
             nearby_order = CourierOrderResponse(
                 id=order["id"],
-                business_name=business["business_name"] if business else "Unknown",
+                business_name=business_name,
                 business_address=order["pickup_location"]["address"],
                 delivery_address=order["delivery_location"]["address"],
                 distance_km=round(distance, 1),
-                estimated_earnings=round(estimated_earnings, 2),
-                order_type=business["business_category"] if business else "gida",
+                estimated_earnings=round(order["courier_earning"], 2),
+                order_type=order["order_type"],
                 estimated_delivery_time=order["estimated_delivery_time"],
-                items_count=len(order["items"]),
-                created_at=datetime.fromisoformat(order["created_at"])
+                items_count=len(order.get("items", [])),
+                created_at=datetime.fromisoformat(order["created_at"]),
+                package_info=package_info
             )
             nearby_orders.append(nearby_order)
     
@@ -755,21 +1092,49 @@ async def accept_order(
     if not user or user["user_type"] != "courier":
         raise HTTPException(status_code=403, detail="Sadece kuryeler sipariş kabul edebilir")
     
+    courier = await db.couriers.find_one({"user_id": current_user_id})
+    if not courier:
+        raise HTTPException(status_code=404, detail="Kurye bulunamadı")
+    
     order = await db.orders.find_one({"id": order_id})
     if not order:
         raise HTTPException(status_code=404, detail="Sipariş bulunamadı")
     
-    if order["status"] != "confirmed" or order.get("courier_id"):
+    if order["status"] not in ["confirmed", "ready"] or order.get("courier_id"):
         raise HTTPException(status_code=400, detail="Bu sipariş artık müsait değil")
     
     # Assign courier to order
     await db.orders.update_one(
         {"id": order_id},
         {"$set": {
-            "courier_id": current_user_id,
+            "courier_id": courier["id"],
             "status": "picked_up",
             "picked_up_at": datetime.now(timezone.utc).isoformat()
         }}
+    )
+    
+    # Add earning record
+    earning = CourierEarning(
+        courier_id=courier["id"],
+        order_id=order_id,
+        amount=order["courier_earning"],
+        description=f"Teslimat kazancı - #{order_id[:8]}"
+    )
+    earning_dict = earning.dict()
+    earning_dict["created_at"] = earning.created_at.isoformat()
+    await db.courier_earnings.insert_one(earning_dict)
+    
+    # Update courier balance
+    await db.courier_balances.update_one(
+        {"courier_id": courier["id"]},
+        {
+            "$inc": {
+                "pending_balance": order["courier_earning"],
+                "total_deliveries": 1
+            },
+            "$set": {"last_updated": datetime.now(timezone.utc).isoformat()}
+        },
+        upsert=True
     )
     
     # Notify customer and business
@@ -779,11 +1144,14 @@ async def accept_order(
         "message": "Siparişiniz kurye tarafından kabul edildi!"
     }, order["customer_id"])
     
-    await manager.send_personal_message({
-        "type": "courier_assigned",
-        "order_id": order_id,
-        "message": "Sipariş kurye tarafından alındı!"
-    }, order["business_id"])
+    if order.get("business_id"):
+        business = await db.businesses.find_one({"id": order["business_id"]})
+        if business:
+            await manager.send_personal_message({
+                "type": "courier_assigned",
+                "order_id": order_id,
+                "message": "Sipariş kurye tarafından alındı!"
+            }, business["user_id"])
     
     return {"success": True, "message": "Sipariş kabul edildi"}
 
@@ -822,6 +1190,20 @@ async def update_order_status(
         update_data["picked_up_at"] = current_time
     elif status == "delivered":
         update_data["delivered_at"] = current_time
+        
+        # Move courier balance from pending to available
+        if order.get("courier_id"):
+            await db.courier_balances.update_one(
+                {"courier_id": order["courier_id"]},
+                {
+                    "$inc": {
+                        "available_balance": order["courier_earning"],
+                        "pending_balance": -order["courier_earning"],
+                        "total_earnings": order["courier_earning"]
+                    },
+                    "$set": {"last_updated": datetime.now(timezone.utc).isoformat()}
+                }
+            )
     
     await db.orders.update_one({"id": order_id}, {"$set": update_data})
     
@@ -845,9 +1227,14 @@ async def update_order_status(
     
     # Notify all relevant parties
     await manager.send_personal_message(message, order["customer_id"])
-    await manager.send_personal_message(message, order["business_id"])
+    if order.get("business_id"):
+        business = await db.businesses.find_one({"id": order["business_id"]})
+        if business:
+            await manager.send_personal_message(message, business["user_id"])
     if order.get("courier_id"):
-        await manager.send_personal_message(message, order["courier_id"])
+        courier = await db.couriers.find_one({"id": order["courier_id"]})
+        if courier:
+            await manager.send_personal_message(message, courier["user_id"])
     
     return {"success": True, "message": "Durum güncellendi"}
 
@@ -862,17 +1249,21 @@ async def get_my_orders(
     if user["user_type"] == "customer":
         query["customer_id"] = current_user_id
     elif user["user_type"] == "business":
-        query["business_id"] = current_user_id
+        business = await db.businesses.find_one({"user_id": current_user_id})
+        if business:
+            query["business_id"] = business["id"]
     elif user["user_type"] == "courier":
-        query["courier_id"] = current_user_id
+        courier = await db.couriers.find_one({"user_id": current_user_id})
+        if courier:
+            query["courier_id"] = courier["id"]
     
     orders = await db.orders.find(query).sort("created_at", -1).to_list(length=50)
     
     # Enrich orders with additional info
     for order in orders:
-        if user["user_type"] != "business":
+        if user["user_type"] != "business" and order.get("business_id"):
             business = await db.businesses.find_one({"id": order["business_id"]})
-            order["business_name"] = business["business_name"] if business else "Unknown"
+            order["business_name"] = business["business_name"] if business else "Bilinmeyen İşletme"
         
         if user["user_type"] != "customer":
             customer = await db.customers.find_one({"user_id": order["customer_id"]})
@@ -880,6 +1271,35 @@ async def get_my_orders(
                 order["customer_name"] = f"{customer['first_name']} {customer['last_name']}"
     
     return {"orders": orders}
+
+# Courier Balance & Earnings
+@api_router.get("/courier/balance")
+async def get_courier_balance(current_user_id: str = Depends(get_current_user)):
+    """Kurye bakiye bilgileri"""
+    user = await db.users.find_one({"id": current_user_id})
+    if not user or user["user_type"] != "courier":
+        raise HTTPException(status_code=403, detail="Sadece kuryeler bakiye görebilir")
+    
+    courier = await db.couriers.find_one({"user_id": current_user_id})
+    if not courier:
+        raise HTTPException(status_code=404, detail="Kurye bulunamadı")
+    
+    balance = await db.courier_balances.find_one({"courier_id": courier["id"]})
+    if not balance:
+        # Create initial balance
+        balance = CourierBalance(courier_id=courier["id"])
+        balance_dict = balance.dict()
+        await db.courier_balances.insert_one(balance_dict)
+    
+    # Get recent earnings
+    recent_earnings = await db.courier_earnings.find(
+        {"courier_id": courier["id"]}
+    ).sort("created_at", -1).limit(10).to_list(length=None)
+    
+    return {
+        "balance": balance,
+        "recent_earnings": recent_earnings
+    }
 
 # Profile Endpoints (existing + updates)
 @api_router.get("/profile")
@@ -894,6 +1314,9 @@ async def get_profile(current_user_id: str = Depends(get_current_user)):
     if user["user_type"] == "courier":
         courier = await db.couriers.find_one({"user_id": current_user_id})
         if courier:
+            # Get balance
+            balance = await db.courier_balances.find_one({"courier_id": courier["id"]})
+            
             profile_data.update({
                 "first_name": courier["first_name"],
                 "last_name": courier["last_name"],
@@ -904,12 +1327,14 @@ async def get_profile(current_user_id: str = Depends(get_current_user)):
                 "license_photo_url": courier.get("license_photo_url"),
                 "vehicle_photo_url": courier.get("vehicle_photo_url"),
                 "is_online": courier.get("is_online", False),
-                "current_location": courier.get("current_location")
+                "current_location": courier.get("current_location"),
+                "balance": balance.get("available_balance", 0) if balance else 0
             })
     elif user["user_type"] == "business":
         business = await db.businesses.find_one({"user_id": current_user_id})
         if business:
             profile_data.update({
+                "business_id": business["id"],
                 "business_name": business["business_name"],
                 "address": business["address"],
                 "city": business["city"],
@@ -962,6 +1387,46 @@ async def update_courier_photos(
 async def get_cities():
     """Türkiye şehirleri listesi"""
     return {"cities": CITIES}
+
+# Business Listings for Customers
+@api_router.get("/businesses/nearby")
+async def get_nearby_businesses(
+    lat: float,
+    lon: float,
+    category: Optional[str] = None,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Yakındaki işletmeleri listele"""
+    query = {"is_open": True}
+    if category:
+        query["business_category"] = category
+    
+    businesses = await db.businesses.find(query).to_list(length=50)
+    
+    nearby_businesses = []
+    for business in businesses:
+        business_location = business.get("location", {"lat": 41.0082, "lon": 28.9784})
+        distance = calculate_distance(
+            lat, lon,
+            business_location["lat"], business_location["lon"]
+        )
+        
+        if distance <= 10:  # 10km radius for businesses
+            business_data = {
+                "id": business["id"],
+                "name": business["business_name"],
+                "category": business["business_category"],
+                "address": business["address"],
+                "distance_km": round(distance, 1),
+                "rating": 4.5,  # Mock rating
+                "estimated_delivery_time": min(20 + int(distance * 2), 60)
+            }
+            nearby_businesses.append(business_data)
+    
+    # Sort by distance
+    nearby_businesses.sort(key=lambda x: x["distance_km"])
+    
+    return {"businesses": nearby_businesses}
 
 # Admin Endpoints (existing + updates)
 @api_router.get("/admin/couriers/pending")
@@ -1021,7 +1486,7 @@ async def reject_courier(courier_id: str, notes: str):
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "DeliverTR API v3.0 - Harita & Sipariş Sistemi"}
+    return {"message": "DeliverTR API v4.0 - Ürün/Menü & Gelişmiş Sipariş Sistemi"}
 
 # Include the router in the main app
 app.include_router(api_router)
