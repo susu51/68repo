@@ -1496,10 +1496,10 @@ const AuthPage = ({ onBack }) => {
         <div className="max-w-4xl mx-auto py-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Hangi rolde katılmak istiyorsun?
+              Profilinizi tamamlayın
             </h1>
             <p className="text-gray-600">
-              DeliverTR ailesine katılmak için rolünüzü seçin
+              {user ? `Merhaba ${user.phone}! Hangi rolde devam etmek istiyorsunuz?` : 'DeliverTR ailesine katılmak için rolünüzü seçin'}
             </p>
           </div>
 
