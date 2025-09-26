@@ -555,21 +555,27 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
-              📱 Telefon: <strong>{currentUser?.phone}</strong> (doğrulandı)
-            </p>
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>E-posta (Opsiyonel)</Label>
+              <Label>E-posta *</Label>
               <Input
                 type="email"
                 placeholder="isletme@email.com"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
                 data-testid="business-email"
+              />
+            </div>
+            <div>
+              <Label>Şifre *</Label>
+              <Input
+                type="password"
+                placeholder="Güvenli şifre"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+                data-testid="business-password"
               />
             </div>
           </div>
