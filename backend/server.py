@@ -331,6 +331,8 @@ async def register_customer(customer_data: CustomerRegistration):
     # Remove password from response and convert ObjectId to string
     del user_doc["password"]
     user_doc["id"] = str(result.inserted_id)
+    if "_id" in user_doc:
+        del user_doc["_id"]
     
     return {
         "access_token": access_token,
