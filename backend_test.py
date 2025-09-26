@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 class DeliverTRAPITester:
-    def __init__(self, base_url="https://delivertr.preview.emergentagent.com"):
+    def __init__(self, base_url="https://quick-courier-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
