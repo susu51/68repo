@@ -102,73 +102,85 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implement DeliverTR MVP - Turkish delivery platform with phone/SMS auth (JWT), 3 roles (Courier, Business, Customer), KYC system for couriers, order flow management, 3% commission system, and admin panel. Focus on Phase 1 (critical fixes) then Phase 2 (core management)."
+user_problem_statement: "Implement DeliverTR MVP - Turkish delivery platform with email/password auth (JWT), detailed courier registration with license/vehicle documents, KYC system, order flow management, 3% commission system, and admin panel."
 
 backend:
-  - task: "Phone/SMS OTP Authentication System"
+  - task: "Email/Password Authentication System"
     implemented: true
     working: "NA"
-    file: "server.py, auth_service.py, otp_service.py, sms_service.py"
+    file: "server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
         -working: "NA"
         -agent: "main"
-        -comment: "Implemented complete phone/SMS OTP authentication system with JWT tokens, Turkish phone validation, rate limiting, Netgsm integration (mock mode), and role-based authentication"
+        -comment: "Reverted to email/password authentication with JWT tokens. Added login, registration endpoints for courier/business/customer roles with detailed courier fields (license info, vehicle details, file uploads)"
 
-  - task: "Configuration Management"
+  - task: "Detailed Courier Registration"
     implemented: true
     working: "NA"
-    file: "config.py, .env"
+    file: "server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
         -working: "NA"
         -agent: "main"
-        -comment: "Added comprehensive configuration for SMS, JWT, OTP, rate limiting with development/production modes"
+        -comment: "Added comprehensive courier registration with ehliyet sınıfı, ehliyet numarası, araç tipi, araç modeli, license_photo_url, vehicle_photo_url, profile_photo_url fields"
+
+  - task: "File Upload System"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "File upload endpoint for images/documents with validation (max 10MB, allowed types: image/*, pdf)"
 
 frontend:
-  - task: "Phone Authentication UI"
+  - task: "Email Authentication UI"
     implemented: true
     working: true
-    file: "PhoneAuth.js, App.js"
+    file: "App.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
         -working: true
         -agent: "main"
-        -comment: "Phone auth UI working perfectly with Turkish formatting, KVKK compliance, and proper validation. Phone input auto-formats to +90 format."
+        -comment: "Email/password login form working correctly. Role selection page shows 3 options (Kurye, İşletme, Müşteri)"
 
-  - task: "Authentication Integration"
+  - task: "Detailed Courier Registration Form"
     implemented: true
-    working: "NA"
-    file: "App.js"
+    working: true
+    file: "App.js, FileUpload.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
-        -working: "NA"
+        -working: true
         -agent: "main"
-        -comment: "Updated AuthProvider, token management, and registration flows for phone-first authentication"
+        -comment: "Comprehensive courier form with ehliyet bilgileri, araç bilgileri, and file upload sections. UI shows proper structure with required fields and upload areas"
 
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 2
+  version: "2.1"
+  test_sequence: 3
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Phone/SMS OTP Authentication System"
-    - "Configuration Management"
-    - "Authentication Integration"
+    - "Email/Password Authentication System"
+    - "Detailed Courier Registration"
+    - "File Upload System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
     -agent: "main"
-    -message: "Phase 2 MVP implementation complete! Successfully replaced email/password authentication with phone/SMS OTP system. Features: Turkish phone validation (+90 format), 6-digit OTP with 2min expiry, JWT access/refresh tokens, rate limiting, KVKK compliance, Netgsm integration (mock mode for dev), role-based registration. Frontend shows proper Turkish formatting and validation. Ready for comprehensive backend testing of authentication flow."
+    -message: "Successfully reverted to email/password authentication system as requested. Implemented detailed courier registration with ehliyet sınıfı, ehliyet numarası, araç tipi, araç modeli, and file upload capabilities for license/vehicle/profile photos. Frontend shows proper forms with structured sections. Ready for comprehensive backend testing of authentication and registration flows."
