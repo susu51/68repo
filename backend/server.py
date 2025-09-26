@@ -1094,8 +1094,8 @@ async def get_system_configurations(current_user_id: str = Depends(get_admin_use
 async def update_system_configuration(
     config_key: str,
     config_value: Any,
-    description: Optional[str] = None,
     request: Request,
+    description: Optional[str] = None,
     current_user_id: str = Depends(get_admin_user)
 ):
     """Sistem konfigürasyonu güncelle"""
