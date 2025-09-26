@@ -1662,14 +1662,8 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
     );
   }
 
-  // If user is authenticated
+  // If user is authenticated, show appropriate dashboard
   if (user) {
-    // If profile is not completed, show profile completion
-    if (!user.profile_completed) {
-      return <AuthPage onBack={() => setShowAuth(false)} />;
-    }
-    
-    // Profile is complete, show appropriate dashboard
     return (
       <Routes>
         <Route path="/" element={
