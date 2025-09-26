@@ -1203,8 +1203,8 @@ async def update_delivery_distance_rules(
 @api_router.post("/admin/system/maintenance-mode")
 async def toggle_maintenance_mode(
     enabled: bool,
-    message: Optional[str] = None,
     request: Request,
+    message: Optional[str] = None,
     current_user_id: str = Depends(get_admin_user)
 ):
     """Bakım modunu aç/kapat"""
