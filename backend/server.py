@@ -197,6 +197,140 @@ async def login(login_data: LoginRequest):
         "user_type": user["role"],
         "user_data": user
     }
+
+@api_router.post("/register/courier")
+async def register_courier(courier_data: CourierRegistration):
+    """Register a new courier"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": courier_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create new courier user
+    hashed_password = hash_password(courier_data.password)
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "email": courier_data.email,
+        "password": hashed_password,
+        "role": "courier",
+        "first_name": courier_data.first_name,
+        "last_name": courier_data.last_name,
+        "iban": courier_data.iban,
+        "vehicle_type": courier_data.vehicle_type,
+        "vehicle_model": courier_data.vehicle_model,
+        "license_class": courier_data.license_class,
+        "license_number": courier_data.license_number,
+        "city": courier_data.city,
+        "license_photo_url": courier_data.license_photo_url,
+        "vehicle_photo_url": courier_data.vehicle_photo_url,
+        "profile_photo_url": courier_data.profile_photo_url,
+        "kyc_status": "pending",
+        "balance": 0.0,
+        "is_online": False,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    # Create access token
+    access_token = create_access_token(data={"sub": courier_data.email})
+    
+    # Remove password from response
+    del user_doc["password"]
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_type": "courier",
+        "user_data": user_doc
+    }
+
+@api_router.post("/register/business")
+async def register_business(business_data: BusinessRegistration):
+    """Register a new business"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": business_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create new business user
+    hashed_password = hash_password(business_data.password)
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "email": business_data.email,
+        "password": hashed_password,
+        "role": "business",
+        "business_name": business_data.business_name,
+        "tax_number": business_data.tax_number,
+        "address": business_data.address,
+        "city": business_data.city,
+        "business_category": business_data.business_category,
+        "description": business_data.description,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    # Create access token
+    access_token = create_access_token(data={"sub": business_data.email})
+    
+    # Remove password from response
+    del user_doc["password"]
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_type": "business",
+        "user_data": user_doc
+    }
+
+@api_router.post("/register/customer")
+async def register_customer(customer_data: CustomerRegistration):
+    """Register a new customer"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": customer_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create new customer user
+    hashed_password = hash_password(customer_data.password)
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "email": customer_data.email,
+        "password": hashed_password,
+        "role": "customer",
+        "first_name": customer_data.first_name,
+        "last_name": customer_data.last_name,
+        "city": customer_data.city,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    # Create access token
+    access_token = create_access_token(data={"sub": customer_data.email})
+    
+    # Remove password from response
+    del user_doc["password"]
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_type": "customer",
+        "user_data": user_doc
+    }
     INACTIVE = "inactive"
     BANNED = "banned"
 
