@@ -405,10 +405,10 @@ const CourierRegistration = ({ onComplete, onBack, currentUser }) => {
   );
 };
 
-const BusinessRegistration = ({ onComplete, onBack }) => {
+const BusinessRegistration = ({ onComplete, onBack, currentUser }) => {
   const [formData, setFormData] = useState({
+    phone: currentUser?.phone || '',
     email: '',
-    password: '',
     business_name: '',
     tax_number: '',
     address: '',
@@ -424,7 +424,7 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
 
     try {
       const response = await axios.post(`${API}/register/business`, formData);
-      onComplete(response.data);
+      onComplete();
       toast.success('İşletme kaydınız tamamlandı!');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
