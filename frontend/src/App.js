@@ -1466,17 +1466,21 @@ const HomePage = ({ onAuthStart }) => {
 };
 
 const AuthPage = ({ onBack }) => {
-  const { login } = useAuth();
-  const [step, setStep] = useState('login'); // login, register, user_type_selection, registration_form
+  const { login, user } = useAuth();
+  const [step, setStep] = useState('login'); // login, user_type_selection, registration_form
   const [userType, setUserType] = useState('');
 
-  const handleRegistrationComplete = (loginData) => {
-    login(loginData.access_token, {
-      email: loginData.user_data.email,
-      user_type: loginData.user_type,
-      ...loginData.user_data
-    });
+  const handleRegistrationComplete = () => {
+    // Refresh user data after profile completion
+    window.location.reload();
   };
+
+  // If user is already authenticated but profile is not complete, show role selection
+  if (user && !user.profile_completed) {
+    if (step === 'login') {
+      setStep('user_type_selection');
+    }
+  }
 
   if (step === 'login') {
     return (
