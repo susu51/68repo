@@ -1123,6 +1123,63 @@ const BusinessDashboard = ({ user }) => {
 
 const CustomerDashboard = ({ user }) => {
   const { logout } = useAuth();
+  const [myOrders, setMyOrders] = useState([]);
+  const [nearbyBusinesses, setNearbyBusinesses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
+
+  useEffect(() => {
+    fetchMyOrders();
+    // In a real app, we'd fetch nearby businesses based on customer location
+    setNearbyBusinesses([
+      {
+        id: 'demo-restaurant-1',
+        name: 'Burger Palace',
+        category: 'gida',
+        distance: 1.2,
+        rating: 4.5,
+        delivery_time: 25
+      },
+      {
+        id: 'demo-restaurant-2', 
+        name: 'Pizza Corner',
+        category: 'gida',
+        distance: 0.8,
+        rating: 4.8,
+        delivery_time: 20
+      },
+      {
+        id: 'demo-cargo-1',
+        name: 'Hızlı Kargo',
+        category: 'nakliye',
+        distance: 2.1,
+        rating: 4.3,
+        delivery_time: 15
+      }
+    ]);
+  }, []);
+
+  const fetchMyOrders = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('delivertr_token');
+      const response = await axios.get(`${API}/orders/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyOrders(response.data.orders);
+    } catch (error) {
+      console.error('Siparişler alınamadı:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleOrderCreated = (orderId) => {
+    toast.success('Sipariş oluşturuldu!');
+    setShowCreateOrder(false);
+    setSelectedBusiness(null);
+    fetchMyOrders();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4" data-testid="customer-dashboard">
@@ -1137,60 +1194,149 @@ const CustomerDashboard = ({ user }) => {
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Yakın Restoranlar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-4">
-                <p className="text-gray-500">Yakınınızdaki restoranları keşfedin</p>
-                <Button className="mt-2 bg-green-600 hover:bg-green-700" data-testid="browse-restaurants-btn">
-                  Restoranlara Göz At
-                </Button>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Nearby Businesses */}
+          <div className="lg:col-span-2 space-y-4">
+            <h2 className="text-xl font-bold">Yakındaki İşletmeler</h2>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              {nearbyBusinesses.map((business) => (
+                <Card key={business.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-semibold">{business.name}</h3>
+                        <p className="text-sm text-gray-600">
+                          {business.category === 'gida' ? '🍔 Gıda' : '📦 Nakliye'}
+                        </p>
+                      </div>
+                      <Badge variant="outline">
+                        ⭐ {business.rating}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
+                      <span>📍 {business.distance} km</span>
+                      <span>🕒 {business.delivery_time} dk</span>
+                    </div>
+                    
+                    <Button
+                      onClick={() => {
+                        setSelectedBusiness(business);
+                        setShowCreateOrder(true);
+                      }}
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      data-testid={`order-from-${business.id}`}
+                    >
+                      Sipariş Ver
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Demo Actions */}
+            <div className="grid md:grid-cols-3 gap-4 mt-6">
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="text-center p-6">
+                  <div className="text-4xl mb-2">🍔</div>
+                  <h3 className="font-semibold mb-2">Restoran</h3>
+                  <p className="text-sm text-gray-600 mb-3">Yemek siparişi ver</p>
+                  <Button className="bg-red-600 hover:bg-red-700" data-testid="browse-restaurants-btn">
+                    Keşfet
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="text-center p-6">
+                  <div className="text-4xl mb-2">🛒</div>
+                  <h3 className="font-semibold mb-2">Market</h3>
+                  <p className="text-sm text-gray-600 mb-3">Günlük alışveriş</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700" data-testid="browse-markets-btn">
+                    Alışveriş
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="text-center p-6">
+                  <div className="text-4xl mb-2">📦</div>
+                  <h3 className="font-semibold mb-2">Kargo</h3>
+                  <p className="text-sm text-gray-600 mb-3">Paket gönder</p>
+                  <Button className="bg-orange-600 hover:bg-orange-700" data-testid="send-package-btn">
+                    Gönder
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* My Orders Sidebar */}
+          <div>
+            <h2 className="text-xl font-bold mb-4">Siparişlerim</h2>
+            
+            {loading ? (
+              <Card>
+                <CardContent className="text-center py-8">
+                  <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-600">Yükleniyor...</p>
+                </CardContent>
+              </Card>
+            ) : myOrders.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-8">
+                  <div className="text-4xl mb-2">📋</div>
+                  <p className="text-gray-500 text-sm">Henüz siparişiniz yok</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {myOrders.slice(0, 5).map((order) => (
+                  <Card key={order.id} className="hover:shadow-sm transition-shadow">
+                    <CardContent className="p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="font-medium text-sm">#{order.id.substring(0, 8)}</p>
+                          <p className="text-xs text-gray-600">{order.business_name}</p>
+                        </div>
+                        <OrderStatusBadge status={order.status} />
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-gray-600">
+                          {new Date(order.created_at).toLocaleDateString('tr-TR')}
+                        </span>
+                        <span className="font-semibold">₺{order.total?.toFixed(2)}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                
+                {myOrders.length > 5 && (
+                  <Button variant="outline" className="w-full" size="sm">
+                    Tümünü Gör ({myOrders.length})
+                  </Button>
+                )}
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Market Alışverişi</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-4">
-                <p className="text-gray-500">Günlük ihtiyaçlarınızı sipariş edin</p>
-                <Button className="mt-2 bg-blue-600 hover:bg-blue-700" data-testid="browse-markets-btn">
-                  Marketlere Göz At
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Kargo Gönder</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-4">
-                <p className="text-gray-500">Paket göndermeniz için kurye</p>
-                <Button className="mt-2 bg-orange-600 hover:bg-orange-700" data-testid="send-package-btn">
-                  Kargo İsteği Oluştur
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            )}
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Son Siparişleriniz</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              Henüz sipariş vermemişsiniz
+        {/* Create Order Modal */}
+        {showCreateOrder && selectedBusiness && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <CreateOrderForm
+                businessId={selectedBusiness.id}
+                onOrderCreated={handleOrderCreated}
+                onCancel={() => {
+                  setShowCreateOrder(false);
+                  setSelectedBusiness(null);
+                }}
+              />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
     </div>
   );
