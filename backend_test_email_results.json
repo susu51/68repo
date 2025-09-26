@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total_tests": 17,
-    "passed_tests": 9,
-    "failed_tests": 8,
-    "success_rate": 52.94117647058824,
-    "timestamp": "2025-09-26T23:57:23.941701",
+    "total_tests": 21,
+    "passed_tests": 18,
+    "failed_tests": 3,
+    "success_rate": 85.71428571428571,
+    "timestamp": "2025-09-26T23:58:32.599513",
     "test_type": "email_password_authentication"
   },
   "test_results": [
@@ -12,103 +12,127 @@
       "test": "Root API Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:21.949666"
+      "timestamp": "2025-09-26T23:58:30.469815"
     },
     {
       "test": "Courier Registration - Detailed Fields",
       "success": false,
       "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-26T23:57:21.991749"
+      "timestamp": "2025-09-26T23:58:30.513806"
     },
     {
       "test": "Business Registration",
       "success": false,
       "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-26T23:57:22.535625"
+      "timestamp": "2025-09-26T23:58:31.058022"
     },
     {
       "test": "Customer Registration",
       "success": false,
       "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-26T23:57:23.071634"
+      "timestamp": "2025-09-26T23:58:31.595563"
     },
     {
       "test": "Duplicate Email Registration",
-      "success": false,
-      "details": "Expected 400, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-26T23:57:23.105207"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:31.636398"
     },
     {
       "test": "Invalid Email Format",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.140999"
+      "timestamp": "2025-09-26T23:58:31.673030"
     },
     {
       "test": "Missing Required Fields",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.173710"
+      "timestamp": "2025-09-26T23:58:31.707473"
     },
     {
       "test": "Email Login - Valid Credentials",
-      "success": false,
-      "details": "Expected 200, got 401. Error: {'detail': 'Incorrect email or password'}",
-      "timestamp": "2025-09-26T23:57:23.208625"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:31.738503"
+    },
+    {
+      "test": "JWT Token Structure Validation",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:31.738951"
     },
     {
       "test": "Email Login - Invalid Credentials",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.761913"
+      "timestamp": "2025-09-26T23:58:32.273866"
     },
     {
       "test": "Email Login - Non-existent Email",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.794475"
+      "timestamp": "2025-09-26T23:58:32.315259"
     },
     {
       "test": "Password Hashing Verification",
-      "success": false,
-      "details": "Expected 200, got 401. Error: {'detail': 'Incorrect email or password'}",
-      "timestamp": "2025-09-26T23:57:23.833605"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:32.352755"
     },
     {
-      "test": "JWT Token Validation",
-      "success": false,
-      "details": "No token available",
-      "timestamp": "2025-09-26T23:57:23.834194"
+      "test": "Password Security Check",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:32.353357"
+    },
+    {
+      "test": "JWT Token - Valid Access",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:32.387968"
+    },
+    {
+      "test": "JWT Token - Malformed",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:32.420282"
     },
     {
       "test": "Unauthorized Access",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.869319"
+      "timestamp": "2025-09-26T23:58:32.489008"
     },
     {
-      "test": "Get User Profile",
-      "success": false,
-      "details": "No authentication token available",
-      "timestamp": "2025-09-26T23:57:23.869838"
+      "test": "Get User Profile (/api/me)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:32.527895"
+    },
+    {
+      "test": "Profile Field Validation",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:58:32.528537"
     },
     {
       "test": "File Upload - Valid Image",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.908084"
+      "timestamp": "2025-09-26T23:58:32.563183"
     },
     {
       "test": "File Upload Response Validation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.908684"
+      "timestamp": "2025-09-26T23:58:32.563791"
     },
     {
       "test": "File Upload - Invalid Type",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:57:23.940806"
+      "timestamp": "2025-09-26T23:58:32.598596"
     }
   ]
 }
