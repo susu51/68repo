@@ -299,24 +299,170 @@ const CourierRegistration = ({ onComplete, onBack }) => {
         <CardDescription>Kurye olarak çalışmak için bilgilerinizi doldurun</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
-              📱 Telefon: <strong>{currentUser?.phone}</strong> (doğrulandı)
-            </p>
-          </div>
-
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email ve Şifre */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>E-posta (Opsiyonel)</Label>
+              <Label>E-posta *</Label>
               <Input
                 type="email"
                 placeholder="ornek@email.com"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
                 data-testid="courier-email"
               />
             </div>
+            <div>
+              <Label>Şifre *</Label>
+              <Input
+                type="password"
+                placeholder="Güvenli şifre"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+                data-testid="courier-password"
+              />
+            </div>
+          </div>
+
+          {/* Kişisel Bilgiler */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Ad *</Label>
+              <Input
+                placeholder="Adınız"
+                value={formData.first_name}
+                onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                required
+                data-testid="courier-first-name"
+              />
+            </div>
+            <div>
+              <Label>Soyad *</Label>
+              <Input
+                placeholder="Soyadınız"
+                value={formData.last_name}
+                onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                required
+                data-testid="courier-last-name"
+              />
+            </div>
+          </div>
+
+          {/* Şehir ve IBAN */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Şehir *</Label>
+              <Input
+                placeholder="İstanbul"
+                value={formData.city}
+                onChange={(e) => setFormData({...formData, city: e.target.value})}
+                required
+                data-testid="courier-city"
+              />
+            </div>
+            <div>
+              <Label>IBAN *</Label>
+              <Input
+                placeholder="TR00 0000 0000 0000 0000 0000 00"
+                value={formData.iban}
+                onChange={(e) => setFormData({...formData, iban: e.target.value})}
+                required
+                data-testid="courier-iban"
+              />
+            </div>
+          </div>
+
+          {/* Ehliyet Bilgileri */}
+          <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
+            <h3 className="font-semibold text-blue-800">Ehliyet Bilgileri</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Ehliyet Sınıfı *</Label>
+                <Select onValueChange={(value) => setFormData({...formData, license_class: value})}>
+                  <SelectTrigger data-testid="courier-license-class">
+                    <SelectValue placeholder="Seçiniz" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="A">A (Motosiklet)</SelectItem>
+                    <SelectItem value="A1">A1 (Hafif Motosiklet)</SelectItem>
+                    <SelectItem value="A2">A2 (Orta Motosiklet)</SelectItem>
+                    <SelectItem value="B">B (Otomobil)</SelectItem>
+                    <SelectItem value="C">C (Kamyon)</SelectItem>
+                    <SelectItem value="D">D (Otobüs)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Ehliyet Numarası *</Label>
+                <Input
+                  placeholder="00000000"
+                  value={formData.license_number}
+                  onChange={(e) => setFormData({...formData, license_number: e.target.value})}
+                  required
+                  data-testid="courier-license-number"
+                />
+              </div>
+            </div>
+            
+            {/* Ehliyet Fotoğrafı */}
+            <FileUpload
+              label="Ehliyet Fotoğrafı"
+              accept="image/*"
+              onFileUploaded={setLicensePhotoUrl}
+              required={true}
+            />
+          </div>
+
+          {/* Araç Bilgileri */}
+          <div className="space-y-4 p-4 bg-green-50 rounded-lg">
+            <h3 className="font-semibold text-green-800">Araç Bilgileri</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Araç Tipi *</Label>
+                <Select onValueChange={(value) => setFormData({...formData, vehicle_type: value})}>
+                  <SelectTrigger data-testid="courier-vehicle-type">
+                    <SelectValue placeholder="Seçiniz" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="araba">Araba</SelectItem>
+                    <SelectItem value="motor">Motosiklet</SelectItem>
+                    <SelectItem value="elektrikli_motor">Elektrikli Motosiklet</SelectItem>
+                    <SelectItem value="bisiklet">Bisiklet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Araç Modeli *</Label>
+                <Input
+                  placeholder="Honda PCX 150"
+                  value={formData.vehicle_model}
+                  onChange={(e) => setFormData({...formData, vehicle_model: e.target.value})}
+                  required
+                  data-testid="courier-vehicle-model"
+                />
+              </div>
+            </div>
+
+            {/* Araç Fotoğrafı */}
+            <FileUpload
+              label="Araç Fotoğrafı"
+              accept="image/*"
+              onFileUploaded={setVehiclePhotoUrl}
+              required={true}
+            />
+          </div>
+
+          {/* Profil Fotoğrafı */}
+          <div className="space-y-4 p-4 bg-orange-50 rounded-lg">
+            <h3 className="font-semibold text-orange-800">Profil Fotoğrafı</h3>
+            <FileUpload
+              label="Profil Fotoğrafınız"
+              accept="image/*"
+              onFileUploaded={setProfilePhotoUrl}
+              required={true}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
