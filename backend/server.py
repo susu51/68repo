@@ -234,13 +234,14 @@ async def register_courier(courier_data: CourierRegistration):
         "created_at": datetime.now(timezone.utc)
     }
     
-    await db.users.insert_one(user_doc)
+    result = await db.users.insert_one(user_doc)
     
     # Create access token
     access_token = create_access_token(data={"sub": courier_data.email})
     
-    # Remove password from response
+    # Remove password from response and convert ObjectId to string
     del user_doc["password"]
+    user_doc["id"] = str(result.inserted_id)
     
     return {
         "access_token": access_token,
