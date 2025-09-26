@@ -1590,18 +1590,21 @@ const AuthPage = ({ onBack }) => {
             <CourierRegistration 
               onComplete={handleRegistrationComplete}
               onBack={() => setStep('user_type_selection')}
+              currentUser={user}
             />
           )}
           {userType === 'business' && (
             <BusinessRegistration 
               onComplete={handleRegistrationComplete}
               onBack={() => setStep('user_type_selection')}
+              currentUser={user}
             />
           )}
           {userType === 'customer' && (
             <CustomerRegistration 
               onComplete={handleRegistrationComplete}
               onBack={() => setStep('user_type_selection')}
+              currentUser={user}
             />
           )}
         </div>
