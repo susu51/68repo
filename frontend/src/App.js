@@ -692,7 +692,7 @@ const CourierDashboard = ({ user }) => {
   const fetchMyOrders = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('delivertr_token');
+      const token = localStorage.getItem('delivertr_access_token');
       const response = await axios.get(`${API}/orders/my-orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
