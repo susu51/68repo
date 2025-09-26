@@ -103,91 +103,230 @@ class DeliverTRAPITester:
         """Test root API endpoint"""
         return self.run_test("Root API Endpoint", "GET", "", 200)
 
-    def test_send_verification_code(self):
-        """Test SMS verification code sending"""
-        success, response = self.run_test(
-            "Send Verification Code",
-            "POST",
-            "auth/send-code",
-            200,
-            data={"phone": self.test_phone}
-        )
-        
-        if success and 'verification_id' in response:
-            self.verification_id = response['verification_id']
-            print(f"   Verification ID stored: {self.verification_id}")
-        
-        return success
+    def test_health_check(self):
+        """Test health check endpoint"""
+        return self.run_test("Health Check", "GET", "health", 200)
 
-    def test_verify_code_new_user(self):
-        """Test code verification for new user"""
-        if not self.verification_id:
-            self.log_test("Verify Code (New User)", False, "No verification ID available")
-            return False
-        
-        # Use mock code "123456" - this should work with the mock system
+    def test_otp_request_valid_phone(self):
+        """Test OTP request with valid Turkish phone number"""
         success, response = self.run_test(
-            "Verify Code (New User)",
+            "OTP Request - Valid Phone",
             "POST",
-            "auth/verify-code",
+            "auth/otp/request",
             200,
             data={
                 "phone": self.test_phone,
-                "code": "123456",
-                "verification_id": self.verification_id
+                "device_id": "test_device_123"
             }
         )
         
+        if success and response.get('success'):
+            self.mock_otp = response.get('mock_otp')
+            print(f"   Mock OTP received: {self.mock_otp}")
+        
         return success
 
+    def test_otp_request_invalid_phone(self):
+        """Test OTP request with invalid phone format"""
+        return self.run_test(
+            "OTP Request - Invalid Phone",
+            "POST",
+            "auth/otp/request",
+            400,
+            data={
+                "phone": "invalid-phone-123",
+                "device_id": "test_device_123"
+            }
+        )
+
+    def test_otp_verify_correct_code(self):
+        """Test OTP verification with correct code"""
+        if not self.mock_otp:
+            # Try to get mock OTP from debug endpoint
+            success, response = self.run_test(
+                "Get Mock OTP",
+                "GET",
+                f"debug/mock-otp/{self.test_phone.replace('+', '')}",
+                200
+            )
+            if success and response.get('mock_otp'):
+                self.mock_otp = response.get('mock_otp')
+        
+        if not self.mock_otp:
+            self.log_test("OTP Verify - Correct Code", False, "No mock OTP available")
+            return False
+        
+        success, response = self.run_test(
+            "OTP Verify - Correct Code",
+            "POST",
+            "auth/otp/verify",
+            200,
+            data={
+                "phone": self.test_phone,
+                "otp": self.mock_otp
+            }
+        )
+        
+        if success and response.get('access_token'):
+            self.access_token = response['access_token']
+            self.refresh_token = response['refresh_token']
+            print(f"   Access token stored: {self.access_token[:20]}...")
+            print(f"   Refresh token stored: {self.refresh_token[:20]}...")
+        
+        return success
+
+    def test_otp_verify_incorrect_code(self):
+        """Test OTP verification with incorrect code"""
+        return self.run_test(
+            "OTP Verify - Incorrect Code",
+            "POST",
+            "auth/otp/verify",
+            400,
+            data={
+                "phone": self.test_phone,
+                "otp": "000000"
+            }
+        )
+
+    def test_token_refresh(self):
+        """Test JWT token refresh"""
+        if not self.refresh_token:
+            self.log_test("Token Refresh", False, "No refresh token available")
+            return False
+        
+        success, response = self.run_test(
+            "Token Refresh",
+            "POST",
+            "auth/refresh",
+            200,
+            data={
+                "refresh_token": self.refresh_token
+            }
+        )
+        
+        if success and response.get('access_token'):
+            old_token = self.access_token
+            self.access_token = response['access_token']
+            print(f"   Token refreshed: {old_token[:20]}... -> {self.access_token[:20]}...")
+        
+        return success
+
+    def test_get_profile(self):
+        """Test getting user profile"""
+        if not self.access_token:
+            self.log_test("Get Profile", False, "No authentication token available")
+            return False
+        
+        return self.run_test("Get Profile", "GET", "me", 200)
+
+    def test_update_profile(self):
+        """Test updating user profile"""
+        if not self.access_token:
+            self.log_test("Update Profile", False, "No authentication token available")
+            return False
+        
+        return self.run_test(
+            "Update Profile",
+            "PATCH",
+            "me",
+            200,
+            data={
+                "first_name": "Test",
+                "last_name": "User",
+                "email": "test@example.com"
+            }
+        )
+
     def test_courier_registration(self):
-        """Test courier registration"""
+        """Test courier registration after phone verification"""
+        if not self.access_token:
+            self.log_test("Courier Registration", False, "No authentication token available")
+            return False
+        
         courier_data = {
             "phone": self.test_phone,
             "first_name": "Test",
             "last_name": "Kurye",
             "iban": "TR330006100519786457841326",
             "vehicle_type": "motor",
-            "license_class": "A2"
+            "vehicle_model": "Honda PCX 150",
+            "license_class": "A2",
+            "city": "İstanbul"
         }
         
-        success, response = self.run_test(
+        return self.run_test(
             "Courier Registration",
             "POST",
             "register/courier",
             200,
             data=courier_data
         )
-        
-        if success and 'access_token' in response:
-            self.token = response['access_token']
-            print(f"   Token stored for courier: {self.token[:20]}...")
-        
-        return success
 
-    def test_business_registration(self):
-        """Test business registration"""
-        # Use different phone for business
-        business_phone = "+905551234568"
-        
-        # First send verification code for business
-        self.run_test(
-            "Send Code for Business",
+    def test_business_registration_flow(self):
+        """Test complete business registration flow"""
+        # First request OTP for business phone
+        success1, response1 = self.run_test(
+            "Business OTP Request",
             "POST",
-            "auth/send-code",
+            "auth/otp/request",
             200,
-            data={"phone": business_phone}
+            data={
+                "phone": self.test_phone_business,
+                "device_id": "business_device_123"
+            }
         )
         
+        if not success1:
+            return False
+        
+        # Get mock OTP for business
+        business_mock_otp = response1.get('mock_otp')
+        if not business_mock_otp:
+            success_debug, response_debug = self.run_test(
+                "Get Business Mock OTP",
+                "GET",
+                f"debug/mock-otp/{self.test_phone_business.replace('+', '')}",
+                200
+            )
+            if success_debug:
+                business_mock_otp = response_debug.get('mock_otp')
+        
+        if not business_mock_otp:
+            self.log_test("Business Registration Flow", False, "No business mock OTP available")
+            return False
+        
+        # Verify OTP for business
+        success2, response2 = self.run_test(
+            "Business OTP Verify",
+            "POST",
+            "auth/otp/verify",
+            200,
+            data={
+                "phone": self.test_phone_business,
+                "otp": business_mock_otp
+            }
+        )
+        
+        if not success2 or not response2.get('access_token'):
+            return False
+        
+        # Store business token temporarily
+        business_token = response2['access_token']
+        old_token = self.access_token
+        self.access_token = business_token
+        
+        # Register as business
         business_data = {
-            "phone": business_phone,
+            "phone": self.test_phone_business,
             "business_name": "Test Restaurant",
             "tax_number": "1234567890",
             "address": "Test Mahallesi, Test Sokak No:1, İstanbul",
-            "business_type": "restaurant"
+            "city": "İstanbul",
+            "business_category": "gida",
+            "description": "Test restaurant for API testing"
         }
         
-        success, response = self.run_test(
+        success3 = self.run_test(
             "Business Registration",
             "POST",
             "register/business",
@@ -195,30 +334,74 @@ class DeliverTRAPITester:
             data=business_data
         )
         
-        return success
-
-    def test_customer_registration(self):
-        """Test customer registration"""
-        # Use different phone for customer
-        customer_phone = "+905551234569"
+        # Restore original token
+        self.access_token = old_token
         
-        # First send verification code for customer
-        self.run_test(
-            "Send Code for Customer",
+        return success1 and success2 and success3
+
+    def test_customer_registration_flow(self):
+        """Test complete customer registration flow"""
+        # First request OTP for customer phone
+        success1, response1 = self.run_test(
+            "Customer OTP Request",
             "POST",
-            "auth/send-code",
+            "auth/otp/request",
             200,
-            data={"phone": customer_phone}
+            data={
+                "phone": self.test_phone_customer,
+                "device_id": "customer_device_123"
+            }
         )
         
+        if not success1:
+            return False
+        
+        # Get mock OTP for customer
+        customer_mock_otp = response1.get('mock_otp')
+        if not customer_mock_otp:
+            success_debug, response_debug = self.run_test(
+                "Get Customer Mock OTP",
+                "GET",
+                f"debug/mock-otp/{self.test_phone_customer.replace('+', '')}",
+                200
+            )
+            if success_debug:
+                customer_mock_otp = response_debug.get('mock_otp')
+        
+        if not customer_mock_otp:
+            self.log_test("Customer Registration Flow", False, "No customer mock OTP available")
+            return False
+        
+        # Verify OTP for customer
+        success2, response2 = self.run_test(
+            "Customer OTP Verify",
+            "POST",
+            "auth/otp/verify",
+            200,
+            data={
+                "phone": self.test_phone_customer,
+                "otp": customer_mock_otp
+            }
+        )
+        
+        if not success2 or not response2.get('access_token'):
+            return False
+        
+        # Store customer token temporarily
+        customer_token = response2['access_token']
+        old_token = self.access_token
+        self.access_token = customer_token
+        
+        # Register as customer
         customer_data = {
-            "phone": customer_phone,
+            "phone": self.test_phone_customer,
             "first_name": "Test",
             "last_name": "Müşteri",
-            "email": "test@example.com"
+            "city": "İstanbul",
+            "email": "customer@example.com"
         }
         
-        success, response = self.run_test(
+        success3 = self.run_test(
             "Customer Registration",
             "POST",
             "register/customer",
@@ -226,79 +409,112 @@ class DeliverTRAPITester:
             data=customer_data
         )
         
-        return success
-
-    def test_get_profile(self):
-        """Test getting user profile"""
-        if not self.token:
-            self.log_test("Get Profile", False, "No authentication token available")
-            return False
-        
-        return self.run_test("Get Profile", "GET", "profile", 200)
-
-    def test_admin_endpoints(self):
-        """Test admin endpoints"""
-        # Test getting pending couriers
-        success1, response = self.run_test(
-            "Get Pending Couriers",
-            "GET",
-            "admin/couriers/pending",
-            200
-        )
-        
-        # If there are pending couriers, test approval/rejection
-        if success1 and isinstance(response, list) and len(response) > 0:
-            courier_id = response[0].get('id')
-            if courier_id:
-                # Test courier approval
-                success2 = self.run_test(
-                    "Approve Courier",
-                    "POST",
-                    f"admin/courier/{courier_id}/approve",
-                    200,
-                    data={"notes": "Test approval"}
-                )
-                
-                return success1 and success2
-        
-        return success1
-
-    def test_invalid_endpoints(self):
-        """Test invalid endpoints and error handling"""
-        # Test invalid phone format
-        success1, _ = self.run_test(
-            "Invalid Phone Format",
-            "POST",
-            "auth/send-code",
-            400,
-            data={"phone": "invalid-phone"}
-        )
-        
-        # Test invalid verification code
-        success2, _ = self.run_test(
-            "Invalid Verification Code",
-            "POST",
-            "auth/verify-code",
-            400,
-            data={
-                "phone": self.test_phone,
-                "code": "000000",
-                "verification_id": "invalid-id"
-            }
-        )
-        
-        # Test unauthorized access
-        old_token = self.token
-        self.token = "invalid-token"
-        success3, _ = self.run_test(
-            "Unauthorized Access",
-            "GET",
-            "profile",
-            401
-        )
-        self.token = old_token
+        # Restore original token
+        self.access_token = old_token
         
         return success1 and success2 and success3
+
+    def test_rate_limiting(self):
+        """Test rate limiting functionality"""
+        # Test multiple rapid OTP requests to trigger rate limiting
+        test_phone_rate = "+905551234570"
+        
+        # Send first request (should succeed)
+        success1, _ = self.run_test(
+            "Rate Limit Test - Request 1",
+            "POST",
+            "auth/otp/request",
+            200,
+            data={"phone": test_phone_rate}
+        )
+        
+        # Send second request immediately (should succeed)
+        success2, _ = self.run_test(
+            "Rate Limit Test - Request 2",
+            "POST",
+            "auth/otp/request",
+            200,
+            data={"phone": test_phone_rate}
+        )
+        
+        # Send third request immediately (should be rate limited)
+        success3, response3 = self.run_test(
+            "Rate Limit Test - Request 3 (Should Fail)",
+            "POST",
+            "auth/otp/request",
+            400,
+            data={"phone": test_phone_rate}
+        )
+        
+        # Check if rate limiting message is present
+        rate_limited = False
+        if not success3 and isinstance(response3, dict):
+            error_detail = response3.get('detail', '')
+            if 'rate limit' in error_detail.lower() or 'retry' in error_detail.lower():
+                rate_limited = True
+        
+        return success1 and success2 and rate_limited
+
+    def test_phone_format_validation(self):
+        """Test various Turkish phone number formats"""
+        phone_formats = [
+            ("+905551234567", True),   # International format
+            ("905551234567", True),    # Without +
+            ("05551234567", True),     # With leading 0
+            ("5551234567", True),      # Without country code
+            ("123456789", False),      # Too short
+            ("+1234567890", False),    # Non-Turkish
+            ("invalid", False),        # Invalid format
+        ]
+        
+        all_passed = True
+        for phone, should_succeed in phone_formats:
+            expected_status = 200 if should_succeed else 400
+            test_name = f"Phone Format - {phone} ({'Valid' if should_succeed else 'Invalid'})"
+            
+            success, _ = self.run_test(
+                test_name,
+                "POST",
+                "auth/otp/request",
+                expected_status,
+                data={"phone": phone}
+            )
+            
+            if not success:
+                all_passed = False
+        
+        return all_passed
+
+    def test_logout(self):
+        """Test user logout"""
+        if not self.refresh_token:
+            self.log_test("Logout", False, "No refresh token available")
+            return False
+        
+        return self.run_test(
+            "Logout",
+            "POST",
+            "auth/logout",
+            200,
+            data={
+                "refresh_token": self.refresh_token
+            }
+        )
+
+    def test_unauthorized_access(self):
+        """Test unauthorized access to protected endpoints"""
+        old_token = self.access_token
+        self.access_token = "invalid-token"
+        
+        success, _ = self.run_test(
+            "Unauthorized Access",
+            "GET",
+            "me",
+            401
+        )
+        
+        self.access_token = old_token
+        return success
 
     def run_all_tests(self):
         """Run all backend tests"""
