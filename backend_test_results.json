@@ -1,95 +1,162 @@
 {
   "summary": {
-    "total_tests": 14,
-    "passed_tests": 13,
-    "failed_tests": 1,
-    "success_rate": 92.85714285714286,
-    "timestamp": "2025-09-26T21:39:39.515435"
+    "total_tests": 25,
+    "passed_tests": 1,
+    "failed_tests": 24,
+    "success_rate": 4.0,
+    "timestamp": "2025-09-26T23:39:44.771678",
+    "test_type": "phone_sms_otp_authentication"
   },
   "test_results": [
     {
       "test": "Root API Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T21:39:30.736742"
+      "timestamp": "2025-09-26T23:39:40.145098"
     },
     {
-      "test": "Send Verification Code",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:30.778655"
-    },
-    {
-      "test": "Verify Code (New User)",
+      "test": "Health Check",
       "success": false,
-      "details": "Expected 200, got 400. Error: {'detail': 'Yanl\u0131\u015f do\u011frulama kodu'}",
-      "timestamp": "2025-09-26T21:39:31.830209"
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.181355"
     },
     {
-      "test": "Courier Registration",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:31.897581"
+      "test": "Phone Format - +905551234567 (Valid)",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.231565"
     },
     {
-      "test": "Send Code for Business",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:32.933549"
+      "test": "Phone Format - 905551234567 (Valid)",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.265462"
     },
     {
-      "test": "Business Registration",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:32.983208"
+      "test": "Phone Format - 05551234567 (Valid)",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.299908"
     },
     {
-      "test": "Send Code for Customer",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:34.018709"
+      "test": "Phone Format - 5551234567 (Valid)",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.333553"
     },
     {
-      "test": "Customer Registration",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:34.082202"
+      "test": "Phone Format - 123456789 (Invalid)",
+      "success": false,
+      "details": "Expected 400, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.366707"
+    },
+    {
+      "test": "Phone Format - +1234567890 (Invalid)",
+      "success": false,
+      "details": "Expected 400, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.399701"
+    },
+    {
+      "test": "Phone Format - invalid (Invalid)",
+      "success": false,
+      "details": "Expected 400, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.431446"
+    },
+    {
+      "test": "OTP Request - Valid Phone",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:40.465411"
+    },
+    {
+      "test": "OTP Request - Invalid Phone",
+      "success": false,
+      "details": "Expected 400, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:41.501565"
+    },
+    {
+      "test": "Get Mock OTP",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:41.535136"
+    },
+    {
+      "test": "OTP Verify - Correct Code",
+      "success": false,
+      "details": "No mock OTP available",
+      "timestamp": "2025-09-26T23:39:41.535733"
+    },
+    {
+      "test": "OTP Verify - Incorrect Code",
+      "success": false,
+      "details": "Expected 400, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:42.570144"
+    },
+    {
+      "test": "Token Refresh",
+      "success": false,
+      "details": "No refresh token available",
+      "timestamp": "2025-09-26T23:39:42.570712"
     },
     {
       "test": "Get Profile",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:39.087981"
+      "success": false,
+      "details": "No authentication token available",
+      "timestamp": "2025-09-26T23:39:42.570722"
     },
     {
-      "test": "Get Pending Couriers",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:39.377561"
+      "test": "Update Profile",
+      "success": false,
+      "details": "No authentication token available",
+      "timestamp": "2025-09-26T23:39:42.570727"
     },
     {
-      "test": "Approve Courier",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:39.411896"
+      "test": "Courier Registration",
+      "success": false,
+      "details": "No authentication token available",
+      "timestamp": "2025-09-26T23:39:42.570733"
     },
     {
-      "test": "Invalid Phone Format",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:39.446794"
+      "test": "Business OTP Request",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:43.603208"
     },
     {
-      "test": "Invalid Verification Code",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:39.484060"
+      "test": "Customer OTP Request",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:44.636751"
+    },
+    {
+      "test": "Rate Limit Test - Request 1",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:44.669550"
+    },
+    {
+      "test": "Rate Limit Test - Request 2",
+      "success": false,
+      "details": "Expected 200, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:44.701831"
+    },
+    {
+      "test": "Rate Limit Test - Request 3 (Should Fail)",
+      "success": false,
+      "details": "Expected 400, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:44.734793"
+    },
+    {
+      "test": "Logout",
+      "success": false,
+      "details": "No refresh token available",
+      "timestamp": "2025-09-26T23:39:44.735440"
     },
     {
       "test": "Unauthorized Access",
-      "success": true,
-      "details": "",
-      "timestamp": "2025-09-26T21:39:39.514795"
+      "success": false,
+      "details": "Expected 401, got 502. Response: ",
+      "timestamp": "2025-09-26T23:39:44.770693"
     }
   ]
 }
