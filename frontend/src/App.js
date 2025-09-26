@@ -250,21 +250,23 @@ const FileUpload = ({ label, onFileSelect, accept = "image/*", testId }) => {
   );
 };
 
-// Registration Components - Now for profile completion after phone auth
-const CourierRegistration = ({ onComplete, onBack, currentUser }) => {
+// Registration Components - Email/Password based registration
+const CourierRegistration = ({ onComplete, onBack }) => {
   const [formData, setFormData] = useState({
-    phone: currentUser?.phone || '',
     email: '',
+    password: '',
     first_name: '',
     last_name: '',
     iban: '',
     vehicle_type: '',
     vehicle_model: '',
     license_class: '',
+    license_number: '',
     city: ''
   });
   const [licensePhotoUrl, setLicensePhotoUrl] = useState('');
   const [vehiclePhotoUrl, setVehiclePhotoUrl] = useState('');
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -272,9 +274,17 @@ const CourierRegistration = ({ onComplete, onBack, currentUser }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/register/courier`, formData);
+      // Add photo URLs to form data
+      const registrationData = {
+        ...formData,
+        license_photo_url: licensePhotoUrl,
+        vehicle_photo_url: vehiclePhotoUrl,
+        profile_photo_url: profilePhotoUrl
+      };
+
+      const response = await axios.post(`${API}/register/courier`, registrationData);
       
-      onComplete();
+      onComplete(response.data);
       toast.success('Kurye kaydınız tamamlandı! KYC onayı bekliyor.');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
