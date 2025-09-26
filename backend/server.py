@@ -127,6 +127,76 @@ class User(BaseModel):
 class UserStatus(str, Enum):
     ACTIVE = "active"
     SUSPENDED = "suspended"
+
+# Helper Functions
+def hash_password(password: str) -> str:
+    """Hash password using bcrypt"""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    """Verify password against hash"""
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """Create JWT access token"""
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get current user from JWT token"""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except jwt.PyJWTError:
+        raise credentials_exception
+    
+    user = await db.users.find_one({"email": email})
+    if user is None:
+        raise credentials_exception
+    
+    return user
+
+# Authentication Endpoints
+@api_router.post("/auth/login")
+async def login(login_data: LoginRequest):
+    """Login with email and password"""
+    user = await db.users.find_one({"email": login_data.email})
+    
+    if not user or not verify_password(login_data.password, user["password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password"
+        )
+    
+    access_token_expires = timedelta(minutes=15)
+    access_token = create_access_token(
+        data={"sub": user["email"]}, expires_delta=access_token_expires
+    )
+    
+    # Convert ObjectId to string for response
+    user["id"] = str(user["_id"])
+    del user["_id"]
+    del user["password"]  # Don't send password in response
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_type": user["role"],
+        "user_data": user
+    }
     INACTIVE = "inactive"
     BANNED = "banned"
 
