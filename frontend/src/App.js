@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import "./App.css";
+import AdminPanel from "./AdminPanel";
 
 // Components
 import { Button } from "./components/ui/button";
