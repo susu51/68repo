@@ -186,7 +186,7 @@ const PricingDisplay = ({ pricing, packageDetails }) => {
           
           {packageDetails.weight_kg > 5 && (
             <div className="flex justify-between text-sm text-blue-600">
-              <span>Ağırlık Ekstra (>5kg):</span>
+              <span>Ağırlık Ekstra (&gt;5kg):</span>
               <span>₺{((packageDetails.weight_kg - 5) * (pricing.base_price || 0) * 0.1).toFixed(2)}</span>
             </div>
           )}
