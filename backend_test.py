@@ -42,11 +42,11 @@ class DeliverTRAPITester:
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
-        url = f"{self.api_url}/{endpoint}"
+        url = f"{self.api_url}/{endpoint}" if endpoint else f"{self.base_url}/"
         test_headers = {'Content-Type': 'application/json'}
         
-        if self.token:
-            test_headers['Authorization'] = f'Bearer {self.token}'
+        if self.access_token:
+            test_headers['Authorization'] = f'Bearer {self.access_token}'
         
         if headers:
             test_headers.update(headers)
@@ -64,6 +64,8 @@ class DeliverTRAPITester:
                 response = requests.post(url, json=data, headers=test_headers, timeout=10)
             elif method == 'PUT':
                 response = requests.put(url, json=data, headers=test_headers, timeout=10)
+            elif method == 'PATCH':
+                response = requests.patch(url, json=data, headers=test_headers, timeout=10)
             elif method == 'DELETE':
                 response = requests.delete(url, headers=test_headers, timeout=10)
 
