@@ -1644,12 +1644,19 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
     );
   }
 
+  // If user is authenticated
   if (user) {
+    // If profile is not completed, show profile completion
+    if (!user.profile_completed) {
+      return <AuthPage onBack={() => setShowAuth(false)} />;
+    }
+    
+    // Profile is complete, show appropriate dashboard
     return (
       <Routes>
         <Route path="/" element={
-          user.user_type === 'courier' ? <CourierDashboard user={user} /> :
-          user.user_type === 'business' ? <BusinessDashboard user={user} /> :
+          user.role === 'courier' ? <CourierDashboard user={user} /> :
+          user.role === 'business' ? <BusinessDashboard user={user} /> :
           <CustomerDashboard user={user} />
         } />
         <Route path="/admin" element={<AdminPanel />} />
@@ -1658,6 +1665,7 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
     );
   }
 
+  // Not authenticated
   if (showAuth) {
     return <AuthPage onBack={() => setShowAuth(false)} />;
   }
