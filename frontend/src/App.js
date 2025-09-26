@@ -990,6 +990,7 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
           user.user_type === 'business' ? <BusinessDashboard user={user} /> :
           <CustomerDashboard user={user} />
         } />
+        <Route path="/admin" element={<AdminPanel />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     );
