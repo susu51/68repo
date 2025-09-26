@@ -1168,6 +1168,7 @@ const CustomerDashboard = ({ user }) => {
   const [nearbyBusinesses, setNearbyBusinesses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [showCreatePackage, setShowCreatePackage] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
 
   useEffect(() => {
@@ -1218,6 +1219,7 @@ const CustomerDashboard = ({ user }) => {
   const handleOrderCreated = (orderId) => {
     toast.success('Sipariş oluşturuldu!');
     setShowCreateOrder(false);
+    setShowCreatePackage(false);
     setSelectedBusiness(null);
     fetchMyOrders();
   };
@@ -1236,80 +1238,91 @@ const CustomerDashboard = ({ user }) => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Nearby Businesses */}
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-xl font-bold">Yakındaki İşletmeler</h2>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-              {nearbyBusinesses.map((business) => (
-                <Card key={business.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-semibold">{business.name}</h3>
-                        <p className="text-sm text-gray-600">
-                          {business.category === 'gida' ? '🍔 Gıda' : '📦 Nakliye'}
-                        </p>
-                      </div>
-                      <Badge variant="outline">
-                        ⭐ {business.rating}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
-                      <span>📍 {business.distance} km</span>
-                      <span>🕒 {business.delivery_time} dk</span>
-                    </div>
-                    
-                    <Button
-                      onClick={() => {
-                        setSelectedBusiness(business);
-                        setShowCreateOrder(true);
-                      }}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                      data-testid={`order-from-${business.id}`}
-                    >
-                      Sipariş Ver
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Demo Actions */}
-            <div className="grid md:grid-cols-3 gap-4 mt-6">
-              <Card className="hover:shadow-md transition-shadow">
+          {/* Main Actions */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Actions */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="text-center p-6">
                   <div className="text-4xl mb-2">🍔</div>
-                  <h3 className="font-semibold mb-2">Restoran</h3>
-                  <p className="text-sm text-gray-600 mb-3">Yemek siparişi ver</p>
-                  <Button className="bg-red-600 hover:bg-red-700" data-testid="browse-restaurants-btn">
-                    Keşfet
+                  <h3 className="font-semibold mb-2">Yemek Sipariş</h3>
+                  <p className="text-sm text-gray-600 mb-3">Restoranlardan sipariş</p>
+                  <Button className="bg-red-600 hover:bg-red-700 w-full" data-testid="browse-restaurants-btn">
+                    Restoranlara Göz At
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="text-center p-6">
                   <div className="text-4xl mb-2">🛒</div>
                   <h3 className="font-semibold mb-2">Market</h3>
                   <p className="text-sm text-gray-600 mb-3">Günlük alışveriş</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700" data-testid="browse-markets-btn">
-                    Alışveriş
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full" data-testid="browse-markets-btn">
+                    Market Alışverişi
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="text-center p-6">
                   <div className="text-4xl mb-2">📦</div>
-                  <h3 className="font-semibold mb-2">Kargo</h3>
-                  <p className="text-sm text-gray-600 mb-3">Paket gönder</p>
-                  <Button className="bg-orange-600 hover:bg-orange-700" data-testid="send-package-btn">
-                    Gönder
+                  <h3 className="font-semibold mb-2">Paket Gönder</h3>
+                  <p className="text-sm text-gray-600 mb-3">Kargo teslimatı</p>
+                  <Button 
+                    onClick={() => setShowCreatePackage(true)}
+                    className="bg-orange-600 hover:bg-orange-700 w-full" 
+                    data-testid="send-package-btn"
+                  >
+                    Paket Gönder
                   </Button>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Nearby Businesses */}
+            <div>
+              <h2 className="text-xl font-bold mb-4">Yakındaki İşletmeler</h2>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                {nearbyBusinesses.map((business) => (
+                  <Card key={business.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-semibold">{business.name}</h3>
+                          <p className="text-sm text-gray-600">
+                            {business.category === 'gida' ? '🍔 Gıda' : '📦 Nakliye'}
+                          </p>
+                        </div>
+                        <Badge variant="outline">
+                          ⭐ {business.rating}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
+                        <span>📍 {business.distance} km</span>
+                        <span>🕒 {business.delivery_time} dk</span>
+                      </div>
+                      
+                      <Button
+                        onClick={() => {
+                          if (business.category === 'gida') {
+                            setSelectedBusiness(business);
+                            setShowCreateOrder(true);
+                          } else {
+                            setShowCreatePackage(true);
+                          }
+                        }}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        data-testid={`order-from-${business.id}`}
+                      >
+                        {business.category === 'gida' ? 'Sipariş Ver' : 'Kargo Gönder'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -1338,8 +1351,12 @@ const CustomerDashboard = ({ user }) => {
                     <CardContent className="p-3">
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <p className="font-medium text-sm">#{order.id.substring(0, 8)}</p>
-                          <p className="text-xs text-gray-600">{order.business_name}</p>
+                          <p className="font-medium text-sm">
+                            {order.order_type === 'food' ? '🍔' : '📦'} #{order.id.substring(0, 8)}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            {order.business_name || 'Paket Teslimat'}
+                          </p>
                         </div>
                         <OrderStatusBadge status={order.status} />
                       </div>
@@ -1374,6 +1391,18 @@ const CustomerDashboard = ({ user }) => {
                   setShowCreateOrder(false);
                   setSelectedBusiness(null);
                 }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Create Package Order Modal */}
+        {showCreatePackage && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <CreatePackageOrder
+                onOrderCreated={handleOrderCreated}
+                onCancel={() => setShowCreatePackage(false)}
               />
             </div>
           </div>
