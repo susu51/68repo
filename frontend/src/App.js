@@ -665,10 +665,10 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
   );
 };
 
-const CustomerRegistration = ({ onComplete, onBack, currentUser }) => {
+const CustomerRegistration = ({ onComplete, onBack }) => {
   const [formData, setFormData] = useState({
-    phone: currentUser?.phone || '',
     email: '',
+    password: '',
     first_name: '',
     last_name: '',
     city: ''
@@ -681,7 +681,7 @@ const CustomerRegistration = ({ onComplete, onBack, currentUser }) => {
 
     try {
       const response = await axios.post(`${API}/register/customer`, formData);
-      onComplete();
+      onComplete(response.data);
       toast.success('Müşteri kaydınız tamamlandı!');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
