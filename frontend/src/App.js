@@ -112,31 +112,87 @@ const useAuth = () => {
   return context;
 };
 
-// Login Component - Now using Phone/SMS OTP
+// Login Component - Email/Password Authentication
 const LoginForm = ({ onRegisterClick }) => {
   const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
 
-  const handleLoginSuccess = (authData) => {
-    login(authData);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await axios.post(`${API}/auth/login`, formData);
+      login(response.data);
+      toast.success('Başarıyla giriş yaptınız!');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Giriş başarısız');
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="space-y-4">
-      <PhoneAuth onLoginSuccess={handleLoginSuccess} />
-      
-      <div className="text-center">
-        <p className="text-sm text-gray-600">
-          Yeni kullanıcı mısınız?{' '}
-          <button
-            onClick={onRegisterClick}
-            className="text-orange-600 hover:text-orange-700 font-medium"
-            data-testid="go-to-register-btn"
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold text-orange-600">Giriş Yap</CardTitle>
+        <CardDescription>DeliverTR hesabınıza giriş yapın</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="email">E-posta</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="ornek@email.com"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              required
+              data-testid="login-email"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="password">Şifre</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Şifrenizi girin"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              required
+              data-testid="login-password"
+            />
+          </div>
+          
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-orange-600 hover:bg-orange-700"
+            data-testid="login-submit-btn"
           >
-            Profil Tamamla
-          </button>
-        </p>
-      </div>
-    </div>
+            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          </Button>
+        </form>
+        
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Hesabınız yok mu?{' '}
+            <button
+              onClick={onRegisterClick}
+              className="text-orange-600 hover:text-orange-700 font-medium"
+              data-testid="go-to-register-btn"
+            >
+              Kayıt Ol
+            </button>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
