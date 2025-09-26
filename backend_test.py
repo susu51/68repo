@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-DeliverTR Backend API Testing Suite
-Tests all API endpoints for the Turkish delivery platform MVP
+DeliverTR Backend API Testing Suite - Phone/SMS OTP Authentication
+Tests all API endpoints for the Turkish delivery platform MVP with new OTP system
 """
 
 import requests
@@ -14,12 +14,15 @@ class DeliverTRAPITester:
     def __init__(self, base_url="https://quick-courier-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
-        self.token = None
+        self.access_token = None
+        self.refresh_token = None
         self.tests_run = 0
         self.tests_passed = 0
-        self.verification_id = None
         self.test_phone = "+905551234567"
+        self.test_phone_business = "+905551234568"
+        self.test_phone_customer = "+905551234569"
         self.test_results = []
+        self.mock_otp = None
 
     def log_test(self, name, success, details=""):
         """Log test results"""
