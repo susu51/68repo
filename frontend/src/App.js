@@ -272,27 +272,21 @@ const CourierRegistration = ({ onComplete, onBack, currentUser }) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-800">
+              📱 Telefon: <strong>{currentUser?.phone}</strong> (doğrulandı)
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>E-posta</Label>
+              <Label>E-posta (Opsiyonel)</Label>
               <Input
                 type="email"
                 placeholder="ornek@email.com"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required
                 data-testid="courier-email"
-              />
-            </div>
-            <div>
-              <Label>Şifre</Label>
-              <Input
-                type="password"
-                placeholder="Güvenli şifre"
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
-                required
-                data-testid="courier-password"
               />
             </div>
           </div>
