@@ -54,6 +54,75 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Pydantic Models
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+class CourierRegistration(BaseModel):
+    email: EmailStr
+    password: str
+    first_name: str
+    last_name: str
+    iban: str
+    vehicle_type: str  # araba, motor, elektrikli_motor, bisiklet
+    vehicle_model: str
+    license_class: str  # A, A1, A2, B, C, D
+    license_number: str
+    city: str
+    license_photo_url: Optional[str] = None
+    vehicle_photo_url: Optional[str] = None
+    profile_photo_url: Optional[str] = None
+
+class BusinessRegistration(BaseModel):
+    email: EmailStr
+    password: str
+    business_name: str
+    tax_number: str
+    address: str
+    city: str
+    business_category: str  # gida, nakliye
+    description: Optional[str] = None
+
+class CustomerRegistration(BaseModel):
+    email: EmailStr
+    password: str
+    first_name: str
+    last_name: str
+    city: str
+
+class User(BaseModel):
+    id: str
+    email: str
+    role: str
+    created_at: datetime
+    is_active: bool = True
+    
+    # Common fields
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    city: Optional[str] = None
+    
+    # Courier specific
+    iban: Optional[str] = None
+    vehicle_type: Optional[str] = None
+    vehicle_model: Optional[str] = None
+    license_class: Optional[str] = None
+    license_number: Optional[str] = None
+    license_photo_url: Optional[str] = None
+    vehicle_photo_url: Optional[str] = None
+    profile_photo_url: Optional[str] = None
+    kyc_status: Optional[str] = "pending"  # pending, approved, rejected
+    balance: Optional[float] = 0.0
+    is_online: Optional[bool] = False
+    
+    # Business specific
+    business_name: Optional[str] = None
+    tax_number: Optional[str] = None
+    address: Optional[str] = None
+    business_category: Optional[str] = None
+    description: Optional[str] = None
+
 # Enums and Constants
 class UserStatus(str, Enum):
     ACTIVE = "active"
