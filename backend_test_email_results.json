@@ -1,0 +1,114 @@
+{
+  "summary": {
+    "total_tests": 17,
+    "passed_tests": 9,
+    "failed_tests": 8,
+    "success_rate": 52.94117647058824,
+    "timestamp": "2025-09-26T23:57:23.941701",
+    "test_type": "email_password_authentication"
+  },
+  "test_results": [
+    {
+      "test": "Root API Endpoint",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:21.949666"
+    },
+    {
+      "test": "Courier Registration - Detailed Fields",
+      "success": false,
+      "details": "Expected 200, got 500. Response: Internal Server Error",
+      "timestamp": "2025-09-26T23:57:21.991749"
+    },
+    {
+      "test": "Business Registration",
+      "success": false,
+      "details": "Expected 200, got 500. Response: Internal Server Error",
+      "timestamp": "2025-09-26T23:57:22.535625"
+    },
+    {
+      "test": "Customer Registration",
+      "success": false,
+      "details": "Expected 200, got 500. Response: Internal Server Error",
+      "timestamp": "2025-09-26T23:57:23.071634"
+    },
+    {
+      "test": "Duplicate Email Registration",
+      "success": false,
+      "details": "Expected 400, got 500. Response: Internal Server Error",
+      "timestamp": "2025-09-26T23:57:23.105207"
+    },
+    {
+      "test": "Invalid Email Format",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.140999"
+    },
+    {
+      "test": "Missing Required Fields",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.173710"
+    },
+    {
+      "test": "Email Login - Valid Credentials",
+      "success": false,
+      "details": "Expected 200, got 401. Error: {'detail': 'Incorrect email or password'}",
+      "timestamp": "2025-09-26T23:57:23.208625"
+    },
+    {
+      "test": "Email Login - Invalid Credentials",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.761913"
+    },
+    {
+      "test": "Email Login - Non-existent Email",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.794475"
+    },
+    {
+      "test": "Password Hashing Verification",
+      "success": false,
+      "details": "Expected 200, got 401. Error: {'detail': 'Incorrect email or password'}",
+      "timestamp": "2025-09-26T23:57:23.833605"
+    },
+    {
+      "test": "JWT Token Validation",
+      "success": false,
+      "details": "No token available",
+      "timestamp": "2025-09-26T23:57:23.834194"
+    },
+    {
+      "test": "Unauthorized Access",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.869319"
+    },
+    {
+      "test": "Get User Profile",
+      "success": false,
+      "details": "No authentication token available",
+      "timestamp": "2025-09-26T23:57:23.869838"
+    },
+    {
+      "test": "File Upload - Valid Image",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.908084"
+    },
+    {
+      "test": "File Upload Response Validation",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.908684"
+    },
+    {
+      "test": "File Upload - Invalid Type",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-26T23:57:23.940806"
+    }
+  ]
+}
