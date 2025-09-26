@@ -331,6 +331,63 @@ async def register_customer(customer_data: CustomerRegistration):
         "user_type": "customer",
         "user_data": user_doc
     }
+
+# File Upload Endpoint
+@api_router.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    """Upload file (images, documents)"""
+    # Validate file type
+    allowed_types = {
+        'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+        'application/pdf', 'image/heic', 'image/heif'
+    }
+    
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported file type"
+        )
+    
+    # Validate file size (max 10MB)
+    max_size = 10 * 1024 * 1024
+    file_content = await file.read()
+    if len(file_content) > max_size:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File too large (max 10MB)"
+        )
+    
+    # Generate unique filename
+    file_extension = Path(file.filename).suffix
+    unique_filename = f"{uuid.uuid4()}{file_extension}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save file
+    with open(file_path, "wb") as f:
+        f.write(file_content)
+    
+    # Return file URL
+    file_url = f"/uploads/{unique_filename}"
+    
+    return {
+        "success": True,
+        "file_url": file_url,
+        "filename": unique_filename,
+        "original_filename": file.filename,
+        "content_type": file.content_type,
+        "size": len(file_content)
+    }
+
+# Get current user info
+@api_router.get("/me")
+async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    """Get current user information"""
+    # Convert ObjectId to string
+    current_user["id"] = str(current_user["_id"])
+    del current_user["_id"]
+    del current_user["password"]  # Don't send password
+    
+    return current_user
     INACTIVE = "inactive"
     BANNED = "banned"
 
