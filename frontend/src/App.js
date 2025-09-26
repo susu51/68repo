@@ -32,26 +32,70 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('delivertr_token');
+    const token = localStorage.getItem('delivertr_access_token');
+    const refreshToken = localStorage.getItem('delivertr_refresh_token');
     const userData = localStorage.getItem('delivertr_user');
     
     if (token && userData) {
       setUser(JSON.parse(userData));
+    } else if (refreshToken) {
+      // Try to refresh token
+      refreshAccessToken(refreshToken);
     }
     setLoading(false);
   }, []);
 
-  const login = (token, userData) => {
-    localStorage.setItem('delivertr_token', token);
-    localStorage.setItem('delivertr_user', JSON.stringify(userData));
-    setUser(userData);
+  const refreshAccessToken = async (refreshToken) => {
+    try {
+      const response = await axios.post(`${API}/auth/refresh`, {
+        refresh_token: refreshToken
+      });
+      
+      localStorage.setItem('delivertr_access_token', response.data.access_token);
+      // User data remains the same, just refresh the token
+      
+    } catch (error) {
+      // Refresh failed, clear everything
+      logout();
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem('delivertr_token');
-    localStorage.removeItem('delivertr_user');
-    setUser(null);
+  const login = (authData) => {
+    localStorage.setItem('delivertr_access_token', authData.access_token);
+    localStorage.setItem('delivertr_refresh_token', authData.refresh_token);
+    localStorage.setItem('delivertr_user', JSON.stringify(authData.user_data));
+    setUser(authData.user_data);
+    
+    // Set axios default authorization header
+    axios.defaults.headers.common['Authorization'] = `Bearer ${authData.access_token}`;
   };
+
+  const logout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('delivertr_refresh_token');
+      if (refreshToken) {
+        await axios.post(`${API}/auth/logout`, {
+          refresh_token: refreshToken
+        });
+      }
+    } catch (error) {
+      console.log('Logout error:', error);
+    } finally {
+      localStorage.removeItem('delivertr_access_token');
+      localStorage.removeItem('delivertr_refresh_token');  
+      localStorage.removeItem('delivertr_user');
+      setUser(null);
+      delete axios.defaults.headers.common['Authorization'];
+    }
+  };
+
+  // Set authorization header on app start
+  useEffect(() => {
+    const token = localStorage.getItem('delivertr_access_token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
