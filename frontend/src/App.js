@@ -191,65 +191,6 @@ const CitySelector = ({ value, onChange, required = false }) => {
   );
 };
 
-// File Upload Component
-const FileUpload = ({ label, onFileSelect, accept = "image/*", testId }) => {
-  const [uploading, setUploading] = useState(false);
-  const [fileUrl, setFileUrl] = useState('');
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await axios.post(`${API}/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      setFileUrl(response.data.file_url);
-      onFileSelect(response.data.file_url);
-      toast.success('Dosya başarıyla yüklendi');
-    } catch (error) {
-      toast.error('Dosya yükleme başarısız');
-    }
-    setUploading(false);
-  };
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-        <input
-          type="file"
-          accept={accept}
-          onChange={handleFileChange}
-          className="hidden"
-          id={testId}
-        />
-        <label htmlFor={testId} className="cursor-pointer">
-          {uploading ? (
-            <div className="text-blue-600">Yükleniyor...</div>
-          ) : fileUrl ? (
-            <div className="space-y-2">
-              <img src={`${BACKEND_URL}${fileUrl}`} alt="Preview" className="mx-auto max-h-20" />
-              <p className="text-green-600 text-sm">✓ Dosya yüklendi</p>
-            </div>
-          ) : (
-            <div className="text-gray-500">
-              📁 {label} için dosya seçin
-            </div>
-          )}
-        </label>
-      </div>
-    </div>
-  );
-};
-
 // Registration Components - Email/Password based registration
 const CourierRegistration = ({ onComplete, onBack }) => {
   const [formData, setFormData] = useState({
