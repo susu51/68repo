@@ -694,7 +694,7 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
 const CourierDashboard = ({ user }) => {
   const { logout } = useAuth();
   const [isOnline, setIsOnline] = useState(user.is_online || false);
-  const [currentView, setCurrentView] = useState('nearby'); // nearby, orders, profile
+  const [currentView, setCurrentView] = useState('nearby'); // nearby, orders, balance, profile
   const [myOrders, setMyOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -822,11 +822,11 @@ const CourierDashboard = ({ user }) => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Günlük Kazanç</CardTitle>
+              <CardTitle className="text-sm">Mevcut Bakiye</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-green-600">₺0.00</p>
-              <p className="text-xs text-gray-600">Bugün</p>
+              <p className="text-2xl font-bold text-green-600">₺{user.balance?.toFixed(2) || '0.00'}</p>
+              <p className="text-xs text-gray-600">Çekilebilir</p>
             </CardContent>
           </Card>
 
@@ -857,6 +857,13 @@ const CourierDashboard = ({ user }) => {
               data-testid="my-orders-tab"
             >
               📋 Siparişlerim
+            </Button>
+            <Button
+              onClick={() => setCurrentView('balance')}
+              variant={currentView === 'balance' ? 'default' : 'outline'}
+              data-testid="balance-tab"
+            >
+              💰 Bakiye & Kazançlar
             </Button>
             <Button
               onClick={() => setCurrentView('map')}
@@ -903,6 +910,10 @@ const CourierDashboard = ({ user }) => {
               />
             )}
           </div>
+        )}
+
+        {currentView === 'balance' && (
+          <CourierBalance />
         )}
 
         {currentView === 'map' && (
