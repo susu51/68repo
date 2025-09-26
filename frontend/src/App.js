@@ -939,7 +939,7 @@ const CourierDashboard = ({ user }) => {
 
 const BusinessDashboard = ({ user }) => {
   const { logout } = useAuth();
-  const [currentView, setCurrentView] = useState('orders'); // orders, create, settings
+  const [currentView, setCurrentView] = useState('orders'); // orders, menu, settings
   const [myOrders, setMyOrders] = useState([]);
   const [showCreateOrder, setShowCreateOrder] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -1041,6 +1041,13 @@ const BusinessDashboard = ({ user }) => {
               📋 Siparişler
             </Button>
             <Button
+              onClick={() => setCurrentView('menu')}
+              variant={currentView === 'menu' ? 'default' : 'outline'}
+              data-testid="menu-tab"
+            >
+              {user.category === 'gida' ? '🍽️ Menü' : '📦 Hizmetler'}
+            </Button>
+            <Button
               onClick={() => setShowCreateOrder(true)}
               className="bg-green-600 hover:bg-green-700"
               data-testid="create-order-btn"
@@ -1074,6 +1081,26 @@ const BusinessDashboard = ({ user }) => {
               />
             )}
           </div>
+        )}
+
+        {currentView === 'menu' && user.category === 'gida' && (
+          <MenuManagement />
+        )}
+
+        {currentView === 'menu' && user.category === 'nakliye' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Nakliye Hizmetleri</CardTitle>
+              <CardDescription>Nakliye işletmeleri için özel hizmet yönetimi</CardDescription>
+            </CardHeader>
+            <CardContent className="text-center py-12">
+              <div className="text-4xl mb-4">🚚</div>
+              <p className="text-gray-500 mb-4">Nakliye hizmet yönetimi yakında!</p>
+              <p className="text-sm text-gray-400">
+                Müşteriler size paket siparişi verebilir
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         {currentView === 'settings' && (
