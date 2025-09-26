@@ -5,6 +5,8 @@ import os
 class Settings(BaseSettings):
     # MongoDB
     mongo_url: str = os.getenv("MONGO_URL", "mongodb://localhost:27017/delivertr")
+    db_name: str = os.getenv("DB_NAME", "delivertr_database")
+    cors_origins: str = os.getenv("CORS_ORIGINS", "*")
     
     # JWT Configuration
     jwt_secret_key: str = "your-super-secret-jwt-key-change-this-in-production"
