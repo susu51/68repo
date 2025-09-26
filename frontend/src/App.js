@@ -925,9 +925,40 @@ const CourierDashboard = ({ user }) => {
 
 const BusinessDashboard = ({ user }) => {
   const { logout } = useAuth();
+  const [currentView, setCurrentView] = useState('orders'); // orders, create, settings
+  const [myOrders, setMyOrders] = useState([]);
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (currentView === 'orders') {
+      fetchMyOrders();
+    }
+  }, [currentView]);
+
+  const fetchMyOrders = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('delivertr_token');
+      const response = await axios.get(`${API}/orders/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyOrders(response.data.orders);
+    } catch (error) {
+      console.error('Siparişler alınamadı:', error);
+    }
+    setLoading(false);
+  };
 
   const getCategoryName = (category) => {
     return category === 'gida' ? 'Gıda' : 'Nakliye';
+  };
+
+  const handleOrderCreated = (orderId) => {
+    toast.success('Sipariş oluşturuldu!');
+    setShowCreateOrder(false);
+    setCurrentView('orders');
+    fetchMyOrders();
   };
 
   return (
@@ -949,7 +980,7 @@ const BusinessDashboard = ({ user }) => {
               <CardTitle className="text-sm">Bugünkü Siparişler</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-blue-600">0</p>
+              <p className="text-2xl font-bold text-blue-600">{myOrders.length}</p>
             </CardContent>
           </Card>
           
@@ -958,16 +989,20 @@ const BusinessDashboard = ({ user }) => {
               <CardTitle className="text-sm">Günlük Ciro</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-green-600">₺0.00</p>
+              <p className="text-2xl font-bold text-green-600">
+                ₺{myOrders.reduce((sum, order) => sum + (order.total || 0), 0).toFixed(2)}
+              </p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Aktif Ürünler</CardTitle>
+              <CardTitle className="text-sm">Aktif Siparişler</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-purple-600">0</p>
+              <p className="text-2xl font-bold text-purple-600">
+                {myOrders.filter(order => !['delivered', 'cancelled'].includes(order.status)).length}
+              </p>
             </CardContent>
           </Card>
           
@@ -976,55 +1011,86 @@ const BusinessDashboard = ({ user }) => {
               <CardTitle className="text-sm">İşletme Durumu</CardTitle>
             </CardHeader>
             <CardContent>
-              <Badge variant="secondary">Kapalı</Badge>
+              <Badge variant="default" className="bg-green-100 text-green-800">Açık</Badge>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="orders" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="orders">Siparişler</TabsTrigger>
-            <TabsTrigger value="menu">
-              {user.category === 'gida' ? 'Menü' : 'Hizmetler'}
-            </TabsTrigger>
-            <TabsTrigger value="settings">Ayarlar</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="orders">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gelen Siparişler</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-gray-500">
-                  Henüz sipariş bulunmuyor
+        {/* Navigation */}
+        <div className="mb-6">
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setCurrentView('orders')}
+              variant={currentView === 'orders' ? 'default' : 'outline'}
+              data-testid="orders-tab"
+            >
+              📋 Siparişler
+            </Button>
+            <Button
+              onClick={() => setShowCreateOrder(true)}
+              className="bg-green-600 hover:bg-green-700"
+              data-testid="create-order-btn"
+            >
+              + Test Sipariş Oluştur
+            </Button>
+            <Button
+              onClick={() => setCurrentView('settings')}
+              variant={currentView === 'settings' ? 'default' : 'outline'}
+            >
+              ⚙️ Ayarlar
+            </Button>
+          </div>
+        </div>
+
+        {/* Content */}
+        {currentView === 'orders' && (
+          <div>
+            {loading ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-gray-600">Siparişler yükleniyor...</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <OrdersList
+                userType="business"
+                orders={myOrders}
+                onStatusUpdate={fetchMyOrders}
+              />
+            )}
+          </div>
+        )}
+
+        {currentView === 'settings' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>İşletme Ayarları</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">İşletme Adı</label>
+                <Input value={user.business_name} readOnly />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Kategori</label>
+                <Input value={getCategoryName(user.category)} readOnly />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Şehir</label>
+                <Input value={user.city} readOnly />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Çalışma Saatleri</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input placeholder="Açılış (09:00)" />
+                  <Input placeholder="Kapanış (22:00)" />
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="menu">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {user.category === 'gida' ? 'Menü Yönetimi' : 'Hizmet Yönetimi'}
-                </CardTitle>
-                <CardDescription>
-                  {user.category === 'gida' 
-                    ? 'Yemek menünüzü oluşturun ve yönetin'
-                    : 'Nakliye hizmetlerinizi tanımlayın'
-                  }
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Button className="bg-blue-600 hover:bg-blue-700" data-testid="add-product-btn">
-                    + {user.category === 'gida' ? 'İlk Yemeğinizi Ekleyin' : 'İlk Hizmetinizi Ekleyin'}
-                  </Button>
-                </div>
-                
-                {/* Admin Panel Link - Demo için */}
-                <div className="mt-4 text-center">
+              </div>
+              
+              {/* Admin Panel Link */}
+              <div className="mt-6 pt-6 border-t">
+                <div className="text-center">
                   <a 
                     href="/admin" 
                     className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
@@ -1033,42 +1099,23 @@ const BusinessDashboard = ({ user }) => {
                     🛠️ Admin Panel (Demo)
                   </a>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>İşletme Ayarları</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">İşletme Adı</label>
-                  <Input value={user.business_name} readOnly />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Kategori</label>
-                  <Input value={getCategoryName(user.category)} readOnly />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Şehir</label>
-                  <Input value={user.city} readOnly />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Çalışma Saatleri</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="Açılış (09:00)" />
-                    <Input placeholder="Kapanış (22:00)" />
-                  </div>
-                </div>
-                <Button className="bg-blue-600 hover:bg-blue-700" data-testid="save-settings-btn">
-                  Ayarları Kaydet
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Create Order Modal */}
+        {showCreateOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <CreateOrderForm
+                businessId={user.business_id || "demo-business-id"}
+                onOrderCreated={handleOrderCreated}
+                onCancel={() => setShowCreateOrder(false)}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
