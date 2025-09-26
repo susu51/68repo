@@ -8,7 +8,7 @@ import { CreateOrderForm, OrdersList, NearbyOrdersForCourier, OrderStatusBadge }
 import { MenuManagement, MenuDisplay } from "./MenuManagement";
 import { CreatePackageOrder, PackageOrderHistory } from "./PackageOrder";
 import CourierBalance from "./CourierBalance";
-import PhoneAuth from "./PhoneAuth";
+import FileUpload from "./FileUpload";
 
 // Components
 import { Button } from "./components/ui/button";
