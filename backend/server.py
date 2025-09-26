@@ -17,6 +17,7 @@ import json
 import math
 import hashlib
 from enum import Enum
+import bcrypt
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -24,14 +25,14 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client.delivertr_database
 
 # Create uploads directory
 UPLOAD_DIR = Path("/app/backend/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 # Create the main app without a prefix
-app = FastAPI(title="DeliverTR API", description="Türkiye Teslimat Platformu - Kapsamlı Admin Sistemi")
+app = FastAPI(title="DeliverTR API", description="Türkiye Teslimat Platformu - Email Authentication")
 
 # Serve uploaded files
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
@@ -43,6 +44,15 @@ api_router = APIRouter(prefix="/api")
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'delivertr-secret-key-2024')
 ALGORITHM = "HS256"
 security = HTTPBearer()
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Enums and Constants
 class UserStatus(str, Enum):
