@@ -2059,10 +2059,9 @@ const BusinessDashboard = ({ user }) => {
                   <div>
                     <Label className="text-xs sm:text-sm font-semibold">Ürün Fotoğrafı</Label>
                     <FileUpload
-                      onUpload={(url) => setProductForm({...productForm, photo_url: url})}
-                      buttonText="📸 Fotoğraf Yükle"
+                      label="Ürün Fotoğrafı"
+                      onFileUploaded={(url) => setProductForm({...productForm, photo_url: url})}
                       accept="image/*"
-                      className="mt-1"
                     />
                     {productForm.photo_url && (
                       <div className="mt-2">
