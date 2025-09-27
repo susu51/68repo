@@ -692,14 +692,16 @@ const AdminDashboard = ({ user }) => {
                                   onClick={() => updateCourierKYC(courier.id, 'approved')}
                                   className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm flex-1"
                                   size="sm"
+                                  disabled={loading}
                                 >
-                                  ✅ Onayla
+                                  {loading ? '⏳ İşleniyor...' : '✅ Onayla'}
                                 </Button>
                                 <Button
-                                  onClick={() => updateCourierKYC(courier.id, 'rejected', 'Belgeler eksik veya hatalı')}
+                                  onClick={() => handleReject(courier)}
                                   variant="destructive"
                                   className="text-xs sm:text-sm flex-1"
                                   size="sm"
+                                  disabled={loading}
                                 >
                                   ❌ Reddet
                                 </Button>
