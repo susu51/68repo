@@ -2085,7 +2085,7 @@ const BusinessDashboard = ({ user }) => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem('delivertr_access_token');
+      const token = localStorage.getItem('kuryecini_access_token');
       await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`, {}, {
         headers: {
           'Authorization': `Bearer ${token}`
