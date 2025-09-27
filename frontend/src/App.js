@@ -198,10 +198,9 @@ const LoginForm = ({ onRegisterClick }) => {
                 <Input
                   id="adminPassword"
                   type="password"
-                  placeholder="Admin şifresini girin"
+                  placeholder="Admin şifresini girin (6851)"
                   value={formData.adminPassword}
                   onChange={(e) => setFormData({...formData, adminPassword: e.target.value})}
-                  required
                   data-testid="admin-password"
                 />
               </div>
