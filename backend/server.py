@@ -1295,15 +1295,14 @@ async def get_current_user_v2(credentials: HTTPAuthorizationCredentials = Depend
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Geçersiz token")
 
-async def get_admin_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def get_admin_user_v2(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Admin yetkisi kontrolü"""
-    user_id = await get_current_user(credentials)
-    user = await db.users.find_one({"id": user_id})
+    user = await get_current_user(credentials)  # Use the first get_current_user function
     
     if not user or user.get("user_type") != "admin":
         raise HTTPException(status_code=403, detail="Admin yetkisi gerekli")
     
-    return user_id
+    return user
 
 # Audit logging function
 async def log_action(action_type: str, target_type: str, target_id: str, 
