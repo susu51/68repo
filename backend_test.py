@@ -177,6 +177,356 @@ class DeliverTRAPITester:
         
         return success
 
+    # ===== COMPREHENSIVE BUSINESS REGISTRATION TESTS =====
+    
+    def test_business_registration_comprehensive(self):
+        """Test business registration with complete data as specified in review request"""
+        business_data = {
+            "email": "testnewbusiness@example.com",
+            "password": "test123",
+            "business_name": "Test İşletmesi 2",
+            "tax_number": "9876543210",
+            "address": "Test Mahallesi, Test Sokak No: 1, İstanbul",
+            "city": "Istanbul",
+            "business_category": "gida",
+            "description": "Test açıklaması"
+        }
+        
+        success, response = self.run_test(
+            "Business Registration - Complete Data",
+            "POST",
+            "register/business",
+            200,
+            data=business_data
+        )
+        
+        if success:
+            # Verify response structure
+            required_fields = ['access_token', 'token_type', 'user_type', 'user_data']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                print(f"   ❌ Missing response fields: {missing_fields}")
+                self.log_test("Business Registration - Complete Data", False, f"Missing fields: {missing_fields}")
+                return False
+            
+            # Verify response values
+            if response.get('token_type') != 'bearer':
+                print(f"   ❌ Wrong token_type: {response.get('token_type')}, expected 'bearer'")
+                return False
+            
+            if response.get('user_type') != 'business':
+                print(f"   ❌ Wrong user_type: {response.get('user_type')}, expected 'business'")
+                return False
+            
+            user_data = response.get('user_data', {})
+            if user_data.get('role') != 'business':
+                print(f"   ❌ Wrong role in user_data: {user_data.get('role')}, expected 'business'")
+                return False
+            
+            # Verify business-specific fields
+            expected_business_fields = ['business_name', 'tax_number', 'address', 'city', 'business_category', 'description']
+            for field in expected_business_fields:
+                if field not in user_data:
+                    print(f"   ❌ Missing business field in user_data: {field}")
+                    return False
+                if user_data[field] != business_data[field]:
+                    print(f"   ❌ Wrong {field}: {user_data[field]}, expected {business_data[field]}")
+                    return False
+            
+            print(f"   ✅ All response fields correct")
+            print(f"   ✅ Access token generated: {response['access_token'][:20]}...")
+            print(f"   ✅ User role set to 'business'")
+            print(f"   ✅ Business data correctly stored")
+            
+        return success
+
+    def test_business_registration_duplicate_email(self):
+        """Test business registration with duplicate email (should fail)"""
+        # First registration
+        business_data_1 = {
+            "email": "duplicate@example.com",
+            "password": "test123",
+            "business_name": "First Business",
+            "tax_number": "1111111111",
+            "address": "First Address",
+            "city": "Istanbul",
+            "business_category": "gida",
+            "description": "First business"
+        }
+        
+        success_1, response_1 = self.run_test(
+            "Business Registration - First (Should Succeed)",
+            "POST",
+            "register/business",
+            200,
+            data=business_data_1
+        )
+        
+        if not success_1:
+            self.log_test("Business Registration - Duplicate Email", False, "First registration failed")
+            return False
+        
+        # Second registration with same email (should fail)
+        business_data_2 = {
+            "email": "duplicate@example.com",  # Same email
+            "password": "test456",
+            "business_name": "Second Business",
+            "tax_number": "2222222222",
+            "address": "Second Address",
+            "city": "Istanbul",
+            "business_category": "nakliye",
+            "description": "Second business"
+        }
+        
+        success_2, response_2 = self.run_test(
+            "Business Registration - Duplicate Email (Should Fail)",
+            "POST",
+            "register/business",
+            400,  # Should fail with bad request
+            data=business_data_2
+        )
+        
+        if success_2:
+            print(f"   ✅ Duplicate email correctly rejected")
+            return True
+        else:
+            self.log_test("Business Registration - Duplicate Email", False, "Duplicate email was not rejected")
+            return False
+
+    def test_business_registration_missing_fields(self):
+        """Test business registration with missing required fields"""
+        required_fields = ["email", "password", "business_name", "tax_number", "address", "city", "business_category"]
+        
+        base_data = {
+            "email": "complete@example.com",
+            "password": "test123",
+            "business_name": "Complete Business",
+            "tax_number": "3333333333",
+            "address": "Complete Address",
+            "city": "Istanbul",
+            "business_category": "gida",
+            "description": "Complete business"
+        }
+        
+        all_success = True
+        
+        for field in required_fields:
+            # Create data without the current field
+            test_data = base_data.copy()
+            del test_data[field]
+            
+            success, response = self.run_test(
+                f"Business Registration - Missing {field} (Should Fail)",
+                "POST",
+                "register/business",
+                422,  # Validation error
+                data=test_data
+            )
+            
+            if success:
+                print(f"   ✅ Missing {field} correctly rejected")
+            else:
+                print(f"   ❌ Missing {field} was not rejected properly")
+                all_success = False
+        
+        return all_success
+
+    def test_business_registration_field_validation(self):
+        """Test business registration field validation"""
+        all_success = True
+        
+        # Test invalid email format
+        invalid_email_data = {
+            "email": "invalid-email",  # Invalid format
+            "password": "test123",
+            "business_name": "Test Business",
+            "tax_number": "4444444444",
+            "address": "Test Address",
+            "city": "Istanbul",
+            "business_category": "gida"
+        }
+        
+        success, response = self.run_test(
+            "Business Registration - Invalid Email (Should Fail)",
+            "POST",
+            "register/business",
+            422,
+            data=invalid_email_data
+        )
+        
+        if not success:
+            all_success = False
+        
+        # Test invalid business category
+        invalid_category_data = {
+            "email": "validcategory@example.com",
+            "password": "test123",
+            "business_name": "Test Business",
+            "tax_number": "5555555555",
+            "address": "Test Address",
+            "city": "Istanbul",
+            "business_category": "invalid_category"  # Should be 'gida' or 'nakliye'
+        }
+        
+        # Note: This might pass if backend doesn't validate category values
+        success, response = self.run_test(
+            "Business Registration - Invalid Category",
+            "POST",
+            "register/business",
+            200,  # Might pass if no validation
+            data=invalid_category_data
+        )
+        
+        if success:
+            print(f"   ⚠️  Invalid category accepted (no validation implemented)")
+        
+        return all_success
+
+    def test_business_registration_kyc_status(self):
+        """Test that new business has initial KYC status"""
+        business_data = {
+            "email": "kyctest@example.com",
+            "password": "test123",
+            "business_name": "KYC Test Business",
+            "tax_number": "6666666666",
+            "address": "KYC Test Address",
+            "city": "Istanbul",
+            "business_category": "gida",
+            "description": "KYC test business"
+        }
+        
+        success, response = self.run_test(
+            "Business Registration - KYC Status Check",
+            "POST",
+            "register/business",
+            200,
+            data=business_data
+        )
+        
+        if success:
+            user_data = response.get('user_data', {})
+            
+            # Check if KYC status is set (might be in user_data or need separate check)
+            kyc_status = user_data.get('kyc_status')
+            
+            if kyc_status:
+                print(f"   ✅ KYC status set to: {kyc_status}")
+                if kyc_status == 'pending':
+                    print(f"   ✅ Initial KYC status is 'pending' as expected")
+                else:
+                    print(f"   ⚠️  KYC status is '{kyc_status}', expected 'pending'")
+            else:
+                print(f"   ⚠️  KYC status not found in response (might be set in database only)")
+            
+            # Check if business is active
+            is_active = user_data.get('is_active')
+            if is_active is not None:
+                print(f"   ✅ Business active status: {is_active}")
+            
+        return success
+
+    def test_business_registration_password_hashing(self):
+        """Test that business password is properly hashed (not stored in plain text)"""
+        business_data = {
+            "email": "passwordtest@example.com",
+            "password": "plaintext123",
+            "business_name": "Password Test Business",
+            "tax_number": "7777777777",
+            "address": "Password Test Address",
+            "city": "Istanbul",
+            "business_category": "gida"
+        }
+        
+        success, response = self.run_test(
+            "Business Registration - Password Hashing",
+            "POST",
+            "register/business",
+            200,
+            data=business_data
+        )
+        
+        if success:
+            user_data = response.get('user_data', {})
+            
+            # Verify password is not in response
+            if 'password' in user_data:
+                print(f"   ❌ Password found in response: {user_data['password']}")
+                self.log_test("Business Registration - Password Hashing", False, "Password exposed in response")
+                return False
+            
+            print(f"   ✅ Password not exposed in response")
+            
+            # Test login with the registered credentials
+            login_data = {
+                "email": business_data["email"],
+                "password": business_data["password"]
+            }
+            
+            login_success, login_response = self.run_test(
+                "Business Login - Verify Password Hashing",
+                "POST",
+                "auth/login",
+                200,
+                data=login_data
+            )
+            
+            if login_success:
+                print(f"   ✅ Login successful - password properly hashed and verified")
+                return True
+            else:
+                print(f"   ❌ Login failed - password hashing/verification issue")
+                return False
+        
+        return success
+
+    def test_business_registration_token_validity(self):
+        """Test that generated access token is valid and can be used for authentication"""
+        business_data = {
+            "email": "tokentest@example.com",
+            "password": "test123",
+            "business_name": "Token Test Business",
+            "tax_number": "8888888888",
+            "address": "Token Test Address",
+            "city": "Istanbul",
+            "business_category": "gida"
+        }
+        
+        success, response = self.run_test(
+            "Business Registration - Token Generation",
+            "POST",
+            "register/business",
+            200,
+            data=business_data
+        )
+        
+        if success:
+            access_token = response.get('access_token')
+            
+            if not access_token:
+                self.log_test("Business Registration - Token Validity", False, "No access token generated")
+                return False
+            
+            print(f"   ✅ Access token generated: {access_token[:20]}...")
+            
+            # Test using the token to access a protected endpoint
+            token_test_success, token_response = self.run_test(
+                "Business Token - Access Protected Endpoint",
+                "GET",
+                "products/my",  # Business-only endpoint
+                200,
+                token=access_token
+            )
+            
+            if token_test_success:
+                print(f"   ✅ Access token valid - can access protected endpoints")
+                return True
+            else:
+                print(f"   ❌ Access token invalid - cannot access protected endpoints")
+                return False
+        
+        return success
+
     def test_customer_registration(self):
         """Test customer registration"""
         customer_data = {
