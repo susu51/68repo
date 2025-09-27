@@ -1000,6 +1000,7 @@ class DeliverTRAPITester:
             "Admin Authentication",
             "Business Registration", 
             "Customer Registration",
+            "Courier Registration",
             "Product Creation",
             "Order Creation",
             "Order Status Update - ASSIGNED",
@@ -1007,7 +1008,13 @@ class DeliverTRAPITester:
             "Order Status Update - DELIVERED",
             "Admin Get All Users",
             "Admin Get All Products",
-            "Admin Get All Orders"
+            "Admin Get All Orders",
+            "KYC Get Couriers",
+            "KYC Approve Courier",
+            "KYC Reject Courier with Notes",
+            "KYC Status Update - APPROVED",
+            "KYC Status Update - REJECTED",
+            "KYC Status Update - PENDING"
         ]
         
         successful_core_tests = [test for test in self.test_results 
