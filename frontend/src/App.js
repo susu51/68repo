@@ -1084,226 +1084,324 @@ const CourierDashboard = ({ user }) => {
   );
 };
 
+// Business Dashboard - Enhanced with Product Management
 const BusinessDashboard = ({ user }) => {
   const { logout } = useAuth();
-  const [currentView, setCurrentView] = useState('orders'); // orders, menu, settings
-  const [myOrders, setMyOrders] = useState([]);
-  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [activeTab, setActiveTab] = useState('products');
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (currentView === 'orders') {
-      fetchMyOrders();
-    }
-  }, [currentView]);
+  // Product form state
+  const [productForm, setProductForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    preparation_time_minutes: 30,
+    photo_url: '',
+    is_available: true
+  });
 
-  const fetchMyOrders = async () => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('delivertr_access_token');
-      const response = await axios.get(`${API}/orders/my-orders`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMyOrders(response.data.orders);
+      const response = await axios.get(`${API}/products/my`);
+      setProducts(response.data);
     } catch (error) {
-      console.error('Siparişler alınamadı:', error);
+      toast.error('Ürünler yüklenemedi');
     }
     setLoading(false);
   };
 
-  const getCategoryName = (category) => {
-    return category === 'gida' ? 'Gıda' : 'Nakliye';
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${API}/orders`);
+      setOrders(response.data);
+    } catch (error) {
+      toast.error('Siparişler yüklenemedi');
+    }
   };
 
-  const handleOrderCreated = (orderId) => {
-    toast.success('Sipariş oluşturuldu!');
-    setShowCreateOrder(false);
-    setCurrentView('orders');
-    fetchMyOrders();
+  useEffect(() => {
+    fetchProducts();
+    fetchOrders();
+  }, []);
+
+  const handleProductSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const productData = {
+        ...productForm,
+        price: parseFloat(productForm.price),
+        preparation_time_minutes: parseInt(productForm.preparation_time_minutes)
+      };
+
+      await axios.post(`${API}/products`, productData);
+      
+      toast.success('Ürün başarıyla eklendi!');
+      setProductForm({
+        name: '',
+        description: '',
+        price: '',
+        category: '',
+        preparation_time_minutes: 30,
+        photo_url: '',
+        is_available: true
+      });
+      fetchProducts();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Ürün eklenemedi');
+    }
+    setLoading(false);
+  };
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`);
+      toast.success('Sipariş durumu güncellendi');
+      fetchOrders();
+    } catch (error) {
+      toast.error('Durum güncellenemedi');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4" data-testid="business-dashboard">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{user.business_name}</h1>
-            <p className="text-gray-600">{getCategoryName(user.category)} • {user.city}</p>
-          </div>
-          <Button onClick={logout} variant="outline" data-testid="logout-btn">
-            Çıkış Yap
-          </Button>
-        </div>
-
-        <div className="grid md:grid-cols-4 gap-6 mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Bugünkü Siparişler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-blue-600">{myOrders.length}</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Günlük Ciro</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-600">
-                ₺{myOrders.reduce((sum, order) => sum + (order.total || 0), 0).toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Aktif Siparişler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-purple-600">
-                {myOrders.filter(order => !['delivered', 'cancelled'].includes(order.status)).length}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">İşletme Durumu</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Badge variant="default" className="bg-green-100 text-green-800">Açık</Badge>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Navigation */}
-        <div className="mb-6">
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setCurrentView('orders')}
-              variant={currentView === 'orders' ? 'default' : 'outline'}
-              data-testid="orders-tab"
-            >
-              📋 Siparişler
-            </Button>
-            <Button
-              onClick={() => setCurrentView('menu')}
-              variant={currentView === 'menu' ? 'default' : 'outline'}
-              data-testid="menu-tab"
-            >
-              {user.category === 'gida' ? '🍽️ Menü' : '📦 Hizmetler'}
-            </Button>
-            <Button
-              onClick={() => setShowCreateOrder(true)}
-              className="bg-green-600 hover:bg-green-700"
-              data-testid="create-order-btn"
-            >
-              + Test Sipariş Oluştur
-            </Button>
-            <Button
-              onClick={() => setCurrentView('settings')}
-              variant={currentView === 'settings' ? 'default' : 'outline'}
-            >
-              ⚙️ Ayarlar
-            </Button>
-          </div>
-        </div>
-
-        {/* Content */}
-        {currentView === 'orders' && (
-          <div>
-            {loading ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-600">Siparişler yükleniyor...</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <OrdersList
-                userType="business"
-                orders={myOrders}
-                onStatusUpdate={fetchMyOrders}
-              />
-            )}
-          </div>
-        )}
-
-        {currentView === 'menu' && user.category === 'gida' && (
-          <MenuManagement />
-        )}
-
-        {currentView === 'menu' && user.category === 'nakliye' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Nakliye Hizmetleri</CardTitle>
-              <CardDescription>Nakliye işletmeleri için özel hizmet yönetimi</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center py-12">
-              <div className="text-4xl mb-4">🚚</div>
-              <p className="text-gray-500 mb-4">Nakliye hizmet yönetimi yakında!</p>
-              <p className="text-sm text-gray-400">
-                Müşteriler size paket siparişi verebilir
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {currentView === 'settings' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>İşletme Ayarları</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">İşletme Adı</label>
-                <Input value={user.business_name} readOnly />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Kategori</label>
-                <Input value={getCategoryName(user.category)} readOnly />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Şehir</label>
-                <Input value={user.city} readOnly />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Çalışma Saatleri</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <Input placeholder="Açılış (09:00)" />
-                  <Input placeholder="Kapanış (22:00)" />
-                </div>
-              </div>
-              
-              {/* Admin Panel Link */}
-              <div className="mt-6 pt-6 border-t">
-                <div className="text-center">
-                  <a 
-                    href="/admin" 
-                    className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
-                    data-testid="admin-panel-link"
-                  >
-                    🛠️ Admin Panel (Demo)
-                  </a>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Create Order Modal */}
-        {showCreateOrder && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <CreateOrderForm
-                businessId={user.business_id || "demo-business-id"}
-                onOrderCreated={handleOrderCreated}
-                onCancel={() => setShowCreateOrder(false)}
-              />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold">
+                {user.business_name || 'İşletme'} - Yönetim Paneli
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Badge variant="outline">İşletme</Badge>
+              <Button onClick={logout} variant="outline">Çıkış</Button>
             </div>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="products">Ürünler</TabsTrigger>
+            <TabsTrigger value="orders">Siparişler</TabsTrigger>
+            <TabsTrigger value="map">Harita</TabsTrigger>
+          </TabsList>
+
+          {/* Products Tab */}
+          <TabsContent value="products" className="space-y-6">
+            {/* Add Product Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Yeni Ürün Ekle</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleProductSubmit} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Ürün Adı *</Label>
+                      <Input
+                        value={productForm.name}
+                        onChange={(e) => setProductForm({...productForm, name: e.target.value})}
+                        placeholder="Margherita Pizza"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>Fiyat (₺) *</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={productForm.price}
+                        onChange={(e) => setProductForm({...productForm, price: e.target.value})}
+                        placeholder="25.50"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Açıklama *</Label>
+                    <Textarea
+                      value={productForm.description}
+                      onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                      placeholder="Ürün açıklaması..."
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Kategori *</Label>
+                      <Select onValueChange={(value) => setProductForm({...productForm, category: value})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Kategori seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pizza">Pizza</SelectItem>
+                          <SelectItem value="burger">Burger</SelectItem>
+                          <SelectItem value="kebap">Kebap</SelectItem>
+                          <SelectItem value="döner">Döner</SelectItem>
+                          <SelectItem value="tatlı">Tatlı</SelectItem>
+                          <SelectItem value="içecek">İçecek</SelectItem>
+                          <SelectItem value="diğer">Diğer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Hazırlık Süresi (dakika)</Label>
+                      <Input
+                        type="number"
+                        value={productForm.preparation_time_minutes}
+                        onChange={(e) => setProductForm({...productForm, preparation_time_minutes: e.target.value})}
+                        placeholder="30"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Product Photo Upload */}
+                  <div>
+                    <FileUpload
+                      label="Ürün Fotoğrafı"
+                      accept="image/*"
+                      onFileUploaded={(url) => setProductForm({...productForm, photo_url: url})}
+                    />
+                  </div>
+
+                  <Button type="submit" disabled={loading} className="w-full">
+                    {loading ? 'Ekleniyor...' : 'Ürün Ekle'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Products List */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mevcut Ürünler ({products.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {products.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Henüz ürün eklenmemiş</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {products.map((product) => (
+                      <Card key={product.id} className="overflow-hidden">
+                        {product.photo_url && (
+                          <div className="h-32 overflow-hidden">
+                            <img 
+                              src={`${BACKEND_URL}${product.photo_url}`} 
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <CardContent className="p-4">
+                          <h3 className="font-semibold">{product.name}</h3>
+                          <p className="text-sm text-gray-600 mb-2">{product.description}</p>
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-green-600">₺{product.price}</span>
+                            <Badge variant={product.is_available ? "default" : "secondary"}>
+                              {product.is_available ? 'Mevcut' : 'Stokta Yok'}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Hazırlık: {product.preparation_time_minutes} dk
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Orders Tab */}
+          <TabsContent value="orders" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Gelen Siparişler ({orders.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {orders.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Henüz sipariş yok</p>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <Card key={order.id}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
+                              <p className="text-sm text-gray-600">{order.customer_name}</p>
+                              <p className="text-xs text-gray-500">{order.delivery_address}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-lg">₺{order.total_amount}</p>
+                              <OrderStatusBadge status={order.status} />
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <h4 className="font-medium mb-1">Siparişler:</h4>
+                            {order.items.map((item, index) => (
+                              <div key={index} className="text-sm text-gray-600">
+                                {item.quantity}x {item.product_name} - ₺{item.subtotal}
+                              </div>
+                            ))}
+                          </div>
+
+                          {order.status === 'created' && (
+                            <Button 
+                              onClick={() => updateOrderStatus(order.id, 'assigned')}
+                              className="w-full"
+                            >
+                              Siparişi Onayla
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Map Tab */}
+          <TabsContent value="map">
+            <Card>
+              <CardHeader>
+                <CardTitle>Teslimat Haritası</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LeafletMap
+                  center={[39.925533, 32.866287]}
+                  zoom={12}
+                  height="500px"
+                  markers={orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
+                    lat: order.delivery_lat,
+                    lng: order.delivery_lng,
+                    type: 'delivery',
+                    popup: true,
+                    title: `Sipariş #${order.id.slice(-8)}`,
+                    description: order.customer_name,
+                    address: order.delivery_address
+                  }))}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
