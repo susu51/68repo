@@ -2896,24 +2896,76 @@ const CustomerDashboard = ({ user }) => {
           {/* Map Tab */}
           {activeTab === 'map' && (
             <div className="space-y-6">
+              {/* Location Status Card */}
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-2xl">📍</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-800">Konum Durumu</h3>
+                        {userLocation ? (
+                          <p className="text-sm text-green-600">
+                            ✅ Konumunuz aktif • {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
+                          </p>
+                        ) : locationError ? (
+                          <p className="text-sm text-red-600">❌ {locationError}</p>
+                        ) : (
+                          <p className="text-sm text-yellow-600">🔄 Konum alınıyor...</p>
+                        )}
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={getCurrentLocation}
+                      className="bg-blue-600 hover:bg-blue-700"
+                      disabled={!navigator.geolocation}
+                    >
+                      📍 Şu Anki Konumum
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Map Card */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Sipariş Takip Haritası</CardTitle>
+                  <CardTitle className="flex items-center space-x-2">
+                    <span>🗺️</span>
+                    <span>Sipariş Takip Haritası</span>
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Aktif siparişlerinizi ve konumunuzu haritada görüntüleyin
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <LeafletMap
-                    center={[39.925533, 32.866287]}
-                    zoom={12}
+                    center={mapCenter}
+                    zoom={userLocation ? 14 : 6}
                     height="500px"
-                    markers={orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
-                      lat: order.delivery_lat,
-                      lng: order.delivery_lng,
-                      type: 'delivery',
-                      popup: true,
-                      title: `Sipariş #${order.id.slice(-8)}`,
-                      description: `Durum: ${order.status}`,
-                      address: order.delivery_address
-                    }))}
+                    markers={[
+                      // User location marker
+                      ...(userLocation ? [{
+                        lat: userLocation.lat,
+                        lng: userLocation.lng,
+                        type: 'user',
+                        popup: true,
+                        title: '📍 Benim Konumum',
+                        description: `${user.first_name || 'Müşteri'}`,
+                        address: 'Şu anki konumunuz'
+                      }] : []),
+                      // Order markers
+                      ...orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
+                        lat: order.delivery_lat,
+                        lng: order.delivery_lng,
+                        type: 'delivery',
+                        popup: true,
+                        title: `Sipariş #${order.id.slice(-8)}`,
+                        description: `Durum: ${order.status}`,
+                        address: order.delivery_address
+                      }))
+                    ]}
                   />
                 </CardContent>
               </Card>
