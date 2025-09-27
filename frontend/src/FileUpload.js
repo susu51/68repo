@@ -62,7 +62,7 @@ const FileUpload = ({ label = "Dosya", accept = "image/*", onFileUploaded, requi
 
   return (
     <div className="space-y-2">
-      <Label>{label} {required && <span className="text-red-500">*</span>}</Label>
+      <Label>{safeLabel} {required && <span className="text-red-500">*</span>}</Label>
       
       {!uploadedFile ? (
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
@@ -72,10 +72,10 @@ const FileUpload = ({ label = "Dosya", accept = "image/*", onFileUploaded, requi
             onChange={handleFileSelect}
             disabled={uploading}
             className="hidden"
-            id={`file-input-${label.replace(/\s+/g, '-').toLowerCase()}`}
+            id={labelId}
           />
           <Label
-            htmlFor={`file-input-${label.replace(/\s+/g, '-').toLowerCase()}`}
+            htmlFor={labelId}
             className="cursor-pointer"
           >
             <div className="flex flex-col items-center space-y-2">
