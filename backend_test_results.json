@@ -1,177 +1,177 @@
 {
   "summary": {
     "total_tests": 25,
-    "passed_tests": 21,
-    "failed_tests": 4,
-    "success_rate": 84.0,
-    "timestamp": "2025-09-27T00:20:36.996912",
+    "passed_tests": 25,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "timestamp": "2025-09-27T00:22:09.901055",
     "test_type": "delivertr_mvp_core_business_flow",
-    "core_flow_success": false
+    "core_flow_success": true
   },
   "test_results": [
     {
       "test": "Admin Authentication",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.018247"
+      "timestamp": "2025-09-27T00:22:09.016056"
     },
     {
       "test": "Admin Authentication - Wrong Password",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.059597"
+      "timestamp": "2025-09-27T00:22:09.054235"
     },
     {
       "test": "Business Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.145996"
+      "timestamp": "2025-09-27T00:22:09.098011"
     },
     {
       "test": "Customer Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.237976"
+      "timestamp": "2025-09-27T00:22:09.133532"
     },
     {
       "test": "Courier Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.275665"
+      "timestamp": "2025-09-27T00:22:09.169222"
     },
     {
       "test": "Business Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.314251"
+      "timestamp": "2025-09-27T00:22:09.202004"
     },
     {
       "test": "Customer Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.360521"
+      "timestamp": "2025-09-27T00:22:09.267127"
     },
     {
       "test": "Product Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.394426"
+      "timestamp": "2025-09-27T00:22:09.307705"
     },
     {
       "test": "Product Creation 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.430375"
+      "timestamp": "2025-09-27T00:22:09.342861"
     },
     {
       "test": "Product Creation 3",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.467251"
+      "timestamp": "2025-09-27T00:22:09.377376"
     },
     {
       "test": "Product Creation 4",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.501275"
+      "timestamp": "2025-09-27T00:22:09.412617"
     },
     {
       "test": "Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.538359"
+      "timestamp": "2025-09-27T00:22:09.446965"
     },
     {
       "test": "Get Business Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.572974"
+      "timestamp": "2025-09-27T00:22:09.482273"
     },
     {
       "test": "Order Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.611951"
+      "timestamp": "2025-09-27T00:22:09.517865"
     },
     {
       "test": "Get Customer Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.644621"
+      "timestamp": "2025-09-27T00:22:09.552658"
     },
     {
       "test": "Get Business Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.680839"
+      "timestamp": "2025-09-27T00:22:09.587847"
     },
     {
       "test": "Order Status Update - ASSIGNED",
-      "success": false,
-      "details": "Expected 200, got 422. Error: {'detail': [{'type': 'missing', 'loc': ['query', 'new_status'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.11/v/missing'}]}",
-      "timestamp": "2025-09-27T00:20:36.714758"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:22:09.621364"
     },
     {
       "test": "Order Status Update - ON_ROUTE",
-      "success": false,
-      "details": "Expected 200, got 422. Error: {'detail': [{'type': 'missing', 'loc': ['query', 'new_status'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.11/v/missing'}]}",
-      "timestamp": "2025-09-27T00:20:36.751375"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:22:09.659793"
     },
     {
       "test": "Order Status Update - DELIVERED",
-      "success": false,
-      "details": "Expected 200, got 422. Error: {'detail': [{'type': 'missing', 'loc': ['query', 'new_status'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.11/v/missing'}]}",
-      "timestamp": "2025-09-27T00:20:36.784368"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:22:09.692401"
     },
     {
       "test": "Admin Get All Users",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.823002"
+      "timestamp": "2025-09-27T00:22:09.723946"
     },
     {
       "test": "Admin Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.854952"
+      "timestamp": "2025-09-27T00:22:09.761637"
     },
     {
       "test": "Admin Get All Orders",
-      "success": false,
-      "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-27T00:20:36.891343"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:22:09.796071"
     },
     {
       "test": "RBAC - Customer Create Product (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.923988"
+      "timestamp": "2025-09-27T00:22:09.832134"
     },
     {
       "test": "RBAC - Business Access Admin (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.959519"
+      "timestamp": "2025-09-27T00:22:09.867538"
     },
     {
       "test": "File Upload Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:20:36.995989"
+      "timestamp": "2025-09-27T00:22:09.900206"
     }
   ],
   "created_entities": {
-    "business_id": "2a8e3e2b-77bc-43a2-a36c-01d39a116004",
-    "customer_id": "770cbe91-fcf5-4638-a0d7-df720e85d151",
-    "courier_id": "db0e4d3d-f5c4-46cb-b16b-eff3053ff30e",
+    "business_id": "fa0aea73-18a2-48a9-87cb-98efe2f929ef",
+    "customer_id": "e701453f-5858-455a-82bd-251b1f61cb44",
+    "courier_id": "e46d6021-79a1-48de-8460-b9b62c58be67",
     "products": [
-      "e2a8e389-d24d-4f06-a37e-d7860a4fb968",
-      "492dc491-c8bf-49f9-b3b4-619d0976d71a",
-      "9fe8242d-d9f1-4293-bc09-0903fb74a7b7",
-      "111cfb00-42b2-40f7-a85a-b8df45df18ab"
+      "ef26bd48-4a3a-4dac-87a1-c1b0f42dce7d",
+      "d568630b-7987-4501-98ee-40208bf6654f",
+      "d54f2ce3-8d53-4af6-b99c-f7a0b4d037dd",
+      "02924098-c400-43ab-a2b4-ceab1a031cc3"
     ],
     "orders": [
-      "6d17a7b6-df4d-4725-a8c1-5d2aaebc2993"
+      "3f7c1eae-b331-4275-9762-153f41e67243"
     ]
   }
 }
