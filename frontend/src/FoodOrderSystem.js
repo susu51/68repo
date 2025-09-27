@@ -107,10 +107,13 @@ const ProductCard = ({ product, onAddToCart, quantity = 0 }) => {
               src={`${API.replace('/api', '')}${product.photo_url}`}
               alt={product.name}
               className="w-full h-full object-cover rounded-l-lg"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/200x150/f97316/ffffff?text=🍽️';
+              }}
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 rounded-l-lg flex items-center justify-center">
-              <span className="text-4xl">🍽️</span>
+            <div className="w-full h-full bg-gradient-to-br from-orange-300 to-red-400 rounded-l-lg flex items-center justify-center">
+              <span className="text-white text-4xl">🍽️</span>
             </div>
           )}
         </div>
@@ -133,7 +136,7 @@ const ProductCard = ({ product, onAddToCart, quantity = 0 }) => {
                 variant={product.is_available ? "default" : "secondary"}
                 className="text-xs"
               >
-                {product.is_available ? 'Mevcut' : 'Tükendi'}
+                {product.is_available ? '✅ Mevcut' : '❌ Tükendi'}
               </Badge>
             </div>
             
