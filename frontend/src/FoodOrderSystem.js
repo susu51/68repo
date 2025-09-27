@@ -36,7 +36,7 @@ const RestaurantCard = ({ restaurant, onClick, userLocation }) => {
           <Badge className="bg-white text-gray-800 shadow-sm">
             ⭐ {restaurant.rating || '4.5'}
           </Badge>
-          {restaurant.distance && (
+          {restaurant.distance && userLocation && (
             <Badge className="bg-blue-500 text-white shadow-sm">
               📍 {restaurant.distance.toFixed(1)} km
             </Badge>
