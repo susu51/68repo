@@ -251,39 +251,83 @@ export const ProfessionalFoodOrderSystem = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
 
   useEffect(() => {
+    getUserLocation();
     fetchRestaurants();
   }, []);
 
+  const getUserLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setUserLocation(location);
+        console.log('Kullanıcı konumu alındı:', location);
+      },
+      (error) => {
+        console.error('Konum alınamadı:', error);
+        setLocationError('Konum erişimi reddedildi. En yakın restoranları gösteriyoruz.');
+        // Default to Istanbul center if location denied
+        setUserLocation({ lat: 41.0082, lng: 28.9784 });
+      },
+      { 
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000  // 5 minutes cache
+      }
+    );
+  };
+
+  const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   const fetchRestaurants = async () => {
     try {
-      // Get all businesses
-      const response = await axios.get(`${API}/admin/users`);
-      const businesses = response.data.filter(user => user.role === 'business');
+      // Use the new public businesses endpoint
+      const response = await axios.get(`${API}/businesses`);
+      const businessData = response.data;
       
-      // Convert to restaurant format
-      const restaurantData = businesses.map(business => ({
-        id: business.id,
-        name: business.business_name || 'İsimsiz Restoran',
-        category: business.business_category === 'gida' ? 'Restoran' : 'Kargo',
-        description: business.description || 'Lezzetli yemekler sizi bekliyor...',
-        rating: (4.0 + Math.random() * 1.5).toFixed(1),
-        delivery_time: `${20 + Math.floor(Math.random() * 20)}-${35 + Math.floor(Math.random() * 15)}`,
-        min_order: 50 + Math.floor(Math.random() * 50),
-        image: `/api/placeholder-restaurant-${business.id.slice(-1)}.jpg`
-      }));
+      // Sort by distance if user location available
+      let sortedBusinesses = businessData;
+      if (userLocation) {
+        sortedBusinesses = businessData.map(business => ({
+          ...business,
+          distance: calculateDistance(
+            userLocation.lat, userLocation.lng,
+            business.location.lat, business.location.lng
+          )
+        })).sort((a, b) => a.distance - b.distance);
+      }
       
-      setRestaurants(restaurantData);
+      setRestaurants(sortedBusinesses);
     } catch (error) {
       console.error('Restoranlar yüklenemedi:', error);
+      toast.error('Restoranlar yüklenirken hata oluştu');
     }
     setLoading(false);
   };
 
   const fetchProducts = async (restaurantId) => {
     try {
-      const response = await axios.get(`${API}/products?business_id=${restaurantId}`);
+      const response = await axios.get(`${API}/businesses/${restaurantId}/products`);
       setProducts(response.data);
       
       // Extract categories
