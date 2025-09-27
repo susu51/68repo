@@ -396,13 +396,16 @@ export const NearbyOrdersForCourier = () => {
 
   const fetchNearbyOrders = async () => {
     try {
-      const token = localStorage.getItem('delivertr_token');
-      const response = await axios.get(`${API}/orders/nearby-couriers`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const token = localStorage.getItem('delivertr_access_token');
+      const response = await axios.get(`${API}/orders/nearby`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
-      setNearbyOrders(response.data.orders);
+      setNearbyOrders(response.data || []);
     } catch (error) {
-      console.error('Yakın siparişler alınamadı:', error);
+      console.error('Yakındaki siparişler alınamadı:', error);
+      setNearbyOrders([]);
     }
     setLoading(false);
   };
