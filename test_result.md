@@ -240,15 +240,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Payment Gateway Integration (Iyzico)"
-    - "Commission Tracking System"
+    - "Courier Order Acceptance and Location Issues"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
     -agent: "main"
-    -message: "CRITICAL JSX ERROR RESOLVED: Fixed JSX parsing error in OrderSystem.js that was blocking frontend compilation. Removed duplicate/orphaned JSX elements in NearbyOrdersForCourier component. Frontend now compiles successfully and DeliverTR application loads correctly. Ready to proceed with payment gateway integration (Iyzico) and commission tracking system implementation."
+    -message: "CRITICAL COURIER FUNCTIONALITY FIXED: 1) Added missing order acceptance API endpoint 2) Completely redesigned location tracking system - now gets courier location first, then fetches orders 3) Fixed coordinate system with realistic Istanbul districts (no more 520km distances!) 4) Enhanced UX with location status indicators and error handling 5) Prevented distance calculation without location. Ready for testing to confirm all courier panel issues are resolved."
     -agent: "testing"
     -message: "✅ KYC MANAGEMENT SYSTEM TESTING COMPLETE: Comprehensive testing of enhanced KYC system shows excellent results (97.7% success rate). All core KYC functionality working: GET /admin/couriers/kyc returns all couriers with KYC data, PATCH endpoint handles approval/rejection workflow perfectly with proper notes handling in request body, admin authentication working (password: 6851), KYC status update flow (pending→approved→rejected) working, error scenarios handled correctly. The user-reported issues with KYC approval system and rejection reason notes have been resolved. Backend KYC APIs are fully functional and ready for frontend integration."
     -agent: "testing"
