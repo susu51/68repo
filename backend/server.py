@@ -736,7 +736,7 @@ async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
     # CHANGED: Show all city-wide orders, not just nearby
     available_orders = await db.orders.find({
         "status": "created",
-        "courier_id": {"$exists": False}  # Not assigned to any courier yet
+        "courier_id": None  # Not assigned to any courier yet (courier_id is null)
     }).to_list(length=None)
     
     # Process orders for courier display
