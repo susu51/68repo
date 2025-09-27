@@ -35,8 +35,8 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('delivertr_access_token');
-    const userData = localStorage.getItem('delivertr_user');
+    const token = localStorage.getItem('kuryecini_access_token');
+    const userData = localStorage.getItem('kuryecini_user');
     
     if (token && userData) {
       setUser(JSON.parse(userData));
