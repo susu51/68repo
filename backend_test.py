@@ -177,6 +177,318 @@ class DeliverTRAPITester:
         
         return success
 
+    # ===== CITY FIELD VALIDATION TESTS FOR BUSINESS REGISTRATION =====
+    
+    def test_business_registration_city_field_validation(self):
+        """Test business registration with various city values focusing on city field validation"""
+        print("\n🏙️  TESTING BUSINESS REGISTRATION CITY FIELD VALIDATION")
+        
+        # Test data with Turkish city names as requested
+        city_test_cases = [
+            {
+                "name": "Istanbul City Test",
+                "city": "Istanbul",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "Ankara City Test", 
+                "city": "Ankara",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "Izmir City Test",
+                "city": "Izmir", 
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "Turkish Istanbul Test",
+                "city": "İstanbul",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "Turkish Ankara Test",
+                "city": "Ankara",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "Turkish Izmir Test",
+                "city": "İzmir",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "Empty City Test",
+                "city": "",
+                "expected_status": 422,
+                "should_pass": False
+            },
+            {
+                "name": "None City Test",
+                "city": None,
+                "expected_status": 422,
+                "should_pass": False
+            }
+        ]
+        
+        all_tests_passed = True
+        passed_tests = 0
+        total_tests = len(city_test_cases)
+        
+        for i, test_case in enumerate(city_test_cases):
+            print(f"\n   🧪 Test {i+1}/{total_tests}: {test_case['name']}")
+            
+            # Create unique email for each test
+            test_email = f"citytest{i}_{uuid.uuid4().hex[:6]}@example.com"
+            
+            business_data = {
+                "email": test_email,
+                "password": "test123",
+                "business_name": f"Test Business {i+1}",
+                "tax_number": f"{1000000000 + i}",
+                "address": "Test Address",
+                "business_category": "gida",
+                "description": "City validation test business"
+            }
+            
+            # Add city field (handle None case)
+            if test_case["city"] is not None:
+                business_data["city"] = test_case["city"]
+            
+            success, response = self.run_test(
+                f"Business Registration - {test_case['name']}",
+                "POST",
+                "register/business",
+                test_case["expected_status"],
+                data=business_data
+            )
+            
+            if success == test_case["should_pass"]:
+                passed_tests += 1
+                if test_case["should_pass"]:
+                    print(f"   ✅ City '{test_case['city']}' accepted successfully")
+                    # Verify city is stored correctly in response
+                    if response and isinstance(response, dict):
+                        user_data = response.get('user_data', {})
+                        stored_city = user_data.get('city')
+                        if stored_city == test_case['city']:
+                            print(f"   ✅ City correctly stored: '{stored_city}'")
+                        else:
+                            print(f"   ⚠️  City storage mismatch: expected '{test_case['city']}', got '{stored_city}'")
+                else:
+                    print(f"   ✅ Invalid city '{test_case['city']}' correctly rejected")
+            else:
+                all_tests_passed = False
+                if test_case["should_pass"]:
+                    print(f"   ❌ City '{test_case['city']}' should have been accepted but was rejected")
+                else:
+                    print(f"   ❌ Invalid city '{test_case['city']}' should have been rejected but was accepted")
+        
+        print(f"\n   📊 City Field Validation Results: {passed_tests}/{total_tests} tests passed")
+        
+        if all_tests_passed:
+            self.log_test("Business Registration City Field Validation", True, f"All {total_tests} city validation tests passed")
+        else:
+            self.log_test("Business Registration City Field Validation", False, f"Only {passed_tests}/{total_tests} city validation tests passed")
+        
+        return all_tests_passed
+
+    def test_business_registration_sample_data_from_request(self):
+        """Test business registration with the exact sample data from the review request"""
+        print("\n📋 TESTING BUSINESS REGISTRATION WITH SAMPLE DATA FROM REQUEST")
+        
+        sample_business_data = {
+            "email": "cityfix-test@example.com",
+            "password": "test123", 
+            "business_name": "Şehir Düzeltme Testi İşletmesi",
+            "tax_number": "1111222233",
+            "address": "Test Mahallesi, Test Sokak No:1",
+            "city": "Istanbul",
+            "business_category": "gida",
+            "description": "Şehir seçim sorunu test edilmesi"
+        }
+        
+        success, response = self.run_test(
+            "Business Registration - Sample Data from Request",
+            "POST", 
+            "register/business",
+            200,
+            data=sample_business_data
+        )
+        
+        if success:
+            print(f"   ✅ Sample business registration successful")
+            
+            # Verify all required fields are in response
+            user_data = response.get('user_data', {})
+            required_fields = ['business_name', 'tax_number', 'address', 'city', 'business_category', 'description']
+            
+            all_fields_correct = True
+            for field in required_fields:
+                expected_value = sample_business_data[field]
+                actual_value = user_data.get(field)
+                
+                if actual_value == expected_value:
+                    print(f"   ✅ {field}: '{actual_value}' ✓")
+                else:
+                    print(f"   ❌ {field}: expected '{expected_value}', got '{actual_value}'")
+                    all_fields_correct = False
+            
+            # Verify token and user type
+            if response.get('token_type') == 'bearer' and response.get('user_type') == 'business':
+                print(f"   ✅ Token and user type correct")
+            else:
+                print(f"   ❌ Token type: {response.get('token_type')}, User type: {response.get('user_type')}")
+                all_fields_correct = False
+            
+            # Test login with the registered credentials
+            login_data = {
+                "email": sample_business_data["email"],
+                "password": sample_business_data["password"]
+            }
+            
+            login_success, login_response = self.run_test(
+                "Login with Sample Business Credentials",
+                "POST",
+                "auth/login", 
+                200,
+                data=login_data
+            )
+            
+            if login_success:
+                print(f"   ✅ Login with sample credentials successful")
+                
+                # Test accessing protected endpoint with token
+                access_token = response.get('access_token')
+                if access_token:
+                    protected_success, protected_response = self.run_test(
+                        "Access Protected Endpoint with Sample Business Token",
+                        "GET",
+                        "products/my",
+                        200,
+                        token=access_token
+                    )
+                    
+                    if protected_success:
+                        print(f"   ✅ Protected endpoint access successful")
+                    else:
+                        print(f"   ❌ Protected endpoint access failed")
+                        all_fields_correct = False
+            else:
+                print(f"   ❌ Login with sample credentials failed")
+                all_fields_correct = False
+            
+            if all_fields_correct:
+                self.log_test("Business Registration Sample Data", True, "Sample business registration with city field working perfectly")
+                return True
+            else:
+                self.log_test("Business Registration Sample Data", False, "Issues found with sample business registration")
+                return False
+        else:
+            self.log_test("Business Registration Sample Data", False, "Sample business registration failed")
+            return False
+
+    def test_business_registration_city_field_edge_cases(self):
+        """Test business registration city field with edge cases"""
+        print("\n🔍 TESTING BUSINESS REGISTRATION CITY FIELD EDGE CASES")
+        
+        edge_cases = [
+            {
+                "name": "Very Long City Name",
+                "city": "A" * 100,  # 100 character city name
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "City with Special Characters",
+                "city": "İstanbul-Beyoğlu/Şişli",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "City with Numbers",
+                "city": "District34",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "Single Character City",
+                "city": "A",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "City with Spaces",
+                "city": "New York",
+                "expected_status": 200,
+                "should_pass": True
+            },
+            {
+                "name": "City with Unicode",
+                "city": "北京",  # Beijing in Chinese
+                "expected_status": 200,
+                "should_pass": True
+            }
+        ]
+        
+        all_tests_passed = True
+        passed_tests = 0
+        
+        for i, test_case in enumerate(edge_cases):
+            print(f"\n   🧪 Edge Case {i+1}: {test_case['name']}")
+            
+            test_email = f"edgecase{i}_{uuid.uuid4().hex[:6]}@example.com"
+            
+            business_data = {
+                "email": test_email,
+                "password": "test123",
+                "business_name": f"Edge Case Business {i+1}",
+                "tax_number": f"{2000000000 + i}",
+                "address": "Edge Case Address",
+                "city": test_case["city"],
+                "business_category": "gida",
+                "description": "Edge case test business"
+            }
+            
+            success, response = self.run_test(
+                f"Business Registration - {test_case['name']}",
+                "POST",
+                "register/business",
+                test_case["expected_status"],
+                data=business_data
+            )
+            
+            if success == test_case["should_pass"]:
+                passed_tests += 1
+                if test_case["should_pass"]:
+                    print(f"   ✅ Edge case city '{test_case['city']}' handled correctly")
+                    # Verify city is stored correctly
+                    if response and isinstance(response, dict):
+                        user_data = response.get('user_data', {})
+                        stored_city = user_data.get('city')
+                        if stored_city == test_case['city']:
+                            print(f"   ✅ City correctly stored with edge case characters")
+                        else:
+                            print(f"   ⚠️  City storage issue: expected '{test_case['city']}', got '{stored_city}'")
+                else:
+                    print(f"   ✅ Invalid edge case city correctly rejected")
+            else:
+                all_tests_passed = False
+                print(f"   ❌ Edge case city '{test_case['city']}' not handled as expected")
+        
+        print(f"\n   📊 Edge Case Results: {passed_tests}/{len(edge_cases)} tests passed")
+        
+        if all_tests_passed:
+            self.log_test("Business Registration City Edge Cases", True, f"All {len(edge_cases)} edge case tests passed")
+        else:
+            self.log_test("Business Registration City Edge Cases", False, f"Only {passed_tests}/{len(edge_cases)} edge case tests passed")
+        
+        return all_tests_passed
+
     # ===== COMPREHENSIVE BUSINESS REGISTRATION TESTS =====
     
     def test_business_registration_comprehensive(self):
