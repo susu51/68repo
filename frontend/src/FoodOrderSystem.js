@@ -366,6 +366,35 @@ export const ProfessionalFoodOrderSystem = () => {
     setRestaurants(sortedBusinesses);
   };
 
+  const sortAndFilterRestaurants = (data, type, location) => {
+    let sortedData = [...data];
+    
+    if (type === 'nearest' && location) {
+      // Sort by distance (En Yakın)
+      sortedData = data.map(business => ({
+        ...business,
+        distance: calculateDistance(
+          location.lat, location.lng,
+          business.location.lat, business.location.lng
+        )
+      })).sort((a, b) => a.distance - b.distance);
+    } else if (type === 'citywide') {
+      // Sort by rating for citywide (Şehir Geneli)
+      sortedData = data.sort((a, b) => {
+        const ratingA = parseFloat(a.rating) || 0;
+        const ratingB = parseFloat(b.rating) || 0;
+        return ratingB - ratingA; // Higher rating first
+      });
+    }
+    
+    setRestaurants(sortedData);
+  };
+
+  const handleSortChange = (newSortType) => {
+    setSortType(newSortType);
+    sortAndFilterRestaurants(originalRestaurants, newSortType, userLocation);
+  };
+
   const fetchProducts = async (restaurantId) => {
     try {
       const response = await axios.get(`${API}/businesses/${restaurantId}/products`);
