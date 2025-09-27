@@ -917,6 +917,325 @@ class DeliverTRAPITester:
         
         return all_success
 
+    # ===== ORDER VISIBILITY BUG TESTS =====
+    
+    def test_courier_nearby_orders_access_control(self):
+        """Test that only KYC-approved couriers can access nearby orders"""
+        if not self.courier_token:
+            self.log_test("Courier Nearby Orders Access Control", False, "No courier token available")
+            return False
+        
+        # First test with non-approved courier (should fail)
+        success, response = self.run_test(
+            "Nearby Orders - Non-Approved Courier (Should Fail)",
+            "GET",
+            "orders/nearby",
+            403,  # Should be forbidden for non-approved couriers
+            token=self.courier_token
+        )
+        
+        if not success:
+            print("   Warning: Non-approved courier was able to access nearby orders")
+        
+        # Now approve the courier and test again
+        if self.admin_token and self.courier_id:
+            approve_success, _ = self.run_test(
+                "Approve Test Courier for Nearby Orders",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+            
+            if approve_success:
+                # Test with approved courier (should succeed)
+                success, response = self.run_test(
+                    "Nearby Orders - Approved Courier",
+                    "GET",
+                    "orders/nearby",
+                    200,
+                    token=self.courier_token
+                )
+                
+                if success:
+                    print(f"   Approved courier can access nearby orders: {len(response) if isinstance(response, list) else 'N/A'} orders found")
+                    return True
+        
+        return False
+
+    def test_order_creation_and_visibility_flow(self):
+        """Test complete flow: customer creates order → order appears in courier nearby orders"""
+        if not self.customer_token or not self.created_products:
+            self.log_test("Order Creation and Visibility Flow", False, "No customer token or products available")
+            return False
+        
+        print("\n🔍 Testing Order Creation and Visibility Flow...")
+        
+        # Step 1: Create a new order as customer
+        order_items = []
+        total_amount = 0
+        
+        for product in self.created_products[:2]:  # Use first 2 products
+            quantity = 1
+            subtotal = product['price'] * quantity
+            
+            order_items.append({
+                "product_id": product['id'],
+                "product_name": product['name'],
+                "product_price": product['price'],
+                "quantity": quantity,
+                "subtotal": subtotal
+            })
+            total_amount += subtotal
+        
+        order_data = {
+            "delivery_address": "Beşiktaş Meydanı No:15, Beşiktaş, İstanbul",
+            "delivery_lat": 41.0422,
+            "delivery_lng": 29.0033,
+            "items": order_items,
+            "total_amount": total_amount,
+            "notes": "Test order for visibility bug"
+        }
+        
+        success, order_response = self.run_test(
+            "Create Order for Visibility Test",
+            "POST",
+            "orders",
+            200,
+            data=order_data,
+            token=self.customer_token
+        )
+        
+        if not success:
+            self.log_test("Order Creation and Visibility Flow", False, "Failed to create test order")
+            return False
+        
+        created_order_id = order_response.get('id')
+        order_status = order_response.get('status')
+        
+        print(f"   ✅ Order created: ID={created_order_id}, Status={order_status}")
+        
+        # Step 2: Verify order has status "created" and no courier_id
+        if order_status != "created":
+            self.log_test("Order Creation and Visibility Flow", False, f"Order status is '{order_status}', expected 'created'")
+            return False
+        
+        if order_response.get('courier_id') is not None:
+            self.log_test("Order Creation and Visibility Flow", False, f"Order has courier_id '{order_response.get('courier_id')}', expected None")
+            return False
+        
+        print(f"   ✅ Order status correct: {order_status}, courier_id: {order_response.get('courier_id')}")
+        
+        # Step 3: Ensure courier is KYC approved
+        if self.admin_token and self.courier_id:
+            approve_success, _ = self.run_test(
+                "Ensure Courier KYC Approved",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+            
+            if not approve_success:
+                self.log_test("Order Creation and Visibility Flow", False, "Failed to approve courier KYC")
+                return False
+        
+        # Step 4: Check if order appears in courier nearby orders
+        success, nearby_orders = self.run_test(
+            "Check Order in Nearby Orders",
+            "GET",
+            "orders/nearby",
+            200,
+            token=self.courier_token
+        )
+        
+        if not success:
+            self.log_test("Order Creation and Visibility Flow", False, "Failed to get nearby orders")
+            return False
+        
+        # Step 5: Verify the created order is in the nearby orders list
+        order_found = False
+        if isinstance(nearby_orders, list):
+            for nearby_order in nearby_orders:
+                if nearby_order.get('id') == created_order_id:
+                    order_found = True
+                    print(f"   ✅ Order found in nearby orders: {nearby_order.get('customer_name')} - {nearby_order.get('business_name')}")
+                    break
+        
+        if not order_found:
+            print(f"   ❌ Order {created_order_id} NOT FOUND in nearby orders list")
+            print(f"   📋 Nearby orders found: {len(nearby_orders) if isinstance(nearby_orders, list) else 0}")
+            if isinstance(nearby_orders, list) and len(nearby_orders) > 0:
+                print("   📋 Available orders:")
+                for i, order in enumerate(nearby_orders[:3]):  # Show first 3
+                    print(f"      {i+1}. ID: {order.get('id')}, Customer: {order.get('customer_name')}")
+            
+            self.log_test("Order Creation and Visibility Flow", False, f"Created order {created_order_id} not visible in courier nearby orders")
+            return False
+        
+        self.log_test("Order Creation and Visibility Flow", True, f"Order {created_order_id} successfully visible in courier nearby orders")
+        return True
+
+    def test_order_database_storage(self):
+        """Test that orders are properly stored in database with correct status"""
+        if not self.admin_token:
+            self.log_test("Order Database Storage", False, "No admin token available")
+            return False
+        
+        # Get all orders from admin endpoint to verify database storage
+        success, all_orders = self.run_test(
+            "Get All Orders from Database",
+            "GET",
+            "admin/orders",
+            200,
+            token=self.admin_token
+        )
+        
+        if not success:
+            self.log_test("Order Database Storage", False, "Failed to get orders from database")
+            return False
+        
+        if not isinstance(all_orders, list):
+            self.log_test("Order Database Storage", False, "Orders response is not a list")
+            return False
+        
+        # Check for orders with status "created"
+        created_orders = [order for order in all_orders if order.get('status') == 'created']
+        
+        print(f"   📊 Total orders in database: {len(all_orders)}")
+        print(f"   📊 Orders with status 'created': {len(created_orders)}")
+        
+        if len(created_orders) == 0:
+            self.log_test("Order Database Storage", False, "No orders with status 'created' found in database")
+            return False
+        
+        # Verify structure of created orders
+        for order in created_orders[:3]:  # Check first 3 created orders
+            required_fields = ['id', 'customer_id', 'status', 'total_amount', 'created_at']
+            missing_fields = [field for field in required_fields if field not in order]
+            
+            if missing_fields:
+                self.log_test("Order Database Storage", False, f"Order {order.get('id')} missing fields: {missing_fields}")
+                return False
+            
+            # Check that courier_id is None for created orders
+            if order.get('courier_id') is not None:
+                print(f"   ⚠️  Order {order.get('id')} has courier_id {order.get('courier_id')} but status is 'created'")
+        
+        self.log_test("Order Database Storage", True, f"Orders properly stored in database: {len(created_orders)} created orders found")
+        return True
+
+    def test_multiple_customers_order_visibility(self):
+        """Test that orders from multiple customers are visible to approved couriers"""
+        if not self.admin_token:
+            self.log_test("Multiple Customers Order Visibility", False, "No admin token available")
+            return False
+        
+        # Create additional customers and orders
+        additional_customers = []
+        additional_orders = []
+        
+        for i in range(2):  # Create 2 additional customers
+            customer_email = f"customer_multi_{i}_{uuid.uuid4().hex[:8]}@test.com"
+            customer_data = {
+                "email": customer_email,
+                "password": self.test_password,
+                "first_name": f"Müşteri{i+1}",
+                "last_name": "Test",
+                "city": "İstanbul"
+            }
+            
+            success, response = self.run_test(
+                f"Register Additional Customer {i+1}",
+                "POST",
+                "register/customer",
+                200,
+                data=customer_data
+            )
+            
+            if success and response.get('access_token'):
+                customer_token = response['access_token']
+                additional_customers.append({
+                    'email': customer_email,
+                    'token': customer_token,
+                    'id': response.get('user_data', {}).get('id')
+                })
+                
+                # Create an order for this customer
+                if self.created_products:
+                    product = self.created_products[0]
+                    order_data = {
+                        "delivery_address": f"Test Address {i+1}, İstanbul",
+                        "delivery_lat": 41.0082 + (i * 0.01),
+                        "delivery_lng": 28.9784 + (i * 0.01),
+                        "items": [{
+                            "product_id": product['id'],
+                            "product_name": product['name'],
+                            "product_price": product['price'],
+                            "quantity": 1,
+                            "subtotal": product['price']
+                        }],
+                        "total_amount": product['price'],
+                        "notes": f"Multi-customer test order {i+1}"
+                    }
+                    
+                    order_success, order_response = self.run_test(
+                        f"Create Order for Customer {i+1}",
+                        "POST",
+                        "orders",
+                        200,
+                        data=order_data,
+                        token=customer_token
+                    )
+                    
+                    if order_success:
+                        additional_orders.append(order_response)
+        
+        if len(additional_orders) == 0:
+            self.log_test("Multiple Customers Order Visibility", False, "Failed to create additional orders")
+            return False
+        
+        # Ensure courier is approved
+        if self.courier_id:
+            self.run_test(
+                "Approve Courier for Multi-Customer Test",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+        
+        # Check if all orders are visible to courier
+        success, nearby_orders = self.run_test(
+            "Get Nearby Orders - Multi Customer",
+            "GET",
+            "orders/nearby",
+            200,
+            token=self.courier_token
+        )
+        
+        if not success:
+            self.log_test("Multiple Customers Order Visibility", False, "Failed to get nearby orders")
+            return False
+        
+        # Verify orders from different customers are visible
+        found_orders = 0
+        if isinstance(nearby_orders, list):
+            for additional_order in additional_orders:
+                order_id = additional_order.get('id')
+                if any(nearby_order.get('id') == order_id for nearby_order in nearby_orders):
+                    found_orders += 1
+        
+        print(f"   📊 Additional orders created: {len(additional_orders)}")
+        print(f"   📊 Orders found in nearby list: {found_orders}")
+        
+        if found_orders < len(additional_orders):
+            self.log_test("Multiple Customers Order Visibility", False, f"Only {found_orders}/{len(additional_orders)} orders visible to courier")
+            return False
+        
+        self.log_test("Multiple Customers Order Visibility", True, f"All {found_orders} orders from multiple customers visible to courier")
+        return True
+
     def run_all_tests(self):
         """Run all backend tests for DeliverTR MVP Core Business Flow"""
         print("🚀 Starting DeliverTR Backend API Tests - Core Business Flow")
