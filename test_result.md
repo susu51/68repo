@@ -102,92 +102,71 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implement DeliverTR MVP - Turkish delivery platform with email/password auth (JWT), detailed courier registration with license/vehicle documents, KYC system, order flow management, 3% commission system, and admin panel."
+user_problem_statement: "Implement DeliverTR MVP - Core flow: Business can add products with photos, customers can browse/cart/order, order flow CREATED→ASSIGNED→ON_ROUTE→DELIVERED, admin can manage everything. Admin login: password 6851. Maps with Leaflet+OpenStreetMap. Photos working properly."
 
 backend:
-  - task: "Email/Password Authentication System"
+  - task: "Core Flow - Product & Order System"
     implemented: true
-    working: true
+    working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         -working: "NA"
         -agent: "main"
-        -comment: "Reverted to email/password authentication with JWT tokens. Added login, registration endpoints for courier/business/customer roles with detailed courier fields (license info, vehicle details, file uploads)"
-        -working: true
-        -agent: "testing"
-        -comment: "✅ PASSED - Email/password authentication working correctly. POST /api/auth/login validates credentials, generates JWT tokens with proper structure (bearer token, user_type, user_data). Password hashing with bcrypt working. Invalid credentials return 401. JWT token validation working for protected routes. Fixed database unique index issue (removed phone index, added email unique index)."
+        -comment: "Complete core flow implemented: Product CRUD, Order management with status flow (CREATED→ASSIGNED→ON_ROUTE→DELIVERED), Admin authentication (password 6851), Commission tracking (3%)"
 
-  - task: "Detailed Courier Registration"
+  - task: "Admin Authentication System"
     implemented: true
     working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
+    status_history:
+        -working: true
+        -agent: "main"
+        -comment: "Admin login working with password 6851, returns proper JWT token, admin dashboard loads correctly"
+
+  - task: "Enhanced API Endpoints"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
     status_history:
         -working: "NA"
         -agent: "main"
-        -comment: "Added comprehensive courier registration with ehliyet sınıfı, ehliyet numarası, araç tipi, araç modeli, license_photo_url, vehicle_photo_url, profile_photo_url fields"
-        -working: true
-        -agent: "testing"
-        -comment: "✅ PASSED - Detailed courier registration working perfectly. POST /api/register/courier accepts all required fields: email, password, first_name, last_name, iban, vehicle_type, vehicle_model, license_class (ehliyet_sınıfı), license_number (ehliyet_numarası), city, plus optional photo URLs. Returns JWT token and complete user data. Validation working for required fields and email format. Duplicate email detection working."
-
-  - task: "File Upload System"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-        -working: "NA"
-        -agent: "main"
-        -comment: "File upload endpoint for images/documents with validation (max 10MB, allowed types: image/*, pdf)"
-        -working: true
-        -agent: "testing"
-        -comment: "✅ PASSED - File upload system working correctly. POST /api/upload validates file types (image/*, pdf), file size (max 10MB), generates unique filenames with UUIDs, returns file_url, filename, original_filename, content_type, and size. Invalid file types return 400 error. Files stored in /uploads directory and accessible via /uploads/{filename} URLs."
-
-  - task: "Business Registration"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-        -working: true
-        -agent: "testing"
-        -comment: "✅ PASSED - Business registration working correctly. POST /api/register/business accepts email, password, business_name, tax_number, address, city, business_category, description. Returns JWT token and business user data. All validation working properly."
-
-  - task: "Customer Registration"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-        -working: true
-        -agent: "testing"
-        -comment: "✅ PASSED - Customer registration working correctly. POST /api/register/customer accepts email, password, first_name, last_name, city. Returns JWT token and customer user data. All validation working properly."
-
-  - task: "JWT Token Management"
-    implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-        -working: true
-        -agent: "testing"
-        -comment: "✅ PASSED - JWT token management working perfectly. Tokens generated with HS256 algorithm, 15-minute expiry. GET /api/me endpoint validates tokens and returns user profile without password. Invalid/malformed tokens return 401. Token structure includes sub (email), exp (expiry). Authorization header format: Bearer {token}."
+        -comment: "Added comprehensive API endpoints: POST/GET /products, POST /orders, PATCH /orders/{id}/status, GET /admin/users, /admin/products, /admin/orders"
 
 frontend:
-  - task: "Email Authentication UI"
+  - task: "Enhanced Business Dashboard"
+    implemented: true
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "Complete business dashboard with product management: add products with photos, view orders, update order status, Leaflet maps integration"
+
+  - task: "Enhanced Customer Dashboard"
+    implemented: true
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "Complete customer experience: browse products, shopping cart functionality, order placement, order tracking, Leaflet maps for delivery tracking"
+
+  - task: "Admin Dashboard & Login"
     implemented: true
     working: true
     file: "App.js"
@@ -197,34 +176,37 @@ frontend:
     status_history:
         -working: true
         -agent: "main"
-        -comment: "Email/password login form working correctly. Role selection page shows 3 options (Kurye, İşletme, Müşteri)"
+        -comment: "Admin login tab working with password 6851, comprehensive admin dashboard with users/products/orders management, system stats"
 
-  - task: "Detailed Courier Registration Form"
+  - task: "Leaflet Maps Integration"
     implemented: true
-    working: true
-    file: "App.js, FileUpload.js"
+    working: "NA"
+    file: "LeafletMap.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        -working: true
+        -working: "NA"
         -agent: "main"
-        -comment: "Comprehensive courier form with ehliyet bilgileri, araç bilgileri, and file upload sections. UI shows proper structure with required fields and upload areas"
+        -comment: "Leaflet + OpenStreetMap integration complete with custom markers, proper height settings, legend, click handlers for all dashboard views"
 
 metadata:
   created_by: "main_agent"
-  version: "2.1"
-  test_sequence: 3
+  version: "3.0"
+  test_sequence: 4
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Core Flow - Product & Order System"
+    - "Enhanced API Endpoints"
+    - "Enhanced Business Dashboard"
+    - "Enhanced Customer Dashboard" 
+    - "Leaflet Maps Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
     -agent: "main"
-    -message: "Successfully reverted to email/password authentication system as requested. Implemented detailed courier registration with ehliyet sınıfı, ehliyet numarası, araç tipi, araç modeli, and file upload capabilities for license/vehicle/profile photos. Frontend shows proper forms with structured sections. Ready for comprehensive backend testing of authentication and registration flows."
-    -agent: "testing"
-    -message: "✅ COMPREHENSIVE BACKEND TESTING COMPLETED - All email/password authentication systems working correctly. Fixed critical database issue (removed phone unique index, added email unique index). All registration endpoints (courier, business, customer) working with proper validation. JWT token management working perfectly. File upload system working with proper validation. Password hashing with bcrypt working securely. All detailed courier fields implemented and working: license_class (ehliyet_sınıfı), license_number (ehliyet_numarası), vehicle_type (araç_tipi), vehicle_model (araç_modeli), plus IBAN, photo URLs. Success rate: 85.7% (18/21 tests passed, 3 expected failures due to duplicate emails from previous test runs). System ready for production use."
+    -message: "Major DeliverTR MVP enhancement complete! Core flow implemented: Business product management with photos, Customer shopping cart & ordering, Order flow (CREATED→ASSIGNED→ON_ROUTE→DELIVERED), Admin management (password 6851), Leaflet maps integration. Admin login working. Ready for comprehensive testing of complete end-to-end workflow including product creation, ordering, and order management."
