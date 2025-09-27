@@ -2065,32 +2065,53 @@ const BusinessDashboard = ({ user }) => {
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
                 {products.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Henüz ürün eklenmemiş</p>
+                  <div className="text-center py-12">
+                    <div className="text-4xl sm:text-6xl mb-4">📦</div>
+                    <p className="text-gray-500 text-sm sm:text-base">Henüz ürününüz yok</p>
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">Yukarıdaki formdan yeni ürün ekleyin</p>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     {products.map((product) => (
-                      <Card key={product.id} className="overflow-hidden">
+                      <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow border-0 shadow-md">
                         {product.photo_url && (
-                          <div className="h-32 overflow-hidden">
+                          <div className="h-28 sm:h-32 overflow-hidden relative">
                             <img 
                               src={`${BACKEND_URL}${product.photo_url}`} 
                               alt={product.name}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             />
-                          </div>
-                        )}
-                        <CardContent className="p-4">
-                          <h3 className="font-semibold">{product.name}</h3>
-                          <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-green-600">₺{product.price}</span>
-                            <Badge variant={product.is_available ? "default" : "secondary"}>
-                              {product.is_available ? 'Mevcut' : 'Stokta Yok'}
+                            <Badge 
+                              variant={product.is_available ? "default" : "secondary"}
+                              className={`absolute top-2 right-2 text-xs ${
+                                product.is_available ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
+                              }`}
+                            >
+                              {product.is_available ? '✅ Mevcut' : '❌ Stokta Yok'}
                             </Badge>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Hazırlık: {product.preparation_time_minutes} dk
+                        )}
+                        <CardContent className="p-3 sm:p-4">
+                          <h3 className="font-semibold text-sm sm:text-base text-gray-900 mb-1">
+                            {product.name}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">
+                            {product.description}
                           </p>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                                ₺{product.price}
+                              </span>
+                              <Badge variant="outline" className="text-xs">
+                                📂 {product.category}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <span>⏱️ {product.preparation_time_minutes} dk</span>
+                              <span>{product.is_available ? '🟢 Aktif' : '🔴 Pasif'}</span>
+                            </div>
+                          </div>
                         </CardContent>
                       </Card>
                     ))}
