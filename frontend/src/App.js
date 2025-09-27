@@ -106,10 +106,6 @@ const LoginForm = ({ onRegisterClick }) => {
 
   const handleAdminSubmit = async (e) => {
     e.preventDefault();
-    
-    // Debug alert to see if function is called
-    alert('Admin login button clicked!');
-    
     setLoading(true);
 
     // Manual validation
@@ -119,25 +115,12 @@ const LoginForm = ({ onRegisterClick }) => {
       return;
     }
 
-    console.log('Admin login attempt:', {
-      password: formData.adminPassword,
-      apiUrl: `${API}/auth/admin`
-    });
-
     try {
       const response = await axios.post(`${API}/auth/admin`, {
         password: formData.adminPassword
       });
-      console.log('Admin login success:', response.data);
-      
-      // Debug toast
-      toast.success(`API Response received! Role: ${response.data.user_data.role}`);
       
       login(response.data);
-      
-      // Another debug toast after login call
-      toast.success('Login function called successfully!');
-      
       toast.success('Admin girişi başarılı!');
     } catch (error) {
       console.error('Admin login error:', error);
