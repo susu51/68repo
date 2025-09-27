@@ -1933,8 +1933,17 @@ class DeliverTRAPITester:
         self.test_kyc_error_scenarios()
         self.test_kyc_notes_handling()
         
-        # Test 11: ORDER VISIBILITY BUG TESTING
-        print("\n📋 PHASE 11: ORDER VISIBILITY BUG TESTING")
+        # Test 11: COURIER ORDER ACCEPTANCE TESTING
+        print("\n📋 PHASE 11: COURIER ORDER ACCEPTANCE TESTING")
+        self.test_order_acceptance_endpoint()
+        self.test_order_acceptance_status_update()
+        self.test_kyc_approval_check_for_acceptance()
+        self.test_already_accepted_order_error()
+        self.test_nearby_orders_realistic_coordinates()
+        self.test_complete_order_acceptance_flow()
+        
+        # Test 12: ORDER VISIBILITY BUG TESTING
+        print("\n📋 PHASE 12: ORDER VISIBILITY BUG TESTING")
         self.test_courier_nearby_orders_access_control()
         self.test_order_creation_and_visibility_flow()
         self.test_order_database_storage()
