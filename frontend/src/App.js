@@ -33,33 +33,64 @@ const AuthContext = React.createContext();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('kuryecini_access_token');
-    const userData = localStorage.getItem('kuryecini_user');
+    setIsMounted(true);
     
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-      // Set axios default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const userData = localStorage.getItem('kuryecini_user');
+      
+      if (token && userData && isMounted) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        // Set axios default authorization header
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+      // Clear corrupted data
+      localStorage.removeItem('kuryecini_access_token');
+      localStorage.removeItem('kuryecini_user');
     }
-    setLoading(false);
+    
+    if (isMounted) {
+      setLoading(false);
+    }
+
+    // Cleanup
+    return () => {
+      setIsMounted(false);
+    };
   }, []);
 
   const login = (authData) => {
-    localStorage.setItem('kuryecini_access_token', authData.access_token);
-    localStorage.setItem('kuryecini_user', JSON.stringify(authData.user_data));
-    setUser(authData.user_data);
+    if (!isMounted) return;
     
-    // Set axios default authorization header
-    axios.defaults.headers.common['Authorization'] = `Bearer ${authData.access_token}`;
+    try {
+      localStorage.setItem('kuryecini_access_token', authData.access_token);
+      localStorage.setItem('kuryecini_user', JSON.stringify(authData.user_data));
+      setUser(authData.user_data);
+      
+      // Set axios default authorization header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${authData.access_token}`;
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem('kuryecini_access_token');
-    localStorage.removeItem('kuryecini_user');
-    setUser(null);
-    delete axios.defaults.headers.common['Authorization'];
+    if (!isMounted) return;
+    
+    try {
+      localStorage.removeItem('kuryecini_access_token');
+      localStorage.removeItem('kuryecini_user');
+      setUser(null);
+      delete axios.defaults.headers.common['Authorization'];
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
