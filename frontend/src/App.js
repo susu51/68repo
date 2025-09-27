@@ -1651,6 +1651,9 @@ const CourierDashboard = ({ user }) => {
   const [myOrders, setMyOrders] = useState([]);
   const [nearbyOrders, setNearbyOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [courierLocation, setCourierLocation] = useState(null);
+  const [routePolyline, setRoutePolyline] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // KYC Status Check
   const isKYCApproved = user.kyc_status === 'approved';
@@ -1684,6 +1687,78 @@ const CourierDashboard = ({ user }) => {
       setNearbyOrders([]);
     }
     setLoading(false);
+  };
+
+  // Location update handler
+  const handleLocationUpdate = (location) => {
+    setCourierLocation(location);
+    // Update nearby orders distances
+    if (nearbyOrders.length > 0) {
+      updateOrderDistances(location);
+    }
+  };
+
+  const updateOrderDistances = (currentLocation) => {
+    const updatedOrders = nearbyOrders.map(order => {
+      // Calculate distance using Haversine formula (simplified)
+      const distance = calculateDistance(
+        currentLocation.lat,
+        currentLocation.lng,
+        order.pickup_address?.lat || 41.0082, // Default Istanbul coords
+        order.pickup_address?.lng || 28.9784
+      );
+      
+      return {
+        ...order,
+        distance_km: distance.toFixed(1),
+        estimated_duration: `${Math.round(distance * 3)} dk` // Rough estimate: 3 min per km
+      };
+    });
+    
+    setNearbyOrders(updatedOrders);
+  };
+
+  // Simple distance calculation (Haversine formula)
+  const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Get route to order location
+  const getRouteToOrder = async (order) => {
+    if (!courierLocation) {
+      toast.error('Konum bilginiz alınamadı, lütfen konumunuzu açın');
+      return;
+    }
+
+    setSelectedOrder(order);
+    
+    // Demo route calculation - in real app would use routing service
+    const pickupLat = order.pickup_address?.lat || 41.0082;
+    const pickupLng = order.pickup_address?.lng || 28.9784;
+    const deliveryLat = order.delivery_address?.lat || 41.0122;
+    const deliveryLng = order.delivery_address?.lng || 28.9824;
+    
+    // Create a simple route polyline
+    const route = [
+      [courierLocation.lat, courierLocation.lng], // Current location
+      [pickupLat, pickupLng], // Pickup location
+      [deliveryLat, deliveryLng] // Delivery location
+    ];
+    
+    setRoutePolyline(route);
+    
+    toast.success(`🧭 ${order.business_name || 'Sipariş'} için yol tarifi hazırlandı!`);
+    
+    // Open external navigation app
+    const googleMapsUrl = `https://www.google.com/maps/dir/${courierLocation.lat},${courierLocation.lng}/${pickupLat},${pickupLng}`;
+    window.open(googleMapsUrl, '_blank');
   };
 
   const getKYCStatusBadge = (status) => {
