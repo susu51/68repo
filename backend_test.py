@@ -587,53 +587,60 @@ class DeliverTRAPITester:
         return success
 
     def run_all_tests(self):
-        """Run all backend tests for Phone/SMS OTP Authentication"""
-        print("🚀 Starting DeliverTR Backend API Tests - Phone/SMS OTP Authentication")
+        """Run all backend tests for DeliverTR MVP Core Business Flow"""
+        print("🚀 Starting DeliverTR Backend API Tests - Core Business Flow")
         print("=" * 70)
         
-        # Test basic connectivity
-        self.test_root_endpoint()
-        self.test_health_check()
+        # Test 1: Admin Authentication
+        print("\n📋 PHASE 1: ADMIN AUTHENTICATION")
+        self.test_admin_authentication()
+        self.test_admin_authentication_wrong_password()
         
-        # Test phone format validation
-        self.test_phone_format_validation()
-        
-        # Test OTP request flow
-        self.test_otp_request_valid_phone()
-        time.sleep(1)  # Brief pause between requests
-        self.test_otp_request_invalid_phone()
-        
-        # Test OTP verification flow
-        self.test_otp_verify_correct_code()
-        time.sleep(1)
-        self.test_otp_verify_incorrect_code()
-        
-        # Test JWT token management
-        self.test_token_refresh()
-        
-        # Test authenticated endpoints
-        self.test_get_profile()
-        self.test_update_profile()
-        
-        # Test role registration endpoints
+        # Test 2: User Registration
+        print("\n📋 PHASE 2: USER REGISTRATION")
+        self.test_business_registration()
+        self.test_customer_registration()
         self.test_courier_registration()
-        time.sleep(1)
-        self.test_business_registration_flow()
-        time.sleep(1)
-        self.test_customer_registration_flow()
         
-        # Test rate limiting
-        self.test_rate_limiting()
+        # Test 3: User Login
+        print("\n📋 PHASE 3: USER LOGIN")
+        self.test_business_login()
+        self.test_customer_login()
         
-        # Test logout
-        self.test_logout()
+        # Test 4: Product Management Flow
+        print("\n📋 PHASE 4: PRODUCT MANAGEMENT FLOW")
+        self.test_product_creation()
+        self.test_product_creation_multiple()
+        self.test_get_products()
+        self.test_get_business_products()
         
-        # Test unauthorized access
-        self.test_unauthorized_access()
+        # Test 5: Order Creation Flow
+        print("\n📋 PHASE 5: ORDER CREATION FLOW")
+        self.test_order_creation()
+        self.test_get_orders_customer()
+        self.test_get_orders_business()
+        
+        # Test 6: Order Status Management Flow
+        print("\n📋 PHASE 6: ORDER STATUS MANAGEMENT FLOW")
+        self.test_order_status_flow()
+        
+        # Test 7: Admin Management
+        print("\n📋 PHASE 7: ADMIN MANAGEMENT")
+        self.test_admin_get_all_users()
+        self.test_admin_get_all_products()
+        self.test_admin_get_all_orders()
+        
+        # Test 8: Role-Based Access Control
+        print("\n📋 PHASE 8: ROLE-BASED ACCESS CONTROL")
+        self.test_role_based_access_control()
+        
+        # Test 9: File Upload
+        print("\n📋 PHASE 9: FILE HANDLING")
+        self.test_file_upload()
         
         # Print summary
         print("\n" + "=" * 70)
-        print("📊 TEST SUMMARY - Phone/SMS OTP Authentication")
+        print("📊 TEST SUMMARY - DeliverTR MVP Core Business Flow")
         print("=" * 70)
         print(f"Total Tests: {self.tests_run}")
         print(f"Passed: {self.tests_passed}")
@@ -647,6 +654,26 @@ class DeliverTRAPITester:
             for test in failed_tests:
                 print(f"   - {test['test']}: {test['details']}")
         
+        # Print successful core flow tests
+        core_flow_tests = [
+            "Admin Authentication",
+            "Business Registration", 
+            "Customer Registration",
+            "Product Creation",
+            "Order Creation",
+            "Order Status Update - ASSIGNED",
+            "Order Status Update - ON_ROUTE", 
+            "Order Status Update - DELIVERED",
+            "Admin Get All Users",
+            "Admin Get All Products",
+            "Admin Get All Orders"
+        ]
+        
+        successful_core_tests = [test for test in self.test_results 
+                               if test['success'] and test['test'] in core_flow_tests]
+        
+        print(f"\n✅ CORE BUSINESS FLOW TESTS PASSED: {len(successful_core_tests)}/{len(core_flow_tests)}")
+        
         # Save detailed results
         with open('/app/backend_test_results.json', 'w') as f:
             json.dump({
@@ -656,9 +683,17 @@ class DeliverTRAPITester:
                     "failed_tests": self.tests_run - self.tests_passed,
                     "success_rate": (self.tests_passed/self.tests_run)*100,
                     "timestamp": datetime.now().isoformat(),
-                    "test_type": "phone_sms_otp_authentication"
+                    "test_type": "delivertr_mvp_core_business_flow",
+                    "core_flow_success": len(successful_core_tests) == len(core_flow_tests)
                 },
-                "test_results": self.test_results
+                "test_results": self.test_results,
+                "created_entities": {
+                    "business_id": self.business_id,
+                    "customer_id": self.customer_id,
+                    "courier_id": self.courier_id,
+                    "products": [p.get('id') for p in self.created_products],
+                    "orders": [o.get('id') for o in self.created_orders]
+                }
             }, f, indent=2)
         
         return self.tests_passed == self.tests_run
