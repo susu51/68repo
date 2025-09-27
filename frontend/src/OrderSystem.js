@@ -608,7 +608,7 @@ export const NearbyOrdersForCourier = () => {
 
   const acceptOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem('delivertr_access_token'); // Fixed token key
+      const token = localStorage.getItem('kuryecini_access_token'); // Fixed token key
       await axios.post(`${API}/orders/${orderId}/accept`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
