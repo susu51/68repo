@@ -1649,6 +1649,7 @@ const CourierDashboard = ({ user }) => {
   const [isOnline, setIsOnline] = useState(user.is_online || false);
   const [currentView, setCurrentView] = useState('nearby');
   const [myOrders, setMyOrders] = useState([]);
+  const [nearbyOrders, setNearbyOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // KYC Status Check
@@ -1657,8 +1658,10 @@ const CourierDashboard = ({ user }) => {
   useEffect(() => {
     if (currentView === 'orders') {
       fetchMyOrders();
+    } else if (currentView === 'nearby' && isKYCApproved) {
+      fetchNearbyOrders();
     }
-  }, [currentView]);
+  }, [currentView, isKYCApproved]);
 
   const fetchMyOrders = async () => {
     setLoading(true);
@@ -1667,6 +1670,18 @@ const CourierDashboard = ({ user }) => {
       setMyOrders(response.data);
     } catch (error) {
       console.error('Siparişler alınamadı:', error);
+    }
+    setLoading(false);
+  };
+
+  const fetchNearbyOrders = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/orders/nearby`);
+      setNearbyOrders(response.data || []);
+    } catch (error) {
+      console.error('Yakındaki siparişler alınamadı:', error);
+      setNearbyOrders([]);
     }
     setLoading(false);
   };
