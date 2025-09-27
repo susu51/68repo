@@ -235,10 +235,8 @@ export const CreatePackageOrder = ({ onOrderCreated, onCancel }) => {
 
   const calculatePricing = () => {
     // Mock pricing calculation (in real app, this would be an API call)
-    const distance = calculateDistance(
-      pickupAddress.lat, pickupAddress.lng,
-      deliveryAddress.lat, deliveryAddress.lng
-    );
+    // Since we don't have coordinates, we'll use a fixed distance for demo
+    const distance = 5.0; // Fixed 5km distance for demo
     
     const basePrice = 12.0;
     const pricePerKm = 3.0;
