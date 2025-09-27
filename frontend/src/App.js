@@ -2663,7 +2663,13 @@ const CustomerDashboard = ({ user }) => {
 
   // Get location on component mount
   useEffect(() => {
+    setIsMounted(true);
     getCurrentLocation();
+    
+    // Cleanup function
+    return () => {
+      setIsMounted(false);
+    };
   }, []);
 
   return (
