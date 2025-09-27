@@ -2051,52 +2051,19 @@ const BusinessDashboard = ({ user }) => {
                 </form>
               </CardContent>
             </Card>
-                          <SelectValue placeholder="Kategori seçin" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pizza">Pizza</SelectItem>
-                          <SelectItem value="burger">Burger</SelectItem>
-                          <SelectItem value="kebap">Kebap</SelectItem>
-                          <SelectItem value="döner">Döner</SelectItem>
-                          <SelectItem value="tatlı">Tatlı</SelectItem>
-                          <SelectItem value="içecek">İçecek</SelectItem>
-                          <SelectItem value="diğer">Diğer</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Hazırlık Süresi (dakika)</Label>
-                      <Input
-                        type="number"
-                        value={productForm.preparation_time_minutes}
-                        onChange={(e) => setProductForm({...productForm, preparation_time_minutes: e.target.value})}
-                        placeholder="30"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Product Photo Upload */}
-                  <div>
-                    <FileUpload
-                      label="Ürün Fotoğrafı"
-                      accept="image/*"
-                      onFileUploaded={(url) => setProductForm({...productForm, photo_url: url})}
-                    />
-                  </div>
-
-                  <Button type="submit" disabled={loading} className="w-full">
-                    {loading ? 'Ekleniyor...' : 'Ürün Ekle'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
 
             {/* Products List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Mevcut Ürünler ({products.length})</CardTitle>
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50">
+                <CardTitle className="flex items-center text-sm sm:text-lg">
+                  <span className="mr-2">📦</span>
+                  Mevcut Ürünler ({products.length})
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Ürünlerinizi yönetin ve düzenleyin
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 {products.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">Henüz ürün eklenmemiş</p>
                 ) : (
