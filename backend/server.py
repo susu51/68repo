@@ -468,6 +468,338 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     del current_user["password"]  # Don't send password
     
     return current_user
+
+# Admin Authentication
+@api_router.post("/auth/admin")
+async def admin_login(admin_data: AdminLogin):
+    """Admin login with special password"""
+    if admin_data.password != "6851":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid admin password"
+        )
+    
+    # Create admin access token
+    access_token = create_access_token(data={"sub": "admin@delivertr.com", "role": "admin"})
+    
+    admin_user = {
+        "id": "admin",
+        "email": "admin@delivertr.com",
+        "role": "admin",
+        "first_name": "Admin",
+        "last_name": "User",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "is_active": True
+    }
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_type": "admin",
+        "user_data": admin_user
+    }
+
+# Admin dependency
+async def get_admin_user(current_user: dict = Depends(get_current_user)):
+    """Require admin role"""
+    if current_user.get("role") != "admin" and current_user.get("email") != "admin@delivertr.com":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    return current_user
+
+# Business dependency
+async def get_business_user(current_user: dict = Depends(get_current_user)):
+    """Require business role"""
+    if current_user.get("role") != "business":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Business access required"
+        )
+    return current_user
+
+# Product Management Endpoints
+@api_router.post("/products")
+async def create_product(product_data: ProductCreate, current_user: dict = Depends(get_business_user)):
+    """Create new product (Business only)"""
+    product_doc = {
+        "id": str(uuid.uuid4()),
+        "business_id": current_user["id"],
+        "business_name": current_user.get("business_name", "Unknown Business"),
+        "name": product_data.name,
+        "description": product_data.description,
+        "price": product_data.price,
+        "category": product_data.category,
+        "preparation_time_minutes": product_data.preparation_time_minutes,
+        "photo_url": product_data.photo_url,
+        "is_available": product_data.is_available,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.products.insert_one(product_doc)
+    
+    # Convert datetime to string
+    product_doc["created_at"] = product_doc["created_at"].isoformat()
+    del product_doc["_id"]
+    
+    return product_doc
+
+@api_router.get("/products")
+async def get_products(business_id: Optional[str] = None, category: Optional[str] = None):
+    """Get products (optionally filtered by business or category)"""
+    filter_query = {"is_available": True}
+    
+    if business_id:
+        filter_query["business_id"] = business_id
+    if category:
+        filter_query["category"] = category
+    
+    products = await db.products.find(filter_query).to_list(length=None)
+    
+    # Convert datetime and ObjectId
+    for product in products:
+        product["id"] = str(product["_id"])
+        del product["_id"]
+        product["created_at"] = product["created_at"].isoformat()
+    
+    return products
+
+@api_router.get("/products/my")
+async def get_my_products(current_user: dict = Depends(get_business_user)):
+    """Get products for current business"""
+    products = await db.products.find({"business_id": current_user["id"]}).to_list(length=None)
+    
+    # Convert datetime and ObjectId
+    for product in products:
+        product["id"] = str(product["_id"])
+        del product["_id"]
+        product["created_at"] = product["created_at"].isoformat()
+    
+    return products
+
+@api_router.put("/products/{product_id}")
+async def update_product(product_id: str, product_data: ProductCreate, current_user: dict = Depends(get_business_user)):
+    """Update product (Business owner only)"""
+    # Check if product belongs to current business
+    product = await db.products.find_one({"id": product_id, "business_id": current_user["id"]})
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found or access denied"
+        )
+    
+    update_data = product_data.dict()
+    update_data["updated_at"] = datetime.now(timezone.utc)
+    
+    await db.products.update_one(
+        {"id": product_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True, "message": "Product updated successfully"}
+
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str, current_user: dict = Depends(get_business_user)):
+    """Delete product (Business owner only)"""
+    # Check if product belongs to current business
+    product = await db.products.find_one({"id": product_id, "business_id": current_user["id"]})
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found or access denied"
+        )
+    
+    await db.products.delete_one({"id": product_id})
+    
+    return {"success": True, "message": "Product deleted successfully"}
+
+# Order Management Endpoints
+@api_router.post("/orders")
+async def create_order(order_data: OrderCreate, current_user: dict = Depends(get_current_user)):
+    """Create new order (Customer only)"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only customers can create orders"
+        )
+    
+    # Calculate commission (3%)
+    commission_amount = order_data.total_amount * 0.03
+    
+    order_doc = {
+        "id": str(uuid.uuid4()),
+        "customer_id": current_user["id"],
+        "customer_name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip(),
+        "business_id": order_data.items[0]["product_id"] if order_data.items else "",  # We'll need to get this properly
+        "business_name": "",  # We'll need to get this from product
+        "courier_id": None,
+        "courier_name": None,
+        "status": OrderStatus.CREATED,
+        "delivery_address": order_data.delivery_address,
+        "delivery_lat": order_data.delivery_lat,
+        "delivery_lng": order_data.delivery_lng,
+        "items": [item.dict() for item in order_data.items],
+        "total_amount": order_data.total_amount,
+        "commission_amount": commission_amount,
+        "notes": order_data.notes,
+        "created_at": datetime.now(timezone.utc),
+        "assigned_at": None,
+        "picked_up_at": None,
+        "delivered_at": None
+    }
+    
+    # Get business info from first product
+    if order_data.items:
+        first_product = await db.products.find_one({"id": order_data.items[0].product_id})
+        if first_product:
+            order_doc["business_id"] = first_product["business_id"]
+            order_doc["business_name"] = first_product["business_name"]
+    
+    await db.orders.insert_one(order_doc)
+    
+    # Convert datetime to string
+    order_doc["created_at"] = order_doc["created_at"].isoformat()
+    del order_doc["_id"]
+    
+    return order_doc
+
+@api_router.get("/orders")
+async def get_orders(status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Get orders based on user role"""
+    filter_query = {}
+    
+    if status:
+        filter_query["status"] = status
+    
+    # Filter by role
+    if current_user.get("role") == "customer":
+        filter_query["customer_id"] = current_user["id"]
+    elif current_user.get("role") == "business":
+        filter_query["business_id"] = current_user["id"]
+    elif current_user.get("role") == "courier":
+        # Couriers see unassigned orders or orders assigned to them
+        if not status:
+            filter_query = {
+                "$or": [
+                    {"status": "created", "courier_id": None},
+                    {"courier_id": current_user["id"]}
+                ]
+            }
+        else:
+            filter_query["courier_id"] = current_user["id"]
+    
+    orders = await db.orders.find(filter_query).to_list(length=None)
+    
+    # Convert datetime and ObjectId
+    for order in orders:
+        order["id"] = str(order["_id"])
+        del order["_id"]
+        order["created_at"] = order["created_at"].isoformat()
+        if order.get("assigned_at"):
+            order["assigned_at"] = order["assigned_at"].isoformat()
+        if order.get("picked_up_at"):
+            order["picked_up_at"] = order["picked_up_at"].isoformat()
+        if order.get("delivered_at"):
+            order["delivered_at"] = order["delivered_at"].isoformat()
+    
+    return orders
+
+@api_router.patch("/orders/{order_id}/status")
+async def update_order_status(order_id: str, new_status: OrderStatus, current_user: dict = Depends(get_current_user)):
+    """Update order status"""
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+    
+    # Check permissions
+    user_role = current_user.get("role")
+    if user_role == "business" and order["business_id"] != current_user["id"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied"
+        )
+    elif user_role == "courier" and order.get("courier_id") != current_user["id"] and new_status != OrderStatus.ASSIGNED:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied"
+        )
+    elif user_role not in ["admin", "business", "courier"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied"
+        )
+    
+    update_data = {"status": new_status}
+    
+    # Update timestamps based on status
+    current_time = datetime.now(timezone.utc)
+    if new_status == OrderStatus.ASSIGNED:
+        update_data["assigned_at"] = current_time
+        update_data["courier_id"] = current_user["id"]
+        update_data["courier_name"] = f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip()
+    elif new_status == OrderStatus.ON_ROUTE:
+        update_data["picked_up_at"] = current_time
+    elif new_status == OrderStatus.DELIVERED:
+        update_data["delivered_at"] = current_time
+    
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True, "message": f"Order status updated to {new_status}"}
+
+# Admin Management Endpoints
+@api_router.get("/admin/users")
+async def get_all_users(current_user: dict = Depends(get_admin_user)):
+    """Get all users (Admin only)"""
+    users = await db.users.find({}).to_list(length=None)
+    
+    # Convert ObjectId and remove passwords
+    for user in users:
+        user["id"] = str(user["_id"])
+        del user["_id"]
+        if "password" in user:
+            del user["password"]
+        user["created_at"] = user["created_at"].isoformat()
+    
+    return users
+
+@api_router.get("/admin/products")
+async def get_all_products(current_user: dict = Depends(get_admin_user)):
+    """Get all products (Admin only)"""
+    products = await db.products.find({}).to_list(length=None)
+    
+    # Convert datetime and ObjectId
+    for product in products:
+        product["id"] = str(product["_id"])
+        del product["_id"]
+        product["created_at"] = product["created_at"].isoformat()
+    
+    return products
+
+@api_router.get("/admin/orders")
+async def get_all_orders(current_user: dict = Depends(get_admin_user)):
+    """Get all orders (Admin only)"""
+    orders = await db.orders.find({}).to_list(length=None)
+    
+    # Convert datetime and ObjectId
+    for order in orders:
+        order["id"] = str(order["_id"])
+        del order["_id"]
+        order["created_at"] = order["created_at"].isoformat()
+        if order.get("assigned_at"):
+            order["assigned_at"] = order["assigned_at"].isoformat()
+        if order.get("picked_up_at"):
+            order["picked_up_at"] = order["picked_up_at"].isoformat()
+        if order.get("delivered_at"):
+            order["delivered_at"] = order["delivered_at"].isoformat()
+    
+    return orders
     INACTIVE = "inactive"
     BANNED = "banned"
 
