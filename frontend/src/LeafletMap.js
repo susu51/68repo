@@ -222,6 +222,37 @@ const LeafletMap = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
+        {/* Route polyline */}
+        {routePolyline && routePolyline.length > 0 && (
+          <Polyline
+            positions={routePolyline}
+            color="blue"
+            weight={4}
+            opacity={0.7}
+            dashArray="10, 5"
+          />
+        )}
+        
+        {/* User's current location */}
+        {userLocation && (
+          <Marker
+            position={[userLocation.lat, userLocation.lng]}
+            icon={icons.myLocation}
+          >
+            <Popup>
+              <div>
+                <h3 className="font-semibold text-blue-600">📍 Konumunuz</h3>
+                <p className="text-sm">Canlı konum takibi aktif</p>
+                <p className="text-xs text-gray-600">
+                  Lat: {userLocation.lat.toFixed(6)}<br/>
+                  Lng: {userLocation.lng.toFixed(6)}
+                </p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+        
+        {/* Other markers */}
         {markers.map((marker, index) => {
           const icon = icons[marker.type] || icons.customer;
           
@@ -236,7 +267,31 @@ const LeafletMap = ({
                   <div>
                     {marker.title && <h3 className="font-semibold">{marker.title}</h3>}
                     {marker.description && <p className="text-sm">{marker.description}</p>}
-                    {marker.address && <p className="text-xs text-gray-600">{marker.address}</p>}
+                    {marker.address && <p className="text-xs text-gray-600 mt-1">{marker.address}</p>}
+                    {marker.distance && (
+                      <p className="text-xs text-blue-600 mt-1">
+                        📏 Mesafe: {marker.distance}
+                      </p>
+                    )}
+                    {marker.estimatedTime && (
+                      <p className="text-xs text-green-600">
+                        ⏱️ Tahmini: {marker.estimatedTime}
+                      </p>
+                    )}
+                    {marker.orderValue && (
+                      <p className="text-sm font-semibold text-purple-600 mt-1">
+                        💰 {marker.orderValue}
+                      </p>
+                    )}
+                    {marker.onNavigate && (
+                      <Button 
+                        size="sm" 
+                        className="mt-2 w-full"
+                        onClick={() => marker.onNavigate(marker)}
+                      >
+                        🧭 Yol Tarifi Al
+                      </Button>
+                    )}
                   </div>
                 </Popup>
               )}
@@ -247,26 +302,70 @@ const LeafletMap = ({
         {onMapClick && <MapClickHandler />}
       </MapContainer>
       
+      {/* Location button */}
+      {showLocationButton && (
+        <div className="absolute bottom-4 right-4 z-[1000]">
+          <Button
+            onClick={centerOnMyLocation}
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+            size="sm"
+          >
+            {watchId ? '🔄 Konum Takibi' : '📍 Konumumu Bul'}
+          </Button>
+        </div>
+      )}
+      
+      {/* Location error */}
+      {locationError && (
+        <div className="absolute top-4 left-4 bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded shadow-lg z-[1000]">
+          <p className="text-sm">⚠️ {locationError}</p>
+        </div>
+      )}
+      
       {/* Map Legend */}
       {markers.length > 0 && (
-        <div className="absolute top-2 right-2 bg-white p-2 rounded shadow-lg z-[1000]">
-          <div className="text-xs space-y-1">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span>Müşteri</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span>İşletme</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-              <span>Kurye</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span>Teslimat</span>
-            </div>
+        <div className="absolute top-2 right-2 bg-white p-3 rounded-lg shadow-lg z-[1000] max-w-xs">
+          <div className="text-xs space-y-2">
+            <div className="font-semibold text-gray-800 mb-2">Harita Sembolleri</div>
+            {courierMode ? (
+              <>
+                <div className="flex items-center space-x-2">
+                  <div className="text-lg">📦</div>
+                  <span>Paket Teslim</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="text-lg">🏪</div>
+                  <span>Paket Alım</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span>Konumunuz</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 border-2 border-blue-500 rounded-full"></div>
+                  <span>Yol Tarifi</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span>Müşteri</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span>İşletme</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <span>Kurye</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span>Teslimat</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
