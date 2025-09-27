@@ -427,7 +427,7 @@ export const NearbyOrdersForCourier = () => {
 
   const fetchNearbyOrders = async () => {
     try {
-      const token = localStorage.getItem('delivertr_access_token');
+      const token = localStorage.getItem('kuryecini_access_token');
       const response = await axios.get(`${API}/orders/nearby`, {
         headers: {
           'Authorization': `Bearer ${token}`
