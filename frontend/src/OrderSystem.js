@@ -588,46 +588,121 @@ export const NearbyOrdersForCourier = () => {
       {nearbyOrders.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
-            <div className="text-4xl mb-4">🔍</div>
-            <p className="text-gray-500">Yakınınızda sipariş bulunamadı</p>
-            <p className="text-sm text-gray-400 mt-2">Çevrimiçi olduğunuzdan ve konum paylaştığınızdan emin olun</p>
+            <div className="text-4xl mb-4">🏙️</div>
+            <p className="text-gray-500">Şu anda şehir genelinde sipariş bulunamadı</p>
+            <p className="text-sm text-gray-400 mt-2">Yeni siparişler her 30 saniyede güncellenir</p>
+            {courierLocation && (
+              <p className="text-xs text-blue-600 mt-2">
+                📍 Konumunuz aktif • Yakın siparişler için bildirim alacaksınız
+              </p>
+            )}
           </CardContent>
         </Card>
       ) : (
-        nearbyOrders.map((order) => (
-          <Card key={order.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="font-semibold text-lg">{order.business_name}</h3>
-                  <p className="text-sm text-gray-600">{order.business_address}</p>
+        <div className="space-y-4">
+          {courierLocation && (
+            <Card className="border-blue-200 bg-blue-50">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <div className="text-blue-600">🔔</div>
+                  <div className="text-sm">
+                    <p className="font-semibold text-blue-800">Bildirim Sistemi Aktif</p>
+                    <p className="text-blue-600">1km yakınınızdaki siparişler için sesli bildirim alacaksınız</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-green-600 text-lg">₺{order.estimated_earnings}</p>
-                  <p className="text-sm text-gray-500">Tahmini kazanç</p>
-                </div>
-              </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {nearbyOrders.map((order) => {
+            // Calculate if order is very close (demo distance calculation)
+            const isVeryClose = courierLocation && order.pickup_address && 
+              calculateDistance(
+                courierLocation.lat, courierLocation.lng,
+                order.pickup_address.lat, order.pickup_address.lng
+              ) <= 1;
+              
+            return (
+              <Card 
+                key={order.id} 
+                className={`hover:shadow-lg transition-shadow ${isVeryClose ? 'border-green-400 bg-green-50' : ''}`}
+              >
+                <CardContent className="p-4">
+                  {isVeryClose && (
+                    <div className="mb-3 p-2 bg-green-100 border border-green-300 rounded-lg">
+                      <p className="text-sm font-semibold text-green-800 flex items-center">
+                        🎯 Çok Yakın Sipariş - 1km İçinde!
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        {order.business_name}
+                        {order.priority === 'high' && (
+                          <Badge className="bg-red-500 text-white text-xs">🔥 Yüksek Ücret</Badge>
+                        )}
+                      </h3>
+                      <p className="text-sm text-gray-600">{order.pickup_address?.address}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-green-600 text-lg">₺{order.total_amount}</p>
+                      <p className="text-sm text-purple-600 font-medium">+₺{order.commission_amount?.toFixed(2)} komisyon</p>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                <div>
-                  <span className="font-medium">Mesafe:</span> {order.distance_km} km
-                </div>
-                <div>
-                  <span className="font-medium">Teslimat Süresi:</span> {order.estimated_delivery_time} dk
-                </div>
-                <div>
-                  <span className="font-medium">Sipariş Türü:</span> 
-                  <Badge className="ml-2">
-                    {order.order_type === 'gida' ? '🍔 Gıda' : '📦 Nakliye'}
-                  </Badge>
-                </div>
-                <div>
-                  <span className="font-medium">Ürün Sayısı:</span> {order.items_count} adet
-                </div>
-              </div>
+                  <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                    <div>
+                      <span className="font-medium">📍 Mesafe:</span> 
+                      <span className={isVeryClose ? 'text-green-600 font-bold' : ''}>
+                        {courierLocation && order.pickup_address ? 
+                          `${calculateDistance(courierLocation.lat, courierLocation.lng, order.pickup_address.lat, order.pickup_address.lng).toFixed(1)} km` : 
+                          'Hesaplanıyor...'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium">⏱️ Hazırlık:</span> {order.preparation_time}
+                    </div>
+                    <div>
+                      <span className="font-medium">📦 Ürünler:</span> {order.items?.length || 0} adet
+                    </div>
+                    <div>
+                      <span className="font-medium">👤 Müşteri:</span> {order.customer_name}
+                    </div>
+                  </div>
 
-              <div className="mb-3">
-                <p className="text-sm"><strong>Teslimat Adresi:</strong> {order.delivery_address}</p>
+                  <div className="mb-3 p-2 bg-gray-50 rounded">
+                    <p className="text-sm">
+                      <strong>📍 Teslimat:</strong> {order.delivery_address?.address || 'Teslimat adresi'}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => acceptOrder(order.id)}
+                      className={`flex-1 ${isVeryClose ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                    >
+                      {isVeryClose ? '🎯 Hemen Kabul Et!' : '✅ Siparişi Kabul Et'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (order.pickup_address?.lat && order.pickup_address?.lng) {
+                          const mapsUrl = `https://www.google.com/maps/dir/${courierLocation?.lat || 41.0082},${courierLocation?.lng || 28.9784}/${order.pickup_address.lat},${order.pickup_address.lng}`;
+                          window.open(mapsUrl, '_blank');
+                        }
+                      }}
+                    >
+                      🗺️ Yol Tarifi
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
               </div>
 
               <div className="flex gap-2">
