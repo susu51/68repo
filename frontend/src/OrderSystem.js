@@ -626,12 +626,40 @@ export const NearbyOrdersForCourier = () => {
         </Button>
       </div>
 
+      {/* Location Status Card */}
+      {!courierLocation && (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="text-yellow-600">📍</div>
+              <div className="text-sm">
+                <p className="font-semibold text-yellow-800">Konum Durumu</p>
+                {locationError ? (
+                  <div>
+                    <p className="text-yellow-700 mb-2">{locationError}</p>
+                    <Button 
+                      onClick={startLocationTracking}
+                      className="bg-yellow-600 hover:bg-yellow-700"
+                      size="sm"
+                    >
+                      🔄 Konumu Tekrar Dene
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-yellow-600">Konum alınıyor... Mesafe hesaplaması için gerekli.</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {nearbyOrders.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
-            <div className="text-4xl mb-4">🏙️</div>
-            <p className="text-gray-500">Şu anda şehir genelinde sipariş bulunamadı</p>
-            <p className="text-sm text-gray-400 mt-2">Yeni siparişler her 30 saniyede güncellenir</p>
+            <div className="text-6xl mb-4">📦</div>
+            <p className="text-xl font-semibold mb-2">Şu anda müsait sipariş yok</p>
+            <p className="text-gray-600">Yeni siparişler geldiğinde burada gösterilecek</p>
             {courierLocation && (
               <p className="text-xs text-blue-600 mt-2">
                 📍 Konumunuz aktif • Yakın siparişler için bildirim alacaksınız
@@ -656,7 +684,7 @@ export const NearbyOrdersForCourier = () => {
           )}
           
           {nearbyOrders.map((order) => {
-            // Calculate if order is very close (demo distance calculation)
+            // Calculate if order is very close only if we have courier location
             const isVeryClose = courierLocation && order.pickup_address && 
               calculateDistance(
                 courierLocation.lat, courierLocation.lng,
@@ -669,7 +697,7 @@ export const NearbyOrdersForCourier = () => {
                 className={`hover:shadow-lg transition-shadow ${isVeryClose ? 'border-green-400 bg-green-50' : ''}`}
               >
                 <CardContent className="p-4">
-                  {isVeryClose && (
+                  {isVeryClose && courierLocation && (
                     <div className="mb-3 p-2 bg-green-100 border border-green-300 rounded-lg">
                       <p className="text-sm font-semibold text-green-800 flex items-center">
                         🎯 Çok Yakın Sipariş - 1km İçinde!
@@ -699,7 +727,7 @@ export const NearbyOrdersForCourier = () => {
                       <span className={isVeryClose ? 'text-green-600 font-bold' : ''}>
                         {courierLocation && order.pickup_address ? 
                           `${calculateDistance(courierLocation.lat, courierLocation.lng, order.pickup_address.lat, order.pickup_address.lng).toFixed(1)} km` : 
-                          'Hesaplanıyor...'}
+                          <span className="text-orange-600">Konum bekleniyor...</span>}
                       </span>
                     </div>
                     <div>
@@ -722,9 +750,9 @@ export const NearbyOrdersForCourier = () => {
                   <div className="flex gap-2">
                     <Button
                       onClick={() => acceptOrder(order.id)}
-                      className={`flex-1 ${isVeryClose ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                      className={`flex-1 ${isVeryClose && courierLocation ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                     >
-                      {isVeryClose ? '🎯 Hemen Kabul Et!' : '✅ Siparişi Kabul Et'}
+                      {isVeryClose && courierLocation ? '🎯 Hemen Kabul Et!' : '✅ Siparişi Kabul Et'}
                     </Button>
                     <Button
                       variant="outline"
