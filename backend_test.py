@@ -59,6 +59,25 @@ class DeliverTRAPITester:
             "timestamp": datetime.now().isoformat()
         })
 
+    def calculate_distance(self, lat1, lon1, lat2, lon2):
+        """Calculate distance between two points using Haversine formula"""
+        import math
+        
+        R = 6371  # Earth's radius in km
+        
+        lat1_rad = math.radians(lat1)
+        lon1_rad = math.radians(lon1)
+        lat2_rad = math.radians(lat2)
+        lon2_rad = math.radians(lon2)
+        
+        dlat = lat2_rad - lat1_rad
+        dlon = lon2_rad - lon1_rad
+        
+        a = math.sin(dlat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        
+        return R * c
+
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, token=None):
         """Run a single API test"""
         url = f"{self.api_url}/{endpoint}" if endpoint else f"{self.base_url}/"
