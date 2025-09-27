@@ -56,8 +56,8 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('delivertr_access_token');
-    localStorage.removeItem('delivertr_user');
+    localStorage.removeItem('kuryecini_access_token');
+    localStorage.removeItem('kuryecini_user');
     setUser(null);
     delete axios.defaults.headers.common['Authorization'];
   };
