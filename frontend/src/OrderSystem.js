@@ -388,23 +388,35 @@ export const NearbyOrdersForCourier = () => {
   const [nearbyOrders, setNearbyOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courierLocation, setCourierLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
   const [lastNotificationTime, setLastNotificationTime] = useState(0);
 
   useEffect(() => {
-    fetchNearbyOrders();
+    // First get location, then fetch orders
     startLocationTracking();
     
-    // Fetch orders every 30 seconds
-    const ordersInterval = setInterval(fetchNearbyOrders, 30000);
+    // Fetch orders every 30 seconds, but only after we have location
+    const ordersInterval = setInterval(() => {
+      if (courierLocation) {
+        fetchNearbyOrders();
+      }
+    }, 30000);
     
     // Update location every 3 minutes 
-    const locationInterval = setInterval(updateLocation, 180000); // 3 minutes = 180000ms
+    const locationInterval = setInterval(updateLocation, 180000);
     
     return () => {
       clearInterval(ordersInterval);
       clearInterval(locationInterval);
     };
   }, []);
+
+  // Fetch orders after location is obtained
+  useEffect(() => {
+    if (courierLocation) {
+      fetchNearbyOrders();
+    }
+  }, [courierLocation]);
 
   const fetchNearbyOrders = async () => {
     try {
@@ -431,40 +443,55 @@ export const NearbyOrdersForCourier = () => {
   };
 
   const startLocationTracking = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setCourierLocation(location);
-        },
-        (error) => console.error('Konum alınamadı:', error),
-        { enableHighAccuracy: true }
-      );
+    if (!navigator.geolocation) {
+      setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+      setLoading(false);
+      return;
     }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setCourierLocation(location);
+        setLocationError(null);
+        console.log('Konum alındı:', location);
+      },
+      (error) => {
+        console.error('Konum alınamadı:', error);
+        setLocationError('Konum erişimi reddedildi veya kullanılamıyor');
+        setLoading(false);
+      },
+      { 
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
   const updateLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const newLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setCourierLocation(newLocation);
-          
-          // Recheck for close orders with new location
-          if (nearbyOrders.length > 0) {
-            checkForCloseOrders(nearbyOrders);
-          }
-        },
-        (error) => console.error('Konum güncellenemedi:', error),
-        { enableHighAccuracy: true }
-      );
-    }
+    if (!navigator.geolocation) return;
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setCourierLocation(location);
+        
+        // Refresh orders when location updates
+        if (nearbyOrders.length > 0) {
+          checkForCloseOrders(nearbyOrders);
+        }
+      },
+      (error) => console.error('Konum güncellenemedi:', error),
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
   };
 
   // Calculate distance using Haversine formula
