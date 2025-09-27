@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { Button } from './components/ui/button';
 
 // Fix for default markers in React Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -17,9 +18,16 @@ const LeafletMap = ({
   height = "400px",
   markers = [], 
   onMapClick = null,
-  className = ""
+  className = "",
+  showLocationButton = false,
+  courierMode = false,
+  onLocationUpdate = null,
+  routePolyline = null
 }) => {
   const [map, setMap] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [watchId, setWatchId] = useState(null);
+  const [locationError, setLocationError] = useState(null);
 
   // Custom icons for different marker types
   const icons = {
@@ -42,10 +50,10 @@ const LeafletMap = ({
     courier: L.icon({
       iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
+      iconSize: [30, 46],
+      iconAnchor: [15, 46],
       popupAnchor: [1, -34],
-      shadowSize: [41, 41]
+      shadowSize: [46, 46]
     }),
     delivery: L.icon({
       iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -54,6 +62,39 @@ const LeafletMap = ({
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
       shadowSize: [41, 41]
+    }),
+    package: L.divIcon({
+      html: `<div style="background: #8B5CF6; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+               <span style="color: white; font-size: 16px;">📦</span>
+             </div>`,
+      className: 'package-marker',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+      popupAnchor: [0, -15]
+    }),
+    pickup: L.divIcon({
+      html: `<div style="background: #10B981; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+               <span style="color: white; font-size: 14px;">🏪</span>
+             </div>`,
+      className: 'pickup-marker',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+      popupAnchor: [0, -15]
+    }),
+    myLocation: L.divIcon({
+      html: `<div style="background: #3B82F6; width: 20px; height: 20px; border-radius: 50%; border: 4px solid white; box-shadow: 0 0 0 2px #3B82F6, 0 2px 8px rgba(0,0,0,0.3); animation: pulse 2s infinite;">
+             </div>
+             <style>
+               @keyframes pulse {
+                 0% { transform: scale(1); opacity: 1; }
+                 50% { transform: scale(1.2); opacity: 0.7; }
+                 100% { transform: scale(1); opacity: 1; }
+               }
+             </style>`,
+      className: 'my-location-marker',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor: [0, -14]
     })
   };
 
