@@ -10,53 +10,78 @@ import toast from 'react-hot-toast';
 const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001/api';
 
 // Restaurant Card Component
-const RestaurantCard = ({ restaurant, onClick }) => {
+const RestaurantCard = ({ restaurant, onClick, userLocation }) => {
   return (
     <Card 
       className="hover:shadow-lg transition-all cursor-pointer group border-2 hover:border-orange-200"
       onClick={() => onClick(restaurant)}
     >
       <div className="relative overflow-hidden">
-        {restaurant.image && (
+        {restaurant.image_url ? (
           <img 
-            src={restaurant.image} 
+            src={`${API.replace('/api', '')}${restaurant.image_url}`}
             alt={restaurant.name}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/400x200/f97316/ffffff?text=🍽️+Restoran';
+            }}
           />
+        ) : (
+          <div className="w-full h-48 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+            <span className="text-white text-6xl">🍽️</span>
+          </div>
         )}
-        <div className="absolute top-2 right-2">
+        
+        <div className="absolute top-2 right-2 space-y-1">
           <Badge className="bg-white text-gray-800 shadow-sm">
             ⭐ {restaurant.rating || '4.5'}
           </Badge>
+          {restaurant.distance && (
+            <Badge className="bg-blue-500 text-white shadow-sm">
+              📍 {restaurant.distance.toFixed(1)} km
+            </Badge>
+          )}
         </div>
+        
+        {restaurant.is_open && (
+          <div className="absolute top-2 left-2">
+            <Badge className="bg-green-500 text-white shadow-sm animate-pulse">
+              🟢 Açık
+            </Badge>
+          </div>
+        )}
       </div>
       
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-bold text-lg text-gray-800">{restaurant.name}</h3>
           <Badge variant="outline" className="text-xs">
-            {restaurant.category}
+            {restaurant.category === 'gida' ? '🍽️ Restoran' : '📦 Kargo'}
           </Badge>
         </div>
         
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {restaurant.description || 'Lezzetli yemekler sizi bekliyor...'}
+          {restaurant.description}
         </p>
+        
+        <div className="flex justify-between items-center text-xs text-gray-500 mb-2">
+          <span className="flex items-center">
+            <span className="mr-1">📍</span>
+            {restaurant.address || restaurant.location?.name}
+          </span>
+        </div>
         
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4 text-sm text-gray-500">
             <span className="flex items-center">
               <span className="mr-1">🚲</span>
-              {restaurant.delivery_time || '25-40'} dk
+              {restaurant.delivery_time} dk
             </span>
             <span className="flex items-center">
               <span className="mr-1">💰</span>
-              Min. ₺{restaurant.min_order || '50'}
+              Min. ₺{restaurant.min_order}
             </span>
           </div>
-          <Badge className="bg-green-100 text-green-800">
-            Açık
-          </Badge>
         </div>
       </CardContent>
     </Card>
