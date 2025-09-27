@@ -742,12 +742,37 @@ async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
     # Process orders for courier display
     orders_for_courier = []
     
+    # İstanbul merkez koordinatları (daha gerçekçi alanlar)
+    istanbul_districts = [
+        (41.0082, 28.9784),  # Sultanahmet
+        (41.0369, 28.9850),  # Beyoğlu 
+        (41.0498, 28.9662),  # Şişli
+        (41.0766, 28.9688),  # Beşiktaş
+        (41.0058, 29.0281),  # Kadıköy
+        (40.9969, 29.0833),  # Ataşehir
+        (41.0431, 29.0088),  # Üsküdar
+        (41.1058, 29.0074),  # Sarıyer
+        (40.9517, 29.1248),  # Maltepe
+        (41.0796, 28.9948),  # Etiler
+    ]
+    
     for i, order in enumerate(available_orders):
-        # Enhanced order data with city coordinates spread
-        pickup_lat = 41.0082 + (i * 0.01) + (hash(str(order["_id"])) % 100) * 0.001  # Spread across city
-        pickup_lng = 28.9784 + (i * 0.008) + (hash(str(order["_id"])) % 100) * 0.001
-        delivery_lat = pickup_lat + 0.005  # Delivery nearby pickup
-        delivery_lng = pickup_lng + 0.005
+        # Her sipariş için rastgele bir İstanbul ilçesi seç
+        district = istanbul_districts[i % len(istanbul_districts)]
+        
+        # İlçe merkezine yakın küçük offset ekle (maksimum 2km)
+        lat_offset = (hash(str(order["_id"])) % 200 - 100) * 0.00002  # ~±2km
+        lng_offset = (hash(str(order["_id"])) % 200 - 100) * 0.00003  # ~±2km
+        
+        pickup_lat = district[0] + lat_offset
+        pickup_lng = district[1] + lng_offset
+        
+        # Teslimat adresi pickup'a yakın (100m - 1km arası)
+        delivery_offset_lat = (hash(str(order["_id"]) + "delivery") % 100 - 50) * 0.00001
+        delivery_offset_lng = (hash(str(order["_id"]) + "delivery") % 100 - 50) * 0.000015
+        
+        delivery_lat = pickup_lat + delivery_offset_lat
+        delivery_lng = pickup_lng + delivery_offset_lng
         
         order_data = {
             "id": order.get("id", str(order["_id"])),
@@ -756,7 +781,7 @@ async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
             "pickup_address": {
                 "lat": pickup_lat,
                 "lng": pickup_lng,
-                "address": order.get("pickup_address", "İşletme adresi")
+                "address": f"İşletme Adresi - {istanbul_districts[i % len(istanbul_districts)]}"
             },
             "delivery_address": {
                 "lat": delivery_lat, 
