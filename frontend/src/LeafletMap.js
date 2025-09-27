@@ -98,6 +98,93 @@ const LeafletMap = ({
     })
   };
 
+  // Location tracking functions
+  const startLocationTracking = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Konum servisi desteklenmiyor');
+      return;
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000 // 1 minute
+    };
+
+    const successCallback = (position) => {
+      const { latitude, longitude } = position.coords;
+      const newLocation = { lat: latitude, lng: longitude };
+      
+      setUserLocation(newLocation);
+      setLocationError(null);
+      
+      // Notify parent component
+      if (onLocationUpdate) {
+        onLocationUpdate(newLocation);
+      }
+      
+      // Center map on user location if first time
+      if (map && !userLocation) {
+        map.setView([latitude, longitude], 16);
+      }
+    };
+
+    const errorCallback = (error) => {
+      console.error('Konum hatası:', error);
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          setLocationError('Konum izni verilmedi');
+          break;
+        case error.POSITION_UNAVAILABLE:
+          setLocationError('Konum bilgisi alınamadı');
+          break;
+        case error.TIMEOUT:
+          setLocationError('Konum alma zaman aşımı');
+          break;
+        default:
+          setLocationError('Bilinmeyen konum hatası');
+      }
+    };
+
+    // Start watching position
+    const id = navigator.geolocation.watchPosition(
+      successCallback,
+      errorCallback,
+      options
+    );
+    
+    setWatchId(id);
+  };
+
+  const stopLocationTracking = () => {
+    if (watchId) {
+      navigator.geolocation.clearWatch(watchId);
+      setWatchId(null);
+    }
+  };
+
+  const centerOnMyLocation = () => {
+    if (userLocation && map) {
+      map.setView([userLocation.lat, userLocation.lng], 16);
+    } else {
+      startLocationTracking();
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopLocationTracking();
+    };
+  }, []);
+
+  // Auto-start location tracking in courier mode
+  useEffect(() => {
+    if (courierMode) {
+      startLocationTracking();
+    }
+  }, [courierMode]);
+
   // Handle map click events
   const MapClickHandler = () => {
     useEffect(() => {
