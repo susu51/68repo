@@ -972,6 +972,45 @@ const AdminDashboard = ({ user }) => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* KYC Reject Dialog */}
+        {showRejectDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-lg font-semibold mb-4">KYC Reddetme Sebebi</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                {selectedCourier?.first_name} {selectedCourier?.last_name} adlı kurye için reddetme sebebini belirtin:
+              </p>
+              <textarea
+                className="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                rows="4"
+                placeholder="Örn: Ehliyet fotoğrafı net değil, araç ruhsatı eksik, vs..."
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+              />
+              <div className="flex justify-end space-x-3 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowRejectDialog(false);
+                    setRejectReason('');
+                    setSelectedCourier(null);
+                  }}
+                  disabled={loading}
+                >
+                  İptal
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmReject}
+                  disabled={loading || !rejectReason.trim()}
+                >
+                  {loading ? '⏳ Reddediliyor...' : '❌ Reddet'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
