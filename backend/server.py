@@ -1382,16 +1382,6 @@ class CourierRegister(BaseModel):
     license_class: str
     city: str
 
-class BusinessRegister(BaseModel):
-    email: EmailStr
-    password: str
-    business_name: str
-    tax_number: str
-    address: str
-    city: str
-    business_category: str
-    description: Optional[str] = None
-
 class CustomerRegister(BaseModel):
     email: EmailStr
     password: str
