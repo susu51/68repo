@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total_tests": 43,
-    "passed_tests": 42,
-    "failed_tests": 1,
-    "success_rate": 97.67441860465115,
-    "timestamp": "2025-09-27T01:09:42.836974",
+    "total_tests": 59,
+    "passed_tests": 55,
+    "failed_tests": 4,
+    "success_rate": 93.22033898305084,
+    "timestamp": "2025-09-27T03:13:27.198754",
     "test_type": "delivertr_mvp_core_business_flow",
     "core_flow_success": true
   },
@@ -13,273 +13,369 @@
       "test": "Admin Authentication",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.359960"
+      "timestamp": "2025-09-27T03:13:25.225461"
     },
     {
       "test": "Admin Authentication - Wrong Password",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.395147"
+      "timestamp": "2025-09-27T03:13:25.263834"
     },
     {
       "test": "Business Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.449607"
+      "timestamp": "2025-09-27T03:13:25.306405"
     },
     {
       "test": "Customer Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.484289"
+      "timestamp": "2025-09-27T03:13:25.341453"
     },
     {
       "test": "Courier Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.519951"
+      "timestamp": "2025-09-27T03:13:25.378021"
     },
     {
       "test": "Business Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.553962"
+      "timestamp": "2025-09-27T03:13:25.413411"
     },
     {
       "test": "Customer Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.589231"
+      "timestamp": "2025-09-27T03:13:25.449575"
     },
     {
       "test": "Product Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.652111"
+      "timestamp": "2025-09-27T03:13:25.489429"
     },
     {
       "test": "Product Creation 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.686191"
+      "timestamp": "2025-09-27T03:13:25.529313"
     },
     {
       "test": "Product Creation 3",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.717330"
+      "timestamp": "2025-09-27T03:13:25.563202"
     },
     {
       "test": "Product Creation 4",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.753676"
+      "timestamp": "2025-09-27T03:13:25.602052"
     },
     {
       "test": "Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.790893"
+      "timestamp": "2025-09-27T03:13:25.639690"
     },
     {
       "test": "Get Business Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.824404"
+      "timestamp": "2025-09-27T03:13:25.673527"
     },
     {
       "test": "Order Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.859330"
+      "timestamp": "2025-09-27T03:13:25.709275"
     },
     {
       "test": "Get Customer Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.891090"
+      "timestamp": "2025-09-27T03:13:25.748268"
     },
     {
       "test": "Get Business Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.927142"
+      "timestamp": "2025-09-27T03:13:25.786242"
     },
     {
       "test": "Order Status Update - ASSIGNED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.958719"
+      "timestamp": "2025-09-27T03:13:25.819059"
     },
     {
       "test": "Order Status Update - ON_ROUTE",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:41.995886"
+      "timestamp": "2025-09-27T03:13:25.856324"
     },
     {
       "test": "Order Status Update - DELIVERED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.030306"
+      "timestamp": "2025-09-27T03:13:25.892696"
     },
     {
       "test": "Admin Get All Users",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.066085"
+      "timestamp": "2025-09-27T03:13:25.930992"
     },
     {
       "test": "Admin Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.100952"
+      "timestamp": "2025-09-27T03:13:25.968253"
     },
     {
       "test": "Admin Get All Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.134800"
+      "timestamp": "2025-09-27T03:13:26.006921"
     },
     {
       "test": "RBAC - Customer Create Product (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.165494"
+      "timestamp": "2025-09-27T03:13:26.042124"
     },
     {
       "test": "RBAC - Business Access Admin (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.195612"
+      "timestamp": "2025-09-27T03:13:26.075567"
     },
     {
       "test": "File Upload Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.230839"
+      "timestamp": "2025-09-27T03:13:26.113044"
     },
     {
       "test": "KYC Get Couriers",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.268133"
+      "timestamp": "2025-09-27T03:13:26.151396"
     },
     {
       "test": "KYC Approve Courier",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.301003"
+      "timestamp": "2025-09-27T03:13:26.187660"
     },
     {
       "test": "Register Courier for Rejection Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.336389"
+      "timestamp": "2025-09-27T03:13:26.223972"
     },
     {
       "test": "KYC Reject Courier with Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.371571"
+      "timestamp": "2025-09-27T03:13:26.259218"
     },
     {
       "test": "Register Courier for Flow Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.406629"
+      "timestamp": "2025-09-27T03:13:26.294558"
     },
     {
       "test": "KYC Status Update - APPROVED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.438825"
+      "timestamp": "2025-09-27T03:13:26.328794"
     },
     {
       "test": "KYC Status Update - REJECTED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.473100"
+      "timestamp": "2025-09-27T03:13:26.365424"
     },
     {
       "test": "KYC Status Update - PENDING",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.508205"
+      "timestamp": "2025-09-27T03:13:26.401028"
     },
     {
       "test": "KYC Get Couriers - No Auth (Should Fail)",
       "success": false,
       "details": "Expected 401, got 403. Error: {'detail': 'Not authenticated'}",
-      "timestamp": "2025-09-27T01:09:42.542430"
+      "timestamp": "2025-09-27T03:13:26.436575"
     },
     {
       "test": "KYC Get Couriers - Business Token (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.572359"
+      "timestamp": "2025-09-27T03:13:26.469592"
     },
     {
       "test": "KYC Get Couriers - Customer Token (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.606377"
+      "timestamp": "2025-09-27T03:13:26.507408"
     },
     {
       "test": "KYC Update - Invalid Courier ID",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.638598"
+      "timestamp": "2025-09-27T03:13:26.540879"
     },
     {
       "test": "KYC Update - Invalid Status",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.671953"
+      "timestamp": "2025-09-27T03:13:26.573164"
     },
     {
       "test": "KYC Update - Malformed Body",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.703300"
+      "timestamp": "2025-09-27T03:13:26.607515"
     },
     {
       "test": "Register Courier for Notes Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.736907"
+      "timestamp": "2025-09-27T03:13:26.641908"
     },
     {
       "test": "KYC Update - With Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.771359"
+      "timestamp": "2025-09-27T03:13:26.679017"
     },
     {
       "test": "KYC Update - Without Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.803138"
+      "timestamp": "2025-09-27T03:13:26.712911"
     },
     {
       "test": "KYC Update - Empty Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T01:09:42.836278"
+      "timestamp": "2025-09-27T03:13:26.745825"
+    },
+    {
+      "test": "Nearby Orders - Non-Approved Courier (Should Fail)",
+      "success": false,
+      "details": "Expected 403, got 200. Error: []",
+      "timestamp": "2025-09-27T03:13:26.779623"
+    },
+    {
+      "test": "Approve Test Courier for Nearby Orders",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:26.817877"
+    },
+    {
+      "test": "Nearby Orders - Approved Courier",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:26.851232"
+    },
+    {
+      "test": "Create Order for Visibility Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:26.883449"
+    },
+    {
+      "test": "Ensure Courier KYC Approved",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:26.917705"
+    },
+    {
+      "test": "Check Order in Nearby Orders",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:26.953110"
+    },
+    {
+      "test": "Order Creation and Visibility Flow",
+      "success": false,
+      "details": "Created order c5249155-13f6-48f0-8b00-4bc152406267 not visible in courier nearby orders",
+      "timestamp": "2025-09-27T03:13:26.953752"
+    },
+    {
+      "test": "Get All Orders from Database",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:26.989279"
+    },
+    {
+      "test": "Order Database Storage",
+      "success": true,
+      "details": "Orders properly stored in database: 10 created orders found",
+      "timestamp": "2025-09-27T03:13:26.989902"
+    },
+    {
+      "test": "Register Additional Customer 1",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:27.031627"
+    },
+    {
+      "test": "Create Order for Customer 1",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:27.067988"
+    },
+    {
+      "test": "Register Additional Customer 2",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:27.100529"
+    },
+    {
+      "test": "Create Order for Customer 2",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:27.131896"
+    },
+    {
+      "test": "Approve Courier for Multi-Customer Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:27.164808"
+    },
+    {
+      "test": "Get Nearby Orders - Multi Customer",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:13:27.197827"
+    },
+    {
+      "test": "Multiple Customers Order Visibility",
+      "success": false,
+      "details": "Only 0/2 orders visible to courier",
+      "timestamp": "2025-09-27T03:13:27.198497"
     }
   ],
   "created_entities": {
-    "business_id": "658ed638-7615-4b39-8a34-21bc0e80e1b8",
-    "customer_id": "9c6ed312-8b2f-4394-b01e-43f5b7ccfb1f",
-    "courier_id": "d7ef834f-8b39-4fee-ba30-16b64dc76b37",
+    "business_id": "6041bd4e-d329-43bf-96db-2fa5ba437411",
+    "customer_id": "4f97701f-e3b3-4ee4-8cd9-bcc9a1bbab99",
+    "courier_id": "e5e2a3cf-a096-466d-b717-afb887360b66",
     "products": [
-      "7d9fd8b8-bc6c-45ae-9693-a7e2af490b87",
-      "1d0f27db-f677-460b-8792-44e915299bcf",
-      "fdb7f498-114a-4e06-b13c-167ccb42aeee",
-      "c8aeef27-0dc9-4630-aef1-ebcd022a0659"
+      "11ddc4a2-2ff2-44aa-943a-12db15d90f23",
+      "34f97e53-0ec5-49f2-b8a9-70f2c34db11f",
+      "ac13031b-32ae-4169-9f2f-9f2bc47530c0",
+      "a837ea48-30fb-48d4-974b-661ab3e297e8"
     ],
     "orders": [
-      "4262ca69-bad3-460e-85df-9474bef17b5f"
+      "bd085a4b-ea32-43d0-aa24-86358c39478c"
     ]
   }
 }
