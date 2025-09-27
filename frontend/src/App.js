@@ -255,7 +255,426 @@ const CitySelector = ({ value, onChange, required = false }) => {
   );
 };
 
-// Registration Components - Email/Password based registration
+// Admin Dashboard - System Management
+const AdminDashboard = ({ user }) => {
+  const { logout } = useAuth();
+  const [activeTab, setActiveTab] = useState('users');
+  const [users, setUsers] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/users`);
+      setUsers(response.data);
+    } catch (error) {
+      toast.error('Kullanıcılar yüklenemedi');
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/products`);
+      setProducts(response.data);
+    } catch (error) {
+      toast.error('Ürünler yüklenemedi');
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/orders`);
+      setOrders(response.data);
+    } catch (error) {
+      toast.error('Siparişler yüklenemedi');
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchProducts();
+    fetchOrders();
+  }, []);
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`);
+      toast.success('Sipariş durumu güncellendi');
+      fetchOrders();
+    } catch (error) {
+      toast.error('Durum güncellenemedi');
+    }
+  };
+
+  const getRoleColor = (role) => {
+    switch (role) {
+      case 'admin': return 'bg-red-100 text-red-800';
+      case 'courier': return 'bg-orange-100 text-orange-800';
+      case 'business': return 'bg-green-100 text-green-800';
+      case 'customer': return 'bg-blue-100 text-blue-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold text-red-600">
+                🛡️ Admin Panel - DeliverTR
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Badge variant="outline" className="bg-red-50 border-red-200 text-red-800">
+                Admin
+              </Badge>
+              <Button onClick={logout} variant="outline">Çıkış</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">👥</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Toplam Kullanıcı
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {users.length}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">🍽️</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Toplam Ürün
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {products.length}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">📦</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Toplam Sipariş
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {orders.length}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">💰</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Toplam Ciro
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      ₺{orders.reduce((sum, order) => sum + order.total_amount, 0).toFixed(2)}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="users">Kullanıcılar</TabsTrigger>
+            <TabsTrigger value="products">Ürünler</TabsTrigger>
+            <TabsTrigger value="orders">Siparişler</TabsTrigger>
+            <TabsTrigger value="map">Harita</TabsTrigger>
+          </TabsList>
+
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Kullanıcı Yönetimi ({users.length})</CardTitle>
+                <CardDescription>
+                  Tüm kullanıcıları görüntüleyin ve yönetin
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {users.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Kullanıcı bulunamadı</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kullanıcı
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Rol
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Şehir
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kayıt Tarihi
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Durum
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {users.map((user) => (
+                          <tr key={user.id}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-10 w-10">
+                                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                    {user.role === 'courier' ? '🚴' : 
+                                     user.role === 'business' ? '🏪' :
+                                     user.role === 'customer' ? '👤' : '👑'}
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {user.first_name} {user.last_name} {user.business_name}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {user.email}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <Badge className={getRoleColor(user.role)}>
+                                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                              </Badge>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {user.city || '-'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(user.created_at).toLocaleDateString('tr-TR')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <Badge variant={user.is_active ? "default" : "secondary"}>
+                                {user.is_active ? 'Aktif' : 'Pasif'}
+                              </Badge>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Products Tab */}
+          <TabsContent value="products" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ürün Yönetimi ({products.length})</CardTitle>
+                <CardDescription>
+                  Tüm ürünleri görüntüleyin ve yönetin
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {products.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Ürün bulunamadı</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {products.map((product) => (
+                      <Card key={product.id} className="overflow-hidden">
+                        {product.photo_url && (
+                          <div className="h-32 overflow-hidden">
+                            <img 
+                              src={`${BACKEND_URL}${product.photo_url}`} 
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <CardContent className="p-4">
+                          <h3 className="font-semibold">{product.name}</h3>
+                          <p className="text-sm text-gray-600 mb-2">{product.description}</p>
+                          <p className="text-xs text-gray-500 mb-2">İşletme: {product.business_name}</p>
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-green-600">₺{product.price}</span>
+                            <Badge variant={product.is_available ? "default" : "secondary"}>
+                              {product.is_available ? 'Mevcut' : 'Stokta Yok'}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Orders Tab */}
+          <TabsContent value="orders" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sipariş Yönetimi ({orders.length})</CardTitle>
+                <CardDescription>
+                  Tüm siparişleri görüntüleyin ve yönetin
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {orders.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Sipariş bulunamadı</p>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <Card key={order.id}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
+                              <p className="text-sm text-gray-600">
+                                {order.customer_name} → {order.business_name}
+                              </p>
+                              <p className="text-xs text-gray-500">{order.delivery_address}</p>
+                              {order.courier_name && (
+                                <p className="text-xs text-gray-500">Kurye: {order.courier_name}</p>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-lg">₺{order.total_amount}</p>
+                              <p className="text-sm text-gray-500">
+                                Komisyon: ₺{order.commission_amount?.toFixed(2)}
+                              </p>
+                              <OrderStatusBadge status={order.status} />
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <h4 className="font-medium mb-1">Siparişler:</h4>
+                            {order.items.map((item, index) => (
+                              <div key={index} className="text-sm text-gray-600">
+                                {item.quantity}x {item.product_name} - ₺{item.subtotal}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex justify-between items-center">
+                            <p className="text-xs text-gray-500">
+                              {new Date(order.created_at).toLocaleString('tr-TR')}
+                            </p>
+                            
+                            {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                              <div className="space-x-2">
+                                {order.status === 'created' && (
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => updateOrderStatus(order.id, 'assigned')}
+                                  >
+                                    Kuryeye Ata
+                                  </Button>
+                                )}
+                                {order.status === 'assigned' && (
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => updateOrderStatus(order.id, 'on_route')}
+                                  >
+                                    Yolda Olarak İşaretle
+                                  </Button>
+                                )}
+                                {order.status === 'on_route' && (
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => updateOrderStatus(order.id, 'delivered')}
+                                  >
+                                    Teslim Edildi
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Map Tab */}
+          <TabsContent value="map">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sistem Haritası</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LeafletMap
+                  center={[39.925533, 32.866287]}
+                  zoom={10}
+                  height="600px"
+                  markers={orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
+                    lat: order.delivery_lat,
+                    lng: order.delivery_lng,
+                    type: 'delivery',
+                    popup: true,
+                    title: `Sipariş #${order.id.slice(-8)}`,
+                    description: `${order.customer_name} - ${order.status}`,
+                    address: order.delivery_address
+                  }))}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+};
 const CourierRegistration = ({ onComplete, onBack }) => {
   const [formData, setFormData] = useState({
     email: '',
