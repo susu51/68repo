@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total_tests": 23,
-    "passed_tests": 18,
-    "failed_tests": 5,
-    "success_rate": 78.26086956521739,
-    "timestamp": "2025-09-27T00:19:20.229160",
+    "total_tests": 25,
+    "passed_tests": 21,
+    "failed_tests": 4,
+    "success_rate": 84.0,
+    "timestamp": "2025-09-27T00:20:36.996912",
     "test_type": "delivertr_mvp_core_business_flow",
     "core_flow_success": false
   },
@@ -13,151 +13,165 @@
       "test": "Admin Authentication",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.462730"
+      "timestamp": "2025-09-27T00:20:36.018247"
     },
     {
       "test": "Admin Authentication - Wrong Password",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.498466"
+      "timestamp": "2025-09-27T00:20:36.059597"
     },
     {
       "test": "Business Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.535719"
+      "timestamp": "2025-09-27T00:20:36.145996"
     },
     {
       "test": "Customer Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.572199"
+      "timestamp": "2025-09-27T00:20:36.237976"
     },
     {
       "test": "Courier Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.613565"
+      "timestamp": "2025-09-27T00:20:36.275665"
     },
     {
       "test": "Business Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.652898"
+      "timestamp": "2025-09-27T00:20:36.314251"
     },
     {
       "test": "Customer Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.686671"
+      "timestamp": "2025-09-27T00:20:36.360521"
     },
     {
       "test": "Product Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.720875"
+      "timestamp": "2025-09-27T00:20:36.394426"
     },
     {
       "test": "Product Creation 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.763374"
+      "timestamp": "2025-09-27T00:20:36.430375"
     },
     {
       "test": "Product Creation 3",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.800064"
+      "timestamp": "2025-09-27T00:20:36.467251"
     },
     {
       "test": "Product Creation 4",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.839447"
+      "timestamp": "2025-09-27T00:20:36.501275"
     },
     {
       "test": "Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.873113"
+      "timestamp": "2025-09-27T00:20:36.538359"
     },
     {
       "test": "Get Business Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.911061"
+      "timestamp": "2025-09-27T00:20:36.572974"
     },
     {
       "test": "Order Creation",
-      "success": false,
-      "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-27T00:19:19.950340"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:20:36.611951"
     },
     {
       "test": "Get Customer Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:19.984492"
+      "timestamp": "2025-09-27T00:20:36.644621"
     },
     {
       "test": "Get Business Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:20.019444"
+      "timestamp": "2025-09-27T00:20:36.680839"
     },
     {
-      "test": "Order Status Flow",
+      "test": "Order Status Update - ASSIGNED",
       "success": false,
-      "details": "No orders or courier token available",
-      "timestamp": "2025-09-27T00:19:20.020080"
+      "details": "Expected 200, got 422. Error: {'detail': [{'type': 'missing', 'loc': ['query', 'new_status'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.11/v/missing'}]}",
+      "timestamp": "2025-09-27T00:20:36.714758"
+    },
+    {
+      "test": "Order Status Update - ON_ROUTE",
+      "success": false,
+      "details": "Expected 200, got 422. Error: {'detail': [{'type': 'missing', 'loc': ['query', 'new_status'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.11/v/missing'}]}",
+      "timestamp": "2025-09-27T00:20:36.751375"
+    },
+    {
+      "test": "Order Status Update - DELIVERED",
+      "success": false,
+      "details": "Expected 200, got 422. Error: {'detail': [{'type': 'missing', 'loc': ['query', 'new_status'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.11/v/missing'}]}",
+      "timestamp": "2025-09-27T00:20:36.784368"
     },
     {
       "test": "Admin Get All Users",
-      "success": false,
-      "details": "Expected 200, got 401. Error: {'detail': 'Could not validate credentials'}",
-      "timestamp": "2025-09-27T00:19:20.051177"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:20:36.823002"
     },
     {
       "test": "Admin Get All Products",
-      "success": false,
-      "details": "Expected 200, got 401. Error: {'detail': 'Could not validate credentials'}",
-      "timestamp": "2025-09-27T00:19:20.091781"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:20:36.854952"
     },
     {
       "test": "Admin Get All Orders",
       "success": false,
-      "details": "Expected 200, got 401. Error: {'detail': 'Could not validate credentials'}",
-      "timestamp": "2025-09-27T00:19:20.125175"
+      "details": "Expected 200, got 500. Response: Internal Server Error",
+      "timestamp": "2025-09-27T00:20:36.891343"
     },
     {
       "test": "RBAC - Customer Create Product (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:20.162330"
+      "timestamp": "2025-09-27T00:20:36.923988"
     },
     {
       "test": "RBAC - Business Access Admin (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:20.196410"
+      "timestamp": "2025-09-27T00:20:36.959519"
     },
     {
       "test": "File Upload Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T00:19:20.228195"
+      "timestamp": "2025-09-27T00:20:36.995989"
     }
   ],
   "created_entities": {
-    "business_id": "0b2c8125-b949-482d-a7e4-ecdc512aa286",
-    "customer_id": "d3b21065-b9fe-465b-aa85-65ba2758dda2",
-    "courier_id": "f24619e8-e812-45a4-9453-8a5fa1f51b55",
+    "business_id": "2a8e3e2b-77bc-43a2-a36c-01d39a116004",
+    "customer_id": "770cbe91-fcf5-4638-a0d7-df720e85d151",
+    "courier_id": "db0e4d3d-f5c4-46cb-b16b-eff3053ff30e",
     "products": [
-      "bba5b3c8-1f70-47d7-b993-26a2d71d65bf",
-      "60892885-f8c5-4db7-89f9-e6efc2868fee",
-      "52ffe1f7-3d2d-4290-b69b-30722c99138e",
-      "a1ec3140-c435-40a6-8f51-549c6674dd86"
+      "e2a8e389-d24d-4f06-a37e-d7860a4fb968",
+      "492dc491-c8bf-49f9-b3b4-619d0976d71a",
+      "9fe8242d-d9f1-4293-bc09-0903fb74a7b7",
+      "111cfb00-42b2-40f7-a85a-b8df45df18ab"
     ],
-    "orders": []
+    "orders": [
+      "6d17a7b6-df4d-4725-a8c1-5d2aaebc2993"
+    ]
   }
 }
