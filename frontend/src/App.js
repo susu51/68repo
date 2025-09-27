@@ -491,159 +491,200 @@ const AdminDashboard = ({ user }) => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm sm:text-base">
-                  Kurye KYC Onayları ({couriers.length})
+                  Kurye KYC Onayları ({couriers.filter(c => kycFilter === 'all' || c.kyc_status === kycFilter).length})
                 </CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
                   Kurye belgelerini inceleyin ve onaylayın
                 </CardDescription>
+                
+                {/* KYC Filter Buttons */}
+                <div className="flex flex-wrap gap-2 pt-4">
+                  <Button
+                    size="sm"
+                    variant={kycFilter === 'pending' ? 'default' : 'outline'}
+                    onClick={() => setKycFilter('pending')}
+                    className="text-xs"
+                  >
+                    ⏳ Bekleyen ({couriers.filter(c => c.kyc_status === 'pending').length})
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={kycFilter === 'approved' ? 'default' : 'outline'}
+                    onClick={() => setKycFilter('approved')}
+                    className="text-xs"
+                  >
+                    ✅ Onaylı ({couriers.filter(c => c.kyc_status === 'approved').length})
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={kycFilter === 'rejected' ? 'default' : 'outline'}
+                    onClick={() => setKycFilter('rejected')}
+                    className="text-xs"
+                  >
+                    ❌ Reddedilen ({couriers.filter(c => c.kyc_status === 'rejected').length})
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={kycFilter === 'all' ? 'default' : 'outline'}
+                    onClick={() => setKycFilter('all')}
+                    className="text-xs"
+                  >
+                    📋 Tümü ({couriers.length})
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                {couriers.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8 text-sm">Kurye bulunamadı</p>
+                {couriers.filter(courier => kycFilter === 'all' || courier.kyc_status === kycFilter).length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 text-sm">
+                      {kycFilter === 'pending' ? 'Bekleyen KYC bulunamadı' :
+                       kycFilter === 'approved' ? 'Onaylı KYC bulunamadı' :
+                       kycFilter === 'rejected' ? 'Reddedilen KYC bulunamadı' :
+                       'Kurye bulunamadı'}
+                    </p>
+                  </div>
                 ) : (
                   <div className="space-y-4">
-                    {couriers.map((courier) => (
+                    {couriers.filter(courier => kycFilter === 'all' || courier.kyc_status === kycFilter).map((courier) => (
                       <Card key={courier.id} className="overflow-hidden">
-                        <CardContent className="p-4">
-                          <div className="flex flex-col sm:flex-row gap-4">
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="space-y-4">
                             {/* Courier Info */}
-                            <div className="flex-1 space-y-3">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <h3 className="font-semibold text-sm sm:text-base">
-                                    {courier.first_name} {courier.last_name}
-                                  </h3>
-                                  <p className="text-xs sm:text-sm text-gray-600">{courier.email}</p>
-                                  <p className="text-xs text-gray-500">
-                                    📍 {courier.city} • 🚗 {courier.vehicle_type}
-                                  </p>
-                                </div>
-                                <Badge className={getKYCStatusColor(courier.kyc_status)} size="sm">
-                                  {courier.kyc_status === 'approved' ? 'Onaylı' :
-                                   courier.kyc_status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
-                                </Badge>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div>
+                                <h3 className="font-semibold text-sm sm:text-base">
+                                  {courier.first_name} {courier.last_name}
+                                </h3>
+                                <p className="text-xs sm:text-sm text-gray-600">{courier.email}</p>
+                                <p className="text-xs text-gray-500">
+                                  📍 {courier.city} • 🚗 {courier.vehicle_type}
+                                </p>
                               </div>
-
-                              {/* Vehicle & License Details */}
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
-                                <div className="space-y-1">
-                                  <p><strong>Araç Modeli:</strong> {courier.vehicle_model}</p>
-                                  <p><strong>Ehliyet Sınıfı:</strong> {courier.license_class}</p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p><strong>Ehliyet No:</strong> {courier.license_number}</p>
-                                  <p><strong>IBAN:</strong> {courier.iban?.slice(-4).padStart(courier.iban?.length || 0, '*')}</p>
-                                </div>
-                              </div>
-
-                              {/* Documents */}
-                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                {/* License Photo */}
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-semibold">Ehliyet Fotoğrafı</Label>
-                                  {courier.license_photo_url ? (
-                                    <div className="relative group">
-                                      <img
-                                        src={`${BACKEND_URL}${courier.license_photo_url}`}
-                                        alt="Ehliyet"
-                                        className="w-full h-20 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75"
-                                        onClick={() => window.open(`${BACKEND_URL}${courier.license_photo_url}`, '_blank')}
-                                      />
-                                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
-                                        <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
-                                          📷 Büyült
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="w-full h-20 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
-                                      Yok
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Vehicle Photo */}
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-semibold">Araç Fotoğrafı</Label>
-                                  {courier.vehicle_photo_url ? (
-                                    <div className="relative group">
-                                      <img
-                                        src={`${BACKEND_URL}${courier.vehicle_photo_url}`}
-                                        alt="Araç"
-                                        className="w-full h-20 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75"
-                                        onClick={() => window.open(`${BACKEND_URL}${courier.vehicle_photo_url}`, '_blank')}
-                                      />
-                                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
-                                        <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
-                                          📷 Büyült
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="w-full h-20 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
-                                      Yok
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Profile Photo */}
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-semibold">Profil Fotoğrafı</Label>
-                                  {courier.profile_photo_url ? (
-                                    <div className="relative group">
-                                      <img
-                                        src={`${BACKEND_URL}${courier.profile_photo_url}`}
-                                        alt="Profil"
-                                        className="w-full h-20 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75"
-                                        onClick={() => window.open(`${BACKEND_URL}${courier.profile_photo_url}`, '_blank')}
-                                      />
-                                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
-                                        <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
-                                          📷 Büyült
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="w-full h-20 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
-                                      Yok
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Action Buttons */}
-                              {courier.kyc_status === 'pending' && (
-                                <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
-                                  <Button
-                                    onClick={() => updateCourierKYC(courier.id, 'approved')}
-                                    className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
-                                    size="sm"
-                                  >
-                                    ✅ Onayla
-                                  </Button>
-                                  <Button
-                                    onClick={() => updateCourierKYC(courier.id, 'rejected', 'Belgeler eksik veya hatalı')}
-                                    variant="destructive"
-                                    className="text-xs sm:text-sm"
-                                    size="sm"
-                                  >
-                                    ❌ Reddet
-                                  </Button>
-                                </div>
-                              )}
-
-                              {/* Review History */}
-                              {(courier.kyc_reviewed_at || courier.kyc_notes) && (
-                                <div className="text-xs text-gray-500 pt-2 border-t">
-                                  {courier.kyc_reviewed_at && (
-                                    <p>İnceleme: {new Date(courier.kyc_reviewed_at).toLocaleDateString('tr-TR')}</p>
-                                  )}
-                                  {courier.kyc_notes && (
-                                    <p>Not: {courier.kyc_notes}</p>
-                                  )}
-                                </div>
-                              )}
+                              <Badge className={getKYCStatusColor(courier.kyc_status)} size="sm">
+                                {courier.kyc_status === 'approved' ? '✅ Onaylı' :
+                                 courier.kyc_status === 'rejected' ? '❌ Reddedildi' : '⏳ Bekliyor'}
+                              </Badge>
                             </div>
+
+                            {/* Vehicle & License Details */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm bg-gray-50 p-3 rounded-lg">
+                              <div className="space-y-1">
+                                <p><strong>Araç Modeli:</strong> {courier.vehicle_model}</p>
+                                <p><strong>Ehliyet Sınıfı:</strong> {courier.license_class}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <p><strong>Ehliyet No:</strong> {courier.license_number}</p>
+                                <p><strong>IBAN:</strong> {courier.iban?.slice(-4).padStart(courier.iban?.length || 0, '*')}</p>
+                              </div>
+                            </div>
+
+                            {/* Documents */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {/* License Photo */}
+                              <div className="space-y-2">
+                                <Label className="text-xs font-semibold">Ehliyet Fotoğrafı</Label>
+                                {courier.license_photo_url ? (
+                                  <div className="relative group">
+                                    <img
+                                      src={`${BACKEND_URL}${courier.license_photo_url}`}
+                                      alt="Ehliyet"
+                                      className="w-full h-24 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75 transition-opacity"
+                                      onClick={() => window.open(`${BACKEND_URL}${courier.license_photo_url}`, '_blank')}
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
+                                      <span className="text-white opacity-0 group-hover:opacity-100 text-xs font-semibold">
+                                        🔍 Büyült
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="w-full h-24 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
+                                    📄 Yok
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Vehicle Photo */}
+                              <div className="space-y-2">
+                                <Label className="text-xs font-semibold">Araç Fotoğrafı</Label>
+                                {courier.vehicle_photo_url ? (
+                                  <div className="relative group">
+                                    <img
+                                      src={`${BACKEND_URL}${courier.vehicle_photo_url}`}
+                                      alt="Araç"
+                                      className="w-full h-24 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75 transition-opacity"
+                                      onClick={() => window.open(`${BACKEND_URL}${courier.vehicle_photo_url}`, '_blank')}
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
+                                      <span className="text-white opacity-0 group-hover:opacity-100 text-xs font-semibold">
+                                        🔍 Büyült
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="w-full h-24 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
+                                    🚗 Yok
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Profile Photo */}
+                              <div className="space-y-2">
+                                <Label className="text-xs font-semibold">Profil Fotoğrafı</Label>
+                                {courier.profile_photo_url ? (
+                                  <div className="relative group">
+                                    <img
+                                      src={`${BACKEND_URL}${courier.profile_photo_url}`}
+                                      alt="Profil"
+                                      className="w-full h-24 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75 transition-opacity"
+                                      onClick={() => window.open(`${BACKEND_URL}${courier.profile_photo_url}`, '_blank')}
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
+                                      <span className="text-white opacity-0 group-hover:opacity-100 text-xs font-semibold">
+                                        🔍 Büyült
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="w-full h-24 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
+                                    👤 Yok
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            {courier.kyc_status === 'pending' && (
+                              <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
+                                <Button
+                                  onClick={() => updateCourierKYC(courier.id, 'approved')}
+                                  className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm flex-1"
+                                  size="sm"
+                                >
+                                  ✅ Onayla
+                                </Button>
+                                <Button
+                                  onClick={() => updateCourierKYC(courier.id, 'rejected', 'Belgeler eksik veya hatalı')}
+                                  variant="destructive"
+                                  className="text-xs sm:text-sm flex-1"
+                                  size="sm"
+                                >
+                                  ❌ Reddet
+                                </Button>
+                              </div>
+                            )}
+
+                            {/* Review History */}
+                            {(courier.kyc_reviewed_at || courier.kyc_notes) && (
+                              <div className="text-xs text-gray-500 pt-2 border-t bg-gray-50 p-2 rounded">
+                                {courier.kyc_reviewed_at && (
+                                  <p>📅 İnceleme: {new Date(courier.kyc_reviewed_at).toLocaleDateString('tr-TR')}</p>
+                                )}
+                                {courier.kyc_notes && (
+                                  <p>📝 Not: {courier.kyc_notes}</p>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
