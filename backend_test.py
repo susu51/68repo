@@ -3141,18 +3141,28 @@ class DeliverTRAPITester:
         return self.tests_passed == self.tests_run
 
 def main():
-    """Main test execution"""
+    """Main test execution - Focus on City Field Validation as requested"""
     tester = DeliverTRAPITester()
     
-    # Run business registration tests as requested in review
-    print("🎯 RUNNING BUSINESS REGISTRATION TESTS AS REQUESTED")
-    success = tester.run_business_registration_tests()
+    print("🎯 RUNNING BUSINESS REGISTRATION CITY FIELD VALIDATION TESTS AS REQUESTED")
+    print("📋 Review Request: Test business registration endpoint focusing on city field validation")
+    print("🏙️  Testing Turkish city names: Istanbul, Ankara, Izmir")
+    print("✅ Testing complete business registration flow with city selection")
+    print("📝 Testing sample business registration data from request")
+    
+    # Run city field validation tests as requested in review
+    success = tester.run_city_field_validation_tests()
     
     if success:
-        print("\n🎉 All Business Registration tests passed!")
+        print("\n🎉 ALL CITY FIELD VALIDATION TESTS PASSED!")
+        print("✅ Business registration endpoint working with city field")
+        print("✅ Turkish city names (Istanbul, Ankara, Izmir) accepted")
+        print("✅ City field validation and acceptance working")
+        print("✅ Complete business registration flow with city selection working")
+        print("✅ Sample business registration data working perfectly")
         return 0
     else:
-        print(f"\n⚠️  Some Business Registration tests failed. Check results above.")
+        print(f"\n⚠️  Some City Field Validation tests failed. Check results above.")
         return 1
 
 if __name__ == "__main__":
