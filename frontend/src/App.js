@@ -2013,9 +2013,15 @@ const BusinessDashboard = ({ user }) => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/products/my`);
+      const token = localStorage.getItem('delivertr_access_token');
+      const response = await axios.get(`${API}/products/my`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setProducts(response.data);
     } catch (error) {
+      console.error('Product fetch error:', error);
       toast.error('Ürünler yüklenemedi');
     }
     setLoading(false);
@@ -2023,9 +2029,15 @@ const BusinessDashboard = ({ user }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${API}/orders`);
+      const token = localStorage.getItem('delivertr_access_token');
+      const response = await axios.get(`${API}/orders`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setOrders(response.data);
     } catch (error) {
+      console.error('Orders fetch error:', error);
       toast.error('Siparişler yüklenemedi');
     }
   };
