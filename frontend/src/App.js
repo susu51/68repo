@@ -308,7 +308,9 @@ const AdminDashboard = ({ user }) => {
   };
 
   const getRoleColor = (role) => {
-    switch (role) {
+    if (!role) return 'bg-gray-100 text-gray-800';
+    
+    switch (role.toLowerCase()) {
       case 'admin': return 'bg-red-100 text-red-800';
       case 'courier': return 'bg-orange-100 text-orange-800';
       case 'business': return 'bg-green-100 text-green-800';
