@@ -1407,251 +1407,409 @@ const BusinessDashboard = ({ user }) => {
   );
 };
 
+// Customer Dashboard - Enhanced with Product Shopping & Cart
 const CustomerDashboard = ({ user }) => {
   const { logout } = useAuth();
-  const [myOrders, setMyOrders] = useState([]);
-  const [nearbyBusinesses, setNearbyBusinesses] = useState([]);
+  const [activeTab, setActiveTab] = useState('products');
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showCreateOrder, setShowCreateOrder] = useState(false);
-  const [showCreatePackage, setShowCreatePackage] = useState(false);
-  const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [orderForm, setOrderForm] = useState({
+    delivery_address: '',
+    delivery_lat: null,
+    delivery_lng: null,
+    notes: ''
+  });
 
-  useEffect(() => {
-    fetchMyOrders();
-    // In a real app, we'd fetch nearby businesses based on customer location
-    setNearbyBusinesses([
-      {
-        id: 'demo-restaurant-1',
-        name: 'Burger Palace',
-        category: 'gida',
-        distance: 1.2,
-        rating: 4.5,
-        delivery_time: 25
-      },
-      {
-        id: 'demo-restaurant-2', 
-        name: 'Pizza Corner',
-        category: 'gida',
-        distance: 0.8,
-        rating: 4.8,
-        delivery_time: 20
-      },
-      {
-        id: 'demo-cargo-1',
-        name: 'Hızlı Kargo',
-        category: 'nakliye',
-        distance: 2.1,
-        rating: 4.3,
-        delivery_time: 15
-      }
-    ]);
-  }, []);
-
-  const fetchMyOrders = async () => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('delivertr_access_token');
-      const response = await axios.get(`${API}/orders/my-orders`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMyOrders(response.data.orders);
+      const response = await axios.get(`${API}/products`);
+      setProducts(response.data);
     } catch (error) {
-      console.error('Siparişler alınamadı:', error);
+      toast.error('Ürünler yüklenemedi');
     }
     setLoading(false);
   };
 
-  const handleOrderCreated = (orderId) => {
-    toast.success('Sipariş oluşturuldu!');
-    setShowCreateOrder(false);
-    setShowCreatePackage(false);
-    setSelectedBusiness(null);
+  const fetchMyOrders = async () => {
+    try {
+      const response = await axios.get(`${API}/orders`);
+      setOrders(response.data);
+    } catch (error) {
+      toast.error('Siparişler yüklenemedi');
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
     fetchMyOrders();
+  }, []);
+
+  const addToCart = (product) => {
+    const existingItem = cart.find(item => item.product_id === product.id);
+    
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.product_id === product.id 
+          ? { ...item, quantity: item.quantity + 1, subtotal: (item.quantity + 1) * item.product_price }
+          : item
+      ));
+    } else {
+      setCart([...cart, {
+        product_id: product.id,
+        product_name: product.name,
+        product_price: product.price,
+        quantity: 1,
+        subtotal: product.price
+      }]);
+    }
+    
+    toast.success(`${product.name} sepete eklendi!`);
+  };
+
+  const removeFromCart = (productId) => {
+    setCart(cart.filter(item => item.product_id !== productId));
+  };
+
+  const updateCartQuantity = (productId, newQuantity) => {
+    if (newQuantity === 0) {
+      removeFromCart(productId);
+      return;
+    }
+    
+    setCart(cart.map(item => 
+      item.product_id === productId 
+        ? { ...item, quantity: newQuantity, subtotal: newQuantity * item.product_price }
+        : item
+    ));
+  };
+
+  const getCartTotal = () => {
+    return cart.reduce((total, item) => total + item.subtotal, 0);
+  };
+
+  const handleOrderSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (cart.length === 0) {
+      toast.error('Sepetiniz boş!');
+      return;
+    }
+    
+    if (!orderForm.delivery_address) {
+      toast.error('Teslimat adresini girin!');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const orderData = {
+        delivery_address: orderForm.delivery_address,
+        delivery_lat: orderForm.delivery_lat,
+        delivery_lng: orderForm.delivery_lng,
+        items: cart,
+        total_amount: getCartTotal(),
+        notes: orderForm.notes
+      };
+
+      await axios.post(`${API}/orders`, orderData);
+      
+      toast.success('Sipariş başarıyla oluşturuldu!');
+      setCart([]);
+      setOrderForm({
+        delivery_address: '',
+        delivery_lat: null,
+        delivery_lng: null,
+        notes: ''
+      });
+      fetchMyOrders();
+      setActiveTab('orders');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Sipariş oluşturulamadı');
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4" data-testid="customer-dashboard">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Hoş Geldin, {user.name}</h1>
-            <p className="text-gray-600">{user.city}</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold">
+                Merhaba, {user.first_name || 'Müşteri'}!
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Badge variant="outline">
+                🛒 Sepet ({cart.length})
+              </Badge>
+              <Badge variant="outline">Müşteri</Badge>
+              <Button onClick={logout} variant="outline">Çıkış</Button>
+            </div>
           </div>
-          <Button onClick={logout} variant="outline" data-testid="logout-btn">
-            Çıkış Yap
-          </Button>
         </div>
+      </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Actions */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Quick Actions */}
-            <div className="grid md:grid-cols-3 gap-4">
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="text-center p-6">
-                  <div className="text-4xl mb-2">🍔</div>
-                  <h3 className="font-semibold mb-2">Yemek Sipariş</h3>
-                  <p className="text-sm text-gray-600 mb-3">Restoranlardan sipariş</p>
-                  <Button className="bg-red-600 hover:bg-red-700 w-full" data-testid="browse-restaurants-btn">
-                    Restoranlara Göz At
-                  </Button>
-                </CardContent>
-              </Card>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="products">Ürünler</TabsTrigger>
+            <TabsTrigger value="cart">Sepet ({cart.length})</TabsTrigger>
+            <TabsTrigger value="orders">Siparişlerim</TabsTrigger>
+            <TabsTrigger value="map">Harita</TabsTrigger>
+          </TabsList>
 
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="text-center p-6">
-                  <div className="text-4xl mb-2">🛒</div>
-                  <h3 className="font-semibold mb-2">Market</h3>
-                  <p className="text-sm text-gray-600 mb-3">Günlük alışveriş</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full" data-testid="browse-markets-btn">
-                    Market Alışverişi
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="text-center p-6">
-                  <div className="text-4xl mb-2">📦</div>
-                  <h3 className="font-semibold mb-2">Paket Gönder</h3>
-                  <p className="text-sm text-gray-600 mb-3">Kargo teslimatı</p>
-                  <Button 
-                    onClick={() => setShowCreatePackage(true)}
-                    className="bg-orange-600 hover:bg-orange-700 w-full" 
-                    data-testid="send-package-btn"
-                  >
-                    Paket Gönder
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Nearby Businesses */}
-            <div>
-              <h2 className="text-xl font-bold mb-4">Yakındaki İşletmeler</h2>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                {nearbyBusinesses.map((business) => (
-                  <Card key={business.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-semibold">{business.name}</h3>
-                          <p className="text-sm text-gray-600">
-                            {business.category === 'gida' ? '🍔 Gıda' : '📦 Nakliye'}
-                          </p>
-                        </div>
-                        <Badge variant="outline">
-                          ⭐ {business.rating}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
-                        <span>📍 {business.distance} km</span>
-                        <span>🕒 {business.delivery_time} dk</span>
-                      </div>
-                      
-                      <Button
-                        onClick={() => {
-                          if (business.category === 'gida') {
-                            setSelectedBusiness(business);
-                            setShowCreateOrder(true);
-                          } else {
-                            setShowCreatePackage(true);
-                          }
-                        }}
-                        className="w-full bg-green-600 hover:bg-green-700"
-                        data-testid={`order-from-${business.id}`}
-                      >
-                        {business.category === 'gida' ? 'Sipariş Ver' : 'Kargo Gönder'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* My Orders Sidebar */}
-          <div>
-            <h2 className="text-xl font-bold mb-4">Siparişlerim</h2>
-            
-            {loading ? (
-              <Card>
-                <CardContent className="text-center py-8">
-                  <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                  <p className="text-sm text-gray-600">Yükleniyor...</p>
-                </CardContent>
-              </Card>
-            ) : myOrders.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-8">
-                  <div className="text-4xl mb-2">📋</div>
-                  <p className="text-gray-500 text-sm">Henüz siparişiniz yok</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-3">
-                {myOrders.slice(0, 5).map((order) => (
-                  <Card key={order.id} className="hover:shadow-sm transition-shadow">
-                    <CardContent className="p-3">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="font-medium text-sm">
-                            {order.order_type === 'food' ? '🍔' : '📦'} #{order.id.substring(0, 8)}
-                          </p>
-                          <p className="text-xs text-gray-600">
-                            {order.business_name || 'Paket Teslimat'}
-                          </p>
-                        </div>
-                        <OrderStatusBadge status={order.status} />
-                      </div>
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-gray-600">
-                          {new Date(order.created_at).toLocaleDateString('tr-TR')}
-                        </span>
-                        <span className="font-semibold">₺{order.total?.toFixed(2)}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                
-                {myOrders.length > 5 && (
-                  <Button variant="outline" className="w-full" size="sm">
-                    Tümünü Gör ({myOrders.length})
-                  </Button>
+          {/* Products Tab */}
+          <TabsContent value="products" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Mevcut Ürünler ({products.length})</CardTitle>
+                <CardDescription>
+                  Lezzetli yemekleri sepetinize ekleyin!
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Ürünler yükleniyor...</p>
+                  </div>
+                ) : products.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Henüz ürün yok</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product) => (
+                      <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                        {product.photo_url && (
+                          <div className="h-48 overflow-hidden">
+                            <img 
+                              src={`${BACKEND_URL}${product.photo_url}`} 
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <CardContent className="p-4">
+                          <div className="mb-3">
+                            <h3 className="font-semibold text-lg">{product.name}</h3>
+                            <p className="text-sm text-gray-600 mb-2">{product.description}</p>
+                            <p className="text-xs text-gray-500">
+                              İşletme: {product.business_name} • Hazırlık: {product.preparation_time_minutes} dk
+                            </p>
+                          </div>
+                          
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="font-bold text-xl text-green-600">₺{product.price}</span>
+                            <Badge variant={product.is_available ? "default" : "secondary"}>
+                              {product.is_available ? 'Mevcut' : 'Stokta Yok'}
+                            </Badge>
+                          </div>
+                          
+                          <Button 
+                            onClick={() => addToCart(product)}
+                            disabled={!product.is_available}
+                            className="w-full"
+                          >
+                            {product.is_available ? 'Sepete Ekle' : 'Stokta Yok'}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Cart Tab */}
+          <TabsContent value="cart" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Cart Items */}
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sepetim ({cart.length} ürün)</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {cart.length === 0 ? (
+                      <p className="text-gray-500 text-center py-8">Sepetiniz boş</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {cart.map((item) => (
+                          <div key={item.product_id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{item.product_name}</h4>
+                              <p className="text-sm text-gray-600">₺{item.product_price} x {item.quantity}</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateCartQuantity(item.product_id, item.quantity - 1)}
+                              >
+                                -
+                              </Button>
+                              <span className="w-8 text-center">{item.quantity}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateCartQuantity(item.product_id, item.quantity + 1)}
+                              >
+                                +
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => removeFromCart(item.product_id)}
+                              >
+                                🗑️
+                              </Button>
+                            </div>
+                            <div className="text-right ml-4">
+                              <p className="font-bold">₺{item.subtotal.toFixed(2)}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* Create Order Modal */}
-        {showCreateOrder && selectedBusiness && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <CreateOrderForm
-                businessId={selectedBusiness.id}
-                onOrderCreated={handleOrderCreated}
-                onCancel={() => {
-                  setShowCreateOrder(false);
-                  setSelectedBusiness(null);
-                }}
-              />
+              {/* Order Summary & Checkout */}
+              <div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sipariş Özeti</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleOrderSubmit} className="space-y-4">
+                      <div>
+                        <Label>Teslimat Adresi *</Label>
+                        <Textarea
+                          value={orderForm.delivery_address}
+                          onChange={(e) => setOrderForm({...orderForm, delivery_address: e.target.value})}
+                          placeholder="Tam adresinizi yazın..."
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Sipariş Notu (Opsiyonel)</Label>
+                        <Textarea
+                          value={orderForm.notes}
+                          onChange={(e) => setOrderForm({...orderForm, notes: e.target.value})}
+                          placeholder="Özel istekleriniz..."
+                        />
+                      </div>
+                      
+                      <div className="border-t pt-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span>Ara Toplam:</span>
+                          <span>₺{getCartTotal().toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span>Teslimat:</span>
+                          <span>Ücretsiz</span>
+                        </div>
+                        <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
+                          <span>Toplam:</span>
+                          <span>₺{getCartTotal().toFixed(2)}</span>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        disabled={loading || cart.length === 0}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        {loading ? 'Sipariş Oluşturuluyor...' : 'Siparişi Tamamla'}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Create Package Order Modal */}
-        {showCreatePackage && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <CreatePackageOrder
-                onOrderCreated={handleOrderCreated}
-                onCancel={() => setShowCreatePackage(false)}
-              />
-            </div>
-          </div>
-        )}
+          {/* Orders Tab */}
+          <TabsContent value="orders" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Siparişlerim ({orders.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {orders.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Henüz siparişiniz yok</p>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <Card key={order.id}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
+                              <p className="text-sm text-gray-600">{order.business_name}</p>
+                              <p className="text-xs text-gray-500">{order.delivery_address}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-lg">₺{order.total_amount}</p>
+                              <OrderStatusBadge status={order.status} />
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <h4 className="font-medium mb-1">Siparişler:</h4>
+                            {order.items.map((item, index) => (
+                              <div key={index} className="text-sm text-gray-600">
+                                {item.quantity}x {item.product_name} - ₺{item.subtotal}
+                              </div>
+                            ))}
+                          </div>
+
+                          <p className="text-xs text-gray-500">
+                            Sipariş Tarihi: {new Date(order.created_at).toLocaleString('tr-TR')}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Map Tab */}
+          <TabsContent value="map">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sipariş Takip Haritası</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LeafletMap
+                  center={[39.925533, 32.866287]}
+                  zoom={12}
+                  height="500px"
+                  markers={orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
+                    lat: order.delivery_lat,
+                    lng: order.delivery_lng,
+                    type: 'delivery',
+                    popup: true,
+                    title: `Sipariş #${order.id.slice(-8)}`,
+                    description: `Durum: ${order.status}`,
+                    address: order.delivery_address
+                  }))}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
