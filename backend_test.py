@@ -2722,13 +2722,16 @@ class DeliverTRAPITester:
 def main():
     """Main test execution"""
     tester = DeliverTRAPITester()
-    success = tester.run_all_tests()
+    
+    # Run business registration tests as requested in review
+    print("🎯 RUNNING BUSINESS REGISTRATION TESTS AS REQUESTED")
+    success = tester.run_business_registration_tests()
     
     if success:
-        print("\n🎉 All DeliverTR MVP Core Business Flow tests passed!")
+        print("\n🎉 All Business Registration tests passed!")
         return 0
     else:
-        print(f"\n⚠️  Some tests failed. Check results above.")
+        print(f"\n⚠️  Some Business Registration tests failed. Check results above.")
         return 1
 
 if __name__ == "__main__":
