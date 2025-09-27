@@ -106,6 +106,10 @@ const LoginForm = ({ onRegisterClick }) => {
 
   const handleAdminSubmit = async (e) => {
     e.preventDefault();
+    
+    // Debug alert to see if function is called
+    alert('Admin login button clicked!');
+    
     setLoading(true);
 
     // Manual validation
