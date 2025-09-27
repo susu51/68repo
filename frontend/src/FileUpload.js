@@ -8,9 +8,13 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const FileUpload = ({ label, accept = "image/*", onFileUploaded, required = false }) => {
+const FileUpload = ({ label = "Dosya", accept = "image/*", onFileUploaded, required = false }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
+
+  // Safe label processing
+  const safeLabel = label || "Dosya";
+  const labelId = `file-input-${safeLabel.replace(/\s+/g, '-').toLowerCase()}`;
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
