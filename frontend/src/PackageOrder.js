@@ -295,15 +295,15 @@ export const CreatePackageOrder = ({ onOrderCreated, onCancel }) => {
     try {
       const orderData = {
         pickup_address: {
-          lat: pickupAddress.lat,
-          lon: pickupAddress.lng,
-          address: `${pickupAddress.lat.toFixed(4)}, ${pickupAddress.lng.toFixed(4)}`,
-          city: "İstanbul" // Demo için
+          lat: 41.0082, // Demo coordinates for Istanbul
+          lon: 28.9784,
+          address: pickupAddress,
+          city: "İstanbul"
         },
         delivery_address: {
-          lat: deliveryAddress.lat,
-          lon: deliveryAddress.lng,
-          address: `${deliveryAddress.lat.toFixed(4)}, ${deliveryAddress.lng.toFixed(4)}`,
+          lat: 41.0082, // Demo coordinates for Istanbul
+          lon: 28.9784,
+          address: deliveryAddress,
           city: "İstanbul"
         },
         package_details: packageDetails,
