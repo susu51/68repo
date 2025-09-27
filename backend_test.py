@@ -704,7 +704,7 @@ def main():
     success = tester.run_all_tests()
     
     if success:
-        print("\n🎉 All tests passed!")
+        print("\n🎉 All DeliverTR MVP Core Business Flow tests passed!")
         return 0
     else:
         print(f"\n⚠️  Some tests failed. Check results above.")
