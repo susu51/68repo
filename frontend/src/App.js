@@ -3081,7 +3081,7 @@ const HomePage = ({ onAuthStart }) => {
 
         {/* Features */}
         <div className="grid md:grid-cols-3 gap-8 mt-16">
-          <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card key="courier-card" className="text-center hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
               <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🚗</span>
@@ -3096,7 +3096,7 @@ const HomePage = ({ onAuthStart }) => {
             </CardContent>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card key="business-card" className="text-center hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🏪</span>
@@ -3111,7 +3111,7 @@ const HomePage = ({ onAuthStart }) => {
             </CardContent>
           </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card key="customer-card" className="text-center hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">📱</span>
