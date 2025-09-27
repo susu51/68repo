@@ -490,22 +490,28 @@ export const NearbyOrdersForCourier = () => {
   };
 
   const updateLocation = () => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation || !isMounted) return;
     
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        setCourierLocation(location);
-        
-        // Refresh orders when location updates
-        if (nearbyOrders.length > 0) {
-          checkForCloseOrders(nearbyOrders);
+        if (isMounted) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setCourierLocation(location);
+          
+          // Refresh orders when location updates
+          if (nearbyOrders.length > 0) {
+            checkForCloseOrders(nearbyOrders);
+          }
         }
       },
-      (error) => console.error('Konum güncellenemedi:', error),
+      (error) => {
+        if (isMounted) {
+          console.error('Konum güncellenemedi:', error);
+        }
+      },
       { enableHighAccuracy: true, timeout: 5000 }
     );
   };
