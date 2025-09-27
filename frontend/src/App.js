@@ -1527,9 +1527,12 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
 const CourierDashboard = ({ user }) => {
   const { logout } = useAuth();
   const [isOnline, setIsOnline] = useState(user.is_online || false);
-  const [currentView, setCurrentView] = useState('nearby'); // nearby, orders, balance, profile
+  const [currentView, setCurrentView] = useState('nearby');
   const [myOrders, setMyOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // KYC Status Check
+  const isKYCApproved = user.kyc_status === 'approved';
 
   useEffect(() => {
     if (currentView === 'orders') {
@@ -1540,232 +1543,175 @@ const CourierDashboard = ({ user }) => {
   const fetchMyOrders = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('delivertr_access_token');
-      const response = await axios.get(`${API}/orders/my-orders`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMyOrders(response.data.orders);
+      const response = await axios.get(`${API}/orders`);
+      setMyOrders(response.data);
     } catch (error) {
       console.error('Siparişler alınamadı:', error);
     }
     setLoading(false);
   };
 
-  const toggleOnlineStatus = async () => {
-    try {
-      const token = localStorage.getItem('delivertr_access_token');
-      const response = await axios.post(`${API}/courier/toggle-online`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setIsOnline(response.data.is_online);
-      toast.success(response.data.is_online ? 'Çevrimiçi oldunuz!' : 'Çevrimdışı oldunuz');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Durum değiştirilemedi');
-    }
-  };
-
-  const updateLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        try {
-          const token = localStorage.getItem('delivertr_access_token');
-          await axios.post(`${API}/courier/location/update`, {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-            address: `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`
-          }, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          
-          toast.success('Konum güncellendi');
-        } catch (error) {
-          toast.error('Konum güncellenemedi');
-        }
-      });
-    }
-  };
-
   const getKYCStatusBadge = (status) => {
     const statusConfig = {
-      pending: { variant: "secondary", text: "Onay Bekliyor", className: "bg-yellow-100 text-yellow-800" },
-      approved: { variant: "default", text: "Onaylandı", className: "bg-green-100 text-green-800" },
-      rejected: { variant: "destructive", text: "Reddedildi", className: "bg-red-100 text-red-800" }
+      pending: { text: "⏳ KYC Onay Bekliyor", className: "bg-yellow-100 text-yellow-800" },
+      approved: { text: "✅ KYC Onaylandı", className: "bg-green-100 text-green-800" },
+      rejected: { text: "❌ KYC Reddedildi", className: "bg-red-100 text-red-800" }
     };
     
     const config = statusConfig[status] || statusConfig.pending;
     return <Badge className={config.className} data-testid="kyc-status-badge">{config.text}</Badge>;
   };
 
+  // KYC Warning Component
+  const KYCWarning = () => (
+    <Card className="border-yellow-200 bg-yellow-50">
+      <CardContent className="p-4">
+        <div className="flex items-center space-x-3">
+          <div className="text-2xl">⚠️</div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-yellow-800">KYC Onayı Gerekli</h3>
+            <p className="text-sm text-yellow-700">
+              {user.kyc_status === 'pending' ? 
+                'Belgeleriniz inceleniyor. Onaylandıktan sonra sipariş alabilirsiniz.' :
+                'Belgeleriniz reddedildi. Lütfen yeni belgeler yükleyip tekrar başvurun.'
+              }
+            </p>
+            {getKYCStatusBadge(user.kyc_status)}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4" data-testid="courier-dashboard">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Kurye Paneli</h1>
-            <p className="text-gray-600">{user.name} - {user.city}</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={updateLocation} variant="outline" size="sm">
-              📍 Konum Güncelle
-            </Button>
-            <Button onClick={logout} variant="outline" data-testid="logout-btn">
-              Çıkış Yap
-            </Button>
-          </div>
-        </div>
-
-        {/* Status Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">KYC Durumu</CardTitle>
-            </CardHeader>
-            <CardContent>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-2 sm:p-4" data-testid="courier-dashboard">
+      {/* Mobile-Responsive Header */}
+      <div className="bg-white shadow-lg rounded-lg mb-4 sm:mb-6">
+        <div className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900">
+                Kurye Panel - {user.first_name} {user.last_name}
+              </h1>
+              <p className="text-sm text-gray-600">
+                {user.city} • {user.vehicle_type} • {user.vehicle_model}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
               {getKYCStatusBadge(user.kyc_status)}
-              <p className="text-xs text-gray-600 mt-2">
-                {user.kyc_status === 'pending' && 'Belgeleriniz inceleniyor'}
-                {user.kyc_status === 'approved' && 'Çalışabilirsiniz!'}
-                {user.kyc_status === 'rejected' && 'Belgeleri güncelleyin'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Çevrimiçi Durum</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <Badge className={isOnline ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
-                  {isOnline ? '🟢 Çevrimiçi' : '⚫ Çevrimdışı'}
-                </Badge>
-                <Button
-                  onClick={toggleOnlineStatus}
-                  disabled={user.kyc_status !== 'approved'}
-                  size="sm"
-                  variant="outline"
-                  data-testid="toggle-online-btn"
+              {isKYCApproved && (
+                <Badge 
+                  className={isOnline ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                  data-testid="online-status"
                 >
-                  Değiştir
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Mevcut Bakiye</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-600">₺{user.balance?.toFixed(2) || '0.00'}</p>
-              <p className="text-xs text-gray-600">Çekilebilir</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Tamamlanan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-blue-600">0</p>
-              <p className="text-xs text-gray-600">Sipariş</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Navigation */}
-        <div className="mb-6">
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setCurrentView('nearby')}
-              variant={currentView === 'nearby' ? 'default' : 'outline'}
-              data-testid="nearby-orders-tab"
-            >
-              🔍 Yakındaki Siparişler
-            </Button>
-            <Button
-              onClick={() => setCurrentView('orders')}
-              variant={currentView === 'orders' ? 'default' : 'outline'}
-              data-testid="my-orders-tab"
-            >
-              📋 Siparişlerim
-            </Button>
-            <Button
-              onClick={() => setCurrentView('balance')}
-              variant={currentView === 'balance' ? 'default' : 'outline'}
-              data-testid="balance-tab"
-            >
-              💰 Bakiye & Kazançlar
-            </Button>
-            <Button
-              onClick={() => setCurrentView('map')}
-              variant={currentView === 'map' ? 'default' : 'outline'}
-            >
-              🗺️ Harita
-            </Button>
+                  {isOnline ? "🟢 Çevrimiçi" : "⚫ Çevrimdışı"}
+                </Badge>
+              )}
+              <Button onClick={logout} variant="outline" size="sm">
+                <span className="hidden sm:inline">Çıkış</span>
+                <span className="sm:hidden">🚪</span>
+              </Button>
+            </div>
           </div>
         </div>
-
-        {/* Content */}
-        {currentView === 'nearby' && user.kyc_status === 'approved' && isOnline && (
-          <NearbyOrdersForCourier />
-        )}
-
-        {currentView === 'nearby' && (user.kyc_status !== 'approved' || !isOnline) && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <div className="text-4xl mb-4">⚠️</div>
-              <p className="text-gray-600 mb-2">
-                {user.kyc_status !== 'approved' 
-                  ? 'KYC onayınız tamamlanmalı' 
-                  : 'Sipariş almak için çevrimiçi olun'
-                }
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {currentView === 'orders' && (
-          <div>
-            {loading ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-600">Siparişler yükleniyor...</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <OrdersList
-                userType="courier"
-                orders={myOrders}
-                onStatusUpdate={fetchMyOrders}
-              />
-            )}
-          </div>
-        )}
-
-        {currentView === 'balance' && (
-          <CourierBalance />
-        )}
-
-        {currentView === 'map' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Konum & Harita</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MapComponent
-                showCurrentLocation={true}
-                height="500px"
-                onLocationSelect={(location) => {
-                  console.log('Seçilen konum:', location);
-                }}
-              />
-            </CardContent>
-          </Card>
-        )}
       </div>
+
+      {/* KYC Warning */}
+      {!isKYCApproved && (
+        <div className="mb-4 sm:mb-6">
+          <KYCWarning />
+        </div>
+      )}
+
+      {/* Main Content - Only show if KYC approved */}
+      {isKYCApproved ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Left Column - Orders & Map */}
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">Yakındaki Siparişler</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Size yakın siparişleri görüntüleyin ve kabul edin
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <NearbyOrdersForCourier />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">Harita</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MapComponent />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Stats & Profile */}
+          <div className="space-y-4 sm:space-y-6">
+            {/* Balance Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">Bakiye</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CourierBalance />
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">Hızlı İşlemler</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  onClick={() => setIsOnline(!isOnline)}
+                  className={`w-full ${isOnline ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+                  size="sm"
+                >
+                  {isOnline ? '⏸️ Çevrimdışı Ol' : '▶️ Çevrimiçi Ol'}
+                </Button>
+                
+                <Button
+                  onClick={() => setCurrentView('orders')}
+                  variant="outline"
+                  className="w-full"
+                  size="sm"
+                >
+                  📦 Siparişlerim
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Profile Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">Profil Özeti</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="text-xs sm:text-sm space-y-1">
+                  <p><strong>Ehliyet:</strong> {user.license_class} - {user.license_number}</p>
+                  <p><strong>IBAN:</strong> {user.iban?.slice(-4).padStart(user.iban?.length || 0, '*')}</p>
+                  <p><strong>Bakiye:</strong> ₺{user.balance || '0.00'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      ) : (
+        // Show message when KYC not approved
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">📋</div>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">KYC Onayı Bekleniyor</h2>
+          <p className="text-gray-600">
+            Belgeleriniz admin tarafından incelendikten sonra sipariş almaya başlayabilirsiniz.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
