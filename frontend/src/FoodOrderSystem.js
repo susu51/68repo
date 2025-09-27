@@ -289,18 +289,25 @@ export const ProfessionalFoodOrderSystem = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [sortType, setSortType] = useState('nearest'); // 'nearest' or 'citywide'
+  const [isMounted, setIsMounted] = useState(true); // Track component mount status
 
   useEffect(() => {
+    setIsMounted(true);
     getUserLocation();
     fetchRestaurants();
+    
+    // Cleanup function
+    return () => {
+      setIsMounted(false);
+    };
   }, []);
 
   // Re-sort when user location changes (only if using nearest sort)
   useEffect(() => {
-    if (userLocation && originalRestaurants.length > 0 && sortType === 'nearest') {
+    if (isMounted && userLocation && originalRestaurants.length > 0 && sortType === 'nearest') {
       sortAndFilterRestaurants(originalRestaurants, sortType, userLocation);
     }
-  }, [userLocation, sortType]);
+  }, [userLocation, sortType, isMounted]);
 
   const getUserLocation = () => {
     if (!navigator.geolocation) {
