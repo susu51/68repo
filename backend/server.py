@@ -239,11 +239,11 @@ async def register_courier(courier_data: CourierRegistration):
     # Create access token
     access_token = create_access_token(data={"sub": courier_data.email})
     
-    # Remove password from response and convert ObjectId to string
+    # Remove password from response and convert datetime to string
     del user_doc["password"]
-    user_doc["id"] = str(result.inserted_id)
     if "_id" in user_doc:
         del user_doc["_id"]
+    user_doc["created_at"] = user_doc["created_at"].isoformat()
     
     return {
         "access_token": access_token,
