@@ -631,7 +631,7 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
         "id": str(uuid.uuid4()),
         "customer_id": current_user["id"],
         "customer_name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip(),
-        "business_id": order_data.items[0]["product_id"] if order_data.items else "",  # We'll need to get this properly
+        "business_id": "",  # Will be set from product lookup
         "business_name": "",  # We'll need to get this from product
         "courier_id": None,
         "courier_name": None,
