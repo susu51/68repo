@@ -2058,7 +2058,7 @@ const BusinessDashboard = ({ user }) => {
         preparation_time_minutes: parseInt(productForm.preparation_time_minutes)
       };
 
-      const token = localStorage.getItem('delivertr_access_token');
+      const token = localStorage.getItem('kuryecini_access_token');
       await axios.post(`${API}/products`, productData, {
         headers: {
           'Authorization': `Bearer ${token}`
