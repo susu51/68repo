@@ -597,7 +597,21 @@ export const NearbyOrdersForCourier = () => {
       <Card>
         <CardContent className="text-center py-12">
           <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Yakın siparişler yükleniyor...</p>
+          <p className="text-gray-600">
+            {courierLocation ? 'Siparişler yükleniyor...' : 'Konum alınıyor...'}
+          </p>
+          {locationError && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">⚠️ {locationError}</p>
+              <Button 
+                onClick={startLocationTracking}
+                className="mt-2 bg-red-600 hover:bg-red-700"
+                size="sm"
+              >
+                🔄 Konumu Tekrar Dene
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
