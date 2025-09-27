@@ -74,21 +74,26 @@ const useAuth = () => {
   return context;
 };
 
-// Login Component - Email/Password Authentication
+// Login Component - Email/Password Authentication + Admin Login
 const LoginForm = ({ onRegisterClick }) => {
   const { login } = useAuth();
+  const [loginType, setLoginType] = useState('user'); // 'user' or 'admin'
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    adminPassword: ''
   });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleUserSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/auth/login`, formData);
+      const response = await axios.post(`${API}/auth/login`, {
+        email: formData.email,
+        password: formData.password
+      });
       login(response.data);
       toast.success('Başarıyla giriş yaptınız!');
     } catch (error) {
@@ -97,62 +102,120 @@ const LoginForm = ({ onRegisterClick }) => {
     setLoading(false);
   };
 
+  const handleAdminSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await axios.post(`${API}/auth/admin`, {
+        password: formData.adminPassword
+      });
+      login(response.data);
+      toast.success('Admin girişi başarılı!');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Yanlış admin şifresi');
+    }
+    setLoading(false);
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-orange-600">Giriş Yap</CardTitle>
-        <CardDescription>DeliverTR hesabınıza giriş yapın</CardDescription>
+        <CardTitle className="text-2xl font-bold text-orange-600">
+          {loginType === 'user' ? 'Giriş Yap' : 'Admin Girişi'}
+        </CardTitle>
+        <CardDescription>
+          {loginType === 'user' ? 'DeliverTR hesabınıza giriş yapın' : 'Admin paneline erişim'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">E-posta</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="ornek@email.com"
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              required
-              data-testid="login-email"
-            />
-          </div>
+        {/* Login Type Selector */}
+        <Tabs value={loginType} onValueChange={setLoginType} className="mb-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="user" data-testid="user-login-tab">Kullanıcı Girişi</TabsTrigger>
+            <TabsTrigger value="admin" data-testid="admin-login-tab">Admin Girişi</TabsTrigger>
+          </TabsList>
           
-          <div>
-            <Label htmlFor="password">Şifre</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Şifrenizi girin"
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              required
-              data-testid="login-password"
-            />
-          </div>
+          <TabsContent value="user">
+            <form onSubmit={handleUserSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="email">E-posta</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="ornek@email.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
+                  data-testid="login-email"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="password">Şifre</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Şifrenizi girin"
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  required
+                  data-testid="login-password"
+                />
+              </div>
+              
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-orange-600 hover:bg-orange-700"
+                data-testid="login-submit-btn"
+              >
+                {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+              </Button>
+            </form>
+          </TabsContent>
           
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="w-full bg-orange-600 hover:bg-orange-700"
-            data-testid="login-submit-btn"
-          >
-            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-          </Button>
-        </form>
+          <TabsContent value="admin">
+            <form onSubmit={handleAdminSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="adminPassword">Admin Şifresi</Label>
+                <Input
+                  id="adminPassword"
+                  type="password"
+                  placeholder="Admin şifresini girin"
+                  value={formData.adminPassword}
+                  onChange={(e) => setFormData({...formData, adminPassword: e.target.value})}
+                  required
+                  data-testid="admin-password"
+                />
+              </div>
+              
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-red-600 hover:bg-red-700"
+                data-testid="admin-login-btn"
+              >
+                {loading ? 'Giriş yapılıyor...' : 'Admin Girişi'}
+              </Button>
+            </form>
+          </TabsContent>
+        </Tabs>
         
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            Hesabınız yok mu?{' '}
-            <button
-              onClick={onRegisterClick}
-              className="text-orange-600 hover:text-orange-700 font-medium"
-              data-testid="go-to-register-btn"
-            >
-              Kayıt Ol
-            </button>
-          </p>
-        </div>
+        {loginType === 'user' && (
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              Hesabınız yok mu?{' '}
+              <button
+                onClick={onRegisterClick}
+                className="text-orange-600 hover:text-orange-700 font-medium"
+                data-testid="go-to-register-btn"
+              >
+                Kayıt Ol
+              </button>
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
