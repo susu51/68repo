@@ -125,7 +125,15 @@ const LoginForm = ({ onRegisterClick }) => {
         password: formData.adminPassword
       });
       console.log('Admin login success:', response.data);
+      
+      // Debug toast
+      toast.success(`API Response received! Role: ${response.data.user_data.role}`);
+      
       login(response.data);
+      
+      // Another debug toast after login call
+      toast.success('Login function called successfully!');
+      
       toast.success('Admin girişi başarılı!');
     } catch (error) {
       console.error('Admin login error:', error);
