@@ -2112,7 +2112,7 @@ const BusinessDashboard = ({ user }) => {
                   <span className="hidden sm:inline">{user.business_name || 'İşletme'} - </span>Yönetim
                 </h1>
                 <p className="text-xs text-gray-600 hidden sm:block">
-                  İşletme Yönetim Paneli
+                  Kuryecini İşletme Yönetim Paneli
                 </p>
               </div>
             </div>
