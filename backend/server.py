@@ -123,6 +123,77 @@ class User(BaseModel):
     business_category: Optional[str] = None
     description: Optional[str] = None
 
+# Product Models
+class ProductCreate(BaseModel):
+    name: str
+    description: str
+    price: float
+    category: str
+    preparation_time_minutes: int = 30
+    photo_url: Optional[str] = None
+    is_available: bool = True
+
+class Product(BaseModel):
+    id: str
+    business_id: str
+    business_name: str
+    name: str
+    description: str
+    price: float
+    category: str
+    preparation_time_minutes: int
+    photo_url: Optional[str] = None
+    is_available: bool
+    created_at: datetime
+
+# Order Models
+class OrderStatus(str, Enum):
+    CREATED = "created"
+    ASSIGNED = "assigned" 
+    ON_ROUTE = "on_route"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+
+class OrderItem(BaseModel):
+    product_id: str
+    product_name: str
+    product_price: float
+    quantity: int
+    subtotal: float
+
+class OrderCreate(BaseModel):
+    delivery_address: str
+    delivery_lat: Optional[float] = None
+    delivery_lng: Optional[float] = None
+    items: List[OrderItem]
+    total_amount: float
+    notes: Optional[str] = None
+
+class Order(BaseModel):
+    id: str
+    customer_id: str
+    customer_name: str
+    business_id: str
+    business_name: str
+    courier_id: Optional[str] = None
+    courier_name: Optional[str] = None
+    status: OrderStatus
+    delivery_address: str
+    delivery_lat: Optional[float] = None
+    delivery_lng: Optional[float] = None
+    items: List[OrderItem]
+    total_amount: float
+    commission_amount: float  # 3% platform commission
+    notes: Optional[str] = None
+    created_at: datetime
+    assigned_at: Optional[datetime] = None
+    picked_up_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
+
+# Admin Login Model
+class AdminLogin(BaseModel):
+    password: str
+
 # Enums and Constants
 class UserStatus(str, Enum):
     ACTIVE = "active"
