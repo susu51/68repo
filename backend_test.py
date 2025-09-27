@@ -969,6 +969,16 @@ class DeliverTRAPITester:
         print("\n📋 PHASE 9: FILE HANDLING")
         self.test_file_upload()
         
+        # Test 10: KYC Management System
+        print("\n📋 PHASE 10: KYC MANAGEMENT SYSTEM")
+        self.test_kyc_get_couriers()
+        self.test_kyc_approve_courier()
+        self.test_kyc_reject_courier_with_notes()
+        self.test_kyc_status_update_flow()
+        self.test_kyc_admin_authentication_required()
+        self.test_kyc_error_scenarios()
+        self.test_kyc_notes_handling()
+        
         # Print summary
         print("\n" + "=" * 70)
         print("📊 TEST SUMMARY - DeliverTR MVP Core Business Flow")
