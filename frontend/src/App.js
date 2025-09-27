@@ -1924,52 +1924,133 @@ const BusinessDashboard = ({ user }) => {
           </TabsList>
 
           {/* Products Tab */}
-          <TabsContent value="products" className="space-y-6">
+          <TabsContent value="products" className="space-y-4 sm:space-y-6">
             {/* Add Product Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Yeni Ürün Ekle</CardTitle>
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50">
+                <CardTitle className="flex items-center text-sm sm:text-lg">
+                  <span className="mr-2">➕</span>
+                  Yeni Ürün Ekle
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Müşterileriniz için yeni ürün ekleyin
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 <form onSubmit={handleProductSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label>Ürün Adı *</Label>
+                      <Label className="text-xs sm:text-sm font-semibold">Ürün Adı *</Label>
                       <Input
                         value={productForm.name}
                         onChange={(e) => setProductForm({...productForm, name: e.target.value})}
                         placeholder="Margherita Pizza"
+                        className="mt-1"
                         required
                       />
                     </div>
                     <div>
-                      <Label>Fiyat (₺) *</Label>
+                      <Label className="text-xs sm:text-sm font-semibold">Fiyat (₺) *</Label>
                       <Input
                         type="number"
                         step="0.01"
+                        min="0"
                         value={productForm.price}
                         onChange={(e) => setProductForm({...productForm, price: e.target.value})}
                         placeholder="25.50"
+                        className="mt-1"
                         required
                       />
                     </div>
                   </div>
 
                   <div>
-                    <Label>Açıklama *</Label>
+                    <Label className="text-xs sm:text-sm font-semibold">Açıklama *</Label>
                     <Textarea
                       value={productForm.description}
                       onChange={(e) => setProductForm({...productForm, description: e.target.value})}
-                      placeholder="Ürün açıklaması..."
+                      placeholder="Ürün açıklaması... (Malzemeler, özellikler vs.)"
+                      className="mt-1 resize-none"
+                      rows="3"
                       required
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label>Kategori *</Label>
-                      <Select onValueChange={(value) => setProductForm({...productForm, category: value})}>
-                        <SelectTrigger>
+                      <Label className="text-xs sm:text-sm font-semibold">Kategori *</Label>
+                      <Select onValueChange={(value) => setProductForm({...productForm, category: value})} required>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Kategori seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pizza">🍕 Pizza</SelectItem>
+                          <SelectItem value="burger">🍔 Burger</SelectItem>
+                          <SelectItem value="kebab">🥙 Kebab</SelectItem>
+                          <SelectItem value="pasta">🍝 Pasta</SelectItem>
+                          <SelectItem value="salad">🥗 Salata</SelectItem>
+                          <SelectItem value="soup">🍲 Çorba</SelectItem>
+                          <SelectItem value="dessert">🍰 Tatlı</SelectItem>
+                          <SelectItem value="drink">🥤 İçecek</SelectItem>
+                          <SelectItem value="other">📦 Diğer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs sm:text-sm font-semibold">Hazırlanma Süresi (dk)</Label>
+                      <Input
+                        type="number"
+                        min="5"
+                        max="120"
+                        value={productForm.preparation_time_minutes}
+                        onChange={(e) => setProductForm({...productForm, preparation_time_minutes: parseInt(e.target.value)})}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs sm:text-sm font-semibold">Ürün Fotoğrafı</Label>
+                    <FileUpload
+                      onUpload={(url) => setProductForm({...productForm, photo_url: url})}
+                      buttonText="📸 Fotoğraf Yükle"
+                      accept="image/*"
+                      className="mt-1"
+                    />
+                    {productForm.photo_url && (
+                      <div className="mt-2">
+                        <img 
+                          src={`${BACKEND_URL}${productForm.photo_url}`} 
+                          alt="Ürün fotoğrafı" 
+                          className="w-20 h-20 object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_available"
+                      checked={productForm.is_available}
+                      onChange={(e) => setProductForm({...productForm, is_available: e.target.checked})}
+                      className="rounded border-gray-300"
+                    />
+                    <Label htmlFor="is_available" className="text-xs sm:text-sm">
+                      ✅ Ürün şu anda mevcut
+                    </Label>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-sm sm:text-base"
+                  >
+                    {loading ? '⏳ Ekleniyor...' : '➕ Ürün Ekle'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
                           <SelectValue placeholder="Kategori seçin" />
                         </SelectTrigger>
                         <SelectContent>
