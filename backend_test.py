@@ -120,234 +120,48 @@ class DeliverTRAPITester:
             self.log_test(name, False, error_msg)
             return False, {}
 
-    def test_root_endpoint(self):
-        """Test root API endpoint"""
-        return self.run_test("Root API Endpoint", "GET", "", 200)
-
-    def test_health_check(self):
-        """Test health check endpoint"""
-        return self.run_test("Health Check", "GET", "health", 200)
-
-    def test_otp_request_valid_phone(self):
-        """Test OTP request with valid Turkish phone number"""
+    # ===== CORE BUSINESS FLOW TESTS =====
+    
+    def test_admin_authentication(self):
+        """Test admin authentication with password '6851'"""
         success, response = self.run_test(
-            "OTP Request - Valid Phone",
+            "Admin Authentication",
             "POST",
-            "auth/otp/request",
+            "auth/admin",
             200,
-            data={
-                "phone": self.test_phone,
-                "device_id": "test_device_123"
-            }
-        )
-        
-        if success and response.get('success'):
-            self.mock_otp = response.get('mock_otp')
-            print(f"   Mock OTP received: {self.mock_otp}")
-        
-        return success
-
-    def test_otp_request_invalid_phone(self):
-        """Test OTP request with invalid phone format"""
-        return self.run_test(
-            "OTP Request - Invalid Phone",
-            "POST",
-            "auth/otp/request",
-            400,
-            data={
-                "phone": "invalid-phone-123",
-                "device_id": "test_device_123"
-            }
-        )
-
-    def test_otp_verify_correct_code(self):
-        """Test OTP verification with correct code"""
-        if not self.mock_otp:
-            # Try to get mock OTP from debug endpoint
-            success, response = self.run_test(
-                "Get Mock OTP",
-                "GET",
-                f"debug/mock-otp/{self.test_phone.replace('+', '')}",
-                200
-            )
-            if success and response.get('mock_otp'):
-                self.mock_otp = response.get('mock_otp')
-        
-        if not self.mock_otp:
-            self.log_test("OTP Verify - Correct Code", False, "No mock OTP available")
-            return False
-        
-        success, response = self.run_test(
-            "OTP Verify - Correct Code",
-            "POST",
-            "auth/otp/verify",
-            200,
-            data={
-                "phone": self.test_phone,
-                "otp": self.mock_otp
-            }
+            data={"password": "6851"}
         )
         
         if success and response.get('access_token'):
-            self.access_token = response['access_token']
-            self.refresh_token = response['refresh_token']
-            print(f"   Access token stored: {self.access_token[:20]}...")
-            print(f"   Refresh token stored: {self.refresh_token[:20]}...")
+            self.admin_token = response['access_token']
+            print(f"   Admin token stored: {self.admin_token[:20]}...")
         
         return success
 
-    def test_otp_verify_incorrect_code(self):
-        """Test OTP verification with incorrect code"""
+    def test_admin_authentication_wrong_password(self):
+        """Test admin authentication with wrong password"""
         return self.run_test(
-            "OTP Verify - Incorrect Code",
+            "Admin Authentication - Wrong Password",
             "POST",
-            "auth/otp/verify",
-            400,
-            data={
-                "phone": self.test_phone,
-                "otp": "000000"
-            }
+            "auth/admin",
+            401,
+            data={"password": "wrong_password"}
         )
 
-    def test_token_refresh(self):
-        """Test JWT token refresh"""
-        if not self.refresh_token:
-            self.log_test("Token Refresh", False, "No refresh token available")
-            return False
-        
-        success, response = self.run_test(
-            "Token Refresh",
-            "POST",
-            "auth/refresh",
-            200,
-            data={
-                "refresh_token": self.refresh_token
-            }
-        )
-        
-        if success and response.get('access_token'):
-            old_token = self.access_token
-            self.access_token = response['access_token']
-            print(f"   Token refreshed: {old_token[:20]}... -> {self.access_token[:20]}...")
-        
-        return success
-
-    def test_get_profile(self):
-        """Test getting user profile"""
-        if not self.access_token:
-            self.log_test("Get Profile", False, "No authentication token available")
-            return False
-        
-        return self.run_test("Get Profile", "GET", "me", 200)
-
-    def test_update_profile(self):
-        """Test updating user profile"""
-        if not self.access_token:
-            self.log_test("Update Profile", False, "No authentication token available")
-            return False
-        
-        return self.run_test(
-            "Update Profile",
-            "PATCH",
-            "me",
-            200,
-            data={
-                "first_name": "Test",
-                "last_name": "User",
-                "email": "test@example.com"
-            }
-        )
-
-    def test_courier_registration(self):
-        """Test courier registration after phone verification"""
-        if not self.access_token:
-            self.log_test("Courier Registration", False, "No authentication token available")
-            return False
-        
-        courier_data = {
-            "phone": self.test_phone,
-            "first_name": "Test",
-            "last_name": "Kurye",
-            "iban": "TR330006100519786457841326",
-            "vehicle_type": "motor",
-            "vehicle_model": "Honda PCX 150",
-            "license_class": "A2",
-            "city": "İstanbul"
-        }
-        
-        return self.run_test(
-            "Courier Registration",
-            "POST",
-            "register/courier",
-            200,
-            data=courier_data
-        )
-
-    def test_business_registration_flow(self):
-        """Test complete business registration flow"""
-        # First request OTP for business phone
-        success1, response1 = self.run_test(
-            "Business OTP Request",
-            "POST",
-            "auth/otp/request",
-            200,
-            data={
-                "phone": self.test_phone_business,
-                "device_id": "business_device_123"
-            }
-        )
-        
-        if not success1:
-            return False
-        
-        # Get mock OTP for business
-        business_mock_otp = response1.get('mock_otp')
-        if not business_mock_otp:
-            success_debug, response_debug = self.run_test(
-                "Get Business Mock OTP",
-                "GET",
-                f"debug/mock-otp/{self.test_phone_business.replace('+', '')}",
-                200
-            )
-            if success_debug:
-                business_mock_otp = response_debug.get('mock_otp')
-        
-        if not business_mock_otp:
-            self.log_test("Business Registration Flow", False, "No business mock OTP available")
-            return False
-        
-        # Verify OTP for business
-        success2, response2 = self.run_test(
-            "Business OTP Verify",
-            "POST",
-            "auth/otp/verify",
-            200,
-            data={
-                "phone": self.test_phone_business,
-                "otp": business_mock_otp
-            }
-        )
-        
-        if not success2 or not response2.get('access_token'):
-            return False
-        
-        # Store business token temporarily
-        business_token = response2['access_token']
-        old_token = self.access_token
-        self.access_token = business_token
-        
-        # Register as business
+    def test_business_registration(self):
+        """Test business registration"""
         business_data = {
-            "phone": self.test_phone_business,
-            "business_name": "Test Restaurant",
+            "email": self.business_email,
+            "password": self.test_password,
+            "business_name": "Test Restaurant Istanbul",
             "tax_number": "1234567890",
-            "address": "Test Mahallesi, Test Sokak No:1, İstanbul",
+            "address": "Kadıköy, İstanbul",
             "city": "İstanbul",
             "business_category": "gida",
             "description": "Test restaurant for API testing"
         }
         
-        success3 = self.run_test(
+        success, response = self.run_test(
             "Business Registration",
             "POST",
             "register/business",
@@ -355,74 +169,25 @@ class DeliverTRAPITester:
             data=business_data
         )
         
-        # Restore original token
-        self.access_token = old_token
+        if success and response.get('access_token'):
+            self.business_token = response['access_token']
+            self.business_id = response.get('user_data', {}).get('id')
+            print(f"   Business token stored: {self.business_token[:20]}...")
+            print(f"   Business ID: {self.business_id}")
         
-        return success1 and success2 and success3
+        return success
 
-    def test_customer_registration_flow(self):
-        """Test complete customer registration flow"""
-        # First request OTP for customer phone
-        success1, response1 = self.run_test(
-            "Customer OTP Request",
-            "POST",
-            "auth/otp/request",
-            200,
-            data={
-                "phone": self.test_phone_customer,
-                "device_id": "customer_device_123"
-            }
-        )
-        
-        if not success1:
-            return False
-        
-        # Get mock OTP for customer
-        customer_mock_otp = response1.get('mock_otp')
-        if not customer_mock_otp:
-            success_debug, response_debug = self.run_test(
-                "Get Customer Mock OTP",
-                "GET",
-                f"debug/mock-otp/{self.test_phone_customer.replace('+', '')}",
-                200
-            )
-            if success_debug:
-                customer_mock_otp = response_debug.get('mock_otp')
-        
-        if not customer_mock_otp:
-            self.log_test("Customer Registration Flow", False, "No customer mock OTP available")
-            return False
-        
-        # Verify OTP for customer
-        success2, response2 = self.run_test(
-            "Customer OTP Verify",
-            "POST",
-            "auth/otp/verify",
-            200,
-            data={
-                "phone": self.test_phone_customer,
-                "otp": customer_mock_otp
-            }
-        )
-        
-        if not success2 or not response2.get('access_token'):
-            return False
-        
-        # Store customer token temporarily
-        customer_token = response2['access_token']
-        old_token = self.access_token
-        self.access_token = customer_token
-        
-        # Register as customer
+    def test_customer_registration(self):
+        """Test customer registration"""
         customer_data = {
-            "phone": self.test_phone_customer,
-            "first_name": "Test",
-            "last_name": "Müşteri",
-            "city": "İstanbul",
-            "email": "customer@example.com"
+            "email": self.customer_email,
+            "password": self.test_password,
+            "first_name": "Ahmet",
+            "last_name": "Yılmaz",
+            "city": "İstanbul"
         }
         
-        success3 = self.run_test(
+        success, response = self.run_test(
             "Customer Registration",
             "POST",
             "register/customer",
@@ -430,111 +195,395 @@ class DeliverTRAPITester:
             data=customer_data
         )
         
-        # Restore original token
-        self.access_token = old_token
+        if success and response.get('access_token'):
+            self.customer_token = response['access_token']
+            self.customer_id = response.get('user_data', {}).get('id')
+            print(f"   Customer token stored: {self.customer_token[:20]}...")
+            print(f"   Customer ID: {self.customer_id}")
         
-        return success1 and success2 and success3
+        return success
 
-    def test_rate_limiting(self):
-        """Test rate limiting functionality"""
-        # Test multiple rapid OTP requests to trigger rate limiting
-        test_phone_rate = "+905551234570"
+    def test_courier_registration(self):
+        """Test courier registration"""
+        courier_data = {
+            "email": self.courier_email,
+            "password": self.test_password,
+            "first_name": "Mehmet",
+            "last_name": "Kurye",
+            "iban": "TR330006100519786457841326",
+            "vehicle_type": "motor",
+            "vehicle_model": "Honda PCX 150",
+            "license_class": "A2",
+            "license_number": "34ABC123",
+            "city": "İstanbul"
+        }
         
-        # Send first request (should succeed)
-        success1, _ = self.run_test(
-            "Rate Limit Test - Request 1",
+        success, response = self.run_test(
+            "Courier Registration",
             "POST",
-            "auth/otp/request",
+            "register/courier",
             200,
-            data={"phone": test_phone_rate}
+            data=courier_data
         )
         
-        # Send second request immediately (should succeed)
-        success2, _ = self.run_test(
-            "Rate Limit Test - Request 2",
-            "POST",
-            "auth/otp/request",
-            200,
-            data={"phone": test_phone_rate}
-        )
+        if success and response.get('access_token'):
+            self.courier_token = response['access_token']
+            self.courier_id = response.get('user_data', {}).get('id')
+            print(f"   Courier token stored: {self.courier_token[:20]}...")
+            print(f"   Courier ID: {self.courier_id}")
         
-        # Send third request immediately (should be rate limited)
-        success3, response3 = self.run_test(
-            "Rate Limit Test - Request 3 (Should Fail)",
-            "POST",
-            "auth/otp/request",
-            400,
-            data={"phone": test_phone_rate}
-        )
-        
-        # Check if rate limiting message is present
-        rate_limited = False
-        if not success3 and isinstance(response3, dict):
-            error_detail = response3.get('detail', '')
-            if 'rate limit' in error_detail.lower() or 'retry' in error_detail.lower():
-                rate_limited = True
-        
-        return success1 and success2 and rate_limited
+        return success
 
-    def test_phone_format_validation(self):
-        """Test various Turkish phone number formats"""
-        phone_formats = [
-            ("+905551234567", True),   # International format
-            ("905551234567", True),    # Without +
-            ("05551234567", True),     # With leading 0
-            ("5551234567", True),      # Without country code
-            ("123456789", False),      # Too short
-            ("+1234567890", False),    # Non-Turkish
-            ("invalid", False),        # Invalid format
+    def test_business_login(self):
+        """Test business login"""
+        login_data = {
+            "email": self.business_email,
+            "password": self.test_password
+        }
+        
+        success, response = self.run_test(
+            "Business Login",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        if success and response.get('access_token'):
+            self.business_token = response['access_token']
+            print(f"   Business login successful, token updated")
+        
+        return success
+
+    def test_customer_login(self):
+        """Test customer login"""
+        login_data = {
+            "email": self.customer_email,
+            "password": self.test_password
+        }
+        
+        success, response = self.run_test(
+            "Customer Login",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        if success and response.get('access_token'):
+            self.customer_token = response['access_token']
+            print(f"   Customer login successful, token updated")
+        
+        return success
+
+    def test_product_creation(self):
+        """Test product creation by business"""
+        if not self.business_token:
+            self.log_test("Product Creation", False, "No business token available")
+            return False
+        
+        product_data = {
+            "name": "İskender Kebap",
+            "description": "Geleneksel İskender kebap, tereyağı ve yoğurt ile",
+            "price": 45.50,
+            "category": "ana_yemek",
+            "preparation_time_minutes": 25,
+            "photo_url": "/uploads/iskender-kebap.jpg",
+            "is_available": True
+        }
+        
+        success, response = self.run_test(
+            "Product Creation",
+            "POST",
+            "products",
+            200,
+            data=product_data,
+            token=self.business_token
+        )
+        
+        if success and response.get('id'):
+            self.created_products.append(response)
+            print(f"   Product created with ID: {response['id']}")
+        
+        return success
+
+    def test_product_creation_multiple(self):
+        """Test creating multiple products"""
+        if not self.business_token:
+            self.log_test("Multiple Product Creation", False, "No business token available")
+            return False
+        
+        products = [
+            {
+                "name": "Adana Kebap",
+                "description": "Acılı Adana kebap, bulgur pilavı ile",
+                "price": 42.00,
+                "category": "ana_yemek",
+                "preparation_time_minutes": 20,
+                "is_available": True
+            },
+            {
+                "name": "Baklava",
+                "description": "Antep fıstıklı baklava, 4 dilim",
+                "price": 18.50,
+                "category": "tatli",
+                "preparation_time_minutes": 5,
+                "is_available": True
+            },
+            {
+                "name": "Ayran",
+                "description": "Ev yapımı ayran, 250ml",
+                "price": 5.00,
+                "category": "icecek",
+                "preparation_time_minutes": 2,
+                "is_available": True
+            }
         ]
         
-        all_passed = True
-        for phone, should_succeed in phone_formats:
-            expected_status = 200 if should_succeed else 400
-            test_name = f"Phone Format - {phone} ({'Valid' if should_succeed else 'Invalid'})"
-            
-            success, _ = self.run_test(
-                test_name,
+        all_success = True
+        for i, product_data in enumerate(products):
+            success, response = self.run_test(
+                f"Product Creation {i+2}",
                 "POST",
-                "auth/otp/request",
-                expected_status,
-                data={"phone": phone}
+                "products",
+                200,
+                data=product_data,
+                token=self.business_token
             )
             
-            if not success:
-                all_passed = False
+            if success and response.get('id'):
+                self.created_products.append(response)
+                print(f"   Product {i+2} created with ID: {response['id']}")
+            else:
+                all_success = False
         
-        return all_passed
+        return all_success
 
-    def test_logout(self):
-        """Test user logout"""
-        if not self.refresh_token:
-            self.log_test("Logout", False, "No refresh token available")
+    def test_get_products(self):
+        """Test getting all available products"""
+        return self.run_test(
+            "Get All Products",
+            "GET",
+            "products",
+            200
+        )
+
+    def test_get_business_products(self):
+        """Test getting products for current business"""
+        if not self.business_token:
+            self.log_test("Get Business Products", False, "No business token available")
             return False
         
         return self.run_test(
-            "Logout",
-            "POST",
-            "auth/logout",
+            "Get Business Products",
+            "GET",
+            "products/my",
             200,
-            data={
-                "refresh_token": self.refresh_token
-            }
+            token=self.business_token
         )
 
-    def test_unauthorized_access(self):
-        """Test unauthorized access to protected endpoints"""
-        old_token = self.access_token
-        self.access_token = "invalid-token"
+    def test_order_creation(self):
+        """Test order creation by customer"""
+        if not self.customer_token or not self.created_products:
+            self.log_test("Order Creation", False, "No customer token or products available")
+            return False
         
-        success, _ = self.run_test(
-            "Unauthorized Access",
-            "GET",
-            "me",
-            401
+        # Use created products for order
+        order_items = []
+        total_amount = 0
+        
+        for product in self.created_products[:3]:  # Use first 3 products
+            quantity = 2 if product['name'] == 'İskender Kebap' else 1
+            subtotal = product['price'] * quantity
+            
+            order_items.append({
+                "product_id": product['id'],
+                "product_name": product['name'],
+                "product_price": product['price'],
+                "quantity": quantity,
+                "subtotal": subtotal
+            })
+            total_amount += subtotal
+        
+        order_data = {
+            "delivery_address": "Bağdat Caddesi No:123, Kadıköy, İstanbul",
+            "delivery_lat": 40.9876,
+            "delivery_lng": 29.0234,
+            "items": order_items,
+            "total_amount": total_amount,
+            "notes": "Kapıda ödeme, 2. kat"
+        }
+        
+        success, response = self.run_test(
+            "Order Creation",
+            "POST",
+            "orders",
+            200,
+            data=order_data,
+            token=self.customer_token
         )
         
-        self.access_token = old_token
+        if success and response.get('id'):
+            self.created_orders.append(response)
+            print(f"   Order created with ID: {response['id']}")
+            print(f"   Total amount: {response.get('total_amount')}")
+            print(f"   Commission (3%): {response.get('commission_amount')}")
+            
+            # Verify commission calculation (3%)
+            expected_commission = total_amount * 0.03
+            actual_commission = response.get('commission_amount', 0)
+            if abs(expected_commission - actual_commission) < 0.01:
+                print(f"   ✅ Commission calculation correct: {actual_commission}")
+            else:
+                print(f"   ❌ Commission calculation incorrect: expected {expected_commission}, got {actual_commission}")
+        
+        return success
+
+    def test_order_status_flow(self):
+        """Test complete order status flow: CREATED → ASSIGNED → ON_ROUTE → DELIVERED"""
+        if not self.created_orders or not self.courier_token:
+            self.log_test("Order Status Flow", False, "No orders or courier token available")
+            return False
+        
+        order_id = self.created_orders[0]['id']
+        statuses = ["assigned", "on_route", "delivered"]
+        
+        all_success = True
+        for status in statuses:
+            success, response = self.run_test(
+                f"Order Status Update - {status.upper()}",
+                "PATCH",
+                f"orders/{order_id}/status",
+                200,
+                data={"new_status": status},
+                token=self.courier_token
+            )
+            
+            if not success:
+                all_success = False
+            else:
+                print(f"   Order status updated to: {status}")
+        
+        return all_success
+
+    def test_get_orders_customer(self):
+        """Test getting orders for customer"""
+        if not self.customer_token:
+            self.log_test("Get Customer Orders", False, "No customer token available")
+            return False
+        
+        return self.run_test(
+            "Get Customer Orders",
+            "GET",
+            "orders",
+            200,
+            token=self.customer_token
+        )
+
+    def test_get_orders_business(self):
+        """Test getting orders for business"""
+        if not self.business_token:
+            self.log_test("Get Business Orders", False, "No business token available")
+            return False
+        
+        return self.run_test(
+            "Get Business Orders",
+            "GET",
+            "orders",
+            200,
+            token=self.business_token
+        )
+
+    def test_admin_get_all_users(self):
+        """Test admin getting all users"""
+        if not self.admin_token:
+            self.log_test("Admin Get All Users", False, "No admin token available")
+            return False
+        
+        return self.run_test(
+            "Admin Get All Users",
+            "GET",
+            "admin/users",
+            200,
+            token=self.admin_token
+        )
+
+    def test_admin_get_all_products(self):
+        """Test admin getting all products"""
+        if not self.admin_token:
+            self.log_test("Admin Get All Products", False, "No admin token available")
+            return False
+        
+        return self.run_test(
+            "Admin Get All Products",
+            "GET",
+            "admin/products",
+            200,
+            token=self.admin_token
+        )
+
+    def test_admin_get_all_orders(self):
+        """Test admin getting all orders"""
+        if not self.admin_token:
+            self.log_test("Admin Get All Orders", False, "No admin token available")
+            return False
+        
+        return self.run_test(
+            "Admin Get All Orders",
+            "GET",
+            "admin/orders",
+            200,
+            token=self.admin_token
+        )
+
+    def test_role_based_access_control(self):
+        """Test role-based access control"""
+        all_success = True
+        
+        # Test customer trying to create product (should fail)
+        if self.customer_token:
+            success, _ = self.run_test(
+                "RBAC - Customer Create Product (Should Fail)",
+                "POST",
+                "products",
+                403,
+                data={
+                    "name": "Unauthorized Product",
+                    "description": "This should fail",
+                    "price": 10.0,
+                    "category": "test"
+                },
+                token=self.customer_token
+            )
+            if not success:
+                all_success = False
+        
+        # Test business trying to access admin endpoint (should fail)
+        if self.business_token:
+            success, _ = self.run_test(
+                "RBAC - Business Access Admin (Should Fail)",
+                "GET",
+                "admin/users",
+                403,
+                token=self.business_token
+            )
+            if not success:
+                all_success = False
+        
+        return all_success
+
+    def test_file_upload(self):
+        """Test file upload functionality"""
+        # This is a basic test - in real scenario we'd upload actual files
+        # For now, we'll test the endpoint exists and returns proper error for missing file
+        success, _ = self.run_test(
+            "File Upload Endpoint",
+            "POST",
+            "upload",
+            422,  # Expecting validation error for missing file
+            token=self.business_token
+        )
+        
         return success
 
     def run_all_tests(self):
