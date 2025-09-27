@@ -834,13 +834,17 @@ async def get_couriers_for_kyc(current_user: dict = Depends(get_admin_user)):
     """Get all couriers with their KYC documents for approval"""
     couriers = await db.users.find({"role": "courier"}).to_list(length=None)
     
-    # Convert ObjectId and prepare KYC data
+    # Clean up data and use proper ID field
     for courier in couriers:
-        courier["id"] = str(courier["_id"])
-        del courier["_id"]
+        # Remove MongoDB ObjectId field 
+        if "_id" in courier:
+            del courier["_id"]
+        # Remove password for security
         if "password" in courier:
             del courier["password"]
-        courier["created_at"] = courier["created_at"].isoformat()
+        # Convert datetime to string
+        if "created_at" in courier:
+            courier["created_at"] = courier["created_at"].isoformat()
     
     return couriers
 
