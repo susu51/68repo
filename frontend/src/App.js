@@ -1761,6 +1761,46 @@ const CourierDashboard = ({ user }) => {
     window.open(googleMapsUrl, '_blank');
   };
 
+  // Generate map markers for nearby orders
+  const getMapMarkers = () => {
+    const markers = [];
+    
+    // Add nearby orders as markers
+    nearbyOrders.forEach((order, index) => {
+      // Pickup location (business)
+      markers.push({
+        lat: order.pickup_address?.lat || (41.0082 + (index * 0.01)),
+        lng: order.pickup_address?.lng || (28.9784 + (index * 0.01)),
+        type: 'pickup',
+        popup: true,
+        title: `🏪 ${order.business_name || 'İşletme'}`,
+        description: 'Paket alım noktası',
+        address: order.pickup_address?.address || 'Adres bilgisi yok',
+        distance: order.distance_km ? `${order.distance_km} km` : null,
+        estimatedTime: order.estimated_duration || null,
+        orderValue: `₺${order.total_amount} (Komisyon: ₺${order.commission_amount})`,
+        onNavigate: () => getRouteToOrder(order)
+      });
+      
+      // Delivery location (customer)
+      markers.push({
+        lat: order.delivery_address?.lat || (41.0122 + (index * 0.01)),
+        lng: order.delivery_address?.lng || (28.9824 + (index * 0.01)),
+        type: 'package',
+        popup: true,
+        title: `📦 ${order.customer_name || 'Müşteri'}`,
+        description: 'Paket teslim noktası',
+        address: order.delivery_address?.address || 'Teslimat adresi',
+        distance: order.distance_km ? `${order.distance_km} km` : null,
+        estimatedTime: order.estimated_duration || null,
+        orderValue: `₺${order.total_amount}`,
+        onNavigate: () => getRouteToOrder(order)
+      });
+    });
+    
+    return markers;
+  };
+
   const getKYCStatusBadge = (status) => {
     const statusConfig = {
       pending: { text: "⏳ KYC Onay Bekliyor", className: "bg-yellow-100 text-yellow-800" },
