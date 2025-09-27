@@ -1828,6 +1828,7 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
     return (
       <Routes>
         <Route path="/" element={
+          user.role === 'admin' ? <AdminDashboard user={user} /> :
           user.role === 'courier' ? <CourierDashboard user={user} /> :
           user.role === 'business' ? <BusinessDashboard user={user} /> :
           <CustomerDashboard user={user} />
