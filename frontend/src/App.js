@@ -262,6 +262,7 @@ const AdminDashboard = ({ user }) => {
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [couriers, setCouriers] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const fetchUsers = async () => {
@@ -291,10 +292,20 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
+  const fetchCouriers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/couriers/kyc`);
+      setCouriers(response.data);
+    } catch (error) {
+      toast.error('Kurye bilgileri yüklenemedi');
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchProducts();
     fetchOrders();
+    fetchCouriers();
   }, []);
 
   const updateOrderStatus = async (orderId, newStatus) => {
@@ -304,6 +315,18 @@ const AdminDashboard = ({ user }) => {
       fetchOrders();
     } catch (error) {
       toast.error('Durum güncellenemedi');
+    }
+  };
+
+  const updateCourierKYC = async (courierId, kycStatus, notes = '') => {
+    try {
+      await axios.patch(`${API}/admin/couriers/${courierId}/kyc?kyc_status=${kycStatus}`, 
+        notes ? { notes } : {}
+      );
+      toast.success(`Kurye KYC durumu ${kycStatus === 'approved' ? 'onaylandı' : 'reddedildi'}`);
+      fetchCouriers();
+    } catch (error) {
+      toast.error('KYC durumu güncellenemedi');
     }
   };
 
@@ -319,43 +342,55 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
+  const getKYCStatusColor = (status) => {
+    switch (status) {
+      case 'approved': return 'bg-green-100 text-green-800';
+      case 'rejected': return 'bg-red-100 text-red-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Mobile-Responsive Header */}
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-red-600">
-                🛡️ Admin Panel - DeliverTR
+              <h1 className="text-sm sm:text-xl font-semibold text-red-600">
+                🛡️ <span className="hidden sm:inline">Admin Panel - </span>DeliverTR
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="bg-red-50 border-red-200 text-red-800">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Badge variant="outline" className="bg-red-50 border-red-200 text-red-800 text-xs">
                 Admin
               </Badge>
-              <Button onClick={logout} variant="outline">Çıkış</Button>
+              <Button onClick={logout} variant="outline" size="sm">
+                <span className="hidden sm:inline">Çıkış</span>
+                <span className="sm:hidden">🚪</span>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+        {/* Mobile-Responsive Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="text-2xl">👥</div>
+                  <div className="text-lg sm:text-2xl">👥</div>
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="ml-2 sm:ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Toplam Kullanıcı
+                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
+                      Kullanıcı
                     </dt>
-                    <dd className="text-lg font-medium text-gray-900">
+                    <dd className="text-sm sm:text-lg font-medium text-gray-900">
                       {users.length}
                     </dd>
                   </dl>
@@ -365,17 +400,17 @@ const AdminDashboard = ({ user }) => {
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="text-2xl">🍽️</div>
+                  <div className="text-lg sm:text-2xl">🍽️</div>
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="ml-2 sm:ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Toplam Ürün
+                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
+                      Ürün
                     </dt>
-                    <dd className="text-lg font-medium text-gray-900">
+                    <dd className="text-sm sm:text-lg font-medium text-gray-900">
                       {products.length}
                     </dd>
                   </dl>
@@ -385,17 +420,17 @@ const AdminDashboard = ({ user }) => {
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="text-2xl">📦</div>
+                  <div className="text-lg sm:text-2xl">📦</div>
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="ml-2 sm:ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Toplam Sipariş
+                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
+                      Sipariş
                     </dt>
-                    <dd className="text-lg font-medium text-gray-900">
+                    <dd className="text-sm sm:text-lg font-medium text-gray-900">
                       {orders.length}
                     </dd>
                   </dl>
@@ -405,17 +440,17 @@ const AdminDashboard = ({ user }) => {
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="text-2xl">💰</div>
+                  <div className="text-lg sm:text-2xl">💰</div>
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="ml-2 sm:ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Toplam Ciro
+                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
+                      Ciro
                     </dt>
-                    <dd className="text-lg font-medium text-gray-900">
+                    <dd className="text-xs sm:text-lg font-medium text-gray-900">
                       ₺{orders.reduce((sum, order) => sum + order.total_amount, 0).toFixed(2)}
                     </dd>
                   </dl>
@@ -425,12 +460,29 @@ const AdminDashboard = ({ user }) => {
           </Card>
         </div>
 
+        {/* Mobile-Responsive Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="users">Kullanıcılar</TabsTrigger>
-            <TabsTrigger value="products">Ürünler</TabsTrigger>
-            <TabsTrigger value="orders">Siparişler</TabsTrigger>
-            <TabsTrigger value="map">Harita</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 text-xs sm:text-sm">
+            <TabsTrigger value="users" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Kullanıcılar</span>
+              <span className="sm:hidden">👥</span>
+            </TabsTrigger>
+            <TabsTrigger value="kyc" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">KYC Onay</span>
+              <span className="sm:hidden">📋</span>
+            </TabsTrigger>
+            <TabsTrigger value="products" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Ürünler</span>
+              <span className="sm:hidden">🍽️</span>
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Siparişler</span>
+              <span className="sm:hidden">📦</span>
+            </TabsTrigger>
+            <TabsTrigger value="map" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Harita</span>
+              <span className="sm:hidden">🗺️</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Users Tab */}
