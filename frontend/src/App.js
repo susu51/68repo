@@ -2613,45 +2613,51 @@ const CustomerDashboard = ({ user }) => {
   // Location Management Functions
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+      if (isMounted) {
+        setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+      }
       return;
     }
 
     setLocationError(null);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        setUserLocation(location);
-        setMapCenter([location.lat, location.lng]);
-        setLocationError(null);
-        toast.success('Konumunuz güncellendi! 📍');
-        
-        // Update order form with new location
-        setOrderForm(prev => ({
-          ...prev,
-          delivery_lat: location.lat,
-          delivery_lng: location.lng
-        }));
+        if (isMounted) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setUserLocation(location);
+          setMapCenter([location.lat, location.lng]);
+          setLocationError(null);
+          toast.success('Konumunuz güncellendi! 📍');
+          
+          // Update order form with new location
+          setOrderForm(prev => ({
+            ...prev,
+            delivery_lat: location.lat,
+            delivery_lng: location.lng
+          }));
+        }
       },
       (error) => {
-        console.error('Konum alınamadı:', error);
-        let errorMessage = 'Konum alınamadı';
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Konum erişimi reddedildi. Lütfen tarayıcı ayarlarından konum izni verin.';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Konum bilgisi mevcut değil.';
-            break;
-          case error.TIMEOUT:
-            errorMessage = 'Konum alma işlemi zaman aşımına uğradı.';
-            break;
+        if (isMounted) {
+          console.error('Konum alınamadı:', error);
+          let errorMessage = 'Konum alınamadı';
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Konum erişimi reddedildi. Lütfen tarayıcı ayarlarından konum izni verin.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Konum bilgisi mevcut değil.';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'Konum alma işlemi zaman aşımına uğradı.';
+              break;
+          }
+          setLocationError(errorMessage);
+          toast.error(errorMessage);
         }
-        setLocationError(errorMessage);
-        toast.error(errorMessage);
       },
       { 
         enableHighAccuracy: true,
