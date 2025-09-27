@@ -214,7 +214,7 @@ const LoginForm = ({ onRegisterClick }) => {
               </div>
               
               <Button 
-                type="submit" 
+                onClick={handleAdminSubmit}
                 disabled={loading}
                 className="w-full bg-red-600 hover:bg-red-700"
                 data-testid="admin-login-btn"
