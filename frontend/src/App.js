@@ -2058,7 +2058,12 @@ const BusinessDashboard = ({ user }) => {
         preparation_time_minutes: parseInt(productForm.preparation_time_minutes)
       };
 
-      await axios.post(`${API}/products`, productData);
+      const token = localStorage.getItem('delivertr_access_token');
+      await axios.post(`${API}/products`, productData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       toast.success('Ürün başarıyla eklendi!');
       setProductForm({
@@ -2072,6 +2077,7 @@ const BusinessDashboard = ({ user }) => {
       });
       fetchProducts();
     } catch (error) {
+      console.error('Product creation error:', error);
       toast.error(error.response?.data?.detail || 'Ürün eklenemedi');
     }
     setLoading(false);
@@ -2079,10 +2085,16 @@ const BusinessDashboard = ({ user }) => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`);
+      const token = localStorage.getItem('delivertr_access_token');
+      await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       toast.success('Sipariş durumu güncellendi');
       fetchOrders();
     } catch (error) {
+      console.error('Order status update error:', error);
       toast.error('Durum güncellenemedi');
     }
   };
