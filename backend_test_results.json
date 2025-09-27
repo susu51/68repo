@@ -1,162 +1,163 @@
 {
   "summary": {
-    "total_tests": 25,
-    "passed_tests": 1,
-    "failed_tests": 24,
-    "success_rate": 4.0,
-    "timestamp": "2025-09-26T23:39:44.771678",
-    "test_type": "phone_sms_otp_authentication"
+    "total_tests": 23,
+    "passed_tests": 18,
+    "failed_tests": 5,
+    "success_rate": 78.26086956521739,
+    "timestamp": "2025-09-27T00:19:20.229160",
+    "test_type": "delivertr_mvp_core_business_flow",
+    "core_flow_success": false
   },
   "test_results": [
     {
-      "test": "Root API Endpoint",
+      "test": "Admin Authentication",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:39:40.145098"
+      "timestamp": "2025-09-27T00:19:19.462730"
     },
     {
-      "test": "Health Check",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.181355"
+      "test": "Admin Authentication - Wrong Password",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.498466"
     },
     {
-      "test": "Phone Format - +905551234567 (Valid)",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.231565"
+      "test": "Business Registration",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.535719"
     },
     {
-      "test": "Phone Format - 905551234567 (Valid)",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.265462"
-    },
-    {
-      "test": "Phone Format - 05551234567 (Valid)",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.299908"
-    },
-    {
-      "test": "Phone Format - 5551234567 (Valid)",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.333553"
-    },
-    {
-      "test": "Phone Format - 123456789 (Invalid)",
-      "success": false,
-      "details": "Expected 400, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.366707"
-    },
-    {
-      "test": "Phone Format - +1234567890 (Invalid)",
-      "success": false,
-      "details": "Expected 400, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.399701"
-    },
-    {
-      "test": "Phone Format - invalid (Invalid)",
-      "success": false,
-      "details": "Expected 400, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.431446"
-    },
-    {
-      "test": "OTP Request - Valid Phone",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:40.465411"
-    },
-    {
-      "test": "OTP Request - Invalid Phone",
-      "success": false,
-      "details": "Expected 400, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:41.501565"
-    },
-    {
-      "test": "Get Mock OTP",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:41.535136"
-    },
-    {
-      "test": "OTP Verify - Correct Code",
-      "success": false,
-      "details": "No mock OTP available",
-      "timestamp": "2025-09-26T23:39:41.535733"
-    },
-    {
-      "test": "OTP Verify - Incorrect Code",
-      "success": false,
-      "details": "Expected 400, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:42.570144"
-    },
-    {
-      "test": "Token Refresh",
-      "success": false,
-      "details": "No refresh token available",
-      "timestamp": "2025-09-26T23:39:42.570712"
-    },
-    {
-      "test": "Get Profile",
-      "success": false,
-      "details": "No authentication token available",
-      "timestamp": "2025-09-26T23:39:42.570722"
-    },
-    {
-      "test": "Update Profile",
-      "success": false,
-      "details": "No authentication token available",
-      "timestamp": "2025-09-26T23:39:42.570727"
+      "test": "Customer Registration",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.572199"
     },
     {
       "test": "Courier Registration",
-      "success": false,
-      "details": "No authentication token available",
-      "timestamp": "2025-09-26T23:39:42.570733"
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.613565"
     },
     {
-      "test": "Business OTP Request",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:43.603208"
+      "test": "Business Login",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.652898"
     },
     {
-      "test": "Customer OTP Request",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:44.636751"
+      "test": "Customer Login",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.686671"
     },
     {
-      "test": "Rate Limit Test - Request 1",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:44.669550"
+      "test": "Product Creation",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.720875"
     },
     {
-      "test": "Rate Limit Test - Request 2",
-      "success": false,
-      "details": "Expected 200, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:44.701831"
+      "test": "Product Creation 2",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.763374"
     },
     {
-      "test": "Rate Limit Test - Request 3 (Should Fail)",
-      "success": false,
-      "details": "Expected 400, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:44.734793"
+      "test": "Product Creation 3",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.800064"
     },
     {
-      "test": "Logout",
-      "success": false,
-      "details": "No refresh token available",
-      "timestamp": "2025-09-26T23:39:44.735440"
+      "test": "Product Creation 4",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.839447"
     },
     {
-      "test": "Unauthorized Access",
+      "test": "Get All Products",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.873113"
+    },
+    {
+      "test": "Get Business Products",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.911061"
+    },
+    {
+      "test": "Order Creation",
       "success": false,
-      "details": "Expected 401, got 502. Response: ",
-      "timestamp": "2025-09-26T23:39:44.770693"
+      "details": "Expected 200, got 500. Response: Internal Server Error",
+      "timestamp": "2025-09-27T00:19:19.950340"
+    },
+    {
+      "test": "Get Customer Orders",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:19.984492"
+    },
+    {
+      "test": "Get Business Orders",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:20.019444"
+    },
+    {
+      "test": "Order Status Flow",
+      "success": false,
+      "details": "No orders or courier token available",
+      "timestamp": "2025-09-27T00:19:20.020080"
+    },
+    {
+      "test": "Admin Get All Users",
+      "success": false,
+      "details": "Expected 200, got 401. Error: {'detail': 'Could not validate credentials'}",
+      "timestamp": "2025-09-27T00:19:20.051177"
+    },
+    {
+      "test": "Admin Get All Products",
+      "success": false,
+      "details": "Expected 200, got 401. Error: {'detail': 'Could not validate credentials'}",
+      "timestamp": "2025-09-27T00:19:20.091781"
+    },
+    {
+      "test": "Admin Get All Orders",
+      "success": false,
+      "details": "Expected 200, got 401. Error: {'detail': 'Could not validate credentials'}",
+      "timestamp": "2025-09-27T00:19:20.125175"
+    },
+    {
+      "test": "RBAC - Customer Create Product (Should Fail)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:20.162330"
+    },
+    {
+      "test": "RBAC - Business Access Admin (Should Fail)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:20.196410"
+    },
+    {
+      "test": "File Upload Endpoint",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T00:19:20.228195"
     }
-  ]
+  ],
+  "created_entities": {
+    "business_id": "0b2c8125-b949-482d-a7e4-ecdc512aa286",
+    "customer_id": "d3b21065-b9fe-465b-aa85-65ba2758dda2",
+    "courier_id": "f24619e8-e812-45a4-9453-8a5fa1f51b55",
+    "products": [
+      "bba5b3c8-1f70-47d7-b993-26a2d71d65bf",
+      "60892885-f8c5-4db7-89f9-e6efc2868fee",
+      "52ffe1f7-3d2d-4290-b69b-30722c99138e",
+      "a1ec3140-c435-40a6-8f51-549c6674dd86"
+    ],
+    "orders": []
+  }
 }
