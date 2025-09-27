@@ -361,14 +361,20 @@ export const ProfessionalFoodOrderSystem = () => {
       const response = await axios.get(`${API}/businesses`);
       const businessData = response.data;
       
-      setOriginalRestaurants(businessData); // Store original data
-      sortAndFilterRestaurants(businessData, sortType, userLocation);
-      console.log('Restaurants fetched:', businessData);
+      if (isMounted) {
+        setOriginalRestaurants(businessData); // Store original data
+        sortAndFilterRestaurants(businessData, sortType, userLocation);
+        console.log('Restaurants fetched:', businessData);
+      }
     } catch (error) {
       console.error('Restoranlar yüklenemedi:', error);
-      toast.error('Restoranlar yüklenirken hata oluştu');
+      if (isMounted) {
+        toast.error('Restoranlar yüklenirken hata oluştu');
+      }
     }
-    setLoading(false);
+    if (isMounted) {
+      setLoading(false);
+    }
   };
 
   const sortRestaurantsByDistance = () => {
