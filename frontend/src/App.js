@@ -2013,7 +2013,7 @@ const BusinessDashboard = ({ user }) => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('delivertr_access_token');
+      const token = localStorage.getItem('kuryecini_access_token');
       const response = await axios.get(`${API}/products/my`, {
         headers: {
           'Authorization': `Bearer ${token}`
