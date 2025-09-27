@@ -217,6 +217,18 @@ frontend:
         -agent: "main"
         -comment: "FIXED: Removed duplicate/orphaned JSX elements and fixed improper JSX structure in NearbyOrdersForCourier component. Frontend now compiles successfully and application loads correctly."
 
+  - task: "Iyzico Payment Gateway Integration"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high" 
+    needs_retesting: true
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "PLANNING: Received comprehensive integration playbook for Iyzico sandbox integration with commission management. Ready to implement payment processing, webhook handling, and commission tracking system with 3% platform fee."
+
 metadata:
   created_by: "main_agent"
   version: "4.0"
