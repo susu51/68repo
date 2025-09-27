@@ -207,8 +207,8 @@ const PricingDisplay = ({ pricing, packageDetails }) => {
 
 // Main Package Order Component
 export const CreatePackageOrder = ({ onOrderCreated, onCancel }) => {
-  const [pickupAddress, setPickupAddress] = useState(null);
-  const [deliveryAddress, setDeliveryAddress] = useState(null);
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
   const [packageDetails, setPackageDetails] = useState({
     weight_kg: 1,
     dimensions: '',
