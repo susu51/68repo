@@ -2529,6 +2529,41 @@ class DeliverTRAPITester:
             self.log_test("Product Data Completeness", False, "Some product data incomplete or improperly typed")
             return False
 
+    def run_business_registration_tests(self):
+        """Run comprehensive business registration tests as requested in review"""
+        print("🚀 Starting Business Registration Endpoint Tests")
+        print("=" * 70)
+        
+        # Test comprehensive business registration functionality
+        print("\n📋 BUSINESS REGISTRATION COMPREHENSIVE TESTING")
+        self.test_business_registration_comprehensive()
+        self.test_business_registration_duplicate_email()
+        self.test_business_registration_missing_fields()
+        self.test_business_registration_field_validation()
+        self.test_business_registration_kyc_status()
+        self.test_business_registration_password_hashing()
+        self.test_business_registration_token_validity()
+        
+        # Print summary
+        print("\n" + "=" * 70)
+        print("📊 BUSINESS REGISTRATION TEST SUMMARY")
+        print("=" * 70)
+        print(f"Total Tests: {self.tests_run}")
+        print(f"Passed: {self.tests_passed}")
+        print(f"Failed: {self.tests_run - self.tests_passed}")
+        print(f"Success Rate: {(self.tests_passed/self.tests_run)*100:.1f}%")
+        
+        # Print failed tests details
+        failed_tests = [test for test in self.test_results if not test['success']]
+        if failed_tests:
+            print("\n❌ FAILED TESTS:")
+            for test in failed_tests:
+                print(f"   - {test['test']}: {test['details']}")
+        else:
+            print("\n✅ ALL BUSINESS REGISTRATION TESTS PASSED!")
+        
+        return self.tests_passed == self.tests_run
+
     def run_all_tests(self):
         """Run all backend tests for DeliverTR MVP Core Business Flow"""
         print("🚀 Starting DeliverTR Backend API Tests - Core Business Flow")
