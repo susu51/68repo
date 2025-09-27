@@ -2039,7 +2039,7 @@ const BusinessDashboard = ({ user }) => {
   );
 };
 
-// Customer Dashboard - Enhanced with Product Shopping & Cart
+// Customer Dashboard - Modern Tech Design
 const CustomerDashboard = ({ user }) => {
   const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
@@ -2098,7 +2098,7 @@ const CustomerDashboard = ({ user }) => {
       }]);
     }
     
-    toast.success(`${product.name} sepete eklendi!`);
+    toast.success(`${product.name} sepete eklendi! ✨`);
   };
 
   const removeFromCart = (productId) => {
@@ -2126,12 +2126,12 @@ const CustomerDashboard = ({ user }) => {
     e.preventDefault();
     
     if (cart.length === 0) {
-      toast.error('Sepetiniz boş!');
+      toast.error('Sepetiniz boş! 🛒');
       return;
     }
     
     if (!orderForm.delivery_address) {
-      toast.error('Teslimat adresini girin!');
+      toast.error('Teslimat adresini girin! 📍');
       return;
     }
 
@@ -2149,7 +2149,7 @@ const CustomerDashboard = ({ user }) => {
 
       await axios.post(`${API}/orders`, orderData);
       
-      toast.success('Sipariş başarıyla oluşturuldu!');
+      toast.success('Sipariş başarıyla oluşturuldu! 🎉');
       setCart([]);
       setOrderForm({
         delivery_address: '',
@@ -2166,25 +2166,41 @@ const CustomerDashboard = ({ user }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-Responsive Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <div className="flex justify-between h-14 sm:h-16">
-            <div className="flex items-center">
-              <h1 className="text-sm sm:text-xl font-semibold">
-                Merhaba, {user.first_name || 'Müşteri'}!
-              </h1>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      {/* Modern Header with Glass Effect */}
+      <div className="bg-white/70 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            <div className="flex items-center space-x-4">
+              <div className="text-2xl sm:text-3xl">🍽️</div>
+              <div>
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  DeliverTR
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Merhaba, {user.first_name || 'Kullanıcı'}! 👋
+                </p>
+              </div>
             </div>
+            
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <Badge variant="outline" className="text-xs">
-                🛒 <span className="hidden sm:inline">Sepet </span>({cart.length})
-              </Badge>
-              <Badge variant="outline" className="text-xs">
-                <span className="hidden sm:inline">Müşteri</span>
-                <span className="sm:hidden">👤</span>
-              </Badge>
-              <Button onClick={logout} variant="outline" size="sm">
+              {/* Cart Badge with Animation */}
+              {cart.length > 0 && (
+                <div className="relative">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold flex items-center space-x-1 shadow-lg">
+                    <span>🛒</span>
+                    <span className="hidden sm:inline">Sepet:</span>
+                    <span>{cart.length}</span>
+                  </div>
+                </div>
+              )}
+              
+              <Button 
+                onClick={logout} 
+                variant="outline" 
+                size="sm"
+                className="bg-white/50 border-gray-300 hover:bg-white/80"
+              >
                 <span className="hidden sm:inline">Çıkış</span>
                 <span className="sm:hidden">🚪</span>
               </Button>
@@ -2194,88 +2210,154 @@ const CustomerDashboard = ({ user }) => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 text-xs sm:text-sm">
-            <TabsTrigger value="products" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Ürünler</span>
-              <span className="sm:hidden">🍽️</span>
-            </TabsTrigger>
-            <TabsTrigger value="cart" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Sepet ({cart.length})</span>
-              <span className="sm:hidden">🛒 ({cart.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Siparişlerim</span>
-              <span className="sm:hidden">📦</span>
-            </TabsTrigger>
-            <TabsTrigger value="map" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Harita</span>
-              <span className="sm:hidden">🗺️</span>
-            </TabsTrigger>
-          </TabsList>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Modern Tab Navigation */}
+        <div className="mb-8">
+          <div className="flex space-x-2 sm:space-x-4 p-2 bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50">
+            {[
+              { id: 'products', icon: '🍽️', label: 'Keşfet', count: products.length },
+              { id: 'cart', icon: '🛒', label: 'Sepet', count: cart.length },
+              { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length },
+              { id: 'map', icon: '🗺️', label: 'Harita', count: null }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  flex items-center space-x-2 px-3 sm:px-6 py-3 rounded-xl transition-all duration-300 text-sm sm:text-base font-medium
+                  ${activeTab === tab.id 
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg transform scale-105' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                  }
+                `}
+              >
+                <span className="text-lg sm:text-xl">{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                {tab.count !== null && tab.count > 0 && (
+                  <span className={`
+                    text-xs px-2 py-1 rounded-full font-semibold
+                    ${activeTab === tab.id ? 'bg-white/20' : 'bg-indigo-100 text-indigo-600'}
+                  `}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
 
+        {/* Tab Content */}
+        <div className="space-y-6">
           {/* Products Tab */}
-          <TabsContent value="products" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mevcut Ürünler ({products.length})</CardTitle>
-                <CardDescription>
-                  Lezzetli yemekleri sepetinize ekleyin!
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+          {activeTab === 'products' && (
+            <div className="space-y-6">
+              {/* Hero Section */}
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="relative">
+                  <h2 className="text-2xl sm:text-4xl font-bold mb-2">Lezzetli Anlar 🍕</h2>
+                  <p className="text-lg sm:text-xl opacity-90">En sevdiğin yemekleri kapına kadar getiriyoruz!</p>
+                  <div className="flex items-center space-x-4 mt-4">
+                    <div className="bg-white/20 px-4 py-2 rounded-full">
+                      <span className="font-semibold">{products.length}</span> Ürün
+                    </div>
+                    <div className="bg-white/20 px-4 py-2 rounded-full">
+                      ⚡ Hızlı Teslimat
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Products Grid */}
+              <div>
                 {loading ? (
-                  <div className="text-center py-8">
-                    <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Ürünler yükleniyor...</p>
+                  <div className="text-center py-16">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mb-4">
+                      <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <p className="text-gray-600 text-lg">Lezzetler yükleniyor... 🍽️</p>
                   </div>
                 ) : products.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Henüz ürün yok</p>
+                  <div className="text-center py-16">
+                    <div className="text-6xl mb-4">🍽️</div>
+                    <p className="text-gray-500 text-lg">Henüz ürün yok</p>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map((product) => (
-                      <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                        {product.photo_url && (
-                          <div className="h-48 overflow-hidden">
-                            <img 
-                              src={`${BACKEND_URL}${product.photo_url}`} 
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <CardContent className="p-4">
-                          <div className="mb-3">
-                            <h3 className="font-semibold text-lg">{product.name}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-                            <p className="text-xs text-gray-500">
-                              İşletme: {product.business_name} • Hazırlık: {product.preparation_time_minutes} dk
-                            </p>
-                          </div>
+                      <div key={product.id} className="group">
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
+                          {/* Product Image */}
+                          {product.photo_url && (
+                            <div className="relative h-48 sm:h-56 overflow-hidden">
+                              <img 
+                                src={`${BACKEND_URL}${product.photo_url}`} 
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              />
+                              <div className="absolute top-3 right-3">
+                                <Badge 
+                                  className={`${product.is_available 
+                                    ? 'bg-green-500 text-white' 
+                                    : 'bg-gray-500 text-white'
+                                  } shadow-lg`}
+                                >
+                                  {product.is_available ? '✅ Mevcut' : '❌ Stokta Yok'}
+                                </Badge>
+                              </div>
+                            </div>
+                          )}
                           
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="font-bold text-xl text-green-600">₺{product.price}</span>
-                            <Badge variant={product.is_available ? "default" : "secondary"}>
-                              {product.is_available ? 'Mevcut' : 'Stokta Yok'}
-                            </Badge>
+                          {/* Product Info */}
+                          <div className="p-5">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
+                                  {product.name}
+                                </h3>
+                                <p className="text-sm text-gray-600 line-clamp-2">
+                                  {product.description}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="text-xs text-gray-500">
+                                🏪 {product.business_name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                ⏱️ {product.preparation_time_minutes} dk
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                                ₺{product.price}
+                              </div>
+                              
+                              <Button 
+                                onClick={() => addToCart(product)}
+                                disabled={!product.is_available}
+                                className={`
+                                  px-6 py-2 rounded-full font-semibold transition-all duration-300
+                                  ${product.is_available
+                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                  }
+                                `}
+                              >
+                                {product.is_available ? '+ Sepet' : 'Stokta Yok'}
+                              </Button>
+                            </div>
                           </div>
-                          
-                          <Button 
-                            onClick={() => addToCart(product)}
-                            disabled={!product.is_available}
-                            className="w-full"
-                          >
-                            {product.is_available ? 'Sepete Ekle' : 'Stokta Yok'}
-                          </Button>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </div>
+          )}
 
           {/* Cart Tab */}
           <TabsContent value="cart" className="space-y-6">
