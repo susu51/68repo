@@ -2122,47 +2122,99 @@ const BusinessDashboard = ({ user }) => {
           </TabsContent>
 
           {/* Orders Tab */}
-          <TabsContent value="orders" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gelen Siparişler ({orders.length})</CardTitle>
+          <TabsContent value="orders" className="space-y-4 sm:space-y-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50">
+                <CardTitle className="flex items-center text-sm sm:text-lg">
+                  <span className="mr-2">🧾</span>
+                  Gelen Siparişler ({orders.length})
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Müşteri siparişlerini yönetin ve takip edin
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 {orders.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Henüz sipariş yok</p>
+                  <div className="text-center py-12">
+                    <div className="text-4xl sm:text-6xl mb-4">🧾</div>
+                    <p className="text-gray-500 text-sm sm:text-base">Henüz siparişiniz yok</p>
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">Müşteriler sipariş vermeye başladığında burada göreceksiniz</p>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {orders.map((order) => (
-                      <Card key={order.id}>
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
-                              <p className="text-sm text-gray-600">{order.customer_name}</p>
-                              <p className="text-xs text-gray-500">{order.delivery_address}</p>
+                      <Card key={order.id} className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow">
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h3 className="font-semibold text-sm sm:text-base">
+                                  Sipariş #{order.id.slice(-8)}
+                                </h3>
+                                <OrderStatusBadge status={order.status} />
+                              </div>
+                              <div className="space-y-1 text-xs sm:text-sm text-gray-600">
+                                <p className="flex items-center">
+                                  <span className="mr-1">👤</span>
+                                  {order.customer_name}
+                                </p>
+                                <p className="flex items-center">
+                                  <span className="mr-1">📍</span>
+                                  <span className="truncate">{order.delivery_address}</span>
+                                </p>
+                                <p className="flex items-center">
+                                  <span className="mr-1">🕐</span>
+                                  {new Date(order.created_at).toLocaleString('tr-TR')}
+                                </p>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-bold text-lg">₺{order.total_amount}</p>
-                              <OrderStatusBadge status={order.status} />
+                            
+                            <div className="text-left sm:text-right">
+                              <p className="text-lg sm:text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                                ₺{order.total_amount}
+                              </p>
+                              <p className="text-xs sm:text-sm text-gray-500">
+                                Komisyon: ₺{order.commission_amount?.toFixed(2) || '0.00'}
+                              </p>
                             </div>
                           </div>
 
-                          <div className="mb-3">
-                            <h4 className="font-medium mb-1">Siparişler:</h4>
-                            {order.items.map((item, index) => (
-                              <div key={index} className="text-sm text-gray-600">
-                                {item.quantity}x {item.product_name} - ₺{item.subtotal}
-                              </div>
-                            ))}
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <h4 className="font-medium mb-2 text-xs sm:text-sm text-gray-800">📋 Sipariş Detayları:</h4>
+                            <div className="space-y-1">
+                              {order.items.map((item, index) => (
+                                <div key={index} className="flex justify-between items-center text-xs sm:text-sm">
+                                  <span className="text-gray-600">
+                                    {item.quantity}x {item.product_name}
+                                  </span>
+                                  <span className="font-medium text-gray-800">₺{item.subtotal}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
 
                           {order.status === 'created' && (
-                            <Button 
-                              onClick={() => updateOrderStatus(order.id, 'assigned')}
-                              className="w-full"
-                            >
-                              Siparişi Onayla
-                            </Button>
+                            <div className="mt-4 pt-3 border-t border-gray-100">
+                              <Button 
+                                onClick={() => updateOrderStatus(order.id, 'assigned')}
+                                className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-xs sm:text-sm"
+                                size="sm"
+                              >
+                                ✅ Siparişi Onayla ve Hazırlamaya Başla
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {order.status === 'assigned' && (
+                            <div className="mt-4 pt-3 border-t border-gray-100">
+                              <Button 
+                                onClick={() => updateOrderStatus(order.id, 'on_route')}
+                                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-xs sm:text-sm"
+                                size="sm"
+                              >
+                                🚚 Kurye Teslim Edildi (Yola Çıktı)
+                              </Button>
+                            </div>
                           )}
                         </CardContent>
                       </Card>
