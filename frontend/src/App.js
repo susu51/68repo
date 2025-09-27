@@ -413,6 +413,15 @@ const AdminDashboard = ({ user }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div className="w-6 h-6 border-3 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-gray-700">Admin paneli yükleniyor...</span>
+          </div>
+        </div>
+      )}
+      
       {/* Mobile-Responsive Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
