@@ -718,7 +718,7 @@ async def get_orders(status: Optional[str] = None, current_user: dict = Depends(
 
 @api_router.get("/orders/nearby")
 async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
-    """Get nearby available orders for couriers"""
+    """Get all available orders for couriers (city-wide, not just nearby)"""
     if current_user.get("role") != "courier":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -733,29 +733,42 @@ async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
         )
     
     # Get orders that are created (available for pickup) and not assigned yet
+    # CHANGED: Show all city-wide orders, not just nearby
     available_orders = await db.orders.find({
         "status": "created",
         "courier_id": {"$exists": False}  # Not assigned to any courier yet
     }).to_list(length=None)
     
-    # For now, return all available orders (in real app, would calculate distance)
-    # In a real implementation, you'd filter by courier location vs order pickup location
+    # Process orders for courier display
     orders_for_courier = []
     
-    for order in available_orders:
-        # Convert ObjectId and datetime
+    for i, order in enumerate(available_orders):
+        # Enhanced order data with city coordinates spread
+        pickup_lat = 41.0082 + (i * 0.01) + (hash(str(order["_id"])) % 100) * 0.001  # Spread across city
+        pickup_lng = 28.9784 + (i * 0.008) + (hash(str(order["_id"])) % 100) * 0.001
+        delivery_lat = pickup_lat + 0.005  # Delivery nearby pickup
+        delivery_lng = pickup_lng + 0.005
+        
         order_data = {
             "id": str(order["_id"]),
             "customer_name": order.get("customer_name", "Müşteri"),
             "business_name": order.get("business_name", "İşletme"),
-            "pickup_address": order.get("pickup_address", {}),
-            "delivery_address": order.get("delivery_address", {}),
+            "pickup_address": {
+                "lat": pickup_lat,
+                "lng": pickup_lng,
+                "address": order.get("pickup_address", "İşletme adresi")
+            },
+            "delivery_address": {
+                "lat": delivery_lat, 
+                "lng": delivery_lng,
+                "address": order.get("delivery_address", "Teslimat adresi")
+            },
             "total_amount": order.get("total_amount", 0),
             "items": order.get("items", []),
             "created_at": order["created_at"].isoformat(),
-            "distance_km": round(5.0 + (len(orders_for_courier) * 0.5), 1),  # Demo distance
-            "estimated_duration": f"{15 + (len(orders_for_courier) * 3)} dk",  # Demo duration
-            "commission_amount": order.get("commission_amount", 0)
+            "commission_amount": order.get("commission_amount", order.get("total_amount", 0) * 0.03),
+            "preparation_time": f"{15 + (i * 2)} dk",  # Dynamic prep time
+            "priority": "high" if order.get("total_amount", 0) > 300 else "normal"
         }
         orders_for_courier.append(order_data)
     
