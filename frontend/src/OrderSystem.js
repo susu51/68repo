@@ -757,13 +757,13 @@ export const NearbyOrdersForCourier = () => {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        if (order.pickup_address?.lat && order.pickup_address?.lng) {
-                          const mapsUrl = `https://www.google.com/maps/dir/${courierLocation?.lat || 41.0082},${courierLocation?.lng || 28.9784}/${order.pickup_address.lat},${order.pickup_address.lng}`;
+                        if (order.delivery_address?.lat && order.delivery_address?.lng) {
+                          const mapsUrl = `https://www.google.com/maps/dir/${courierLocation?.lat || 41.0082},${courierLocation?.lng || 28.9784}/${order.delivery_address.lat},${order.delivery_address.lng}`;
                           window.open(mapsUrl, '_blank');
                         }
                       }}
                     >
-                      🗺️ Yol Tarifi
+                      🗺️ Müşteriye Git
                     </Button>
                   </div>
                 </CardContent>
