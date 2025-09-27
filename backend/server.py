@@ -822,6 +822,63 @@ async def update_order_status(order_id: str, new_status: OrderStatus, current_us
     
     return {"success": True, "message": f"Order status updated to {new_status}"}
 
+@api_router.post("/orders/{order_id}/accept")
+async def accept_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Accept an order (Courier only)"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only couriers can accept orders"
+        )
+    
+    # Check if courier is KYC approved
+    if current_user.get("kyc_status") != "approved":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="KYC approval required to accept orders"
+        )
+    
+    # Find the order
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+    
+    # Check if order is available for assignment
+    if order.get("status") != "created":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order is not available for assignment"
+        )
+    
+    if order.get("courier_id") is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order is already assigned to another courier"
+        )
+    
+    # Assign order to courier
+    update_data = {
+        "status": "assigned",
+        "courier_id": current_user["id"],
+        "courier_name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip(),
+        "assigned_at": datetime.now(timezone.utc)
+    }
+    
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": update_data}
+    )
+    
+    return {
+        "success": True, 
+        "message": "Order successfully accepted",
+        "order_id": order_id,
+        "courier_name": update_data["courier_name"]
+    }
+
 # Admin Management Endpoints
 @api_router.get("/admin/users")
 async def get_all_users(current_user: dict = Depends(get_admin_user)):
