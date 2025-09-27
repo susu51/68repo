@@ -263,6 +263,7 @@ const AdminDashboard = ({ user }) => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [couriers, setCouriers] = useState([]);
+  const [kycFilter, setKycFilter] = useState('pending'); // pending, approved, rejected, all
   const [loading, setLoading] = useState(false);
 
   const fetchUsers = async () => {
