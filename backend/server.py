@@ -716,6 +716,51 @@ async def get_orders(status: Optional[str] = None, current_user: dict = Depends(
     
     return orders
 
+@api_router.get("/orders/nearby")
+async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
+    """Get nearby available orders for couriers"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only couriers can access nearby orders"
+        )
+    
+    # Check if courier is KYC approved
+    if current_user.get("kyc_status") != "approved":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="KYC approval required to view orders"
+        )
+    
+    # Get orders that are created (available for pickup) and not assigned yet
+    available_orders = await db.orders.find({
+        "status": "created",
+        "courier_id": {"$exists": False}  # Not assigned to any courier yet
+    }).to_list(length=None)
+    
+    # For now, return all available orders (in real app, would calculate distance)
+    # In a real implementation, you'd filter by courier location vs order pickup location
+    orders_for_courier = []
+    
+    for order in available_orders:
+        # Convert ObjectId and datetime
+        order_data = {
+            "id": str(order["_id"]),
+            "customer_name": order.get("customer_name", "Müşteri"),
+            "business_name": order.get("business_name", "İşletme"),
+            "pickup_address": order.get("pickup_address", {}),
+            "delivery_address": order.get("delivery_address", {}),
+            "total_amount": order.get("total_amount", 0),
+            "items": order.get("items", []),
+            "created_at": order["created_at"].isoformat(),
+            "distance_km": round(5.0 + (len(orders_for_courier) * 0.5), 1),  # Demo distance
+            "estimated_duration": f"{15 + (len(orders_for_courier) * 3)} dk",  # Demo duration
+            "commission_amount": order.get("commission_amount", 0)
+        }
+        orders_for_courier.append(order_data)
+    
+    return orders_for_courier
+
 @api_router.patch("/orders/{order_id}/status")
 async def update_order_status(order_id: str, new_status: OrderStatus, current_user: dict = Depends(get_current_user)):
     """Update order status"""
