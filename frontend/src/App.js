@@ -1506,11 +1506,29 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
             </div>
             <div>
               <Label>Şehir</Label>
-              <CitySelector 
-                value={formData.city}
-                onChange={(value) => setFormData({...formData, city: value})}
-                required
-              />
+              <Select onValueChange={(value) => setFormData({...formData, city: value})} required>
+                <SelectTrigger data-testid="business-city-select">
+                  <SelectValue placeholder="Şehir seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Istanbul">🏙️ İstanbul</SelectItem>
+                  <SelectItem value="Ankara">🏛️ Ankara</SelectItem>
+                  <SelectItem value="Izmir">🌊 İzmir</SelectItem>
+                  <SelectItem value="Bursa">🌳 Bursa</SelectItem>
+                  <SelectItem value="Antalya">🏖️ Antalya</SelectItem>
+                  <SelectItem value="Adana">🌾 Adana</SelectItem>
+                  <SelectItem value="Konya">🕌 Konya</SelectItem>
+                  <SelectItem value="Gaziantep">🍯 Gaziantep</SelectItem>
+                  <SelectItem value="Kayseri">⛰️ Kayseri</SelectItem>
+                  <SelectItem value="Mersin">🚢 Mersin</SelectItem>
+                  <SelectItem value="Eskisehir">🎓 Eskişehir</SelectItem>
+                  <SelectItem value="Diyarbakir">🏛️ Diyarbakır</SelectItem>
+                  <SelectItem value="Samsun">⚓ Samsun</SelectItem>
+                  <SelectItem value="Denizli">🏔️ Denizli</SelectItem>
+                  <SelectItem value="Trabzon">🏔️ Trabzon</SelectItem>
+                  <SelectItem value="Other">🌍 Diğer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
