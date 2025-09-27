@@ -287,6 +287,13 @@ export const ProfessionalFoodOrderSystem = () => {
     fetchRestaurants();
   }, []);
 
+  // Re-fetch and sort when user location changes
+  useEffect(() => {
+    if (userLocation && restaurants.length > 0) {
+      sortRestaurantsByDistance();
+    }
+  }, [userLocation]);
+
   const getUserLocation = () => {
     if (!navigator.geolocation) {
       setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
