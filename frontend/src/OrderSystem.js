@@ -390,22 +390,29 @@ export const NearbyOrdersForCourier = () => {
   const [courierLocation, setCourierLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [lastNotificationTime, setLastNotificationTime] = useState(0);
+  const [isMounted, setIsMounted] = useState(true);
 
   useEffect(() => {
+    setIsMounted(true);
     // First get location, then fetch orders
     startLocationTracking();
     
     // Fetch orders every 30 seconds, but only after we have location
     const ordersInterval = setInterval(() => {
-      if (courierLocation) {
+      if (courierLocation && isMounted) {
         fetchNearbyOrders();
       }
     }, 30000);
     
     // Update location every 3 minutes 
-    const locationInterval = setInterval(updateLocation, 180000);
+    const locationInterval = setInterval(() => {
+      if (isMounted) {
+        updateLocation();
+      }
+    }, 180000);
     
     return () => {
+      setIsMounted(false);
       clearInterval(ordersInterval);
       clearInterval(locationInterval);
     };
@@ -413,10 +420,10 @@ export const NearbyOrdersForCourier = () => {
 
   // Fetch orders after location is obtained
   useEffect(() => {
-    if (courierLocation) {
+    if (courierLocation && isMounted) {
       fetchNearbyOrders();
     }
-  }, [courierLocation]);
+  }, [courierLocation, isMounted]);
 
   const fetchNearbyOrders = async () => {
     try {
