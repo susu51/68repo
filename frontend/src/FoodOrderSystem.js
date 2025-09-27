@@ -289,12 +289,12 @@ export const ProfessionalFoodOrderSystem = () => {
     fetchRestaurants();
   }, []);
 
-  // Re-fetch and sort when user location changes
+  // Re-sort when user location changes (only if using nearest sort)
   useEffect(() => {
-    if (userLocation && restaurants.length > 0) {
-      sortRestaurantsByDistance();
+    if (userLocation && originalRestaurants.length > 0 && sortType === 'nearest') {
+      sortAndFilterRestaurants(originalRestaurants, sortType, userLocation);
     }
-  }, [userLocation]);
+  }, [userLocation, sortType]);
 
   const getUserLocation = () => {
     if (!navigator.geolocation) {
