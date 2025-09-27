@@ -221,6 +221,24 @@ const LeafletMap = ({
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
+      <style>
+        {`
+          @keyframes pulse {
+            0%, 100% {
+              opacity: 1;
+              transform: scale(1);
+            }
+            50% {
+              opacity: 0.7;
+              transform: scale(1.2);
+            }
+          }
+          .user-location-marker div:last-child {
+            animation: pulse 2s infinite;
+          }
+        `}
+      </style>
+      
       <MapContainer
         center={center}
         zoom={zoom}
