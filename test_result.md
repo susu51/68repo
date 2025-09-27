@@ -231,6 +231,9 @@ frontend:
         -working: true
         -agent: "testing"
         -comment: "✅ PUBLIC BUSINESS ENDPOINTS TESTING COMPLETE: Comprehensive testing of public customer endpoints shows excellent results (92.9% success rate, 92/99 tests passed). CRITICAL VALIDATIONS CONFIRMED: 1) GET /api/businesses endpoint working - returns approved businesses with location data (currently 0 businesses as none are KYC approved yet). 2) GET /api/businesses/{business_id}/products endpoint working - returns products for specific business with all required fields (name, description, price, is_available, preparation_time_minutes). 3) Business data structure validation passed - location data includes Istanbul districts with realistic coordinates. 4) Product data completeness verified - all required and optional fields properly typed. 5) Public endpoints accessible without authentication confirmed. 6) Only approved businesses (kyc_status: approved) filter working correctly - non-approved businesses excluded from public list. 7) Error handling for invalid business IDs working (returns empty array instead of 500 error). The public business endpoints are fully functional and ready for customer food ordering system integration."
+        -working: true
+        -agent: "main"
+        -comment: "ENHANCED: Fixed location dependency issues in restaurant fetching. Added proper API endpoints for businesses and products. Created test data: approved business 'Test Restoranı' with 3 products (Margherita Pizza ₺85, Chicken Burger ₺65, Coca Cola ₺15). Customer dashboard accessible via testcustomer@example.com/test123. Location-based sorting and error handling implemented. Professional UI with restaurant cards, product images (with fallback), cart management, and responsive design working."
 
   - task: "Route Navigation Fix"
     implemented: true
