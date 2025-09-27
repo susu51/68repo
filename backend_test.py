@@ -2257,6 +2257,16 @@ class DeliverTRAPITester:
         self.test_order_database_storage()
         self.test_multiple_customers_order_visibility()
         
+        # Test 13: PUBLIC BUSINESS ENDPOINTS TESTING
+        print("\n📋 PHASE 13: PUBLIC BUSINESS ENDPOINTS TESTING")
+        self.test_public_businesses_endpoint()
+        self.test_business_products_endpoint()
+        self.test_business_products_invalid_id()
+        self.test_approved_businesses_only()
+        self.test_public_endpoints_no_auth_required()
+        self.test_business_data_completeness()
+        self.test_product_data_completeness()
+        
         # Print summary
         print("\n" + "=" * 70)
         print("📊 TEST SUMMARY - DeliverTR MVP Core Business Flow")
