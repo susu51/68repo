@@ -31,6 +31,16 @@ const LeafletMap = ({
 
   // Custom icons for different marker types
   const icons = {
+    user: L.divIcon({
+      html: `<div style="background: #3B82F6; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid white; box-shadow: 0 3px 12px rgba(59, 130, 246, 0.4); position: relative;">
+               <span style="color: white; font-size: 18px;">📍</span>
+               <div style="position: absolute; top: -5px; right: -5px; background: #10B981; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; animation: pulse 2s infinite;"></div>
+             </div>`,
+      className: 'user-location-marker',
+      iconSize: [35, 35],
+      iconAnchor: [17, 17],
+      popupAnchor: [0, -20]
+    }),
     customer: L.icon({
       iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
