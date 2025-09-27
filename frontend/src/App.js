@@ -2665,59 +2665,12 @@ const CustomerDashboard = ({ user }) => {
 
         {/* Tab Content */}
         <div className="space-y-6">
-          {/* Products Tab */}
+          {/* Products Tab - Professional Food Order System */}
           {activeTab === 'products' && (
-            <div className="space-y-6">
-              {/* Hero Section */}
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="relative">
-                  <h2 className="text-2xl sm:text-4xl font-bold mb-2">Lezzetli Anlar 🍕</h2>
-                  <p className="text-lg sm:text-xl opacity-90">En sevdiğin yemekleri kapına kadar getiriyoruz!</p>
-                  <div className="flex items-center space-x-4 mt-4">
-                    <div className="bg-white/20 px-4 py-2 rounded-full">
-                      <span className="font-semibold">{products.length}</span> Ürün
-                    </div>
-                    <div className="bg-white/20 px-4 py-2 rounded-full">
-                      ⚡ Hızlı Teslimat
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Products Grid */}
-              <div>
-                {loading ? (
-                  <div className="text-center py-16">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mb-4">
-                      <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                    <p className="text-gray-600 text-lg">Lezzetler yükleniyor... 🍽️</p>
-                  </div>
-                ) : products.length === 0 ? (
-                  <div className="text-center py-16">
-                    <div className="text-6xl mb-4">🍽️</div>
-                    <p className="text-gray-500 text-lg">Henüz ürün yok</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {products.map((product) => (
-                      <div key={product.id} className="group">
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
-                          {/* Product Image */}
-                          {product.photo_url && (
-                            <div className="relative h-48 sm:h-56 overflow-hidden">
-                              <img 
-                                src={`${BACKEND_URL}${product.photo_url}`} 
-                                alt={product.name}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              />
-                              <div className="absolute top-3 right-3">
-                                <Badge 
-                                  className={`${product.is_available 
-                                    ? 'bg-green-500 text-white' 
-                                    : 'bg-gray-500 text-white'
-                                  } shadow-lg`}
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+              <ProfessionalFoodOrderSystem />
+            </div>
+          )}
                                 >
                                   {product.is_available ? '✅ Mevcut' : '❌ Stokta Yok'}
                                 </Badge>
