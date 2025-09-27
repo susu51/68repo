@@ -59,13 +59,15 @@ class DeliverTRAPITester:
             "timestamp": datetime.now().isoformat()
         })
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, token=None):
         """Run a single API test"""
         url = f"{self.api_url}/{endpoint}" if endpoint else f"{self.base_url}/"
         test_headers = {'Content-Type': 'application/json'}
         
-        if self.access_token:
-            test_headers['Authorization'] = f'Bearer {self.access_token}'
+        # Use specific token if provided, otherwise use default access_token
+        auth_token = token or self.access_token
+        if auth_token:
+            test_headers['Authorization'] = f'Bearer {auth_token}'
         
         if headers:
             test_headers.update(headers)
