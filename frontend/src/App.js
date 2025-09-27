@@ -3022,7 +3022,7 @@ const HomePage = ({ onAuthStart }) => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">
-            DeliverTR
+            📦 Kuryecini
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Türkiye'nin en hızlı teslimat platformu. Herkes kurye olabilir, 
