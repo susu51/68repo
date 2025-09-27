@@ -1874,31 +1874,53 @@ const BusinessDashboard = ({ user }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold">
-                {user.business_name || 'İşletme'} - Yönetim Paneli
-              </h1>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+      {/* Mobile-Responsive Header */}
+      <div className="bg-white/70 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="text-xl sm:text-2xl">🏪</div>
+              <div>
+                <h1 className="text-sm sm:text-xl font-semibold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                  <span className="hidden sm:inline">{user.business_name || 'İşletme'} - </span>Yönetim
+                </h1>
+                <p className="text-xs text-gray-600 hidden sm:block">
+                  İşletme Yönetim Paneli
+                </p>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline">İşletme</Badge>
-              <Button onClick={logout} variant="outline">Çıkış</Button>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Badge variant="outline" className="bg-green-50 border-green-200 text-green-800 text-xs">
+                İşletme
+              </Badge>
+              <Button onClick={logout} variant="outline" size="sm">
+                <span className="hidden sm:inline">Çıkış</span>
+                <span className="sm:hidden">🚪</span>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="products">Ürünler</TabsTrigger>
-            <TabsTrigger value="orders">Siparişler</TabsTrigger>
-            <TabsTrigger value="map">Harita</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-white/60 backdrop-blur-lg">
+            <TabsTrigger value="products" className="text-xs sm:text-sm">
+              <span className="mr-1 sm:mr-2">📦</span>
+              <span className="hidden sm:inline">Ürünler</span>
+              <span className="sm:hidden">Ürün</span>
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="text-xs sm:text-sm">
+              <span className="mr-1 sm:mr-2">🧾</span>
+              <span className="hidden sm:inline">Siparişler</span>
+              <span className="sm:hidden">Sipariş</span>
+            </TabsTrigger>
+            <TabsTrigger value="map" className="text-xs sm:text-sm">
+              <span className="mr-1 sm:mr-2">🗺️</span>
+              Harita
+            </TabsTrigger>
           </TabsList>
 
           {/* Products Tab */}
