@@ -1035,6 +1035,62 @@ async def update_courier_kyc_status(
     
     return {"success": True, "message": f"KYC status updated to {kyc_status}"}
 
+# Public Business Endpoints for Customers
+@api_router.get("/businesses")
+async def get_public_businesses():
+    """Get all active businesses for customers"""
+    try:
+        businesses = await db.users.find({
+            "role": "business",
+            "kyc_status": "approved"  # Only show approved businesses
+        }).to_list(length=None)
+        
+        business_list = []
+        for business in businesses:
+            # Add location data (Istanbul districts for demo)
+            istanbul_districts = [
+                {"name": "Sultanahmet", "lat": 41.0082, "lng": 28.9784},
+                {"name": "Beyoğlu", "lat": 41.0369, "lng": 28.9850},
+                {"name": "Şişli", "lat": 41.0498, "lng": 28.9662},
+                {"name": "Beşiktaş", "lat": 41.0766, "lng": 28.9688},
+                {"name": "Kadıköy", "lat": 41.0058, "lng": 29.0281},
+                {"name": "Ataşehir", "lat": 40.9969, "lng": 29.0833},
+                {"name": "Üsküdar", "lat": 41.0431, "lng": 29.0088},
+                {"name": "Sarıyer", "lat": 41.1058, "lng": 29.0074},
+            ]
+            
+            # Assign location based on business ID
+            district = istanbul_districts[hash(business["id"]) % len(istanbul_districts)]
+            
+            business_data = {
+                "id": business.get("id"),
+                "name": business.get("business_name", "İsimsiz İşletme"),
+                "category": business.get("business_category", "gida"),
+                "description": business.get("description", "Lezzetli yemekler sizi bekliyor..."),
+                "rating": round(4.0 + (hash(business["id"]) % 15) / 10, 1),
+                "delivery_time": f"{20 + (hash(business['id']) % 20)}-{35 + (hash(business['id']) % 15)}",
+                "min_order": 50 + (hash(business["id"]) % 50),
+                "location": district,
+                "is_open": True,
+                "phone": business.get("phone"),
+                "address": f"{district['name']}, İstanbul",
+                "image_url": f"/api/placeholder/restaurant-{hash(business['id']) % 10}.jpg"
+            }
+            business_list.append(business_data)
+        
+        return business_list
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching businesses: {str(e)}")
+
+@api_router.get("/businesses/{business_id}/products")
+async def get_business_products(business_id: str):
+    """Get products for a specific business"""
+    try:
+        products = await db.products.find({"business_id": business_id}).to_list(length=None)
+        return [Product(**product).dict() for product in products]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching products: {str(e)}")
+
     INACTIVE = "inactive"
     BANNED = "banned"
 
