@@ -485,36 +485,204 @@ const AdminDashboard = ({ user }) => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-6">
+          {/* KYC Tab */}
+          <TabsContent value="kyc" className="space-y-4 sm:space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Kullanıcı Yönetimi ({users.length})</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-sm sm:text-base">
+                  Kurye KYC Onayları ({couriers.length})
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Kurye belgelerini inceleyin ve onaylayın
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {couriers.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8 text-sm">Kurye bulunamadı</p>
+                ) : (
+                  <div className="space-y-4">
+                    {couriers.map((courier) => (
+                      <Card key={courier.id} className="overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="flex flex-col sm:flex-row gap-4">
+                            {/* Courier Info */}
+                            <div className="flex-1 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h3 className="font-semibold text-sm sm:text-base">
+                                    {courier.first_name} {courier.last_name}
+                                  </h3>
+                                  <p className="text-xs sm:text-sm text-gray-600">{courier.email}</p>
+                                  <p className="text-xs text-gray-500">
+                                    📍 {courier.city} • 🚗 {courier.vehicle_type}
+                                  </p>
+                                </div>
+                                <Badge className={getKYCStatusColor(courier.kyc_status)} size="sm">
+                                  {courier.kyc_status === 'approved' ? 'Onaylı' :
+                                   courier.kyc_status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
+                                </Badge>
+                              </div>
+
+                              {/* Vehicle & License Details */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                                <div className="space-y-1">
+                                  <p><strong>Araç Modeli:</strong> {courier.vehicle_model}</p>
+                                  <p><strong>Ehliyet Sınıfı:</strong> {courier.license_class}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p><strong>Ehliyet No:</strong> {courier.license_number}</p>
+                                  <p><strong>IBAN:</strong> {courier.iban?.slice(-4).padStart(courier.iban?.length || 0, '*')}</p>
+                                </div>
+                              </div>
+
+                              {/* Documents */}
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {/* License Photo */}
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-semibold">Ehliyet Fotoğrafı</Label>
+                                  {courier.license_photo_url ? (
+                                    <div className="relative group">
+                                      <img
+                                        src={`${BACKEND_URL}${courier.license_photo_url}`}
+                                        alt="Ehliyet"
+                                        className="w-full h-20 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75"
+                                        onClick={() => window.open(`${BACKEND_URL}${courier.license_photo_url}`, '_blank')}
+                                      />
+                                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
+                                        <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
+                                          📷 Büyült
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="w-full h-20 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
+                                      Yok
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Vehicle Photo */}
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-semibold">Araç Fotoğrafı</Label>
+                                  {courier.vehicle_photo_url ? (
+                                    <div className="relative group">
+                                      <img
+                                        src={`${BACKEND_URL}${courier.vehicle_photo_url}`}
+                                        alt="Araç"
+                                        className="w-full h-20 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75"
+                                        onClick={() => window.open(`${BACKEND_URL}${courier.vehicle_photo_url}`, '_blank')}
+                                      />
+                                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
+                                        <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
+                                          📷 Büyült
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="w-full h-20 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
+                                      Yok
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Profile Photo */}
+                                <div className="space-y-2">
+                                  <Label className="text-xs font-semibold">Profil Fotoğrafı</Label>
+                                  {courier.profile_photo_url ? (
+                                    <div className="relative group">
+                                      <img
+                                        src={`${BACKEND_URL}${courier.profile_photo_url}`}
+                                        alt="Profil"
+                                        className="w-full h-20 sm:h-32 object-cover rounded border cursor-pointer hover:opacity-75"
+                                        onClick={() => window.open(`${BACKEND_URL}${courier.profile_photo_url}`, '_blank')}
+                                      />
+                                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all flex items-center justify-center">
+                                        <span className="text-white opacity-0 group-hover:opacity-100 text-xs">
+                                          📷 Büyült
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="w-full h-20 sm:h-32 bg-gray-100 rounded border flex items-center justify-center text-gray-500 text-xs">
+                                      Yok
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              {courier.kyc_status === 'pending' && (
+                                <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
+                                  <Button
+                                    onClick={() => updateCourierKYC(courier.id, 'approved')}
+                                    className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
+                                    size="sm"
+                                  >
+                                    ✅ Onayla
+                                  </Button>
+                                  <Button
+                                    onClick={() => updateCourierKYC(courier.id, 'rejected', 'Belgeler eksik veya hatalı')}
+                                    variant="destructive"
+                                    className="text-xs sm:text-sm"
+                                    size="sm"
+                                  >
+                                    ❌ Reddet
+                                  </Button>
+                                </div>
+                              )}
+
+                              {/* Review History */}
+                              {(courier.kyc_reviewed_at || courier.kyc_notes) && (
+                                <div className="text-xs text-gray-500 pt-2 border-t">
+                                  {courier.kyc_reviewed_at && (
+                                    <p>İnceleme: {new Date(courier.kyc_reviewed_at).toLocaleDateString('tr-TR')}</p>
+                                  )}
+                                  {courier.kyc_notes && (
+                                    <p>Not: {courier.kyc_notes}</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Users Tab - Mobile Responsive */}
+          <TabsContent value="users" className="space-y-4 sm:space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm sm:text-base">Kullanıcı Yönetimi ({users.length})</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                   Tüm kullanıcıları görüntüleyin ve yönetin
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {users.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Kullanıcı bulunamadı</p>
+                  <p className="text-gray-500 text-center py-8 text-sm">Kullanıcı bulunamadı</p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Kullanıcı
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Rol
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Şehir
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Kayıt Tarihi
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Durum
                           </th>
                         </tr>
@@ -522,41 +690,41 @@ const AdminDashboard = ({ user }) => {
                       <tbody className="bg-white divide-y divide-gray-200">
                         {users.map((user) => (
                           <tr key={user.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
-                                <div className="flex-shrink-0 h-10 w-10">
-                                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
+                                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-200 flex items-center justify-center text-xs sm:text-base">
                                     {user.role === 'courier' ? '🚴' : 
                                      user.role === 'business' ? '🏪' :
                                      user.role === 'customer' ? '👤' : '👑'}
                                   </div>
                                 </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">
+                                <div className="ml-2 sm:ml-4">
+                                  <div className="text-xs sm:text-sm font-medium text-gray-900">
                                     {user.first_name && user.last_name ? 
                                       `${user.first_name} ${user.last_name}` :
                                       user.business_name || user.email || 'İsimsiz Kullanıcı'
                                     }
                                   </div>
-                                  <div className="text-sm text-gray-500">
+                                  <div className="text-xs text-gray-500">
                                     {user.email || 'E-posta yok'}
                                   </div>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge className={getRoleColor(user.role)}>
+                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                              <Badge className={getRoleColor(user.role)} size="sm">
                                 {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown'}
                               </Badge>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                               {user.city || '-'}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(user.created_at).toLocaleDateString('tr-TR')}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge variant={user.is_active ? "default" : "secondary"}>
+                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                              <Badge variant={user.is_active ? "default" : "secondary"} size="sm">
                                 {user.is_active ? 'Aktif' : 'Pasif'}
                               </Badge>
                             </td>
