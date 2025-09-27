@@ -2895,7 +2895,97 @@ class DeliverTRAPITester:
         
         return self.tests_passed == self.tests_run
 
-    def run_all_tests(self):
+    def run_city_field_validation_tests(self):
+        """Run comprehensive city field validation tests for business registration"""
+        print("🏙️  STARTING BUSINESS REGISTRATION CITY FIELD VALIDATION TESTS")
+        print("=" * 80)
+        
+        # Test sequence focusing on city field validation
+        test_sequence = [
+            ("Business Registration City Field Validation", self.test_business_registration_city_field_validation),
+            ("Business Registration Sample Data from Request", self.test_business_registration_sample_data_from_request),
+            ("Business Registration City Field Edge Cases", self.test_business_registration_city_field_edge_cases),
+            ("Business Registration Complete Data", self.test_business_registration_comprehensive),
+            ("Business Registration Duplicate Email", self.test_business_registration_duplicate_email),
+            ("Business Registration Missing Fields", self.test_business_registration_missing_fields),
+            ("Business Registration Field Validation", self.test_business_registration_field_validation),
+            ("Business Registration Password Hashing", self.test_business_registration_password_hashing),
+            ("Business Registration Token Validity", self.test_business_registration_token_validity),
+        ]
+        
+        print(f"📋 Running {len(test_sequence)} city field validation tests...\n")
+        
+        for test_name, test_func in test_sequence:
+            print(f"\n{'='*60}")
+            print(f"🧪 RUNNING: {test_name}")
+            print(f"{'='*60}")
+            
+            try:
+                test_func()
+            except Exception as e:
+                print(f"❌ Test {test_name} failed with exception: {str(e)}")
+                self.log_test(test_name, False, f"Exception: {str(e)}")
+            
+            print(f"\n✅ Completed: {test_name}")
+        
+        return self.generate_city_field_test_summary()
+
+    def generate_city_field_test_summary(self):
+        """Generate summary of city field validation test results"""
+        print("\n" + "="*80)
+        print("🏙️  CITY FIELD VALIDATION TEST SUMMARY")
+        print("="*80)
+        
+        # Filter results for city field related tests
+        city_tests = [result for result in self.test_results if 
+                     'city' in result['test'].lower() or 
+                     'sample data' in result['test'].lower() or
+                     'business registration' in result['test'].lower()]
+        
+        passed_city_tests = [test for test in city_tests if test['success']]
+        failed_city_tests = [test for test in city_tests if not test['success']]
+        
+        print(f"📊 OVERALL RESULTS:")
+        print(f"   Total Tests Run: {len(city_tests)}")
+        print(f"   Tests Passed: {len(passed_city_tests)}")
+        print(f"   Tests Failed: {len(failed_city_tests)}")
+        print(f"   Success Rate: {(len(passed_city_tests)/len(city_tests)*100):.1f}%")
+        
+        if passed_city_tests:
+            print(f"\n✅ PASSED TESTS:")
+            for test in passed_city_tests:
+                print(f"   ✅ {test['test']}")
+        
+        if failed_city_tests:
+            print(f"\n❌ FAILED TESTS:")
+            for test in failed_city_tests:
+                print(f"   ❌ {test['test']}: {test['details']}")
+        
+        print(f"\n🎯 CITY FIELD SPECIFIC RESULTS:")
+        city_specific_tests = [test for test in city_tests if 'city' in test['test'].lower()]
+        if city_specific_tests:
+            city_passed = [test for test in city_specific_tests if test['success']]
+            print(f"   City Field Tests: {len(city_passed)}/{len(city_specific_tests)} passed")
+            
+            if len(city_passed) == len(city_specific_tests):
+                print(f"   🎉 ALL CITY FIELD VALIDATION TESTS PASSED!")
+                print(f"   ✅ Turkish city names (Istanbul, Ankara, Izmir) working")
+                print(f"   ✅ City field validation and acceptance working")
+                print(f"   ✅ Complete business registration flow with city selection working")
+            else:
+                print(f"   ⚠️  Some city field tests failed - see details above")
+        
+        # Check if sample data test passed
+        sample_test = next((test for test in city_tests if 'sample data' in test['test'].lower()), None)
+        if sample_test:
+            if sample_test['success']:
+                print(f"   ✅ Sample business registration from request working perfectly")
+            else:
+                print(f"   ❌ Sample business registration from request failed")
+        
+        print("="*80)
+        
+        return len(passed_city_tests) == len(city_tests)
         """Run all backend tests for DeliverTR MVP Core Business Flow"""
         print("🚀 Starting DeliverTR Backend API Tests - Core Business Flow")
         print("=" * 70)
