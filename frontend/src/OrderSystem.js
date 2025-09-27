@@ -383,15 +383,27 @@ export const OrdersList = ({ userType, orders, onStatusUpdate, onOrderSelect }) 
   );
 };
 
-// Courier Nearby Orders Component
+// Courier Nearby Orders Component (City-wide with Notifications)
 export const NearbyOrdersForCourier = () => {
   const [nearbyOrders, setNearbyOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [courierLocation, setCourierLocation] = useState(null);
+  const [lastNotificationTime, setLastNotificationTime] = useState(0);
 
   useEffect(() => {
     fetchNearbyOrders();
-    const interval = setInterval(fetchNearbyOrders, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
+    startLocationTracking();
+    
+    // Fetch orders every 30 seconds
+    const ordersInterval = setInterval(fetchNearbyOrders, 30000);
+    
+    // Update location every 3 minutes 
+    const locationInterval = setInterval(updateLocation, 180000); // 3 minutes = 180000ms
+    
+    return () => {
+      clearInterval(ordersInterval);
+      clearInterval(locationInterval);
+    };
   }, []);
 
   const fetchNearbyOrders = async () => {
@@ -402,22 +414,156 @@ export const NearbyOrdersForCourier = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      setNearbyOrders(response.data || []);
+      
+      const orders = response.data || [];
+      setNearbyOrders(orders);
+      
+      // Check for very close orders and send notifications
+      if (courierLocation && orders.length > 0) {
+        checkForCloseOrders(orders);
+      }
+      
     } catch (error) {
-      console.error('Yakındaki siparişler alınamadı:', error);
+      console.error('Siparişler alınamadı:', error);
       setNearbyOrders([]);
     }
     setLoading(false);
   };
 
+  const startLocationTracking = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setCourierLocation(location);
+        },
+        (error) => console.error('Konum alınamadı:', error),
+        { enableHighAccuracy: true }
+      );
+    }
+  };
+
+  const updateLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setCourierLocation(newLocation);
+          
+          // Recheck for close orders with new location
+          if (nearbyOrders.length > 0) {
+            checkForCloseOrders(nearbyOrders);
+          }
+        },
+        (error) => console.error('Konum güncellenemedi:', error),
+        { enableHighAccuracy: true }
+      );
+    }
+  };
+
+  // Calculate distance using Haversine formula
+  const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Check for orders within 1km and send audio notification
+  const checkForCloseOrders = (orders) => {
+    if (!courierLocation) return;
+    
+    const now = Date.now();
+    // Don't send notifications more than once per 5 minutes
+    if (now - lastNotificationTime < 300000) return;
+
+    const closeOrders = orders.filter(order => {
+      const pickupLat = order.pickup_address?.lat || 41.0082;
+      const pickupLng = order.pickup_address?.lng || 28.9784;
+      const distance = calculateDistance(
+        courierLocation.lat, courierLocation.lng,
+        pickupLat, pickupLng
+      );
+      return distance <= 1; // Within 1km
+    });
+
+    if (closeOrders.length > 0) {
+      sendAudioNotification(closeOrders);
+      setLastNotificationTime(now);
+    }
+  };
+
+  // Send audio notification for close orders
+  const sendAudioNotification = (closeOrders) => {
+    // Browser notification
+    if (Notification.permission === 'granted') {
+      const orderCount = closeOrders.length;
+      const totalValue = closeOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+      
+      new Notification('🚚 Yakında Sipariş!', {
+        body: `${orderCount} adet sipariş 1km yakınınızda! Toplam: ₺${totalValue.toFixed(2)}`,
+        icon: '/favicon.ico',
+        tag: 'nearby-order'
+      });
+    }
+
+    // Audio notification
+    try {
+      const audio = new Audio();
+      // Create beep sound using Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // 800Hz beep
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+      
+      console.log('🔊 Ses bildirimi gönderildi!');
+    } catch (error) {
+      console.error('Ses bildirimi gönderilemedi:', error);
+    }
+
+    // Visual toast notification
+    toast.success(`🚚 ${closeOrders.length} adet sipariş yakınınızda!`);
+  };
+
+  // Request notification permission on component mount
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
   const acceptOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem('delivertr_token');
+      const token = localStorage.getItem('delivertr_access_token'); // Fixed token key
       await axios.post(`${API}/orders/${orderId}/accept`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
       toast.success('Sipariş kabul edildi!');
+      fetchNearbyOrders(); // Refresh list
+    } catch (error) {
+      toast.error('Sipariş kabul edilemedi');
+    }
+  };
       fetchNearbyOrders(); // Refresh list
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Sipariş kabul edilemedi');
