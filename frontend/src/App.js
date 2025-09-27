@@ -8,6 +8,7 @@ import { CreatePackageOrder, PackageOrderHistory } from "./PackageOrder";
 import CourierBalance from "./CourierBalance";
 import FileUpload from "./FileUpload";
 import LeafletMap from "./LeafletMap";
+import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
 
 // Components
 import { Button } from "./components/ui/button";
