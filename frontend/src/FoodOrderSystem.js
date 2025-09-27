@@ -81,6 +81,12 @@ const RestaurantCard = ({ restaurant, onClick, userLocation }) => {
               <span className="mr-1">💰</span>
               Min. ₺{restaurant.min_order}
             </span>
+            {restaurant.distance && userLocation && (
+              <span className="flex items-center text-blue-600 font-semibold">
+                <span className="mr-1">📍</span>
+                {restaurant.distance.toFixed(1)} km
+              </span>
+            )}
           </div>
         </div>
       </CardContent>
