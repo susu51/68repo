@@ -848,7 +848,7 @@ async def get_couriers_for_kyc(current_user: dict = Depends(get_admin_user)):
 async def update_courier_kyc_status(
     courier_id: str, 
     kyc_status: str,  # approved, rejected, pending
-    notes: Optional[str] = None,
+    request: Request,
     current_user: dict = Depends(get_admin_user)
 ):
     """Update courier KYC status (Admin only)"""
@@ -866,6 +866,14 @@ async def update_courier_kyc_status(
             detail="Courier not found"
         )
     
+    # Get notes from request body if available
+    notes = None
+    try:
+        body = await request.json()
+        notes = body.get("notes", "")
+    except:
+        pass
+    
     update_data = {
         "kyc_status": kyc_status,
         "kyc_reviewed_at": datetime.now(timezone.utc),
@@ -873,8 +881,8 @@ async def update_courier_kyc_status(
         "updated_at": datetime.now(timezone.utc)
     }
     
-    if notes:
-        update_data["kyc_notes"] = notes
+    if notes and notes.strip():
+        update_data["kyc_notes"] = notes.strip()
     
     await db.users.update_one(
         {"id": courier_id},
