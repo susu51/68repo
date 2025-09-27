@@ -2179,34 +2179,52 @@ const CustomerDashboard = ({ user }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Mobile-Responsive Header */}
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold">
+              <h1 className="text-sm sm:text-xl font-semibold">
                 Merhaba, {user.first_name || 'Müşteri'}!
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline">
-                🛒 Sepet ({cart.length})
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Badge variant="outline" className="text-xs">
+                🛒 <span className="hidden sm:inline">Sepet </span>({cart.length})
               </Badge>
-              <Badge variant="outline">Müşteri</Badge>
-              <Button onClick={logout} variant="outline">Çıkış</Button>
+              <Badge variant="outline" className="text-xs">
+                <span className="hidden sm:inline">Müşteri</span>
+                <span className="sm:hidden">👤</span>
+              </Badge>
+              <Button onClick={logout} variant="outline" size="sm">
+                <span className="hidden sm:inline">Çıkış</span>
+                <span className="sm:hidden">🚪</span>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="products">Ürünler</TabsTrigger>
-            <TabsTrigger value="cart">Sepet ({cart.length})</TabsTrigger>
-            <TabsTrigger value="orders">Siparişlerim</TabsTrigger>
-            <TabsTrigger value="map">Harita</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 text-xs sm:text-sm">
+            <TabsTrigger value="products" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Ürünler</span>
+              <span className="sm:hidden">🍽️</span>
+            </TabsTrigger>
+            <TabsTrigger value="cart" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Sepet ({cart.length})</span>
+              <span className="sm:hidden">🛒 ({cart.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Siparişlerim</span>
+              <span className="sm:hidden">📦</span>
+            </TabsTrigger>
+            <TabsTrigger value="map" className="px-1 sm:px-3">
+              <span className="hidden sm:inline">Harita</span>
+              <span className="sm:hidden">🗺️</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Products Tab */}
