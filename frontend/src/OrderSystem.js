@@ -201,9 +201,11 @@ export const CreateOrderForm = ({ businessId, onOrderCreated, onCancel }) => {
           <div>
             <Label className="text-base font-semibold">Teslimat Adresi</Label>
             <div className="mt-2">
-              <LocationPicker
-                onLocationSelect={setDeliveryLocation}
-                placeholder="Teslimat adresini seçin"
+              <Textarea
+                value={deliveryLocation}
+                onChange={(e) => setDeliveryLocation(e.target.value)}
+                placeholder="Teslimat adresini tam olarak yazın"
+                rows="3"
               />
             </div>
           </div>
