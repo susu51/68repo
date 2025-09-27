@@ -827,6 +827,62 @@ async def get_all_orders(current_user: dict = Depends(get_admin_user)):
                 order["delivered_at"] = order["delivered_at"].isoformat()
     
     return orders
+
+# KYC Management Endpoints
+@api_router.get("/admin/couriers/kyc")
+async def get_couriers_for_kyc(current_user: dict = Depends(get_admin_user)):
+    """Get all couriers with their KYC documents for approval"""
+    couriers = await db.users.find({"role": "courier"}).to_list(length=None)
+    
+    # Convert ObjectId and prepare KYC data
+    for courier in couriers:
+        courier["id"] = str(courier["_id"])
+        del courier["_id"]
+        if "password" in courier:
+            del courier["password"]
+        courier["created_at"] = courier["created_at"].isoformat()
+    
+    return couriers
+
+@api_router.patch("/admin/couriers/{courier_id}/kyc")
+async def update_courier_kyc_status(
+    courier_id: str, 
+    kyc_status: str,  # approved, rejected, pending
+    notes: Optional[str] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update courier KYC status (Admin only)"""
+    if kyc_status not in ["approved", "rejected", "pending"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid KYC status"
+        )
+    
+    # Check if courier exists
+    courier = await db.users.find_one({"id": courier_id, "role": "courier"})
+    if not courier:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Courier not found"
+        )
+    
+    update_data = {
+        "kyc_status": kyc_status,
+        "kyc_reviewed_at": datetime.now(timezone.utc),
+        "kyc_reviewed_by": current_user["id"],
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    if notes:
+        update_data["kyc_notes"] = notes
+    
+    await db.users.update_one(
+        {"id": courier_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True, "message": f"KYC status updated to {kyc_status}"}
+
     INACTIVE = "inactive"
     BANNED = "banned"
 
