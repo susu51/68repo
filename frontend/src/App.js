@@ -1852,14 +1852,33 @@ const CourierDashboard = ({ user }) => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base sm:text-lg">Harita</CardTitle>
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                  🗺️ Kurye Haritası
+                  {courierLocation && (
+                    <Badge variant="outline" className="bg-green-50 border-green-200 text-green-800 text-xs">
+                      📍 Konum Aktif
+                    </Badge>
+                  )}
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Canlı konumunuz ve yakındaki siparişler
+                  {selectedOrder && (
+                    <span className="block text-blue-600 mt-1">
+                      🧭 {selectedOrder.business_name} için yol tarifi aktif
+                    </span>
+                  )}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <LeafletMap
-                  center={[39.925533, 32.866287]}
-                  zoom={12}
-                  height="300px"
-                  markers={[]}
+                  center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [41.0082, 28.9784]}
+                  zoom={courierLocation ? 14 : 12}
+                  height="400px"
+                  markers={getMapMarkers()}
+                  showLocationButton={true}
+                  courierMode={true}
+                  onLocationUpdate={handleLocationUpdate}
+                  routePolyline={routePolyline}
                 />
               </CardContent>
             </Card>
