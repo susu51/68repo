@@ -9,7 +9,6 @@ import { Label } from './components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
 import { Checkbox } from './components/ui/checkbox';
 import { toast } from 'sonner';
-import { LocationPicker } from './MapComponent';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
