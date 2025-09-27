@@ -491,28 +491,69 @@ export const ProfessionalFoodOrderSystem = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">🍽️ DeliverTR Yemek</h1>
           <p className="text-gray-600">En lezzetli yemekler kapınızda!</p>
           
-          {/* Location Status */}
-          {userLocation && (
-            <div className="mt-3 inline-flex items-center space-x-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
-              <span className="text-green-600">📍</span>
-              <span className="text-sm text-green-700">Konumunuza göre sıralandı</span>
-            </div>
-          )}
+          {/* Sort Options */}
+          <div className="mt-6 flex justify-center space-x-4">
+            <Button
+              onClick={() => handleSortChange('nearest')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                sortType === 'nearest'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              disabled={!userLocation}
+            >
+              📍 En Yakın Konum
+            </Button>
+            <Button
+              onClick={() => handleSortChange('citywide')}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                sortType === 'citywide'
+                  ? 'bg-orange-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              🏙️ Şehir Geneli
+            </Button>
+          </div>
           
-          {locationError && (
-            <div className="mt-3 inline-flex items-center space-x-2 bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
-              <span className="text-yellow-600">⚠️</span>
-              <span className="text-sm text-yellow-700">{locationError}</span>
-              <Button 
-                onClick={getUserLocation}
-                size="sm"
-                variant="outline"
-                className="ml-2 text-xs"
-              >
-                🔄 Tekrar Dene
-              </Button>
-            </div>
-          )}
+          {/* Location Status */}
+          <div className="mt-4 space-y-2">
+            {userLocation && sortType === 'nearest' && (
+              <div className="inline-flex items-center space-x-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                <span className="text-green-600">📍</span>
+                <span className="text-sm text-green-700">Konumunuza göre sıralandı ({restaurants.length} restoran)</span>
+              </div>
+            )}
+            
+            {sortType === 'citywide' && (
+              <div className="inline-flex items-center space-x-2 bg-orange-50 px-4 py-2 rounded-full border border-orange-200">
+                <span className="text-orange-600">⭐</span>
+                <span className="text-sm text-orange-700">En yüksek puanlı restoranlar ({restaurants.length} restoran)</span>
+              </div>
+            )}
+            
+            {locationError && !userLocation && (
+              <div className="inline-flex items-center space-x-2 bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
+                <span className="text-yellow-600">⚠️</span>
+                <span className="text-sm text-yellow-700">{locationError}</span>
+                <Button 
+                  onClick={getUserLocation}
+                  size="sm"
+                  variant="outline"
+                  className="ml-2 text-xs"
+                >
+                  🔄 Tekrar Dene
+                </Button>
+              </div>
+            )}
+            
+            {!userLocation && !locationError && (
+              <div className="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
+                <span className="text-blue-600">🔄</span>
+                <span className="text-sm text-blue-700">Konum alınıyor... En yakın restoranları gösterebilmek için</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
