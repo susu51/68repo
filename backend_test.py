@@ -450,12 +450,12 @@ class DeliverTRAPITester:
         
         all_success = True
         for status in statuses:
+            # Send status as query parameter
             success, response = self.run_test(
                 f"Order Status Update - {status.upper()}",
                 "PATCH",
-                f"orders/{order_id}/status",
+                f"orders/{order_id}/status?new_status={status}",
                 200,
-                data={"new_status": status},
                 token=self.courier_token
             )
             
