@@ -434,19 +434,25 @@ export const NearbyOrdersForCourier = () => {
         }
       });
       
-      const orders = response.data || [];
-      setNearbyOrders(orders);
-      
-      // Check for very close orders and send notifications
-      if (courierLocation && orders.length > 0) {
-        checkForCloseOrders(orders);
+      if (isMounted) {
+        const orders = response.data || [];
+        setNearbyOrders(orders);
+        
+        // Check for very close orders and send notifications
+        if (courierLocation && orders.length > 0) {
+          checkForCloseOrders(orders);
+        }
       }
       
     } catch (error) {
       console.error('Siparişler alınamadı:', error);
-      setNearbyOrders([]);
+      if (isMounted) {
+        setNearbyOrders([]);
+      }
     }
-    setLoading(false);
+    if (isMounted) {
+      setLoading(false);
+    }
   };
 
   const startLocationTracking = () => {
