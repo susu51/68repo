@@ -47,8 +47,8 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (authData) => {
-    localStorage.setItem('delivertr_access_token', authData.access_token);
-    localStorage.setItem('delivertr_user', JSON.stringify(authData.user_data));
+    localStorage.setItem('kuryecini_access_token', authData.access_token);
+    localStorage.setItem('kuryecini_user', JSON.stringify(authData.user_data));
     setUser(authData.user_data);
     
     // Set axios default authorization header
