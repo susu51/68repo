@@ -1276,7 +1276,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def get_current_user_v2(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -1291,7 +1291,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         if user.get("status") == "suspended":
             raise HTTPException(status_code=403, detail="Hesabınız askıya alınmış")
         
-        return user_id
+        return user  # Return full user object, not just ID
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Geçersiz token")
 
