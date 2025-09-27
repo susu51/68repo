@@ -561,11 +561,6 @@ export const NearbyOrdersForCourier = () => {
       toast.success('Sipariş kabul edildi!');
       fetchNearbyOrders(); // Refresh list
     } catch (error) {
-      toast.error('Sipariş kabul edilemedi');
-    }
-  };
-      fetchNearbyOrders(); // Refresh list
-    } catch (error) {
       toast.error(error.response?.data?.detail || 'Sipariş kabul edilemedi');
     }
   };
