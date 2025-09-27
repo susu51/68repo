@@ -586,6 +586,337 @@ class DeliverTRAPITester:
         
         return success
 
+    # ===== KYC MANAGEMENT SYSTEM TESTS =====
+    
+    def test_kyc_get_couriers(self):
+        """Test GET /admin/couriers/kyc - Get all couriers with KYC data"""
+        if not self.admin_token:
+            self.log_test("KYC Get Couriers", False, "No admin token available")
+            return False
+        
+        success, response = self.run_test(
+            "KYC Get Couriers",
+            "GET",
+            "admin/couriers/kyc",
+            200,
+            token=self.admin_token
+        )
+        
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} couriers for KYC review")
+            # Check if our test courier is in the list
+            test_courier_found = False
+            for courier in response:
+                if courier.get('email') == self.courier_email:
+                    test_courier_found = True
+                    print(f"   Test courier found with KYC status: {courier.get('kyc_status', 'unknown')}")
+                    break
+            
+            if not test_courier_found:
+                print(f"   Warning: Test courier {self.courier_email} not found in KYC list")
+        
+        return success
+
+    def test_kyc_approve_courier(self):
+        """Test PATCH /admin/couriers/{courier_id}/kyc - Approve courier KYC"""
+        if not self.admin_token or not self.courier_id:
+            self.log_test("KYC Approve Courier", False, "No admin token or courier ID available")
+            return False
+        
+        # Test approval without notes
+        success, response = self.run_test(
+            "KYC Approve Courier",
+            "PATCH",
+            f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+            200,
+            token=self.admin_token
+        )
+        
+        if success:
+            print(f"   Courier {self.courier_id} KYC approved successfully")
+        
+        return success
+
+    def test_kyc_reject_courier_with_notes(self):
+        """Test PATCH /admin/couriers/{courier_id}/kyc - Reject courier KYC with notes"""
+        if not self.admin_token or not self.courier_id:
+            self.log_test("KYC Reject Courier with Notes", False, "No admin token or courier ID available")
+            return False
+        
+        # First, let's create another courier for rejection test
+        rejection_courier_email = f"reject_courier_{uuid.uuid4().hex[:8]}@test.com"
+        courier_data = {
+            "email": rejection_courier_email,
+            "password": self.test_password,
+            "first_name": "Rejected",
+            "last_name": "Courier",
+            "iban": "TR330006100519786457841327",
+            "vehicle_type": "bisiklet",
+            "vehicle_model": "Mountain Bike",
+            "license_class": "B",
+            "license_number": "34XYZ789",
+            "city": "Ankara"
+        }
+        
+        reg_success, reg_response = self.run_test(
+            "Register Courier for Rejection Test",
+            "POST",
+            "register/courier",
+            200,
+            data=courier_data
+        )
+        
+        if not reg_success:
+            self.log_test("KYC Reject Courier with Notes", False, "Failed to create test courier for rejection")
+            return False
+        
+        reject_courier_id = reg_response.get('user_data', {}).get('id')
+        if not reject_courier_id:
+            self.log_test("KYC Reject Courier with Notes", False, "No courier ID from registration")
+            return False
+        
+        # Test rejection with notes in request body
+        rejection_notes = "Belge kalitesi yetersiz, ehliyet fotoğrafı bulanık. Lütfen yeniden yükleyin."
+        success, response = self.run_test(
+            "KYC Reject Courier with Notes",
+            "PATCH",
+            f"admin/couriers/{reject_courier_id}/kyc?kyc_status=rejected",
+            200,
+            data={"notes": rejection_notes},
+            token=self.admin_token
+        )
+        
+        if success:
+            print(f"   Courier {reject_courier_id} KYC rejected with notes")
+        
+        return success
+
+    def test_kyc_status_update_flow(self):
+        """Test complete KYC status update flow: pending → approved → rejected"""
+        if not self.admin_token:
+            self.log_test("KYC Status Update Flow", False, "No admin token available")
+            return False
+        
+        # Create a new courier for this test
+        flow_courier_email = f"flow_courier_{uuid.uuid4().hex[:8]}@test.com"
+        courier_data = {
+            "email": flow_courier_email,
+            "password": self.test_password,
+            "first_name": "Flow",
+            "last_name": "Test",
+            "iban": "TR330006100519786457841328",
+            "vehicle_type": "araba",
+            "vehicle_model": "Toyota Corolla",
+            "license_class": "B",
+            "license_number": "06ABC456",
+            "city": "Ankara"
+        }
+        
+        reg_success, reg_response = self.run_test(
+            "Register Courier for Flow Test",
+            "POST",
+            "register/courier",
+            200,
+            data=courier_data
+        )
+        
+        if not reg_success:
+            self.log_test("KYC Status Update Flow", False, "Failed to create test courier")
+            return False
+        
+        flow_courier_id = reg_response.get('user_data', {}).get('id')
+        if not flow_courier_id:
+            self.log_test("KYC Status Update Flow", False, "No courier ID from registration")
+            return False
+        
+        # Test flow: pending → approved → rejected
+        statuses = [
+            ("approved", "Belgeler onaylandı"),
+            ("rejected", "Yeniden değerlendirme sonucu red"),
+            ("pending", "Tekrar inceleme için beklemede")
+        ]
+        
+        all_success = True
+        for kyc_status, notes in statuses:
+            success, response = self.run_test(
+                f"KYC Status Update - {kyc_status.upper()}",
+                "PATCH",
+                f"admin/couriers/{flow_courier_id}/kyc?kyc_status={kyc_status}",
+                200,
+                data={"notes": notes},
+                token=self.admin_token
+            )
+            
+            if not success:
+                all_success = False
+            else:
+                print(f"   KYC status updated to: {kyc_status}")
+        
+        return all_success
+
+    def test_kyc_admin_authentication_required(self):
+        """Test that KYC endpoints require admin authentication"""
+        all_success = True
+        
+        # Test without token
+        success, _ = self.run_test(
+            "KYC Get Couriers - No Auth (Should Fail)",
+            "GET",
+            "admin/couriers/kyc",
+            401
+        )
+        if not success:
+            all_success = False
+        
+        # Test with business token (should fail)
+        if self.business_token:
+            success, _ = self.run_test(
+                "KYC Get Couriers - Business Token (Should Fail)",
+                "GET",
+                "admin/couriers/kyc",
+                403,
+                token=self.business_token
+            )
+            if not success:
+                all_success = False
+        
+        # Test with customer token (should fail)
+        if self.customer_token:
+            success, _ = self.run_test(
+                "KYC Get Couriers - Customer Token (Should Fail)",
+                "GET",
+                "admin/couriers/kyc",
+                403,
+                token=self.customer_token
+            )
+            if not success:
+                all_success = False
+        
+        return all_success
+
+    def test_kyc_error_scenarios(self):
+        """Test KYC error scenarios"""
+        if not self.admin_token:
+            self.log_test("KYC Error Scenarios", False, "No admin token available")
+            return False
+        
+        all_success = True
+        
+        # Test with invalid courier ID
+        success, _ = self.run_test(
+            "KYC Update - Invalid Courier ID",
+            "PATCH",
+            "admin/couriers/invalid-courier-id/kyc?kyc_status=approved",
+            404,
+            token=self.admin_token
+        )
+        if not success:
+            all_success = False
+        
+        # Test with invalid KYC status
+        if self.courier_id:
+            success, _ = self.run_test(
+                "KYC Update - Invalid Status",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=invalid_status",
+                400,
+                token=self.admin_token
+            )
+            if not success:
+                all_success = False
+        
+        # Test with malformed request body
+        if self.courier_id:
+            success, _ = self.run_test(
+                "KYC Update - Malformed Body",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,  # Should still work, notes are optional
+                data={"invalid_field": "test"},
+                token=self.admin_token
+            )
+            if not success:
+                all_success = False
+        
+        return all_success
+
+    def test_kyc_notes_handling(self):
+        """Test KYC notes field handling"""
+        if not self.admin_token:
+            self.log_test("KYC Notes Handling", False, "No admin token available")
+            return False
+        
+        # Create a courier for notes testing
+        notes_courier_email = f"notes_courier_{uuid.uuid4().hex[:8]}@test.com"
+        courier_data = {
+            "email": notes_courier_email,
+            "password": self.test_password,
+            "first_name": "Notes",
+            "last_name": "Test",
+            "iban": "TR330006100519786457841329",
+            "vehicle_type": "elektrikli_motor",
+            "vehicle_model": "Electric Scooter",
+            "license_class": "A1",
+            "license_number": "34ELE123",
+            "city": "İzmir"
+        }
+        
+        reg_success, reg_response = self.run_test(
+            "Register Courier for Notes Test",
+            "POST",
+            "register/courier",
+            200,
+            data=courier_data
+        )
+        
+        if not reg_success:
+            self.log_test("KYC Notes Handling", False, "Failed to create test courier")
+            return False
+        
+        notes_courier_id = reg_response.get('user_data', {}).get('id')
+        if not notes_courier_id:
+            self.log_test("KYC Notes Handling", False, "No courier ID from registration")
+            return False
+        
+        all_success = True
+        
+        # Test with notes
+        success, _ = self.run_test(
+            "KYC Update - With Notes",
+            "PATCH",
+            f"admin/couriers/{notes_courier_id}/kyc?kyc_status=rejected",
+            200,
+            data={"notes": "Ehliyet süresi geçmiş, güncel ehliyet gerekli"},
+            token=self.admin_token
+        )
+        if not success:
+            all_success = False
+        
+        # Test without notes (approval)
+        success, _ = self.run_test(
+            "KYC Update - Without Notes",
+            "PATCH",
+            f"admin/couriers/{notes_courier_id}/kyc?kyc_status=approved",
+            200,
+            token=self.admin_token
+        )
+        if not success:
+            all_success = False
+        
+        # Test with empty notes
+        success, _ = self.run_test(
+            "KYC Update - Empty Notes",
+            "PATCH",
+            f"admin/couriers/{notes_courier_id}/kyc?kyc_status=pending",
+            200,
+            data={"notes": ""},
+            token=self.admin_token
+        )
+        if not success:
+            all_success = False
+        
+        return all_success
+
     def run_all_tests(self):
         """Run all backend tests for DeliverTR MVP Core Business Flow"""
         print("🚀 Starting DeliverTR Backend API Tests - Core Business Flow")
