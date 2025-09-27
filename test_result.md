@@ -107,39 +107,84 @@ user_problem_statement: "Implement DeliverTR MVP - Turkish delivery platform wit
 backend:
   - task: "Email/Password Authentication System"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         -working: "NA"
         -agent: "main"
         -comment: "Reverted to email/password authentication with JWT tokens. Added login, registration endpoints for courier/business/customer roles with detailed courier fields (license info, vehicle details, file uploads)"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED - Email/password authentication working correctly. POST /api/auth/login validates credentials, generates JWT tokens with proper structure (bearer token, user_type, user_data). Password hashing with bcrypt working. Invalid credentials return 401. JWT token validation working for protected routes. Fixed database unique index issue (removed phone index, added email unique index)."
 
   - task: "Detailed Courier Registration"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         -working: "NA"
         -agent: "main"
         -comment: "Added comprehensive courier registration with ehliyet sınıfı, ehliyet numarası, araç tipi, araç modeli, license_photo_url, vehicle_photo_url, profile_photo_url fields"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED - Detailed courier registration working perfectly. POST /api/register/courier accepts all required fields: email, password, first_name, last_name, iban, vehicle_type, vehicle_model, license_class (ehliyet_sınıfı), license_number (ehliyet_numarası), city, plus optional photo URLs. Returns JWT token and complete user data. Validation working for required fields and email format. Duplicate email detection working."
 
   - task: "File Upload System"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         -working: "NA"
         -agent: "main"
         -comment: "File upload endpoint for images/documents with validation (max 10MB, allowed types: image/*, pdf)"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED - File upload system working correctly. POST /api/upload validates file types (image/*, pdf), file size (max 10MB), generates unique filenames with UUIDs, returns file_url, filename, original_filename, content_type, and size. Invalid file types return 400 error. Files stored in /uploads directory and accessible via /uploads/{filename} URLs."
+
+  - task: "Business Registration"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED - Business registration working correctly. POST /api/register/business accepts email, password, business_name, tax_number, address, city, business_category, description. Returns JWT token and business user data. All validation working properly."
+
+  - task: "Customer Registration"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED - Customer registration working correctly. POST /api/register/customer accepts email, password, first_name, last_name, city. Returns JWT token and customer user data. All validation working properly."
+
+  - task: "JWT Token Management"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED - JWT token management working perfectly. Tokens generated with HS256 algorithm, 15-minute expiry. GET /api/me endpoint validates tokens and returns user profile without password. Invalid/malformed tokens return 401. Token structure includes sub (email), exp (expiry). Authorization header format: Bearer {token}."
 
 frontend:
   - task: "Email Authentication UI"
