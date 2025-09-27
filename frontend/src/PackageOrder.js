@@ -284,7 +284,7 @@ export const CreatePackageOrder = ({ onOrderCreated, onCancel }) => {
     e.preventDefault();
     
     if (!pickupAddress || !deliveryAddress) {
-      toast.error('Alış ve teslim adreslerini seçiniz');
+      toast.error('Alış ve teslim adreslerini giriniz');
       return;
     }
 
