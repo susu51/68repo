@@ -2360,188 +2360,194 @@ const CustomerDashboard = ({ user }) => {
           )}
 
           {/* Cart Tab */}
-          <TabsContent value="cart" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Cart Items */}
-              <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Sepetim ({cart.length} ürün)</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {cart.length === 0 ? (
-                      <p className="text-gray-500 text-center py-8">Sepetiniz boş</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {cart.map((item) => (
-                          <div key={item.product_id} className="flex items-center justify-between p-4 border rounded-lg">
-                            <div className="flex-1">
-                              <h4 className="font-medium">{item.product_name}</h4>
-                              <p className="text-sm text-gray-600">₺{item.product_price} x {item.quantity}</p>
+          {activeTab === 'cart' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Cart Items */}
+                <div className="lg:col-span-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Sepetim ({cart.length} ürün)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {cart.length === 0 ? (
+                        <p className="text-gray-500 text-center py-8">Sepetiniz boş</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {cart.map((item) => (
+                            <div key={item.product_id} className="flex items-center justify-between p-4 border rounded-lg">
+                              <div className="flex-1">
+                                <h4 className="font-medium">{item.product_name}</h4>
+                                <p className="text-sm text-gray-600">₺{item.product_price} x {item.quantity}</p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => updateCartQuantity(item.product_id, item.quantity - 1)}
+                                >
+                                  -
+                                </Button>
+                                <span className="w-8 text-center">{item.quantity}</span>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => updateCartQuantity(item.product_id, item.quantity + 1)}
+                                >
+                                  +
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => removeFromCart(item.product_id)}
+                                >
+                                  🗑️
+                                </Button>
+                              </div>
+                              <div className="text-right ml-4">
+                                <p className="font-bold">₺{item.subtotal.toFixed(2)}</p>
+                              </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateCartQuantity(item.product_id, item.quantity - 1)}
-                              >
-                                -
-                              </Button>
-                              <span className="w-8 text-center">{item.quantity}</span>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateCartQuantity(item.product_id, item.quantity + 1)}
-                              >
-                                +
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => removeFromCart(item.product_id)}
-                              >
-                                🗑️
-                              </Button>
-                            </div>
-                            <div className="text-right ml-4">
-                              <p className="font-bold">₺{item.subtotal.toFixed(2)}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
 
-              {/* Order Summary & Checkout */}
-              <div>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Sipariş Özeti</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handleOrderSubmit} className="space-y-4">
-                      <div>
-                        <Label>Teslimat Adresi *</Label>
-                        <Textarea
-                          value={orderForm.delivery_address}
-                          onChange={(e) => setOrderForm({...orderForm, delivery_address: e.target.value})}
-                          placeholder="Tam adresinizi yazın..."
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label>Sipariş Notu (Opsiyonel)</Label>
-                        <Textarea
-                          value={orderForm.notes}
-                          onChange={(e) => setOrderForm({...orderForm, notes: e.target.value})}
-                          placeholder="Özel istekleriniz..."
-                        />
-                      </div>
-                      
-                      <div className="border-t pt-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span>Ara Toplam:</span>
-                          <span>₺{getCartTotal().toFixed(2)}</span>
+                {/* Order Summary & Checkout */}
+                <div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Sipariş Özeti</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <form onSubmit={handleOrderSubmit} className="space-y-4">
+                        <div>
+                          <Label>Teslimat Adresi *</Label>
+                          <Textarea
+                            value={orderForm.delivery_address}
+                            onChange={(e) => setOrderForm({...orderForm, delivery_address: e.target.value})}
+                            placeholder="Tam adresinizi yazın..."
+                            required
+                          />
                         </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span>Teslimat:</span>
-                          <span>Ücretsiz</span>
+                        
+                        <div>
+                          <Label>Sipariş Notu (Opsiyonel)</Label>
+                          <Textarea
+                            value={orderForm.notes}
+                            onChange={(e) => setOrderForm({...orderForm, notes: e.target.value})}
+                            placeholder="Özel istekleriniz..."
+                          />
                         </div>
-                        <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
-                          <span>Toplam:</span>
-                          <span>₺{getCartTotal().toFixed(2)}</span>
+                        
+                        <div className="border-t pt-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <span>Ara Toplam:</span>
+                            <span>₺{getCartTotal().toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span>Teslimat:</span>
+                            <span>Ücretsiz</span>
+                          </div>
+                          <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
+                            <span>Toplam:</span>
+                            <span>₺{getCartTotal().toFixed(2)}</span>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <Button 
-                        type="submit" 
-                        disabled={loading || cart.length === 0}
-                        className="w-full bg-green-600 hover:bg-green-700"
-                      >
-                        {loading ? 'Sipariş Oluşturuluyor...' : 'Siparişi Tamamla'}
-                      </Button>
-                    </form>
-                  </CardContent>
-                </Card>
+                        
+                        <Button 
+                          type="submit" 
+                          disabled={loading || cart.length === 0}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                        >
+                          {loading ? 'Sipariş Oluşturuluyor...' : 'Siparişi Tamamla'}
+                        </Button>
+                      </form>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
-          </TabsContent>
+          )}
 
           {/* Orders Tab */}
-          <TabsContent value="orders" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Siparişlerim ({orders.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {orders.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Henüz siparişiniz yok</p>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <Card key={order.id}>
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
-                              <p className="text-sm text-gray-600">{order.business_name}</p>
-                              <p className="text-xs text-gray-500">{order.delivery_address}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-bold text-lg">₺{order.total_amount}</p>
-                              <OrderStatusBadge status={order.status} />
-                            </div>
-                          </div>
-
-                          <div className="mb-3">
-                            <h4 className="font-medium mb-1">Siparişler:</h4>
-                            {order.items.map((item, index) => (
-                              <div key={index} className="text-sm text-gray-600">
-                                {item.quantity}x {item.product_name} - ₺{item.subtotal}
+          {activeTab === 'orders' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Siparişlerim ({orders.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {orders.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">Henüz siparişiniz yok</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {orders.map((order) => (
+                        <Card key={order.id}>
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-3">
+                              <div>
+                                <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
+                                <p className="text-sm text-gray-600">{order.business_name}</p>
+                                <p className="text-xs text-gray-500">{order.delivery_address}</p>
                               </div>
-                            ))}
-                          </div>
+                              <div className="text-right">
+                                <p className="font-bold text-lg">₺{order.total_amount}</p>
+                                <OrderStatusBadge status={order.status} />
+                              </div>
+                            </div>
 
-                          <p className="text-xs text-gray-500">
-                            Sipariş Tarihi: {new Date(order.created_at).toLocaleString('tr-TR')}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                            <div className="mb-3">
+                              <h4 className="font-medium mb-1">Siparişler:</h4>
+                              {order.items.map((item, index) => (
+                                <div key={index} className="text-sm text-gray-600">
+                                  {item.quantity}x {item.product_name} - ₺{item.subtotal}
+                                </div>
+                              ))}
+                            </div>
+
+                            <p className="text-xs text-gray-500">
+                              Sipariş Tarihi: {new Date(order.created_at).toLocaleString('tr-TR')}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Map Tab */}
-          <TabsContent value="map">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sipariş Takip Haritası</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LeafletMap
-                  center={[39.925533, 32.866287]}
-                  zoom={12}
-                  height="500px"
-                  markers={orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
-                    lat: order.delivery_lat,
-                    lng: order.delivery_lng,
-                    type: 'delivery',
-                    popup: true,
-                    title: `Sipariş #${order.id.slice(-8)}`,
-                    description: `Durum: ${order.status}`,
-                    address: order.delivery_address
-                  }))}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          {activeTab === 'map' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sipariş Takip Haritası</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <LeafletMap
+                    center={[39.925533, 32.866287]}
+                    zoom={12}
+                    height="500px"
+                    markers={orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
+                      lat: order.delivery_lat,
+                      lng: order.delivery_lng,
+                      type: 'delivery',
+                      popup: true,
+                      title: `Sipariş #${order.id.slice(-8)}`,
+                      description: `Durum: ${order.status}`,
+                      address: order.delivery_address
+                    }))}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
