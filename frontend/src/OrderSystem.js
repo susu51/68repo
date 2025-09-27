@@ -451,26 +451,35 @@ export const NearbyOrdersForCourier = () => {
 
   const startLocationTracking = () => {
     if (!navigator.geolocation) {
-      setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
-      setLoading(false);
+      if (isMounted) {
+        setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+        setLoading(false);
+      }
       return;
     }
 
-    setLoading(true);
+    if (isMounted) {
+      setLoading(true);
+    }
+    
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        setCourierLocation(location);
-        setLocationError(null);
-        console.log('Konum alındı:', location);
+        if (isMounted) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setCourierLocation(location);
+          setLocationError(null);
+          console.log('Konum alındı:', location);
+        }
       },
       (error) => {
-        console.error('Konum alınamadı:', error);
-        setLocationError('Konum erişimi reddedildi veya kullanılamıyor');
-        setLoading(false);
+        if (isMounted) {
+          console.error('Konum alınamadı:', error);
+          setLocationError('Konum erişimi reddedildi veya kullanılamıyor');
+          setLoading(false);
+        }
       },
       { 
         enableHighAccuracy: true,
