@@ -481,10 +481,13 @@ const AdminDashboard = ({ user }) => {
                                 </div>
                                 <div className="ml-4">
                                   <div className="text-sm font-medium text-gray-900">
-                                    {user.first_name} {user.last_name} {user.business_name}
+                                    {user.first_name && user.last_name ? 
+                                      `${user.first_name} ${user.last_name}` :
+                                      user.business_name || user.email || 'İsimsiz Kullanıcı'
+                                    }
                                   </div>
                                   <div className="text-sm text-gray-500">
-                                    {user.email}
+                                    {user.email || 'E-posta yok'}
                                   </div>
                                 </div>
                               </div>
