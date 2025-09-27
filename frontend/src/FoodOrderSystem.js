@@ -448,6 +448,29 @@ export const ProfessionalFoodOrderSystem = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">🍽️ DeliverTR Yemek</h1>
           <p className="text-gray-600">En lezzetli yemekler kapınızda!</p>
+          
+          {/* Location Status */}
+          {userLocation && (
+            <div className="mt-3 inline-flex items-center space-x-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+              <span className="text-green-600">📍</span>
+              <span className="text-sm text-green-700">Konumunuza göre sıralandı</span>
+            </div>
+          )}
+          
+          {locationError && (
+            <div className="mt-3 inline-flex items-center space-x-2 bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
+              <span className="text-yellow-600">⚠️</span>
+              <span className="text-sm text-yellow-700">{locationError}</span>
+              <Button 
+                onClick={getUserLocation}
+                size="sm"
+                variant="outline"
+                className="ml-2 text-xs"
+              >
+                🔄 Tekrar Dene
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -456,6 +479,7 @@ export const ProfessionalFoodOrderSystem = () => {
               key={restaurant.id}
               restaurant={restaurant}
               onClick={handleRestaurantSelect}
+              userLocation={userLocation}
             />
           ))}
         </div>
