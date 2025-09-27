@@ -802,13 +802,29 @@ async def get_all_orders(current_user: dict = Depends(get_admin_user)):
     for order in orders:
         order["id"] = str(order["_id"])
         del order["_id"]
-        order["created_at"] = order["created_at"].isoformat()
+        # Handle datetime conversion safely
+        if isinstance(order["created_at"], str):
+            pass  # Already converted
+        else:
+            order["created_at"] = order["created_at"].isoformat()
+        
         if order.get("assigned_at"):
-            order["assigned_at"] = order["assigned_at"].isoformat()
+            if isinstance(order["assigned_at"], str):
+                pass  # Already converted
+            else:
+                order["assigned_at"] = order["assigned_at"].isoformat()
+        
         if order.get("picked_up_at"):
-            order["picked_up_at"] = order["picked_up_at"].isoformat()
+            if isinstance(order["picked_up_at"], str):
+                pass  # Already converted
+            else:
+                order["picked_up_at"] = order["picked_up_at"].isoformat()
+        
         if order.get("delivered_at"):
-            order["delivered_at"] = order["delivered_at"].isoformat()
+            if isinstance(order["delivered_at"], str):
+                pass  # Already converted
+            else:
+                order["delivered_at"] = order["delivered_at"].isoformat()
     
     return orders
     INACTIVE = "inactive"
