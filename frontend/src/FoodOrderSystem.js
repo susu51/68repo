@@ -342,7 +342,8 @@ export const ProfessionalFoodOrderSystem = () => {
       const response = await axios.get(`${API}/businesses`);
       const businessData = response.data;
       
-      setRestaurants(businessData);
+      setOriginalRestaurants(businessData); // Store original data
+      sortAndFilterRestaurants(businessData, sortType, userLocation);
       console.log('Restaurants fetched:', businessData);
     } catch (error) {
       console.error('Restoranlar yüklenemedi:', error);
