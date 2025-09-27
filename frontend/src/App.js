@@ -270,44 +270,73 @@ const AdminDashboard = ({ user }) => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${API}/admin/users`);
-      setUsers(response.data);
+      setUsers(response.data || []);
     } catch (error) {
-      toast.error('Kullanıcılar yüklenemedi');
+      console.error('Users fetch error:', error);
+      setUsers([]);
+      if (error.response?.status !== 403) {
+        toast.error('Kullanıcılar yüklenemedi');
+      }
     }
   };
 
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${API}/admin/products`);
-      setProducts(response.data);
+      setProducts(response.data || []);
     } catch (error) {
-      toast.error('Ürünler yüklenemedi');
+      console.error('Products fetch error:', error);
+      setProducts([]);
+      if (error.response?.status !== 403) {
+        toast.error('Ürünler yüklenemedi');
+      }
     }
   };
 
   const fetchOrders = async () => {
     try {
       const response = await axios.get(`${API}/admin/orders`);
-      setOrders(response.data);
+      setOrders(response.data || []);
     } catch (error) {
-      toast.error('Siparişler yüklenemedi');
+      console.error('Orders fetch error:', error);
+      setOrders([]);
+      if (error.response?.status !== 403) {
+        toast.error('Siparişler yüklenemedi');
+      }
     }
   };
 
   const fetchCouriers = async () => {
     try {
       const response = await axios.get(`${API}/admin/couriers/kyc`);
-      setCouriers(response.data);
+      setCouriers(response.data || []);
     } catch (error) {
-      toast.error('Kurye bilgileri yüklenemedi');
+      console.error('Couriers fetch error:', error);
+      setCouriers([]);
+      if (error.response?.status !== 403) {
+        toast.error('Kurye bilgileri yüklenemedi');
+      }
     }
   };
 
   useEffect(() => {
-    fetchUsers();
-    fetchProducts();
-    fetchOrders();
-    fetchCouriers();
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.allSettled([
+          fetchUsers(),
+          fetchProducts(), 
+          fetchOrders(),
+          fetchCouriers()
+        ]);
+      } catch (error) {
+        console.error('Data fetch error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
   const updateOrderStatus = async (orderId, newStatus) => {
