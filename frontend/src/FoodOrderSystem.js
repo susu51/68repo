@@ -311,24 +311,30 @@ export const ProfessionalFoodOrderSystem = () => {
 
   const getUserLocation = () => {
     if (!navigator.geolocation) {
-      setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+      if (isMounted) {
+        setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+      }
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        setUserLocation(location);
-        console.log('Kullanıcı konumu alındı:', location);
+        if (isMounted) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setUserLocation(location);
+          console.log('Kullanıcı konumu alındı:', location);
+        }
       },
       (error) => {
-        console.error('Konum alınamadı:', error);
-        setLocationError('Konum erişimi reddedildi. En yakın restoranları gösteriyoruz.');
-        // Default to Istanbul center if location denied
-        setUserLocation({ lat: 41.0082, lng: 28.9784 });
+        if (isMounted) {
+          console.error('Konum alınamadı:', error);
+          setLocationError('Konum erişimi reddedildi. En yakın restoranları gösteriyoruz.');
+          // Default to Istanbul center if location denied
+          setUserLocation({ lat: 41.0082, lng: 28.9784 });
+        }
       },
       { 
         enableHighAccuracy: true,
