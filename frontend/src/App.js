@@ -2671,63 +2671,6 @@ const CustomerDashboard = ({ user }) => {
               <ProfessionalFoodOrderSystem />
             </div>
           )}
-                                >
-                                  {product.is_available ? '✅ Mevcut' : '❌ Stokta Yok'}
-                                </Badge>
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Product Info */}
-                          <div className="p-5">
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex-1">
-                                <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
-                                  {product.name}
-                                </h3>
-                                <p className="text-sm text-gray-600 line-clamp-2">
-                                  {product.description}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="text-xs text-gray-500">
-                                🏪 {product.business_name}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                ⏱️ {product.preparation_time_minutes} dk
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                                ₺{product.price}
-                              </div>
-                              
-                              <Button 
-                                onClick={() => addToCart(product)}
-                                disabled={!product.is_available}
-                                className={`
-                                  px-6 py-2 rounded-full font-semibold transition-all duration-300
-                                  ${product.is_available
-                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                  }
-                                `}
-                              >
-                                {product.is_available ? '+ Sepet' : 'Stokta Yok'}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Cart Tab */}
           {activeTab === 'cart' && (
