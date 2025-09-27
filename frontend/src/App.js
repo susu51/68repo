@@ -1197,13 +1197,94 @@ const CourierRegistration = ({ onComplete, onBack }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Şehir *</Label>
-              <Input
-                placeholder="İstanbul"
-                value={formData.city}
-                onChange={(e) => setFormData({...formData, city: e.target.value})}
-                required
-                data-testid="courier-city"
-              />
+              <Select onValueChange={(value) => setFormData({...formData, city: value})} required>
+                <SelectTrigger data-testid="courier-city-select">
+                  <SelectValue placeholder="Şehir seçin" />
+                </SelectTrigger>
+                <SelectContent className="max-h-60 overflow-y-auto">
+                  <SelectItem value="Adana">🌾 Adana</SelectItem>
+                  <SelectItem value="Adiyaman">🏔️ Adıyaman</SelectItem>
+                  <SelectItem value="Afyonkarahisar">🌸 Afyonkarahisar</SelectItem>
+                  <SelectItem value="Agri">⛰️ Ağrı</SelectItem>
+                  <SelectItem value="Aksaray">🏛️ Aksaray</SelectItem>
+                  <SelectItem value="Amasya">🍎 Amasya</SelectItem>
+                  <SelectItem value="Ankara">🏛️ Ankara</SelectItem>
+                  <SelectItem value="Antalya">🏖️ Antalya</SelectItem>
+                  <SelectItem value="Ardahan">❄️ Ardahan</SelectItem>
+                  <SelectItem value="Artvin">🌲 Artvin</SelectItem>
+                  <SelectItem value="Aydin">🫒 Aydın</SelectItem>
+                  <SelectItem value="Balikesir">🐟 Balıkesir</SelectItem>
+                  <SelectItem value="Bartin">⚓ Bartın</SelectItem>
+                  <SelectItem value="Batman">🛢️ Batman</SelectItem>
+                  <SelectItem value="Bayburt">🏔️ Bayburt</SelectItem>
+                  <SelectItem value="Bilecik">🏺 Bilecik</SelectItem>
+                  <SelectItem value="Bingol">🏞️ Bingöl</SelectItem>
+                  <SelectItem value="Bitlis">🏔️ Bitlis</SelectItem>
+                  <SelectItem value="Bolu">🌲 Bolu</SelectItem>
+                  <SelectItem value="Burdur">🌊 Burdur</SelectItem>
+                  <SelectItem value="Bursa">🌳 Bursa</SelectItem>
+                  <SelectItem value="Canakkale">⚔️ Çanakkale</SelectItem>
+                  <SelectItem value="Cankiri">🏞️ Çankırı</SelectItem>
+                  <SelectItem value="Corum">🌾 Çorum</SelectItem>
+                  <SelectItem value="Denizli">🏔️ Denizli</SelectItem>
+                  <SelectItem value="Diyarbakir">🏛️ Diyarbakır</SelectItem>
+                  <SelectItem value="Duzce">🌲 Düzce</SelectItem>
+                  <SelectItem value="Edirne">🏰 Edirne</SelectItem>
+                  <SelectItem value="Elazig">🏔️ Elazığ</SelectItem>
+                  <SelectItem value="Erzincan">⛰️ Erzincan</SelectItem>
+                  <SelectItem value="Erzurum">🏔️ Erzurum</SelectItem>
+                  <SelectItem value="Eskisehir">🎓 Eskişehir</SelectItem>
+                  <SelectItem value="Gaziantep">🍯 Gaziantep</SelectItem>
+                  <SelectItem value="Giresun">🌰 Giresun</SelectItem>
+                  <SelectItem value="Gumushane">⛏️ Gümüşhane</SelectItem>
+                  <SelectItem value="Hakkari">🏔️ Hakkâri</SelectItem>
+                  <SelectItem value="Hatay">🌶️ Hatay</SelectItem>
+                  <SelectItem value="Igdir">🏔️ Iğdır</SelectItem>
+                  <SelectItem value="Isparta">🌹 Isparta</SelectItem>
+                  <SelectItem value="Istanbul">🏙️ İstanbul</SelectItem>
+                  <SelectItem value="Izmir">🌊 İzmir</SelectItem>
+                  <SelectItem value="Kahramanmaras">🍦 Kahramanmaraş</SelectItem>
+                  <SelectItem value="Karabuk">🔥 Karabük</SelectItem>
+                  <SelectItem value="Karaman">🏛️ Karaman</SelectItem>
+                  <SelectItem value="Kars">❄️ Kars</SelectItem>
+                  <SelectItem value="Kastamonu">🌰 Kastamonu</SelectItem>
+                  <SelectItem value="Kayseri">⛰️ Kayseri</SelectItem>
+                  <SelectItem value="Kirikkale">🏭 Kırıkkale</SelectItem>
+                  <SelectItem value="Kirklareli">🌾 Kırklareli</SelectItem>
+                  <SelectItem value="Kirsehir">🏛️ Kırşehir</SelectItem>
+                  <SelectItem value="Kilis">🏛️ Kilis</SelectItem>
+                  <SelectItem value="Kocaeli">🏭 Kocaeli</SelectItem>
+                  <SelectItem value="Konya">🕌 Konya</SelectItem>
+                  <SelectItem value="Kutahya">🏺 Kütahya</SelectItem>
+                  <SelectItem value="Malatya">🍑 Malatya</SelectItem>
+                  <SelectItem value="Manisa">🍇 Manisa</SelectItem>
+                  <SelectItem value="Mardin">🏛️ Mardin</SelectItem>
+                  <SelectItem value="Mersin">🚢 Mersin</SelectItem>
+                  <SelectItem value="Mugla">🏖️ Muğla</SelectItem>
+                  <SelectItem value="Mus">🏔️ Muş</SelectItem>
+                  <SelectItem value="Nevsehir">🎈 Nevşehir</SelectItem>
+                  <SelectItem value="Nigde">🍒 Niğde</SelectItem>
+                  <SelectItem value="Ordu">🌰 Ordu</SelectItem>
+                  <SelectItem value="Osmaniye">🌾 Osmaniye</SelectItem>
+                  <SelectItem value="Rize">🫖 Rize</SelectItem>
+                  <SelectItem value="Sakarya">🏭 Sakarya</SelectItem>
+                  <SelectItem value="Samsun">⚓ Samsun</SelectItem>
+                  <SelectItem value="Sanliurfa">🏛️ Şanlıurfa</SelectItem>
+                  <SelectItem value="Siirt">🏔️ Siirt</SelectItem>
+                  <SelectItem value="Sinop">⚓ Sinop</SelectItem>
+                  <SelectItem value="Sirnak">🏔️ Şırnak</SelectItem>
+                  <SelectItem value="Sivas">🏛️ Sivas</SelectItem>
+                  <SelectItem value="Tekirdag">🌾 Tekirdağ</SelectItem>
+                  <SelectItem value="Tokat">🌾 Tokat</SelectItem>
+                  <SelectItem value="Trabzon">🏔️ Trabzon</SelectItem>
+                  <SelectItem value="Tunceli">🏞️ Tunceli</SelectItem>
+                  <SelectItem value="Usak">🏺 Uşak</SelectItem>
+                  <SelectItem value="Van">🌊 Van</SelectItem>
+                  <SelectItem value="Yalova">🌊 Yalova</SelectItem>
+                  <SelectItem value="Yozgat">🌾 Yozgat</SelectItem>
+                  <SelectItem value="Zonguldak">⚫ Zonguldak</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>IBAN *</Label>
