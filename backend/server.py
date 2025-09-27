@@ -345,7 +345,7 @@ async def register_courier(courier_data: CourierRegistration):
     }
 
 @api_router.post("/register/business")
-async def register_business(business_data: BusinessRegistration):
+async def register_business(business_data: BusinessRegister):
     """Register a new business"""
     # Check if email already exists
     existing_user = await db.users.find_one({"email": business_data.email})
