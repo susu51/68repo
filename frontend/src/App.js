@@ -324,14 +324,43 @@ const AdminDashboard = ({ user }) => {
 
   const updateCourierKYC = async (courierId, kycStatus, notes = '') => {
     try {
+      setLoading(true);
       await axios.patch(`${API}/admin/couriers/${courierId}/kyc?kyc_status=${kycStatus}`, 
-        notes ? { notes } : {}
+        notes ? { notes } : {},
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
       toast.success(`Kurye KYC durumu ${kycStatus === 'approved' ? 'onaylandı' : 'reddedildi'}`);
-      fetchCouriers();
+      
+      // Refresh couriers list to update UI immediately
+      await fetchCouriers();
+      
+      // Close dialog if open
+      setShowRejectDialog(false);
+      setRejectReason('');
+      setSelectedCourier(null);
     } catch (error) {
+      console.error('KYC Update Error:', error);
       toast.error('KYC durumu güncellenemedi');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleReject = (courier) => {
+    setSelectedCourier(courier);
+    setShowRejectDialog(true);
+  };
+
+  const confirmReject = async () => {
+    if (!rejectReason.trim()) {
+      toast.error('Lütfen reddetme sebebini yazın');
+      return;
+    }
+    await updateCourierKYC(selectedCourier.id, 'rejected', rejectReason);
   };
 
   const getRoleColor = (role) => {
