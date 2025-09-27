@@ -1361,13 +1361,14 @@ const CourierRegistration = ({ onComplete, onBack }) => {
           <div className="grid grid-cols-2 gap-4">
             <FileUpload
               label="Ehliyet Fotoğrafı"
-              onFileSelect={setLicensePhotoUrl}
-              testId="license-upload"
+              onFileUploaded={setLicensePhotoUrl}
+              accept="image/*"
             />
             <FileUpload
               label="Araç Fotoğrafı"
-              onFileSelect={setVehiclePhotoUrl}
-              testId="vehicle-upload"
+              onFileUploaded={setVehiclePhotoUrl}
+              accept="image/*"
+            />
             />
           </div>
           
