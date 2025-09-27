@@ -489,7 +489,7 @@ const AdminDashboard = ({ user }) => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <Badge className={getRoleColor(user.role)}>
-                                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                                {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown'}
                               </Badge>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
