@@ -3021,9 +3021,14 @@ const HomePage = ({ onAuthStart }) => {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">
-            📦 Kuryecini
-          </h1>
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg mr-4">
+              <span className="text-white text-2xl font-bold">K</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">
+              Kuryecini
+            </h1>
+          </div>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Türkiye'nin en hızlı teslimat platformu. Herkes kurye olabilir, 
             her işletme satabilir, herkes sipariş verebilir.
