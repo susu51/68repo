@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total_tests": 59,
-    "passed_tests": 57,
-    "failed_tests": 2,
-    "success_rate": 96.61016949152543,
-    "timestamp": "2025-09-27T03:15:23.274118",
+    "total_tests": 86,
+    "passed_tests": 81,
+    "failed_tests": 5,
+    "success_rate": 94.18604651162791,
+    "timestamp": "2025-09-27T03:44:32.322216",
     "test_type": "delivertr_mvp_core_business_flow",
     "core_flow_success": true
   },
@@ -13,369 +13,531 @@
       "test": "Admin Authentication",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.329889"
+      "timestamp": "2025-09-27T03:44:29.664815"
     },
     {
       "test": "Admin Authentication - Wrong Password",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.360884"
+      "timestamp": "2025-09-27T03:44:29.699447"
     },
     {
       "test": "Business Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.400978"
+      "timestamp": "2025-09-27T03:44:29.735800"
     },
     {
       "test": "Customer Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.443035"
+      "timestamp": "2025-09-27T03:44:29.770148"
     },
     {
       "test": "Courier Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.479952"
+      "timestamp": "2025-09-27T03:44:29.808120"
     },
     {
       "test": "Business Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.515052"
+      "timestamp": "2025-09-27T03:44:29.842263"
     },
     {
       "test": "Customer Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.548091"
+      "timestamp": "2025-09-27T03:44:29.875318"
     },
     {
       "test": "Product Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.582750"
+      "timestamp": "2025-09-27T03:44:29.913388"
     },
     {
       "test": "Product Creation 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.619658"
+      "timestamp": "2025-09-27T03:44:29.945680"
     },
     {
       "test": "Product Creation 3",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.654047"
+      "timestamp": "2025-09-27T03:44:29.979578"
     },
     {
       "test": "Product Creation 4",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.685625"
+      "timestamp": "2025-09-27T03:44:30.017058"
     },
     {
       "test": "Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.719614"
+      "timestamp": "2025-09-27T03:44:30.055506"
     },
     {
       "test": "Get Business Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.751509"
+      "timestamp": "2025-09-27T03:44:30.088919"
     },
     {
       "test": "Order Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.785357"
+      "timestamp": "2025-09-27T03:44:30.124541"
     },
     {
       "test": "Get Customer Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.825031"
+      "timestamp": "2025-09-27T03:44:30.158932"
     },
     {
       "test": "Get Business Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.859626"
+      "timestamp": "2025-09-27T03:44:30.195039"
     },
     {
       "test": "Order Status Update - ASSIGNED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.895364"
+      "timestamp": "2025-09-27T03:44:30.232504"
     },
     {
       "test": "Order Status Update - ON_ROUTE",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.929268"
+      "timestamp": "2025-09-27T03:44:30.267546"
     },
     {
       "test": "Order Status Update - DELIVERED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.963086"
+      "timestamp": "2025-09-27T03:44:30.303138"
     },
     {
       "test": "Admin Get All Users",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:21.996802"
+      "timestamp": "2025-09-27T03:44:30.338800"
     },
     {
       "test": "Admin Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.034373"
+      "timestamp": "2025-09-27T03:44:30.373808"
     },
     {
       "test": "Admin Get All Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.070248"
+      "timestamp": "2025-09-27T03:44:30.413257"
     },
     {
       "test": "RBAC - Customer Create Product (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.107798"
+      "timestamp": "2025-09-27T03:44:30.448027"
     },
     {
       "test": "RBAC - Business Access Admin (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.144092"
+      "timestamp": "2025-09-27T03:44:30.486920"
     },
     {
       "test": "File Upload Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.177721"
+      "timestamp": "2025-09-27T03:44:30.520788"
     },
     {
       "test": "KYC Get Couriers",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.212439"
+      "timestamp": "2025-09-27T03:44:30.556258"
     },
     {
       "test": "KYC Approve Courier",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.244298"
+      "timestamp": "2025-09-27T03:44:30.588100"
     },
     {
       "test": "Register Courier for Rejection Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.278895"
+      "timestamp": "2025-09-27T03:44:30.624191"
     },
     {
       "test": "KYC Reject Courier with Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.311721"
+      "timestamp": "2025-09-27T03:44:30.660371"
     },
     {
       "test": "Register Courier for Flow Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.345855"
+      "timestamp": "2025-09-27T03:44:30.695284"
     },
     {
       "test": "KYC Status Update - APPROVED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.380793"
+      "timestamp": "2025-09-27T03:44:30.726679"
     },
     {
       "test": "KYC Status Update - REJECTED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.424588"
+      "timestamp": "2025-09-27T03:44:30.760807"
     },
     {
       "test": "KYC Status Update - PENDING",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.459835"
+      "timestamp": "2025-09-27T03:44:30.793943"
     },
     {
       "test": "KYC Get Couriers - No Auth (Should Fail)",
       "success": false,
       "details": "Expected 401, got 403. Error: {'detail': 'Not authenticated'}",
-      "timestamp": "2025-09-27T03:15:22.507243"
+      "timestamp": "2025-09-27T03:44:30.825403"
     },
     {
       "test": "KYC Get Couriers - Business Token (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.543372"
+      "timestamp": "2025-09-27T03:44:30.861875"
     },
     {
       "test": "KYC Get Couriers - Customer Token (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.577156"
+      "timestamp": "2025-09-27T03:44:30.894546"
     },
     {
       "test": "KYC Update - Invalid Courier ID",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.611582"
+      "timestamp": "2025-09-27T03:44:30.930024"
     },
     {
       "test": "KYC Update - Invalid Status",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.647604"
+      "timestamp": "2025-09-27T03:44:30.963276"
     },
     {
       "test": "KYC Update - Malformed Body",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.679628"
+      "timestamp": "2025-09-27T03:44:30.996124"
     },
     {
       "test": "Register Courier for Notes Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.712805"
+      "timestamp": "2025-09-27T03:44:31.035311"
     },
     {
       "test": "KYC Update - With Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.745249"
+      "timestamp": "2025-09-27T03:44:31.071739"
     },
     {
       "test": "KYC Update - Without Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.780167"
+      "timestamp": "2025-09-27T03:44:31.106186"
     },
     {
       "test": "KYC Update - Empty Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.815012"
+      "timestamp": "2025-09-27T03:44:31.138122"
+    },
+    {
+      "test": "Approve Courier for Order Acceptance",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.172087"
+    },
+    {
+      "test": "Create Order for Acceptance Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.207570"
+    },
+    {
+      "test": "Accept Order - POST /orders/{order_id}/accept",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.241372"
+    },
+    {
+      "test": "Approve Courier for Status Update Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.277310"
+    },
+    {
+      "test": "Create Order for Status Update Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.311399"
+    },
+    {
+      "test": "Accept Order for Status Verification",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.342483"
+    },
+    {
+      "test": "Verify Order Status After Acceptance",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.376052"
+    },
+    {
+      "test": "Order Acceptance Status Update",
+      "success": false,
+      "details": "Could not find accepted order in database",
+      "timestamp": "2025-09-27T03:44:31.376730"
+    },
+    {
+      "test": "Register Non-Approved Courier",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.409569"
+    },
+    {
+      "test": "Create Order for KYC Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.443275"
+    },
+    {
+      "test": "Non-Approved Courier Accept Order (Should Fail)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.475538"
+    },
+    {
+      "test": "Approve Courier for Acceptance Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.507402"
+    },
+    {
+      "test": "Approved Courier Accept Order",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.537776"
+    },
+    {
+      "test": "KYC Approval Check for Acceptance",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.538343"
+    },
+    {
+      "test": "Approve Courier for Double Accept Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.570786"
+    },
+    {
+      "test": "Create Order for Double Accept Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.603943"
+    },
+    {
+      "test": "First Order Acceptance",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.636670"
+    },
+    {
+      "test": "Second Order Acceptance (Should Fail)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.669691"
+    },
+    {
+      "test": "Already Accepted Order Error",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.670171"
+    },
+    {
+      "test": "Approve Courier for Coordinates Test",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.702006"
+    },
+    {
+      "test": "Get Nearby Orders for Coordinate Check",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.736464"
+    },
+    {
+      "test": "Nearby Orders Realistic Coordinates",
+      "success": false,
+      "details": "No nearby orders returned",
+      "timestamp": "2025-09-27T03:44:31.737015"
+    },
+    {
+      "test": "Approve Courier for Complete Flow",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.770857"
+    },
+    {
+      "test": "Create Order for Complete Flow",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.804274"
+    },
+    {
+      "test": "Accept Order in Complete Flow",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.844258"
+    },
+    {
+      "test": "Verify Final Order State",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T03:44:31.882404"
+    },
+    {
+      "test": "Complete Order Acceptance Flow",
+      "success": false,
+      "details": "Could not find order in database",
+      "timestamp": "2025-09-27T03:44:31.882988"
     },
     {
       "test": "Nearby Orders - Non-Approved Courier (Should Fail)",
       "success": false,
-      "details": "Expected 403, got 200. Error: [{'id': '6d17a7b6-df4d-4725-a8c1-5d2aaebc2993', 'customer_name': 'Ahmet Y\u0131lmaz', 'business_name': 'Test Restaurant Istanbul', 'pickup_address': {'lat': 41.0702, 'lng': 29.0404, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.0752, 'lng': 29.0454, 'address': 'Ba\u011fdat Caddesi No:123, Kad\u0131k\u00f6y, \u0130stanbul'}, 'total_amount': 151.5, 'items': [{'product_id': 'e2a8e389-d24d-4f06-a37e-d7860a4fb968', 'product_name': '\u0130skender Kebap', 'product_price': 45.5, 'quantity': 2, 'subtotal': 91.0}, {'product_id': '492dc491-c8bf-49f9-b3b4-619d0976d71a', 'product_name': 'Adana Kebap', 'product_price': 42.0, 'quantity': 1, 'subtotal': 42.0}, {'product_id': '9fe8242d-d9f1-4293-bc09-0903fb74a7b7', 'product_name': 'Baklava', 'product_price': 18.5, 'quantity': 1, 'subtotal': 18.5}], 'created_at': '2025-09-27T00:20:36.606000', 'commission_amount': 4.545, 'preparation_time': '15 dk', 'priority': 'normal'}, {'id': '7734a423-2a30-4ec8-bce3-76c001de98f2', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.0992, 'lng': 29.0674, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.104200000000006, 'lng': 29.0724, 'address': 'Aksaray merkez p\u0131nar Mahallesi 4011sokak no 19'}, 'total_amount': 536.5, 'items': [{'product_id': '68d72d8798c71563b891639b', 'product_name': '\u0130skender Kebap', 'product_price': 45.5, 'quantity': 3, 'subtotal': 136.5}, {'product_id': '68d72d7a98c71563b8916397', 'product_name': 'D\u00f6ner ', 'product_price': 200.0, 'quantity': 2, 'subtotal': 400.0}], 'created_at': '2025-09-27T00:20:51.730000', 'commission_amount': 16.095, 'preparation_time': '17 dk', 'priority': 'high'}, {'id': 'ec0105a5-7809-405e-ba5d-dee5a83166cd', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.059200000000004, 'lng': 29.025399999999998, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.06420000000001, 'lng': 29.030399999999997, 'address': 'Aksaray Efor AVM Teknosa '}, 'total_amount': 245.5, 'items': [{'product_id': '68d72d8798c71563b891639b', 'product_name': '\u0130skender Kebap', 'product_price': 45.5, 'quantity': 1, 'subtotal': 45.5}, {'product_id': '68d72d7a98c71563b8916397', 'product_name': 'D\u00f6ner ', 'product_price': 200.0, 'quantity': 1, 'subtotal': 200.0}], 'created_at': '2025-09-27T00:32:27.246000', 'commission_amount': 7.364999999999999, 'preparation_time': '19 dk', 'priority': 'normal'}, {'id': 'b7925e71-6a22-480a-91ce-284b8a830efa', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.0912, 'lng': 29.055400000000002, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.0962, 'lng': 29.0604, 'address': 'H\u00fcrriyet mahallesi atasayar cami Aksaray '}, 'total_amount': 200.0, 'items': [{'product_id': '68d72d7a98c71563b8916397', 'product_name': 'D\u00f6ner ', 'product_price': 200.0, 'quantity': 1, 'subtotal': 200.0}], 'created_at': '2025-09-27T00:41:46.257000', 'commission_amount': 6.0, 'preparation_time': '21 dk', 'priority': 'normal'}, {'id': '6332d915-80a1-48c9-8aad-2cc4c8fa21aa', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.1092, 'lng': 29.0714, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.114200000000004, 'lng': 29.0764, 'address': 'Aksaray Efor AVM Teknosa '}, 'total_amount': 200.0, 'items': [{'product_id': '68d72d7a98c71563b8916397', 'product_name': 'D\u00f6ner ', 'product_price': 200.0, 'quantity': 1, 'subtotal': 200.0}], 'created_at': '2025-09-27T00:52:36.926000', 'commission_amount': 6.0, 'preparation_time': '23 dk', 'priority': 'normal'}, {'id': 'c685e024-1ac9-4cf0-92e1-64245ecd7de6', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.1452, 'lng': 29.1054, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.150200000000005, 'lng': 29.1104, 'address': 'Efor avm'}, 'total_amount': 280.0, 'items': [{'product_id': '68d736b3575bf728ecd7281a', 'product_name': 'D\u00f6ner ', 'product_price': 280.0, 'quantity': 1, 'subtotal': 280.0}], 'created_at': '2025-09-27T00:59:36.691000', 'commission_amount': 8.4, 'preparation_time': '25 dk', 'priority': 'normal'}, {'id': '53ac5ce3-38df-441d-af99-7f8569aae336', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.156200000000005, 'lng': 29.1144, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.16120000000001, 'lng': 29.1194, 'address': 'Aksaray P\u0131nar mahallesi 4011.sokak no 19'}, 'total_amount': 200.0, 'items': [{'product_id': '68d72d7a98c71563b8916397', 'product_name': 'D\u00f6ner ', 'product_price': 200.0, 'quantity': 1, 'subtotal': 200.0}], 'created_at': '2025-09-27T02:28:14.119000', 'commission_amount': 6.0, 'preparation_time': '27 dk', 'priority': 'normal'}, {'id': '07535631-ada6-4853-8a37-01765c5b15f1', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.129200000000004, 'lng': 29.0854, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.13420000000001, 'lng': 29.0904, 'address': 'P\u0131nar mahallesi 4011.sokak no 19 Aksaray Merkez'}, 'total_amount': 185.0, 'items': [{'product_id': '68d74d6af8980ce0b2d67c46', 'product_name': 'Tacos Pizza+ Ayran', 'product_price': 185.0, 'quantity': 1, 'subtotal': 185.0}], 'created_at': '2025-09-27T02:36:30.452000', 'commission_amount': 5.55, 'preparation_time': '29 dk', 'priority': 'normal'}, {'id': 'c15aca9b-a00c-458a-9ef0-17159a3df36f', 'customer_name': '\u015euayip  Ba\u015fer', 'business_name': '', 'pickup_address': {'lat': 41.1862, 'lng': 29.1404, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.1912, 'lng': 29.1454, 'address': 'Fatih Mahallesi Fatih Park\u0131 Aksaray '}, 'total_amount': 185.0, 'items': [{'product_id': '68d74d6af8980ce0b2d67c46', 'product_name': 'Tacos Pizza+ Ayran', 'product_price': 185.0, 'quantity': 1, 'subtotal': 185.0}], 'created_at': '2025-09-27T03:07:33.727000', 'commission_amount': 5.55, 'preparation_time': '31 dk', 'priority': 'normal'}, {'id': 'c5249155-13f6-48f0-8b00-4bc152406267', 'customer_name': 'Ahmet Y\u0131lmaz', 'business_name': 'Test Restaurant Istanbul', 'pickup_address': {'lat': 41.14020000000001, 'lng': 29.0924, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.14520000000001, 'lng': 29.0974, 'address': 'Be\u015fikta\u015f Meydan\u0131 No:15, Be\u015fikta\u015f, \u0130stanbul'}, 'total_amount': 87.5, 'items': [{'product_id': '11ddc4a2-2ff2-44aa-943a-12db15d90f23', 'product_name': '\u0130skender Kebap', 'product_price': 45.5, 'quantity': 1, 'subtotal': 45.5}, {'product_id': '34f97e53-0ec5-49f2-b8a9-70f2c34db11f', 'product_name': 'Adana Kebap', 'product_price': 42.0, 'quantity': 1, 'subtotal': 42.0}], 'created_at': '2025-09-27T03:13:26.881000', 'commission_amount': 2.625, 'preparation_time': '33 dk', 'priority': 'normal'}, {'id': '0463fbd2-c756-4640-82e7-4e7156bff6be', 'customer_name': 'M\u00fc\u015fteri1 Test', 'business_name': 'Test Restaurant Istanbul', 'pickup_address': {'lat': 41.196200000000005, 'lng': 29.1464, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.20120000000001, 'lng': 29.1514, 'address': 'Test Address 1, \u0130stanbul'}, 'total_amount': 45.5, 'items': [{'product_id': '11ddc4a2-2ff2-44aa-943a-12db15d90f23', 'product_name': '\u0130skender Kebap', 'product_price': 45.5, 'quantity': 1, 'subtotal': 45.5}], 'created_at': '2025-09-27T03:13:27.064000', 'commission_amount': 1.365, 'preparation_time': '35 dk', 'priority': 'normal'}, {'id': '90fc5f93-5fcb-4f48-a256-0d436fb86846', 'customer_name': 'M\u00fc\u015fteri2 Test', 'business_name': 'Test Restaurant Istanbul', 'pickup_address': {'lat': 41.208200000000005, 'lng': 29.1564, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.21320000000001, 'lng': 29.1614, 'address': 'Test Address 2, \u0130stanbul'}, 'total_amount': 45.5, 'items': [{'product_id': '11ddc4a2-2ff2-44aa-943a-12db15d90f23', 'product_name': '\u0130skender Kebap', 'product_price': 45.5, 'quantity': 1, 'subtotal': 45.5}], 'created_at': '2025-09-27T03:13:27.129000', 'commission_amount': 1.365, 'preparation_time': '37 dk', 'priority': 'normal'}, {'id': '06d6f730-b5c1-488c-87f9-9dbac48afde5', 'customer_name': 'Test Customer', 'business_name': 'Test Restaurant', 'pickup_address': {'lat': 41.1702, 'lng': 29.116400000000002, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.175200000000004, 'lng': 29.1214, 'address': 'Test Delivery Address'}, 'total_amount': 25.0, 'items': [{'product_id': '28203fb3-1abb-4e64-ad59-dd8da6b42c19', 'product_name': 'Test Product', 'product_price': 25.0, 'quantity': 1, 'subtotal': 25.0}], 'created_at': '2025-09-27T03:14:44.641000', 'commission_amount': 0.75, 'preparation_time': '39 dk', 'priority': 'normal'}, {'id': '9ee9f46d-2115-4b2c-9ba0-f1d280a9889b', 'customer_name': 'Test Customer', 'business_name': 'Test Restaurant', 'pickup_address': {'lat': 41.1702, 'lng': 29.1144, 'address': '\u0130\u015fletme adresi'}, 'delivery_address': {'lat': 41.175200000000004, 'lng': 29.1194, 'address': 'Test Delivery Address'}, 'total_amount': 25.0, 'items': [{'product_id': '52211c92-3a5c-4f45-b76b-21089c38ba68', 'product_name': 'Test Product', 'product_price': 25.0, 'quantity': 1, 'subtotal': 25.0}], 'created_at': '2025-09-27T03:15:14.924000', 'commission_amount': 0.75, 'preparation_time': '41 dk', 'priority': 'normal'}]",
-      "timestamp": "2025-09-27T03:15:22.850458"
+      "details": "Expected 403, got 200. Error: []",
+      "timestamp": "2025-09-27T03:44:31.917709"
     },
     {
       "test": "Approve Test Courier for Nearby Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.883220"
+      "timestamp": "2025-09-27T03:44:31.949824"
     },
     {
       "test": "Nearby Orders - Approved Courier",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.926761"
+      "timestamp": "2025-09-27T03:44:31.981361"
     },
     {
       "test": "Create Order for Visibility Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.962597"
+      "timestamp": "2025-09-27T03:44:32.018390"
     },
     {
       "test": "Ensure Courier KYC Approved",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:22.998530"
+      "timestamp": "2025-09-27T03:44:32.050365"
     },
     {
       "test": "Check Order in Nearby Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.032278"
+      "timestamp": "2025-09-27T03:44:32.081727"
     },
     {
       "test": "Order Creation and Visibility Flow",
       "success": true,
-      "details": "Order 63c5d057-c762-4579-8dc1-061195e6a82c successfully visible in courier nearby orders",
-      "timestamp": "2025-09-27T03:15:23.032882"
+      "details": "Order ae018e57-f9eb-4924-9f9e-80535fbc7740 successfully visible in courier nearby orders",
+      "timestamp": "2025-09-27T03:44:32.082320"
     },
     {
       "test": "Get All Orders from Database",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.068597"
+      "timestamp": "2025-09-27T03:44:32.116075"
     },
     {
       "test": "Order Database Storage",
       "success": true,
-      "details": "Orders properly stored in database: 15 created orders found",
-      "timestamp": "2025-09-27T03:15:23.069299"
+      "details": "Orders properly stored in database: 1 created orders found",
+      "timestamp": "2025-09-27T03:44:32.116765"
     },
     {
       "test": "Register Additional Customer 1",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.101320"
+      "timestamp": "2025-09-27T03:44:32.151485"
     },
     {
       "test": "Create Order for Customer 1",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.135166"
+      "timestamp": "2025-09-27T03:44:32.187429"
     },
     {
       "test": "Register Additional Customer 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.168562"
+      "timestamp": "2025-09-27T03:44:32.218377"
     },
     {
       "test": "Create Order for Customer 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.202505"
+      "timestamp": "2025-09-27T03:44:32.249938"
     },
     {
       "test": "Approve Courier for Multi-Customer Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.238454"
+      "timestamp": "2025-09-27T03:44:32.285329"
     },
     {
       "test": "Get Nearby Orders - Multi Customer",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:15:23.273150"
+      "timestamp": "2025-09-27T03:44:32.321252"
     },
     {
       "test": "Multiple Customers Order Visibility",
       "success": true,
       "details": "All 2 orders from multiple customers visible to courier",
-      "timestamp": "2025-09-27T03:15:23.273779"
+      "timestamp": "2025-09-27T03:44:32.321867"
     }
   ],
   "created_entities": {
-    "business_id": "4cac656c-2a25-4007-8884-1ffa3b8a411c",
-    "customer_id": "90e72392-9077-49fb-9e21-e74a5e889fd8",
-    "courier_id": "d9fb4311-cbb6-44f0-96d5-113b02427e7d",
+    "business_id": "da021946-4f66-4336-91b8-54b1a8db82c2",
+    "customer_id": "f3b42e79-ddc6-4c93-b1dc-5950983de6fc",
+    "courier_id": "73dda8b5-ef64-4fd4-88d4-dfc7025ecc42",
     "products": [
-      "d6cb1e0a-a12b-4bad-b8cf-f78f605305d5",
-      "7fce2d05-1c19-47f8-a4c8-226c8be02b67",
-      "edfe0ba0-5e56-4fe1-813d-3785d2cfbfac",
-      "6d82e289-77b0-423a-8cc8-aaee7d5b42aa"
+      "4fa31282-b890-4534-be53-8fdb3008deab",
+      "88b283d4-17fe-4d84-bb23-8bddbcb6c48c",
+      "bd051510-53ce-4b31-b23b-d85c0346a988",
+      "09beed36-f728-4225-a509-02a2951fd562"
     ],
     "orders": [
-      "d4de66f4-b937-4f20-b8dc-42f3f10785e9"
+      "ffc26b5e-b5f4-4eb8-b0b7-4c8b3a1d5437"
     ]
   }
 }
