@@ -108,6 +108,13 @@ const LoginForm = ({ onRegisterClick }) => {
     e.preventDefault();
     setLoading(true);
 
+    // Manual validation
+    if (!formData.adminPassword || formData.adminPassword.trim() === '') {
+      toast.error('Lütfen admin şifresini girin');
+      setLoading(false);
+      return;
+    }
+
     console.log('Admin login attempt:', {
       password: formData.adminPassword,
       apiUrl: `${API}/auth/admin`
@@ -122,7 +129,7 @@ const LoginForm = ({ onRegisterClick }) => {
       toast.success('Admin girişi başarılı!');
     } catch (error) {
       console.error('Admin login error:', error);
-      toast.error(error.response?.data?.detail || 'Yanlış admin şifresi');
+      toast.error(error.response?.data?.detail || 'Admin giriş hatası');
     }
     setLoading(false);
   };
