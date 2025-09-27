@@ -2464,6 +2464,9 @@ const CustomerDashboard = ({ user }) => {
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  const [mapCenter, setMapCenter] = useState([39.925533, 32.866287]); // Default to Turkey center
   const [orderForm, setOrderForm] = useState({
     delivery_address: '',
     delivery_lat: null,
