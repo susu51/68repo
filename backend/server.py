@@ -1082,6 +1082,26 @@ async def get_public_businesses():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching businesses: {str(e)}")
 
+@api_router.patch("/admin/users/{user_id}/approve")
+async def approve_user(user_id: str, current_user: dict = Depends(get_admin_user)):
+    """Approve any user (business, courier) for KYC"""
+    try:
+        # Update user with approved status
+        result = await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"kyc_status": "approved"}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        return {"success": True, "message": f"User {user_id} approved successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error approving user: {str(e)}")
+
 @api_router.get("/businesses/{business_id}/products")
 async def get_business_products(business_id: str):
     """Get products for a specific business"""
