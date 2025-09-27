@@ -1871,6 +1871,314 @@ class DeliverTRAPITester:
         self.log_test("Multiple Customers Order Visibility", True, f"All {found_orders} orders from multiple customers visible to courier")
         return True
 
+    # ===== PUBLIC BUSINESS ENDPOINTS TESTS =====
+    
+    def test_public_businesses_endpoint(self):
+        """Test GET /businesses endpoint - should return approved businesses with location data"""
+        success, response = self.run_test(
+            "Public Businesses Endpoint",
+            "GET",
+            "businesses",
+            200
+        )
+        
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} businesses")
+            
+            # Verify business data structure
+            if len(response) > 0:
+                business = response[0]
+                required_fields = ['id', 'name', 'category', 'rating', 'delivery_time', 'min_order', 'location']
+                missing_fields = [field for field in required_fields if field not in business]
+                
+                if missing_fields:
+                    self.log_test("Public Businesses Endpoint", False, f"Missing required fields: {missing_fields}")
+                    return False
+                
+                # Verify location data structure
+                location = business.get('location', {})
+                location_fields = ['name', 'lat', 'lng']
+                missing_location_fields = [field for field in location_fields if field not in location]
+                
+                if missing_location_fields:
+                    self.log_test("Public Businesses Endpoint", False, f"Missing location fields: {missing_location_fields}")
+                    return False
+                
+                # Verify Istanbul coordinates
+                lat = location.get('lat')
+                lng = location.get('lng')
+                istanbul_bounds = {'lat_min': 40.8, 'lat_max': 41.3, 'lng_min': 28.5, 'lng_max': 29.5}
+                
+                if not (istanbul_bounds['lat_min'] <= lat <= istanbul_bounds['lat_max'] and 
+                        istanbul_bounds['lng_min'] <= lng <= istanbul_bounds['lng_max']):
+                    self.log_test("Public Businesses Endpoint", False, f"Coordinates not in Istanbul bounds: {lat}, {lng}")
+                    return False
+                
+                print(f"   ✅ Business data structure valid")
+                print(f"   ✅ Location data: {location['name']} ({lat}, {lng})")
+                print(f"   ✅ Sample business: {business['name']} - {business['category']}")
+        
+        return success
+
+    def test_business_products_endpoint(self):
+        """Test GET /businesses/{business_id}/products endpoint"""
+        if not self.business_id:
+            self.log_test("Business Products Endpoint", False, "No business ID available")
+            return False
+        
+        success, response = self.run_test(
+            "Business Products Endpoint",
+            "GET",
+            f"businesses/{self.business_id}/products",
+            200
+        )
+        
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} products for business {self.business_id}")
+            
+            # Verify product data structure if products exist
+            if len(response) > 0:
+                product = response[0]
+                required_fields = ['name', 'description', 'price', 'is_available', 'preparation_time_minutes']
+                missing_fields = [field for field in required_fields if field not in product]
+                
+                if missing_fields:
+                    self.log_test("Business Products Endpoint", False, f"Missing required product fields: {missing_fields}")
+                    return False
+                
+                print(f"   ✅ Product data structure valid")
+                print(f"   ✅ Sample product: {product['name']} - ${product['price']}")
+        
+        return success
+
+    def test_business_products_invalid_id(self):
+        """Test GET /businesses/{business_id}/products with invalid business ID"""
+        success, response = self.run_test(
+            "Business Products - Invalid ID",
+            "GET",
+            "businesses/invalid-business-id/products",
+            500  # Expecting error for invalid ID
+        )
+        
+        return success
+
+    def test_approved_businesses_only(self):
+        """Test that only approved businesses (kyc_status: approved) are returned"""
+        # First, create a business and ensure it's not approved
+        non_approved_email = f"non_approved_biz_{uuid.uuid4().hex[:8]}@test.com"
+        business_data = {
+            "email": non_approved_email,
+            "password": self.test_password,
+            "business_name": "Non-Approved Restaurant",
+            "tax_number": "9876543210",
+            "address": "Test Address, İstanbul",
+            "city": "İstanbul",
+            "business_category": "gida",
+            "description": "This business should not appear in public list"
+        }
+        
+        reg_success, reg_response = self.run_test(
+            "Register Non-Approved Business",
+            "POST",
+            "register/business",
+            200,
+            data=business_data
+        )
+        
+        if not reg_success:
+            self.log_test("Approved Businesses Only", False, "Failed to create non-approved business")
+            return False
+        
+        non_approved_business_id = reg_response.get('user_data', {}).get('id')
+        
+        # Get public businesses list
+        success, businesses = self.run_test(
+            "Get Public Businesses for Approval Check",
+            "GET",
+            "businesses",
+            200
+        )
+        
+        if not success:
+            self.log_test("Approved Businesses Only", False, "Failed to get businesses list")
+            return False
+        
+        # Check that non-approved business is NOT in the list
+        non_approved_found = False
+        if isinstance(businesses, list):
+            for business in businesses:
+                if business.get('id') == non_approved_business_id:
+                    non_approved_found = True
+                    break
+        
+        if non_approved_found:
+            self.log_test("Approved Businesses Only", False, "Non-approved business found in public list")
+            return False
+        
+        # Now approve the business and check it appears
+        if self.admin_token:
+            # First, we need to set the business kyc_status to approved
+            # This would typically be done through an admin endpoint
+            print(f"   ✅ Non-approved business correctly excluded from public list")
+            self.log_test("Approved Businesses Only", True)
+            return True
+        
+        return True
+
+    def test_public_endpoints_no_auth_required(self):
+        """Test that public business endpoints work without authentication"""
+        # Test businesses endpoint without token
+        success, response = self.run_test(
+            "Public Businesses - No Auth Required",
+            "GET",
+            "businesses",
+            200
+        )
+        
+        if not success:
+            self.log_test("Public Endpoints No Auth Required", False, "Businesses endpoint requires authentication")
+            return False
+        
+        # Test business products endpoint without token (if we have a business ID)
+        if self.business_id:
+            success, response = self.run_test(
+                "Public Business Products - No Auth Required",
+                "GET",
+                f"businesses/{self.business_id}/products",
+                200
+            )
+            
+            if not success:
+                self.log_test("Public Endpoints No Auth Required", False, "Business products endpoint requires authentication")
+                return False
+        
+        print(f"   ✅ Public endpoints accessible without authentication")
+        self.log_test("Public Endpoints No Auth Required", True)
+        return True
+
+    def test_business_data_completeness(self):
+        """Test that business data includes all required fields with proper values"""
+        success, businesses = self.run_test(
+            "Get Businesses for Data Completeness Check",
+            "GET",
+            "businesses",
+            200
+        )
+        
+        if not success or not isinstance(businesses, list) or len(businesses) == 0:
+            self.log_test("Business Data Completeness", False, "No businesses returned")
+            return False
+        
+        all_valid = True
+        for i, business in enumerate(businesses[:3]):  # Check first 3 businesses
+            print(f"   Checking business {i+1}: {business.get('name', 'Unknown')}")
+            
+            # Check required fields
+            required_fields = {
+                'id': str,
+                'name': str,
+                'category': str,
+                'rating': (int, float),
+                'delivery_time': str,
+                'min_order': (int, float),
+                'location': dict,
+                'is_open': bool
+            }
+            
+            for field, expected_type in required_fields.items():
+                value = business.get(field)
+                if value is None:
+                    print(f"      ❌ Missing field: {field}")
+                    all_valid = False
+                elif not isinstance(value, expected_type):
+                    print(f"      ❌ Wrong type for {field}: expected {expected_type}, got {type(value)}")
+                    all_valid = False
+                else:
+                    print(f"      ✅ {field}: {value}")
+            
+            # Check location data specifically
+            location = business.get('location', {})
+            if isinstance(location, dict):
+                location_fields = ['name', 'lat', 'lng']
+                for field in location_fields:
+                    if field not in location:
+                        print(f"      ❌ Missing location field: {field}")
+                        all_valid = False
+                    else:
+                        print(f"      ✅ location.{field}: {location[field]}")
+        
+        if all_valid:
+            print(f"   ✅ All business data complete and properly typed")
+            self.log_test("Business Data Completeness", True)
+            return True
+        else:
+            self.log_test("Business Data Completeness", False, "Some business data incomplete or improperly typed")
+            return False
+
+    def test_product_data_completeness(self):
+        """Test that product data includes all required fields with proper values"""
+        if not self.business_id:
+            self.log_test("Product Data Completeness", False, "No business ID available")
+            return False
+        
+        success, products = self.run_test(
+            "Get Products for Data Completeness Check",
+            "GET",
+            f"businesses/{self.business_id}/products",
+            200
+        )
+        
+        if not success or not isinstance(products, list) or len(products) == 0:
+            self.log_test("Product Data Completeness", False, "No products returned")
+            return False
+        
+        all_valid = True
+        for i, product in enumerate(products[:3]):  # Check first 3 products
+            print(f"   Checking product {i+1}: {product.get('name', 'Unknown')}")
+            
+            # Check required fields
+            required_fields = {
+                'name': str,
+                'description': str,
+                'price': (int, float),
+                'is_available': bool,
+                'preparation_time_minutes': int
+            }
+            
+            optional_fields = {
+                'photo_url': str,
+                'category': str
+            }
+            
+            for field, expected_type in required_fields.items():
+                value = product.get(field)
+                if value is None:
+                    print(f"      ❌ Missing required field: {field}")
+                    all_valid = False
+                elif not isinstance(value, expected_type):
+                    print(f"      ❌ Wrong type for {field}: expected {expected_type}, got {type(value)}")
+                    all_valid = False
+                else:
+                    print(f"      ✅ {field}: {value}")
+            
+            # Check optional fields (if present)
+            for field, expected_type in optional_fields.items():
+                value = product.get(field)
+                if value is not None:
+                    if not isinstance(value, expected_type):
+                        print(f"      ❌ Wrong type for optional {field}: expected {expected_type}, got {type(value)}")
+                        all_valid = False
+                    else:
+                        print(f"      ✅ {field}: {value}")
+        
+        if all_valid:
+            print(f"   ✅ All product data complete and properly typed")
+            self.log_test("Product Data Completeness", True)
+            return True
+        else:
+            self.log_test("Product Data Completeness", False, "Some product data incomplete or improperly typed")
+            return False
+
     def run_all_tests(self):
         """Run all backend tests for DeliverTR MVP Core Business Flow"""
         print("🚀 Starting DeliverTR Backend API Tests - Core Business Flow")
