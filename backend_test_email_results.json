@@ -4,7 +4,7 @@
     "passed_tests": 18,
     "failed_tests": 3,
     "success_rate": 85.71428571428571,
-    "timestamp": "2025-09-26T23:58:32.599513",
+    "timestamp": "2025-09-27T00:00:50.530853",
     "test_type": "email_password_authentication"
   },
   "test_results": [
@@ -12,127 +12,127 @@
       "test": "Root API Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:30.469815"
+      "timestamp": "2025-09-27T00:00:48.441561"
     },
     {
       "test": "Courier Registration - Detailed Fields",
       "success": false,
-      "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-26T23:58:30.513806"
+      "details": "Expected 200, got 400. Error: {'detail': 'Email already registered'}",
+      "timestamp": "2025-09-27T00:00:48.477828"
     },
     {
       "test": "Business Registration",
       "success": false,
-      "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-26T23:58:31.058022"
+      "details": "Expected 200, got 400. Error: {'detail': 'Email already registered'}",
+      "timestamp": "2025-09-27T00:00:49.014290"
     },
     {
       "test": "Customer Registration",
       "success": false,
-      "details": "Expected 200, got 500. Response: Internal Server Error",
-      "timestamp": "2025-09-26T23:58:31.595563"
+      "details": "Expected 200, got 400. Error: {'detail': 'Email already registered'}",
+      "timestamp": "2025-09-27T00:00:49.555094"
     },
     {
       "test": "Duplicate Email Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:31.636398"
+      "timestamp": "2025-09-27T00:00:49.593827"
     },
     {
       "test": "Invalid Email Format",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:31.673030"
+      "timestamp": "2025-09-27T00:00:49.628368"
     },
     {
       "test": "Missing Required Fields",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:31.707473"
+      "timestamp": "2025-09-27T00:00:49.664977"
     },
     {
       "test": "Email Login - Valid Credentials",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:31.738503"
+      "timestamp": "2025-09-27T00:00:49.702271"
     },
     {
       "test": "JWT Token Structure Validation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:31.738951"
+      "timestamp": "2025-09-27T00:00:49.703002"
     },
     {
       "test": "Email Login - Invalid Credentials",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.273866"
+      "timestamp": "2025-09-27T00:00:50.240962"
     },
     {
       "test": "Email Login - Non-existent Email",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.315259"
+      "timestamp": "2025-09-27T00:00:50.280609"
     },
     {
       "test": "Password Hashing Verification",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.352755"
+      "timestamp": "2025-09-27T00:00:50.315820"
     },
     {
       "test": "Password Security Check",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.353357"
+      "timestamp": "2025-09-27T00:00:50.316377"
     },
     {
       "test": "JWT Token - Valid Access",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.387968"
+      "timestamp": "2025-09-27T00:00:50.354789"
     },
     {
       "test": "JWT Token - Malformed",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.420282"
+      "timestamp": "2025-09-27T00:00:50.387483"
     },
     {
       "test": "Unauthorized Access",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.489008"
+      "timestamp": "2025-09-27T00:00:50.425760"
     },
     {
       "test": "Get User Profile (/api/me)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.527895"
+      "timestamp": "2025-09-27T00:00:50.459877"
     },
     {
       "test": "Profile Field Validation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.528537"
+      "timestamp": "2025-09-27T00:00:50.460628"
     },
     {
       "test": "File Upload - Valid Image",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.563183"
+      "timestamp": "2025-09-27T00:00:50.491999"
     },
     {
       "test": "File Upload Response Validation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.563791"
+      "timestamp": "2025-09-27T00:00:50.492596"
     },
     {
       "test": "File Upload - Invalid Type",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-26T23:58:32.598596"
+      "timestamp": "2025-09-27T00:00:50.529892"
     }
   ]
 }
