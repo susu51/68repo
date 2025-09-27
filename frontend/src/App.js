@@ -265,6 +265,9 @@ const AdminDashboard = ({ user }) => {
   const [couriers, setCouriers] = useState([]);
   const [kycFilter, setKycFilter] = useState('pending'); // pending, approved, rejected, all
   const [loading, setLoading] = useState(false);
+  const [selectedCourier, setSelectedCourier] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
 
   const fetchUsers = async () => {
     try {
