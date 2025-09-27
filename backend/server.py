@@ -84,6 +84,16 @@ class BusinessRegistration(BaseModel):
     business_category: str  # gida, nakliye
     description: Optional[str] = None
 
+class BusinessRegister(BaseModel):
+    email: EmailStr
+    password: str
+    business_name: str
+    tax_number: str
+    address: str
+    city: str
+    business_category: str
+    description: Optional[str] = None
+
 class CustomerRegistration(BaseModel):
     email: EmailStr
     password: str
