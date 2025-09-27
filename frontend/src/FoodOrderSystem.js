@@ -340,24 +340,27 @@ export const ProfessionalFoodOrderSystem = () => {
       const response = await axios.get(`${API}/businesses`);
       const businessData = response.data;
       
-      // Sort by distance if user location available
-      let sortedBusinesses = businessData;
-      if (userLocation) {
-        sortedBusinesses = businessData.map(business => ({
-          ...business,
-          distance: calculateDistance(
-            userLocation.lat, userLocation.lng,
-            business.location.lat, business.location.lng
-          )
-        })).sort((a, b) => a.distance - b.distance);
-      }
-      
-      setRestaurants(sortedBusinesses);
+      setRestaurants(businessData);
+      console.log('Restaurants fetched:', businessData);
     } catch (error) {
       console.error('Restoranlar yüklenemedi:', error);
       toast.error('Restoranlar yüklenirken hata oluştu');
     }
     setLoading(false);
+  };
+
+  const sortRestaurantsByDistance = () => {
+    if (!userLocation || restaurants.length === 0) return;
+    
+    const sortedBusinesses = restaurants.map(business => ({
+      ...business,
+      distance: calculateDistance(
+        userLocation.lat, userLocation.lng,
+        business.location.lat, business.location.lng
+      )
+    })).sort((a, b) => a.distance - b.distance);
+    
+    setRestaurants(sortedBusinesses);
   };
 
   const fetchProducts = async (restaurantId) => {
