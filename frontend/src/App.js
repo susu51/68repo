@@ -9,6 +9,7 @@ import { MenuManagement, MenuDisplay } from "./MenuManagement";
 import { CreatePackageOrder, PackageOrderHistory } from "./PackageOrder";
 import CourierBalance from "./CourierBalance";
 import FileUpload from "./FileUpload";
+import LeafletMap from "./LeafletMap";
 
 // Components
 import { Button } from "./components/ui/button";
