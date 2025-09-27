@@ -917,6 +917,641 @@ class DeliverTRAPITester:
         
         return all_success
 
+    # ===== COURIER ORDER ACCEPTANCE TESTS =====
+    
+    def test_order_acceptance_endpoint(self):
+        """Test /orders/{order_id}/accept endpoint functionality"""
+        if not self.courier_token or not self.created_orders:
+            self.log_test("Order Acceptance Endpoint", False, "No courier token or orders available")
+            return False
+        
+        # Ensure courier is KYC approved first
+        if self.admin_token and self.courier_id:
+            self.run_test(
+                "Approve Courier for Order Acceptance",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+        
+        # Create a fresh order for acceptance testing
+        if not self.customer_token or not self.created_products:
+            self.log_test("Order Acceptance Endpoint", False, "No customer token or products for order creation")
+            return False
+        
+        product = self.created_products[0]
+        order_data = {
+            "delivery_address": "Taksim Meydanı No:1, Beyoğlu, İstanbul",
+            "delivery_lat": 41.0369,
+            "delivery_lng": 28.9850,
+            "items": [{
+                "product_id": product['id'],
+                "product_name": product['name'],
+                "product_price": product['price'],
+                "quantity": 1,
+                "subtotal": product['price']
+            }],
+            "total_amount": product['price'],
+            "notes": "Order acceptance test"
+        }
+        
+        order_success, order_response = self.run_test(
+            "Create Order for Acceptance Test",
+            "POST",
+            "orders",
+            200,
+            data=order_data,
+            token=self.customer_token
+        )
+        
+        if not order_success:
+            self.log_test("Order Acceptance Endpoint", False, "Failed to create test order")
+            return False
+        
+        order_id = order_response.get('id')
+        
+        # Test order acceptance
+        success, response = self.run_test(
+            "Accept Order - POST /orders/{order_id}/accept",
+            "POST",
+            f"orders/{order_id}/accept",
+            200,
+            token=self.courier_token
+        )
+        
+        if success:
+            print(f"   ✅ Order {order_id} accepted successfully")
+            print(f"   Response: {response}")
+            
+            # Verify response contains expected fields
+            expected_fields = ['success', 'message', 'order_id', 'courier_name']
+            missing_fields = [field for field in expected_fields if field not in response]
+            if missing_fields:
+                print(f"   ⚠️  Missing response fields: {missing_fields}")
+        
+        return success
+    
+    def test_order_acceptance_status_update(self):
+        """Test that order acceptance updates status to 'assigned' and sets courier_id"""
+        if not self.courier_token or not self.customer_token or not self.created_products:
+            self.log_test("Order Acceptance Status Update", False, "Missing required tokens or products")
+            return False
+        
+        # Ensure courier is KYC approved
+        if self.admin_token and self.courier_id:
+            self.run_test(
+                "Approve Courier for Status Update Test",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+        
+        # Create order
+        product = self.created_products[0]
+        order_data = {
+            "delivery_address": "Şişli Plaza, Şişli, İstanbul",
+            "delivery_lat": 41.0498,
+            "delivery_lng": 28.9662,
+            "items": [{
+                "product_id": product['id'],
+                "product_name": product['name'],
+                "product_price": product['price'],
+                "quantity": 1,
+                "subtotal": product['price']
+            }],
+            "total_amount": product['price'],
+            "notes": "Status update test order"
+        }
+        
+        order_success, order_response = self.run_test(
+            "Create Order for Status Update Test",
+            "POST",
+            "orders",
+            200,
+            data=order_data,
+            token=self.customer_token
+        )
+        
+        if not order_success:
+            self.log_test("Order Acceptance Status Update", False, "Failed to create test order")
+            return False
+        
+        order_id = order_response.get('id')
+        
+        # Verify initial order state
+        if order_response.get('status') != 'created':
+            self.log_test("Order Acceptance Status Update", False, f"Initial order status is '{order_response.get('status')}', expected 'created'")
+            return False
+        
+        if order_response.get('courier_id') is not None:
+            self.log_test("Order Acceptance Status Update", False, f"Initial courier_id is '{order_response.get('courier_id')}', expected None")
+            return False
+        
+        print(f"   ✅ Initial order state correct: status='{order_response.get('status')}', courier_id={order_response.get('courier_id')}")
+        
+        # Accept the order
+        accept_success, accept_response = self.run_test(
+            "Accept Order for Status Verification",
+            "POST",
+            f"orders/{order_id}/accept",
+            200,
+            token=self.courier_token
+        )
+        
+        if not accept_success:
+            self.log_test("Order Acceptance Status Update", False, "Failed to accept order")
+            return False
+        
+        # Verify order status was updated by getting order details from admin
+        if self.admin_token:
+            verify_success, all_orders = self.run_test(
+                "Verify Order Status After Acceptance",
+                "GET",
+                "admin/orders",
+                200,
+                token=self.admin_token
+            )
+            
+            if verify_success and isinstance(all_orders, list):
+                accepted_order = None
+                for order in all_orders:
+                    if order.get('id') == order_id:
+                        accepted_order = order
+                        break
+                
+                if accepted_order:
+                    actual_status = accepted_order.get('status')
+                    actual_courier_id = accepted_order.get('courier_id')
+                    
+                    print(f"   📊 Order after acceptance: status='{actual_status}', courier_id='{actual_courier_id}'")
+                    
+                    if actual_status != 'assigned':
+                        self.log_test("Order Acceptance Status Update", False, f"Order status is '{actual_status}', expected 'assigned'")
+                        return False
+                    
+                    if actual_courier_id != self.courier_id:
+                        self.log_test("Order Acceptance Status Update", False, f"Courier ID is '{actual_courier_id}', expected '{self.courier_id}'")
+                        return False
+                    
+                    print(f"   ✅ Order status correctly updated to 'assigned' with courier_id '{actual_courier_id}'")
+                    self.log_test("Order Acceptance Status Update", True)
+                    return True
+                else:
+                    self.log_test("Order Acceptance Status Update", False, "Could not find accepted order in database")
+                    return False
+        
+        self.log_test("Order Acceptance Status Update", False, "Could not verify order status update")
+        return False
+    
+    def test_kyc_approval_check_for_acceptance(self):
+        """Test that only KYC approved couriers can accept orders"""
+        # Create a new courier that is not KYC approved
+        non_approved_courier_email = f"non_approved_{uuid.uuid4().hex[:8]}@test.com"
+        courier_data = {
+            "email": non_approved_courier_email,
+            "password": self.test_password,
+            "first_name": "Non",
+            "last_name": "Approved",
+            "iban": "TR330006100519786457841330",
+            "vehicle_type": "motor",
+            "vehicle_model": "Test Bike",
+            "license_class": "A2",
+            "license_number": "34TEST123",
+            "city": "İstanbul"
+        }
+        
+        reg_success, reg_response = self.run_test(
+            "Register Non-Approved Courier",
+            "POST",
+            "register/courier",
+            200,
+            data=courier_data
+        )
+        
+        if not reg_success:
+            self.log_test("KYC Approval Check for Acceptance", False, "Failed to create non-approved courier")
+            return False
+        
+        non_approved_token = reg_response.get('access_token')
+        non_approved_id = reg_response.get('user_data', {}).get('id')
+        
+        # Create an order to test with
+        if not self.customer_token or not self.created_products:
+            self.log_test("KYC Approval Check for Acceptance", False, "No customer token or products available")
+            return False
+        
+        product = self.created_products[0]
+        order_data = {
+            "delivery_address": "Beşiktaş İskelesi, Beşiktaş, İstanbul",
+            "delivery_lat": 41.0766,
+            "delivery_lng": 28.9688,
+            "items": [{
+                "product_id": product['id'],
+                "product_name": product['name'],
+                "product_price": product['price'],
+                "quantity": 1,
+                "subtotal": product['price']
+            }],
+            "total_amount": product['price'],
+            "notes": "KYC approval test order"
+        }
+        
+        order_success, order_response = self.run_test(
+            "Create Order for KYC Test",
+            "POST",
+            "orders",
+            200,
+            data=order_data,
+            token=self.customer_token
+        )
+        
+        if not order_success:
+            self.log_test("KYC Approval Check for Acceptance", False, "Failed to create test order")
+            return False
+        
+        order_id = order_response.get('id')
+        
+        # Test 1: Non-approved courier tries to accept order (should fail)
+        success, response = self.run_test(
+            "Non-Approved Courier Accept Order (Should Fail)",
+            "POST",
+            f"orders/{order_id}/accept",
+            403,  # Should be forbidden
+            token=non_approved_token
+        )
+        
+        if not success:
+            self.log_test("KYC Approval Check for Acceptance", False, "Non-approved courier was able to accept order")
+            return False
+        
+        print(f"   ✅ Non-approved courier correctly blocked from accepting orders")
+        
+        # Test 2: Approve the courier and try again (should succeed)
+        if self.admin_token:
+            approve_success, _ = self.run_test(
+                "Approve Courier for Acceptance Test",
+                "PATCH",
+                f"admin/couriers/{non_approved_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+            
+            if approve_success:
+                # Now try to accept the order (should succeed)
+                success, response = self.run_test(
+                    "Approved Courier Accept Order",
+                    "POST",
+                    f"orders/{order_id}/accept",
+                    200,
+                    token=non_approved_token
+                )
+                
+                if success:
+                    print(f"   ✅ Approved courier successfully accepted order")
+                    self.log_test("KYC Approval Check for Acceptance", True)
+                    return True
+                else:
+                    self.log_test("KYC Approval Check for Acceptance", False, "Approved courier failed to accept order")
+                    return False
+        
+        self.log_test("KYC Approval Check for Acceptance", False, "Could not complete KYC approval test")
+        return False
+    
+    def test_already_accepted_order_error(self):
+        """Test error handling for already accepted orders"""
+        if not self.courier_token or not self.customer_token or not self.created_products:
+            self.log_test("Already Accepted Order Error", False, "Missing required tokens or products")
+            return False
+        
+        # Ensure courier is KYC approved
+        if self.admin_token and self.courier_id:
+            self.run_test(
+                "Approve Courier for Double Accept Test",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+        
+        # Create order
+        product = self.created_products[0]
+        order_data = {
+            "delivery_address": "Üsküdar Meydanı, Üsküdar, İstanbul",
+            "delivery_lat": 41.0431,
+            "delivery_lng": 29.0088,
+            "items": [{
+                "product_id": product['id'],
+                "product_name": product['name'],
+                "product_price": product['price'],
+                "quantity": 1,
+                "subtotal": product['price']
+            }],
+            "total_amount": product['price'],
+            "notes": "Double acceptance test order"
+        }
+        
+        order_success, order_response = self.run_test(
+            "Create Order for Double Accept Test",
+            "POST",
+            "orders",
+            200,
+            data=order_data,
+            token=self.customer_token
+        )
+        
+        if not order_success:
+            self.log_test("Already Accepted Order Error", False, "Failed to create test order")
+            return False
+        
+        order_id = order_response.get('id')
+        
+        # Accept the order first time (should succeed)
+        first_accept_success, first_response = self.run_test(
+            "First Order Acceptance",
+            "POST",
+            f"orders/{order_id}/accept",
+            200,
+            token=self.courier_token
+        )
+        
+        if not first_accept_success:
+            self.log_test("Already Accepted Order Error", False, "Failed to accept order first time")
+            return False
+        
+        print(f"   ✅ Order accepted first time successfully")
+        
+        # Try to accept the same order again (should fail)
+        second_accept_success, second_response = self.run_test(
+            "Second Order Acceptance (Should Fail)",
+            "POST",
+            f"orders/{order_id}/accept",
+            400,  # Should be bad request
+            token=self.courier_token
+        )
+        
+        if second_accept_success:
+            print(f"   ✅ Second acceptance correctly rejected")
+            self.log_test("Already Accepted Order Error", True)
+            return True
+        else:
+            self.log_test("Already Accepted Order Error", False, "Second acceptance was not properly rejected")
+            return False
+    
+    def test_nearby_orders_realistic_coordinates(self):
+        """Test that nearby orders API returns realistic Istanbul coordinates instead of 520km distances"""
+        if not self.courier_token:
+            self.log_test("Nearby Orders Realistic Coordinates", False, "No courier token available")
+            return False
+        
+        # Ensure courier is KYC approved
+        if self.admin_token and self.courier_id:
+            self.run_test(
+                "Approve Courier for Coordinates Test",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+        
+        # Get nearby orders
+        success, nearby_orders = self.run_test(
+            "Get Nearby Orders for Coordinate Check",
+            "GET",
+            "orders/nearby",
+            200,
+            token=self.courier_token
+        )
+        
+        if not success:
+            self.log_test("Nearby Orders Realistic Coordinates", False, "Failed to get nearby orders")
+            return False
+        
+        if not isinstance(nearby_orders, list) or len(nearby_orders) == 0:
+            self.log_test("Nearby Orders Realistic Coordinates", False, "No nearby orders returned")
+            return False
+        
+        print(f"   📊 Found {len(nearby_orders)} nearby orders")
+        
+        # Check coordinates are realistic for Istanbul
+        istanbul_bounds = {
+            'lat_min': 40.8, 'lat_max': 41.3,  # Istanbul latitude range
+            'lng_min': 28.5, 'lng_max': 29.5   # Istanbul longitude range
+        }
+        
+        realistic_orders = 0
+        total_distance_sum = 0
+        
+        for i, order in enumerate(nearby_orders[:5]):  # Check first 5 orders
+            pickup_addr = order.get('pickup_address', {})
+            delivery_addr = order.get('delivery_address', {})
+            
+            pickup_lat = pickup_addr.get('lat')
+            pickup_lng = pickup_addr.get('lng')
+            delivery_lat = delivery_addr.get('lat')
+            delivery_lng = delivery_addr.get('lng')
+            
+            print(f"   📍 Order {i+1}:")
+            print(f"      Pickup: {pickup_lat}, {pickup_lng}")
+            print(f"      Delivery: {delivery_lat}, {delivery_lng}")
+            
+            # Check if coordinates are within Istanbul bounds
+            pickup_in_istanbul = (
+                pickup_lat and pickup_lng and
+                istanbul_bounds['lat_min'] <= pickup_lat <= istanbul_bounds['lat_max'] and
+                istanbul_bounds['lng_min'] <= pickup_lng <= istanbul_bounds['lng_max']
+            )
+            
+            delivery_in_istanbul = (
+                delivery_lat and delivery_lng and
+                istanbul_bounds['lat_min'] <= delivery_lat <= istanbul_bounds['lat_max'] and
+                istanbul_bounds['lng_min'] <= delivery_lng <= istanbul_bounds['lng_max']
+            )
+            
+            if pickup_in_istanbul and delivery_in_istanbul:
+                realistic_orders += 1
+                
+                # Calculate distance between pickup and delivery
+                if pickup_lat and pickup_lng and delivery_lat and delivery_lng:
+                    distance = self.calculate_distance(pickup_lat, pickup_lng, delivery_lat, delivery_lng)
+                    total_distance_sum += distance
+                    print(f"      Distance: {distance:.2f} km")
+                    
+                    # Check if distance is reasonable (not 520km!)
+                    if distance > 50:  # More than 50km is unrealistic for Istanbul delivery
+                        print(f"      ⚠️  Distance too large: {distance:.2f} km")
+                    else:
+                        print(f"      ✅ Realistic distance: {distance:.2f} km")
+            else:
+                print(f"      ❌ Coordinates outside Istanbul bounds")
+        
+        avg_distance = total_distance_sum / realistic_orders if realistic_orders > 0 else 0
+        
+        print(f"   📊 Realistic orders: {realistic_orders}/{min(5, len(nearby_orders))}")
+        print(f"   📊 Average distance: {avg_distance:.2f} km")
+        
+        # Success criteria: at least 80% of orders have realistic coordinates and average distance < 20km
+        success_rate = realistic_orders / min(5, len(nearby_orders))
+        
+        if success_rate >= 0.8 and avg_distance < 20:
+            print(f"   ✅ Coordinates are realistic: {success_rate*100:.1f}% success rate, {avg_distance:.2f}km avg distance")
+            self.log_test("Nearby Orders Realistic Coordinates", True)
+            return True
+        else:
+            print(f"   ❌ Coordinates not realistic enough: {success_rate*100:.1f}% success rate, {avg_distance:.2f}km avg distance")
+            self.log_test("Nearby Orders Realistic Coordinates", False, f"Only {success_rate*100:.1f}% realistic coordinates, {avg_distance:.2f}km avg distance")
+            return False
+    
+    def calculate_distance(self, lat1, lng1, lat2, lng2):
+        """Calculate distance between two points using Haversine formula"""
+        import math
+        
+        R = 6371  # Earth's radius in km
+        
+        lat1_rad = math.radians(lat1)
+        lng1_rad = math.radians(lng1)
+        lat2_rad = math.radians(lat2)
+        lng2_rad = math.radians(lng2)
+        
+        dlat = lat2_rad - lat1_rad
+        dlng = lng2_rad - lng1_rad
+        
+        a = math.sin(dlat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlng/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        
+        return R * c
+    
+    def test_complete_order_acceptance_flow(self):
+        """Test complete flow: courier accepts order → order status updates to 'assigned' → courier_id is set"""
+        if not self.courier_token or not self.customer_token or not self.created_products:
+            self.log_test("Complete Order Acceptance Flow", False, "Missing required tokens or products")
+            return False
+        
+        print("\n🔍 Testing Complete Order Acceptance Flow...")
+        
+        # Step 1: Ensure courier is KYC approved
+        if self.admin_token and self.courier_id:
+            approve_success, _ = self.run_test(
+                "Approve Courier for Complete Flow",
+                "PATCH",
+                f"admin/couriers/{self.courier_id}/kyc?kyc_status=approved",
+                200,
+                token=self.admin_token
+            )
+            
+            if not approve_success:
+                self.log_test("Complete Order Acceptance Flow", False, "Failed to approve courier")
+                return False
+        
+        # Step 2: Create a fresh order
+        product = self.created_products[0]
+        order_data = {
+            "delivery_address": "Sarıyer Sahil, Sarıyer, İstanbul",
+            "delivery_lat": 41.1058,
+            "delivery_lng": 29.0074,
+            "items": [{
+                "product_id": product['id'],
+                "product_name": product['name'],
+                "product_price": product['price'],
+                "quantity": 1,
+                "subtotal": product['price']
+            }],
+            "total_amount": product['price'],
+            "notes": "Complete flow test order"
+        }
+        
+        order_success, order_response = self.run_test(
+            "Create Order for Complete Flow",
+            "POST",
+            "orders",
+            200,
+            data=order_data,
+            token=self.customer_token
+        )
+        
+        if not order_success:
+            self.log_test("Complete Order Acceptance Flow", False, "Failed to create test order")
+            return False
+        
+        order_id = order_response.get('id')
+        print(f"   ✅ Step 1: Order created with ID {order_id}")
+        
+        # Step 3: Verify initial order state
+        if order_response.get('status') != 'created' or order_response.get('courier_id') is not None:
+            self.log_test("Complete Order Acceptance Flow", False, "Initial order state incorrect")
+            return False
+        
+        print(f"   ✅ Step 2: Initial order state correct (status='created', courier_id=None)")
+        
+        # Step 4: Accept the order
+        accept_success, accept_response = self.run_test(
+            "Accept Order in Complete Flow",
+            "POST",
+            f"orders/{order_id}/accept",
+            200,
+            token=self.courier_token
+        )
+        
+        if not accept_success:
+            self.log_test("Complete Order Acceptance Flow", False, "Failed to accept order")
+            return False
+        
+        print(f"   ✅ Step 3: Order accepted successfully")
+        
+        # Step 5: Verify order status and courier assignment
+        if self.admin_token:
+            verify_success, all_orders = self.run_test(
+                "Verify Final Order State",
+                "GET",
+                "admin/orders",
+                200,
+                token=self.admin_token
+            )
+            
+            if verify_success and isinstance(all_orders, list):
+                final_order = None
+                for order in all_orders:
+                    if order.get('id') == order_id:
+                        final_order = order
+                        break
+                
+                if final_order:
+                    final_status = final_order.get('status')
+                    final_courier_id = final_order.get('courier_id')
+                    assigned_at = final_order.get('assigned_at')
+                    
+                    print(f"   📊 Final order state:")
+                    print(f"      Status: {final_status}")
+                    print(f"      Courier ID: {final_courier_id}")
+                    print(f"      Assigned at: {assigned_at}")
+                    
+                    # Verify all expected changes
+                    if final_status != 'assigned':
+                        self.log_test("Complete Order Acceptance Flow", False, f"Final status is '{final_status}', expected 'assigned'")
+                        return False
+                    
+                    if final_courier_id != self.courier_id:
+                        self.log_test("Complete Order Acceptance Flow", False, f"Final courier_id is '{final_courier_id}', expected '{self.courier_id}'")
+                        return False
+                    
+                    if not assigned_at:
+                        self.log_test("Complete Order Acceptance Flow", False, "assigned_at timestamp not set")
+                        return False
+                    
+                    print(f"   ✅ Step 4: Order status correctly updated to 'assigned'")
+                    print(f"   ✅ Step 5: Courier ID correctly set to '{final_courier_id}'")
+                    print(f"   ✅ Step 6: Assignment timestamp recorded")
+                    
+                    self.log_test("Complete Order Acceptance Flow", True, "All steps completed successfully")
+                    return True
+                else:
+                    self.log_test("Complete Order Acceptance Flow", False, "Could not find order in database")
+                    return False
+        
+        self.log_test("Complete Order Acceptance Flow", False, "Could not verify final order state")
+        return False
+
     # ===== ORDER VISIBILITY BUG TESTS =====
     
     def test_courier_nearby_orders_access_control(self):
