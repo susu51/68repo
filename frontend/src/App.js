@@ -1369,7 +1369,6 @@ const CourierRegistration = ({ onComplete, onBack }) => {
               onFileUploaded={setVehiclePhotoUrl}
               accept="image/*"
             />
-            />
           </div>
           
           <div className="flex gap-4">
