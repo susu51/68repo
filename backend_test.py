@@ -1298,6 +1298,13 @@ class DeliverTRAPITester:
         self.test_kyc_error_scenarios()
         self.test_kyc_notes_handling()
         
+        # Test 11: ORDER VISIBILITY BUG TESTING
+        print("\n📋 PHASE 11: ORDER VISIBILITY BUG TESTING")
+        self.test_courier_nearby_orders_access_control()
+        self.test_order_creation_and_visibility_flow()
+        self.test_order_database_storage()
+        self.test_multiple_customers_order_visibility()
+        
         # Print summary
         print("\n" + "=" * 70)
         print("📊 TEST SUMMARY - DeliverTR MVP Core Business Flow")
