@@ -1765,7 +1765,12 @@ const CourierDashboard = ({ user }) => {
                 <CardTitle className="text-base sm:text-lg">Harita</CardTitle>
               </CardHeader>
               <CardContent>
-                <MapComponent />
+                <LeafletMap
+                  center={[39.925533, 32.866287]}
+                  zoom={12}
+                  height="300px"
+                  markers={[]}
+                />
               </CardContent>
             </Card>
           </div>
