@@ -272,6 +272,7 @@ const CartSummary = ({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) => {
 // Main Food Order System Component
 export const ProfessionalFoodOrderSystem = () => {
   const [restaurants, setRestaurants] = useState([]);
+  const [originalRestaurants, setOriginalRestaurants] = useState([]); // Store original data
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -281,6 +282,7 @@ export const ProfessionalFoodOrderSystem = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
+  const [sortType, setSortType] = useState('nearest'); // 'nearest' or 'citywide'
 
   useEffect(() => {
     getUserLocation();
