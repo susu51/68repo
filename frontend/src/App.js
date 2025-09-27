@@ -108,13 +108,20 @@ const LoginForm = ({ onRegisterClick }) => {
     e.preventDefault();
     setLoading(true);
 
+    console.log('Admin login attempt:', {
+      password: formData.adminPassword,
+      apiUrl: `${API}/auth/admin`
+    });
+
     try {
       const response = await axios.post(`${API}/auth/admin`, {
         password: formData.adminPassword
       });
+      console.log('Admin login success:', response.data);
       login(response.data);
       toast.success('Admin girişi başarılı!');
     } catch (error) {
+      console.error('Admin login error:', error);
       toast.error(error.response?.data?.detail || 'Yanlış admin şifresi');
     }
     setLoading(false);
