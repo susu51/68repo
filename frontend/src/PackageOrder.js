@@ -342,9 +342,11 @@ export const CreatePackageOrder = ({ onOrderCreated, onCancel }) => {
             <div>
               <Label className="text-base font-semibold">Alış Adresi</Label>
               <div className="mt-2">
-                <LocationPicker
-                  onLocationSelect={setPickupAddress}
-                  placeholder="Paket alınacak adres"
+                <Textarea
+                  value={pickupAddress}
+                  onChange={(e) => setPickupAddress(e.target.value)}
+                  placeholder="Paket alınacak adres (tam adres bilgisi)"
+                  rows="3"
                 />
               </div>
             </div>
@@ -352,9 +354,11 @@ export const CreatePackageOrder = ({ onOrderCreated, onCancel }) => {
             <div>
               <Label className="text-base font-semibold">Teslim Adresi</Label>
               <div className="mt-2">
-                <LocationPicker
-                  onLocationSelect={setDeliveryAddress}
-                  placeholder="Paket teslim edilecek adres"
+                <Textarea
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  placeholder="Paket teslim edilecek adres (tam adres bilgisi)"
+                  rows="3"
                 />
               </div>
             </div>
