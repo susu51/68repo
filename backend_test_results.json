@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total_tests": 86,
-    "passed_tests": 81,
-    "failed_tests": 5,
-    "success_rate": 94.18604651162791,
-    "timestamp": "2025-09-27T03:44:32.322216",
+    "total_tests": 99,
+    "passed_tests": 92,
+    "failed_tests": 7,
+    "success_rate": 92.92929292929293,
+    "timestamp": "2025-09-27T10:56:08.340846",
     "test_type": "delivertr_mvp_core_business_flow",
     "core_flow_success": true
   },
@@ -13,531 +13,609 @@
       "test": "Admin Authentication",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.664815"
+      "timestamp": "2025-09-27T10:55:49.085845"
     },
     {
       "test": "Admin Authentication - Wrong Password",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.699447"
+      "timestamp": "2025-09-27T10:55:49.122169"
     },
     {
       "test": "Business Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.735800"
+      "timestamp": "2025-09-27T10:55:51.714901"
     },
     {
       "test": "Customer Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.770148"
+      "timestamp": "2025-09-27T10:55:51.751792"
     },
     {
       "test": "Courier Registration",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.808120"
+      "timestamp": "2025-09-27T10:55:51.787750"
     },
     {
       "test": "Business Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.842263"
+      "timestamp": "2025-09-27T10:55:51.828943"
     },
     {
       "test": "Customer Login",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.875318"
+      "timestamp": "2025-09-27T10:55:51.864793"
     },
     {
       "test": "Product Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.913388"
+      "timestamp": "2025-09-27T10:55:52.810698"
     },
     {
       "test": "Product Creation 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.945680"
+      "timestamp": "2025-09-27T10:55:52.846090"
     },
     {
       "test": "Product Creation 3",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:29.979578"
+      "timestamp": "2025-09-27T10:55:52.884379"
     },
     {
       "test": "Product Creation 4",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.017058"
+      "timestamp": "2025-09-27T10:55:52.916892"
     },
     {
       "test": "Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.055506"
+      "timestamp": "2025-09-27T10:55:52.953314"
     },
     {
       "test": "Get Business Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.088919"
+      "timestamp": "2025-09-27T10:55:52.999435"
     },
     {
       "test": "Order Creation",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.124541"
+      "timestamp": "2025-09-27T10:55:53.045854"
     },
     {
       "test": "Get Customer Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.158932"
+      "timestamp": "2025-09-27T10:55:53.136786"
     },
     {
       "test": "Get Business Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.195039"
+      "timestamp": "2025-09-27T10:55:53.171775"
     },
     {
       "test": "Order Status Update - ASSIGNED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.232504"
+      "timestamp": "2025-09-27T10:55:53.204049"
     },
     {
       "test": "Order Status Update - ON_ROUTE",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.267546"
+      "timestamp": "2025-09-27T10:55:53.236106"
     },
     {
       "test": "Order Status Update - DELIVERED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.303138"
+      "timestamp": "2025-09-27T10:55:53.268211"
     },
     {
       "test": "Admin Get All Users",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.338800"
+      "timestamp": "2025-09-27T10:55:53.306073"
     },
     {
       "test": "Admin Get All Products",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.373808"
+      "timestamp": "2025-09-27T10:55:53.339332"
     },
     {
       "test": "Admin Get All Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.413257"
+      "timestamp": "2025-09-27T10:55:53.375401"
     },
     {
       "test": "RBAC - Customer Create Product (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.448027"
+      "timestamp": "2025-09-27T10:55:53.406327"
     },
     {
       "test": "RBAC - Business Access Admin (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.486920"
+      "timestamp": "2025-09-27T10:55:53.439105"
     },
     {
       "test": "File Upload Endpoint",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.520788"
+      "timestamp": "2025-09-27T10:55:53.475690"
     },
     {
       "test": "KYC Get Couriers",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.556258"
+      "timestamp": "2025-09-27T10:55:53.511343"
     },
     {
       "test": "KYC Approve Courier",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.588100"
+      "timestamp": "2025-09-27T10:55:53.544133"
     },
     {
       "test": "Register Courier for Rejection Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.624191"
+      "timestamp": "2025-09-27T10:55:53.578647"
     },
     {
       "test": "KYC Reject Courier with Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.660371"
+      "timestamp": "2025-09-27T10:55:54.525347"
     },
     {
       "test": "Register Courier for Flow Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.695284"
+      "timestamp": "2025-09-27T10:55:54.578179"
     },
     {
       "test": "KYC Status Update - APPROVED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.726679"
+      "timestamp": "2025-09-27T10:55:54.612326"
     },
     {
       "test": "KYC Status Update - REJECTED",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.760807"
+      "timestamp": "2025-09-27T10:55:54.646542"
     },
     {
       "test": "KYC Status Update - PENDING",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.793943"
+      "timestamp": "2025-09-27T10:55:54.680741"
     },
     {
       "test": "KYC Get Couriers - No Auth (Should Fail)",
       "success": false,
       "details": "Expected 401, got 403. Error: {'detail': 'Not authenticated'}",
-      "timestamp": "2025-09-27T03:44:30.825403"
+      "timestamp": "2025-09-27T10:55:55.506274"
     },
     {
       "test": "KYC Get Couriers - Business Token (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.861875"
+      "timestamp": "2025-09-27T10:55:55.542331"
     },
     {
       "test": "KYC Get Couriers - Customer Token (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.894546"
+      "timestamp": "2025-09-27T10:55:55.573734"
     },
     {
       "test": "KYC Update - Invalid Courier ID",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.930024"
+      "timestamp": "2025-09-27T10:55:55.604607"
     },
     {
       "test": "KYC Update - Invalid Status",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.963276"
+      "timestamp": "2025-09-27T10:55:55.636744"
     },
     {
       "test": "KYC Update - Malformed Body",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:30.996124"
+      "timestamp": "2025-09-27T10:55:55.667324"
     },
     {
       "test": "Register Courier for Notes Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.035311"
+      "timestamp": "2025-09-27T10:55:55.701950"
     },
     {
       "test": "KYC Update - With Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.071739"
+      "timestamp": "2025-09-27T10:55:55.736369"
     },
     {
       "test": "KYC Update - Without Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.106186"
+      "timestamp": "2025-09-27T10:55:55.769890"
     },
     {
       "test": "KYC Update - Empty Notes",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.138122"
+      "timestamp": "2025-09-27T10:55:55.803976"
     },
     {
       "test": "Approve Courier for Order Acceptance",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.172087"
+      "timestamp": "2025-09-27T10:55:55.840234"
     },
     {
       "test": "Create Order for Acceptance Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.207570"
+      "timestamp": "2025-09-27T10:55:55.873942"
     },
     {
       "test": "Accept Order - POST /orders/{order_id}/accept",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.241372"
+      "timestamp": "2025-09-27T10:55:55.905119"
     },
     {
       "test": "Approve Courier for Status Update Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.277310"
+      "timestamp": "2025-09-27T10:55:55.937363"
     },
     {
       "test": "Create Order for Status Update Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.311399"
+      "timestamp": "2025-09-27T10:55:55.971886"
     },
     {
       "test": "Accept Order for Status Verification",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.342483"
+      "timestamp": "2025-09-27T10:55:56.006469"
     },
     {
       "test": "Verify Order Status After Acceptance",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.376052"
+      "timestamp": "2025-09-27T10:55:56.049352"
     },
     {
       "test": "Order Acceptance Status Update",
       "success": false,
       "details": "Could not find accepted order in database",
-      "timestamp": "2025-09-27T03:44:31.376730"
+      "timestamp": "2025-09-27T10:55:56.049967"
     },
     {
       "test": "Register Non-Approved Courier",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.409569"
+      "timestamp": "2025-09-27T10:55:56.667581"
     },
     {
       "test": "Create Order for KYC Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.443275"
+      "timestamp": "2025-09-27T10:55:56.701010"
     },
     {
       "test": "Non-Approved Courier Accept Order (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.475538"
+      "timestamp": "2025-09-27T10:55:56.731305"
     },
     {
       "test": "Approve Courier for Acceptance Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.507402"
+      "timestamp": "2025-09-27T10:55:56.763832"
     },
     {
       "test": "Approved Courier Accept Order",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.537776"
+      "timestamp": "2025-09-27T10:55:57.533064"
     },
     {
       "test": "KYC Approval Check for Acceptance",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.538343"
+      "timestamp": "2025-09-27T10:55:57.533762"
     },
     {
       "test": "Approve Courier for Double Accept Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.570786"
+      "timestamp": "2025-09-27T10:55:57.564964"
     },
     {
       "test": "Create Order for Double Accept Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.603943"
+      "timestamp": "2025-09-27T10:55:57.597271"
     },
     {
       "test": "First Order Acceptance",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.636670"
+      "timestamp": "2025-09-27T10:55:57.631026"
     },
     {
       "test": "Second Order Acceptance (Should Fail)",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.669691"
+      "timestamp": "2025-09-27T10:55:57.665182"
     },
     {
       "test": "Already Accepted Order Error",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.670171"
+      "timestamp": "2025-09-27T10:55:57.665785"
     },
     {
       "test": "Approve Courier for Coordinates Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.702006"
+      "timestamp": "2025-09-27T10:55:57.701649"
     },
     {
       "test": "Get Nearby Orders for Coordinate Check",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.736464"
+      "timestamp": "2025-09-27T10:55:57.738222"
     },
     {
       "test": "Nearby Orders Realistic Coordinates",
       "success": false,
       "details": "No nearby orders returned",
-      "timestamp": "2025-09-27T03:44:31.737015"
+      "timestamp": "2025-09-27T10:55:57.738806"
     },
     {
       "test": "Approve Courier for Complete Flow",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.770857"
+      "timestamp": "2025-09-27T10:55:57.769875"
     },
     {
       "test": "Create Order for Complete Flow",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.804274"
+      "timestamp": "2025-09-27T10:55:57.807769"
     },
     {
       "test": "Accept Order in Complete Flow",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.844258"
+      "timestamp": "2025-09-27T10:55:57.840795"
     },
     {
       "test": "Verify Final Order State",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.882404"
+      "timestamp": "2025-09-27T10:55:57.879793"
     },
     {
       "test": "Complete Order Acceptance Flow",
       "success": false,
       "details": "Could not find order in database",
-      "timestamp": "2025-09-27T03:44:31.882988"
+      "timestamp": "2025-09-27T10:55:57.880408"
     },
     {
       "test": "Nearby Orders - Non-Approved Courier (Should Fail)",
       "success": false,
       "details": "Expected 403, got 200. Error: []",
-      "timestamp": "2025-09-27T03:44:31.917709"
+      "timestamp": "2025-09-27T10:55:57.914957"
     },
     {
       "test": "Approve Test Courier for Nearby Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.949824"
+      "timestamp": "2025-09-27T10:55:57.947415"
     },
     {
       "test": "Nearby Orders - Approved Courier",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:31.981361"
+      "timestamp": "2025-09-27T10:55:57.979004"
     },
     {
       "test": "Create Order for Visibility Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.018390"
+      "timestamp": "2025-09-27T10:55:58.024889"
     },
     {
       "test": "Ensure Courier KYC Approved",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.050365"
+      "timestamp": "2025-09-27T10:55:58.057868"
     },
     {
       "test": "Check Order in Nearby Orders",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.081727"
+      "timestamp": "2025-09-27T10:55:58.092587"
     },
     {
       "test": "Order Creation and Visibility Flow",
       "success": true,
-      "details": "Order ae018e57-f9eb-4924-9f9e-80535fbc7740 successfully visible in courier nearby orders",
-      "timestamp": "2025-09-27T03:44:32.082320"
+      "details": "Order be8851ba-72f2-4c61-b2ba-2b6aaf5f9fe0 successfully visible in courier nearby orders",
+      "timestamp": "2025-09-27T10:55:58.093221"
     },
     {
       "test": "Get All Orders from Database",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.116075"
+      "timestamp": "2025-09-27T10:56:00.006487"
     },
     {
       "test": "Order Database Storage",
       "success": true,
       "details": "Orders properly stored in database: 1 created orders found",
-      "timestamp": "2025-09-27T03:44:32.116765"
+      "timestamp": "2025-09-27T10:56:00.007153"
     },
     {
       "test": "Register Additional Customer 1",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.151485"
+      "timestamp": "2025-09-27T10:56:02.240932"
     },
     {
       "test": "Create Order for Customer 1",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.187429"
+      "timestamp": "2025-09-27T10:56:02.302474"
     },
     {
       "test": "Register Additional Customer 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.218377"
+      "timestamp": "2025-09-27T10:56:05.120342"
     },
     {
       "test": "Create Order for Customer 2",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.249938"
+      "timestamp": "2025-09-27T10:56:07.920442"
     },
     {
       "test": "Approve Courier for Multi-Customer Test",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.285329"
+      "timestamp": "2025-09-27T10:56:07.963258"
     },
     {
       "test": "Get Nearby Orders - Multi Customer",
       "success": true,
       "details": "",
-      "timestamp": "2025-09-27T03:44:32.321252"
+      "timestamp": "2025-09-27T10:56:07.995952"
     },
     {
       "test": "Multiple Customers Order Visibility",
       "success": true,
       "details": "All 2 orders from multiple customers visible to courier",
-      "timestamp": "2025-09-27T03:44:32.321867"
+      "timestamp": "2025-09-27T10:56:07.996561"
+    },
+    {
+      "test": "Public Businesses Endpoint",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.031054"
+    },
+    {
+      "test": "Business Products Endpoint",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.063076"
+    },
+    {
+      "test": "Business Products - Invalid ID",
+      "success": false,
+      "details": "Expected 500, got 200. Error: []",
+      "timestamp": "2025-09-27T10:56:08.098162"
+    },
+    {
+      "test": "Register Non-Approved Business",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.131780"
+    },
+    {
+      "test": "Get Public Businesses for Approval Check",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.166452"
+    },
+    {
+      "test": "Approved Businesses Only",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.167077"
+    },
+    {
+      "test": "Public Businesses - No Auth Required",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.201893"
+    },
+    {
+      "test": "Public Business Products - No Auth Required",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.263762"
+    },
+    {
+      "test": "Public Endpoints No Auth Required",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.264363"
+    },
+    {
+      "test": "Get Businesses for Data Completeness Check",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.297444"
+    },
+    {
+      "test": "Business Data Completeness",
+      "success": false,
+      "details": "No businesses returned",
+      "timestamp": "2025-09-27T10:56:08.298110"
+    },
+    {
+      "test": "Get Products for Data Completeness Check",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.339884"
+    },
+    {
+      "test": "Product Data Completeness",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-09-27T10:56:08.340588"
     }
   ],
   "created_entities": {
-    "business_id": "da021946-4f66-4336-91b8-54b1a8db82c2",
-    "customer_id": "f3b42e79-ddc6-4c93-b1dc-5950983de6fc",
-    "courier_id": "73dda8b5-ef64-4fd4-88d4-dfc7025ecc42",
+    "business_id": "d4934b81-0e20-4744-bd1f-65e030770da4",
+    "customer_id": "fa1132df-79c8-42fb-8a93-89b6ba3ef7c7",
+    "courier_id": "160950e4-7c21-43e6-afd4-029981854b08",
     "products": [
-      "4fa31282-b890-4534-be53-8fdb3008deab",
-      "88b283d4-17fe-4d84-bb23-8bddbcb6c48c",
-      "bd051510-53ce-4b31-b23b-d85c0346a988",
-      "09beed36-f728-4225-a509-02a2951fd562"
+      "6ee22001-8ae7-45c0-97a8-f15fa4226601",
+      "e894504d-dab3-4ae9-b7ba-040f65d515be",
+      "c1463924-da37-40d6-bf59-be1ae37dd075",
+      "f3d042db-9e8f-437d-95d0-aadb52e80e8d"
     ],
     "orders": [
-      "ffc26b5e-b5f4-4eb8-b0b7-4c8b3a1d5437"
+      "a8d6267a-0dfa-4d79-9115-fbbac863b889"
     ]
   }
 }
