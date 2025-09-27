@@ -750,7 +750,7 @@ async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
         delivery_lng = pickup_lng + 0.005
         
         order_data = {
-            "id": str(order["_id"]),
+            "id": order.get("id", str(order["_id"])),
             "customer_name": order.get("customer_name", "Müşteri"),
             "business_name": order.get("business_name", "İşletme"),
             "pickup_address": {
