@@ -138,6 +138,18 @@ backend:
         -agent: "testing"
         -comment: "✅ COMPREHENSIVE TESTING COMPLETE: All core business flow tests passed (25/25, 100% success rate). Product creation working with proper business association."
 
+  - task: "Business Dashboard API Authentication"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: false
+        -agent: "testing"
+        -comment: "❌ CRITICAL AUTHENTICATION FAILURES: Business dashboard API endpoints (GET /products/my, POST /products, GET /orders) work WITHOUT authentication tokens - major security vulnerability. Authentication middleware not enforcing properly. Business ID mismatch: login returns '68d7c3f4a2dfae073624e55b' but products show '768a4c2e-5d50-4f63-942a-21d5020d5b35'. Some endpoints return 404 intermittently. Business login with testrestoran@example.com/test123 works correctly, but protected endpoints accessible without valid tokens. URGENT FIX REQUIRED."
+
 frontend:
   - task: "CustomerDashboard JSX Fix"
     implemented: true
