@@ -217,17 +217,20 @@ frontend:
         -agent: "main"
         -comment: "FIXED: Removed duplicate/orphaned JSX elements and fixed improper JSX structure in NearbyOrdersForCourier component. Frontend now compiles successfully and application loads correctly."
 
-  - task: "Iyzico Payment Gateway Integration"
-    implemented: false
-    working: "NA"
-    file: "server.py"
+  - task: "Courier Order Acceptance and Location Issues"
+    implemented: true
+    working: true
+    file: "OrderSystem.js, server.py"
     stuck_count: 0
-    priority: "high" 
+    priority: "high"
     needs_retesting: true
     status_history:
-        -working: "NA"
+        -working: false
+        -agent: "user"
+        -comment: "USER REPORTED: 1) Cannot accept orders 2) Distance calculation showing 520km for nearby addresses 3) Map calculates distance without showing courier location first"
+        -working: true
         -agent: "main"
-        -comment: "PLANNING: Received comprehensive integration playbook for Iyzico sandbox integration with commission management. Ready to implement payment processing, webhook handling, and commission tracking system with 3% platform fee."
+        -comment: "FIXED: 1) Added missing /orders/{order_id}/accept API endpoint in backend 2) Improved location tracking - now gets location first, then fetches orders 3) Enhanced coordinate system with realistic Istanbul districts instead of fake spreading 4) Added location error handling and retry functionality 5) Prevented distance calculation without courier location 6) Added location status indicators and better UX"
 
 metadata:
   created_by: "main_agent"
