@@ -703,24 +703,6 @@ export const NearbyOrdersForCourier = () => {
           })}
         </div>
       )}
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => acceptOrder(order.id)}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                  data-testid={`accept-order-${order.id}`}
-                >
-                  ✅ Kabul Et
-                </Button>
-                <Button variant="outline" className="flex-1">
-                  📍 Haritada Gör
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      )}
     </div>
   );
 };
