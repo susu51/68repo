@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-DeliverTR Backend API Testing Suite - Phone/SMS OTP Authentication
-Tests all API endpoints for the Turkish delivery platform MVP with new OTP system
+DeliverTR Backend API Testing Suite - Core Business Flow
+Tests all API endpoints for the Turkish delivery platform MVP core business flow:
+- Product Management (Business creates products with photos)
+- Order Creation (Customer creates orders with multiple items)
+- Order Status Management (CREATED→ASSIGNED→ON_ROUTE→DELIVERED)
+- Admin Authentication (password "6851")
+- Admin Management (users, products, orders)
+- Commission Calculation (3%)
 """
 
 import requests
@@ -9,20 +15,33 @@ import sys
 import json
 from datetime import datetime
 import time
+import uuid
 
 class DeliverTRAPITester:
     def __init__(self, base_url="https://quick-courier-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.access_token = None
-        self.refresh_token = None
+        self.admin_token = None
+        self.business_token = None
+        self.customer_token = None
+        self.courier_token = None
         self.tests_run = 0
         self.tests_passed = 0
-        self.test_phone = "+905551234567"
-        self.test_phone_business = "+905551234568"
-        self.test_phone_customer = "+905551234569"
         self.test_results = []
-        self.mock_otp = None
+        
+        # Test data
+        self.business_email = f"business_{uuid.uuid4().hex[:8]}@test.com"
+        self.customer_email = f"customer_{uuid.uuid4().hex[:8]}@test.com"
+        self.courier_email = f"courier_{uuid.uuid4().hex[:8]}@test.com"
+        self.test_password = "TestPass123!"
+        
+        # Store created entities for testing
+        self.created_products = []
+        self.created_orders = []
+        self.business_id = None
+        self.customer_id = None
+        self.courier_id = None
 
     def log_test(self, name, success, details=""):
         """Log test results"""
