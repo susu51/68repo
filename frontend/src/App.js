@@ -3736,8 +3736,8 @@ const CustomerDashboard = ({ user }) => {
                   </Card>
                 ) : (
                   <div className="grid md:grid-cols-2 gap-4">
-                    {activeCoupons.map((coupon) => (
-                      <Card key={coupon.id} className="border-2 border-dashed border-blue-300 hover:border-blue-500 transition-colors">
+                    {activeCoupons.map((coupon, index) => (
+                      <Card key={`coupon-${coupon.id || index}`} className="border-2 border-dashed border-blue-300 hover:border-blue-500 transition-colors">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div className="text-lg font-bold text-blue-600">{coupon.code}</div>
