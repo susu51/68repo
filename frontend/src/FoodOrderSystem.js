@@ -299,6 +299,9 @@ export const ProfessionalFoodOrderSystem = () => {
     // Cleanup function
     return () => {
       setIsMounted(false);
+      // Clear any pending state updates
+      setLoading(false);
+      setLocationError(null);
     };
   }, []);
 
