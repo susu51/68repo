@@ -739,8 +739,16 @@ const AdminDashboard = ({ user }) => {
           {/* Main Content Area */}
           <div className="flex-1">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
+              {/* Users Tab */}
+              <TabsContent value="users" className="space-y-6">
+                <Card>
+                  <CardContent className="p-6">
+                    <p>Kullanıcı Yönetimi - {users.length} kullanıcı</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-          {/* KYC Tab */}
+              {/* KYC Tab */}
           <TabsContent value="kyc" className="space-y-4 sm:space-y-6">
             <Card>
               <CardHeader>
