@@ -20,6 +20,32 @@ from enum import Enum
 import bcrypt
 import random
 
+# Import phone validation function
+try:
+    from models import validate_turkish_phone
+except ImportError:
+    # Fallback phone validation function
+    def validate_turkish_phone(phone: str) -> str:
+        import re
+        cleaned = re.sub(r'[^\d+]', '', phone)
+        patterns = [
+            r'^\+90[5-9]\d{9}$',  # +90 5xx xxx xx xx
+            r'^90[5-9]\d{9}$',    # 90 5xx xxx xx xx  
+            r'^0[5-9]\d{9}$',     # 0 5xx xxx xx xx
+            r'^[5-9]\d{9}$'       # 5xx xxx xx xx
+        ]
+        for pattern in patterns:
+            if re.match(pattern, cleaned):
+                if cleaned.startswith('+90'):
+                    return cleaned
+                elif cleaned.startswith('90'):
+                    return '+' + cleaned
+                elif cleaned.startswith('0'):
+                    return '+90' + cleaned[1:]
+                else:
+                    return '+90' + cleaned
+        raise ValueError('Invalid Turkish phone number format')
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
