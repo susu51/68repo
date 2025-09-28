@@ -744,7 +744,7 @@ const AdminDashboard = ({ user }) => {
                   onClick={() => setActiveTab(item.value)}
                   className={`w-full text-left p-4 rounded-xl transition-all duration-300 group ${
                     activeTab === item.value
-                      ? `bg-gradient-to-r from-${item.color}-500 to-${item.color}-600 text-white shadow-lg transform scale-105`
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105'
                       : isDarkMode
                       ? 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-md'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 hover:shadow-md'
