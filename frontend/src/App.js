@@ -3319,9 +3319,43 @@ const CustomerDashboard = ({ user }) => {
     }
   };
 
+  // Marketing & Loyalty fetch functions
+  const fetchCampaigns = async () => {
+    try {
+      const response = await axios.get(`${API}/campaigns`);
+      setCampaigns(response.data);
+    } catch (error) {
+      console.error('Kampanyalar yüklenemedi:', error);
+    }
+  };
+
+  const fetchLoyaltyPoints = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const response = await axios.get(`${API}/loyalty/points`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLoyaltyPoints(response.data);
+    } catch (error) {
+      console.error('Sadakat puanları yüklenemedi:', error);
+    }
+  };
+
+  const fetchActiveCoupons = async () => {
+    try {
+      const response = await axios.get(`${API}/coupons/active`);
+      setActiveCoupons(response.data);
+    } catch (error) {
+      console.error('Kuponlar yüklenemedi:', error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
     fetchMyOrders();
+    fetchCampaigns();
+    fetchLoyaltyPoints();
+    fetchActiveCoupons();
   }, []);
 
   const addToCart = (product) => {
