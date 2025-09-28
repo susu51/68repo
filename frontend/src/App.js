@@ -3880,7 +3880,82 @@ const HomePage = ({ onAuthStart }) => {
           </div>
         </div>
 
-        {/* Features */}
+        {/* Social Proof Section */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
+          <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
+            🏆 Binlerce Müşterimiz Bize Güveniyor
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="flex flex-col items-center">
+              <div className="text-3xl font-bold text-orange-600">1000+</div>
+              <div className="text-sm text-gray-600">Mutlu Müşteri</div>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="text-3xl font-bold text-green-600">500+</div>
+              <div className="text-sm text-gray-600">Partner İşletme</div>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="text-3xl font-bold text-blue-600">15 dk</div>
+              <div className="text-sm text-gray-600">Ortalama Teslimat</div>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="text-3xl font-bold text-purple-600">4.8⭐</div>
+              <div className="text-sm text-gray-600">Müşteri Puanı</div>
+            </div>
+          </div>
+          
+          {/* Trust Badges */}
+          <div className="flex flex-wrap justify-center items-center gap-6 mt-8 pt-8 border-t border-gray-200">
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span className="text-green-500">🔒</span>
+              <span>SSL Güvenlik</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span className="text-blue-500">💳</span>
+              <span>Güvenli Ödeme</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span className="text-orange-500">🚚</span>
+              <span>7/24 Teslimat</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span className="text-red-500">📞</span>
+              <span>Müşteri Desteği</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Popular Products Section */}
+        <div className="mb-16">
+          <h3 className="text-3xl font-bold text-center text-gray-800 mb-8">
+            🔥 Popüler Ürünler
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { name: "Margherita Pizza", price: "45₺", image: "🍕", rating: "4.9", orders: "1200+" },
+              { name: "Cheeseburger Menü", price: "35₺", image: "🍔", rating: "4.8", orders: "850+" },
+              { name: "Tavuk Döner", price: "25₺", image: "🌯", rating: "4.7", orders: "950+" },
+              { name: "Sushi Set", price: "85₺", image: "🍣", rating: "4.9", orders: "420+" }
+            ].map((product, index) => (
+              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+                <CardContent className="p-4">
+                  <div className="text-4xl mb-3">{product.image}</div>
+                  <h4 className="font-semibold text-gray-800 mb-2">{product.name}</h4>
+                  <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
+                    <span>⭐ {product.rating}</span>
+                    <span className="text-orange-600 font-bold">{product.price}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">{product.orders} sipariş</div>
+                  <Button className="w-full mt-3 bg-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white text-sm">
+                    Sepete Ekle
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Service Features */}
         <div className="grid md:grid-cols-3 gap-8 mt-16">
           <Card key="courier-card" className="text-center hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
