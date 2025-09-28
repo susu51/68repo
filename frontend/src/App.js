@@ -3562,10 +3562,11 @@ const CustomerDashboard = ({ user }) => {
         <div className="mb-8">
           <div className="flex space-x-2 sm:space-x-4 p-2 bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50">
             {[
+              { id: 'campaigns', icon: '🎉', label: 'Kampanyalar', count: campaigns.length },
               { id: 'products', icon: '🍽️', label: 'Keşfet', count: products.length },
+              { id: 'loyalty', icon: '⭐', label: 'Puanlarım', count: loyaltyPoints.total_points },
               { id: 'cart', icon: '🛒', label: 'Sepet', count: cart.length },
-              { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length },
-              { id: 'map', icon: '🗺️', label: 'Harita', count: null }
+              { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length }
             ].map((tab) => (
               <button
                 key={tab.id}
