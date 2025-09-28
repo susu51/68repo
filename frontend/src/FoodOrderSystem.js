@@ -360,11 +360,14 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const fetchRestaurants = async () => {
+    if (!isMounted) return; // Early return if component is unmounted
+    
     try {
       // Use the new public businesses endpoint
       const response = await axios.get(`${API}/businesses`);
       const businessData = response.data;
       
+      // Double-check isMounted after async operation
       if (isMounted) {
         setOriginalRestaurants(businessData); // Store original data
         sortAndFilterRestaurants(businessData, sortType, userLocation);
@@ -375,9 +378,11 @@ export const ProfessionalFoodOrderSystem = () => {
       if (isMounted) {
         toast.error('Restoranlar yüklenirken hata oluştu');
       }
-    }
-    if (isMounted) {
-      setLoading(false);
+    } finally {
+      // Always set loading to false if component is still mounted
+      if (isMounted) {
+        setLoading(false);
+      }
     }
   };
 
