@@ -246,6 +246,10 @@ const AdminDashboard = ({ user }) => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [couriers, setCouriers] = useState([]);
+  const [kycFilter, setKycFilter] = useState('pending');
+  const [selectedCourier, setSelectedCourier] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   
   // Theme state
