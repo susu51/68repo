@@ -2489,6 +2489,95 @@ async def earn_loyalty_points(order_id: str, current_user: dict = Depends(get_cu
     
     return {"message": f"{points_earned} puan kazandınız!", "points": points_earned}
 
+# Business Approval System Endpoints
+@api_router.get("/admin/businesses/pending")
+async def get_pending_businesses(current_user: dict = Depends(get_admin_user)):
+    """Get all businesses pending approval (Admin only)"""
+    businesses = await db.users.find({
+        "role": "business",
+        "business_status": "pending"
+    }).to_list(length=None)
+    
+    for business in businesses:
+        business["id"] = str(business["_id"])
+        del business["_id"]
+        if "password" in business:
+            del business["password"]
+        business["created_at"] = business["created_at"].isoformat()
+    
+    return businesses
+
+@api_router.post("/admin/businesses/{business_id}/approve")
+async def approve_business(business_id: str, current_user: dict = Depends(get_admin_user)):
+    """Approve a business (Admin only)"""
+    try:
+        # Try UUID format first
+        business = await db.users.find_one({"id": business_id, "role": "business"})
+        
+        if not business:
+            # Try ObjectId format
+            from bson import ObjectId
+            object_id = ObjectId(business_id)
+            business = await db.users.find_one({"_id": object_id, "role": "business"})
+            business_id_filter = {"_id": object_id}
+        else:
+            business_id_filter = {"id": business_id}
+            
+        if not business:
+            raise HTTPException(status_code=404, detail="Business not found")
+        
+        # Update business status to approved
+        await db.users.update_one(
+            business_id_filter,
+            {
+                "$set": {
+                    "business_status": "approved",
+                    "approved_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {"message": "Business approved successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.post("/admin/businesses/{business_id}/reject")
+async def reject_business(business_id: str, reason: str, current_user: dict = Depends(get_admin_user)):
+    """Reject a business with reason (Admin only)"""
+    try:
+        # Try UUID format first
+        business = await db.users.find_one({"id": business_id, "role": "business"})
+        
+        if not business:
+            # Try ObjectId format
+            from bson import ObjectId
+            object_id = ObjectId(business_id)
+            business = await db.users.find_one({"_id": object_id, "role": "business"})
+            business_id_filter = {"_id": object_id}
+        else:
+            business_id_filter = {"id": business_id}
+            
+        if not business:
+            raise HTTPException(status_code=404, detail="Business not found")
+        
+        # Update business status to rejected
+        await db.users.update_one(
+            business_id_filter,
+            {
+                "$set": {
+                    "business_status": "rejected",
+                    "rejection_reason": reason,
+                    "rejected_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {"message": "Business rejected successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 # Coupon Management Endpoints
 @api_router.get("/coupons/active")
 async def get_active_coupons():
