@@ -13,6 +13,7 @@ import { CustomerProfile } from "./CustomerProfile";
 import PhoneAuth from "./PhoneAuth";
 import { ModernLogin } from "./ModernLogin";
 import { KuryeciniTextLogo } from "./components/KuryeciniLogo";
+import { AdCarousel } from "./components/AdCarousel";
 
 // Components
 import { Button } from "./components/ui/button";
