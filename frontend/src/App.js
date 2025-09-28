@@ -238,24 +238,14 @@ const CitySelector = ({ value, onChange, required = false }) => {
   );
 };
 
-// Admin Dashboard - Simplified with Sidebar
+// Admin Dashboard - Simple Working Version
 const AdminDashboard = ({ user }) => {
   const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [couriers, setCouriers] = useState([]);
-  const [kycFilter, setKycFilter] = useState('pending');
   const [loading, setLoading] = useState(false);
-  const [selectedCourier, setSelectedCourier] = useState(null);
-  const [rejectReason, setRejectReason] = useState('');
-  const [showRejectDialog, setShowRejectDialog] = useState(false);
-  
-  // Theme state
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('admin_theme') === 'dark';
-  });
 
   const fetchUsers = async () => {
     try {
