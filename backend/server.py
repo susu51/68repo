@@ -3242,7 +3242,7 @@ async def verify_phone_otp(verify_data: dict):
             "id": user["id"],
             "phone": user["phone"],
             "email": user.get("email"),
-            "role": user["role"],
+            "role": user.get("role", "customer"),
             "first_name": user.get("first_name", ""),
             "last_name": user.get("last_name", ""),
             "profile_completed": user.get("profile_completed", False)
