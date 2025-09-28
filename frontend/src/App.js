@@ -11,6 +11,8 @@ import LeafletMap from "./LeafletMap";
 import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
 import { CustomerProfile } from "./CustomerProfile";
 import PhoneAuth from "./PhoneAuth";
+import { ModernLogin } from "./ModernLogin";
+import { KuryeciniTextLogo } from "./components/KuryeciniLogo";
 
 // Components
 import { Button } from "./components/ui/button";
