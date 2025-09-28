@@ -4268,10 +4268,11 @@ const HomePage = ({ onAuthStart }) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
               onClick={onAuthStart}
-              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-8 py-4 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-              data-testid="get-started-btn"
+              size="lg"
+              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-8 py-4 text-xl font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+              data-testid="cta-button"
             >
-              🛍️ Hemen Sipariş Ver
+              🚀 Hemen Sipariş Ver
             </Button>
             <div className="flex items-center space-x-4 text-sm text-gray-600">
               <span className="flex items-center">⭐ 4.8 Ortalama Puan</span>
