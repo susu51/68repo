@@ -3383,7 +3383,7 @@ async def verify_phone_otp(verify_data: dict):
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "Kuryecini API v7.0 - Customer Profile & Phone Auth System"}
+    return {"message": "Kuryecini API v8.0 - Modern Login & Google OAuth Integration"}
 
 # Include the router in the main app
 app.include_router(api_router)
