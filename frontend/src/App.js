@@ -4266,7 +4266,7 @@ const HomePage = ({ onAuthStart }) => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Button 
               onClick={onAuthStart}
               size="lg"
@@ -4277,9 +4277,14 @@ const HomePage = ({ onAuthStart }) => {
             </Button>
             <div className="flex items-center space-x-4 text-sm text-gray-600">
               <span className="flex items-center">⭐ 4.8 Ortalama Puan</span>
-              <span className="flex items-center">🚚 Ücretsz Teslimat</span>
-              <span className="flex items-center">💳 Güvenli Ödeme</span>
+              <span className="flex items-center">🚚 Ücretsiz Teslimat</span>
+              <span className="flex items-center">💸 Güvenli Ödeme</span>
             </div>
+          </div>
+          
+          {/* Advertisement Carousel */}
+          <div className="max-w-4xl mx-auto">
+            <AdCarousel />
           </div>
         </div>
 
