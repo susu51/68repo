@@ -3229,7 +3229,7 @@ async def verify_phone_otp(verify_data: dict):
     token_data = {
         "sub": user["id"],
         "phone": user["phone"],
-        "role": user["role"],
+        "role": user.get("role", "customer"),  # Default to customer if role not set
         "exp": datetime.now(timezone.utc) + timedelta(hours=24)
     }
     
