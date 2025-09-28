@@ -3810,36 +3810,74 @@ const CustomerDashboard = ({ user }) => {
 
 // Main Pages
 const HomePage = ({ onAuthStart }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50">
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
+      {/* Marketing Hero Section */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Main Hero */}
+        <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6" key="logo-container">
             <div 
               key="logo-icon"
-              className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg mr-4"
+              className="w-20 h-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg mr-4"
             >
-              <span className="text-white text-2xl font-bold">K</span>
+              <span className="text-white text-3xl font-bold">🍕</span>
             </div>
-            <h1 
-              key="logo-text"
-              className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent"
-            >
-              Kuryecini
-            </h1>
+            <div>
+              <h1 
+                key="logo-text"
+                className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"
+              >
+                Kuryecini
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">Türkiye'nin En Hızlı Teslimat Platformu</p>
+            </div>
           </div>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Türkiye'nin en hızlı teslimat platformu. Herkes kurye olabilir, 
-            her işletme satabilir, herkes sipariş verebilir.
+          
+          {/* Marketing Slogan */}
+          <h2 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 leading-tight">
+            🚀 <span className="text-orange-600">15 Dakikada</span> Kapınızda!
+          </h2>
+          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Binlerce restoran, market ve mağazadan istediğinizi sipariş edin. 
+            <span className="font-semibold text-orange-600"> Güvenli, hızlı ve uygun fiyatla!</span>
           </p>
-          <Button 
-            onClick={onAuthStart}
-            className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-            data-testid="get-started-btn"
-          >
-            Hemen Başla →
-          </Button>
+
+          {/* Search Box */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="🔍 Restoran, ürün veya mağaza ara..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-6 py-4 text-lg border-2 border-orange-200 rounded-full focus:border-orange-500 focus:outline-none shadow-lg"
+              />
+              <Button 
+                className="absolute right-2 top-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-full"
+              >
+                Ara
+              </Button>
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button 
+              onClick={onAuthStart}
+              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-8 py-4 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+              data-testid="get-started-btn"
+            >
+              🛍️ Hemen Sipariş Ver
+            </Button>
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <span className="flex items-center">⭐ 4.8 Ortalama Puan</span>
+              <span className="flex items-center">🚚 Ücretsz Teslimat</span>
+              <span className="flex items-center">💳 Güvenli Ödeme</span>
+            </div>
+          </div>
         </div>
 
         {/* Features */}
