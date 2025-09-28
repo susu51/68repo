@@ -3200,7 +3200,41 @@ class DeliverTRAPITester:
             print(f"\n✅ Completed: {test_name}")
         
         # Print final results
-        self.print_final_results()
+        print(f"\n📊 ADMIN LOGIN INTEGRATION TEST RESULTS:")
+        print(f"   Total Tests Run: {self.tests_run}")
+        print(f"   Tests Passed: {self.tests_passed}")
+        print(f"   Tests Failed: {self.tests_run - self.tests_passed}")
+        print(f"   Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%" if self.tests_run > 0 else "   Success Rate: 0%")
+        
+        # Show passed tests
+        passed_tests = [test for test in self.test_results if test['success']]
+        failed_tests = [test for test in self.test_results if not test['success']]
+        
+        if passed_tests:
+            print(f"\n✅ PASSED TESTS:")
+            for test in passed_tests:
+                print(f"   ✅ {test['test']}")
+        
+        if failed_tests:
+            print(f"\n❌ FAILED TESTS:")
+            for test in failed_tests:
+                print(f"   ❌ {test['test']}: {test['details']}")
+        
+        # Admin-specific results
+        admin_tests = [test for test in self.test_results if 'admin' in test['test'].lower()]
+        if admin_tests:
+            admin_passed = [test for test in admin_tests if test['success']]
+            print(f"\n🔐 ADMIN LOGIN SPECIFIC RESULTS:")
+            print(f"   Admin Tests: {len(admin_passed)}/{len(admin_tests)} passed")
+            
+            if len(admin_passed) == len(admin_tests):
+                print(f"   🎉 ALL ADMIN LOGIN INTEGRATION TESTS PASSED!")
+                print(f"   ✅ Admin login via regular endpoint working")
+                print(f"   ✅ Password '6851' grants admin access with any email")
+                print(f"   ✅ Admin user data structure correct")
+                print(f"   ✅ JWT token generation and validation working")
+            else:
+                print(f"   ⚠️  Some admin login tests failed - see details above")
         
         return all_success
 
