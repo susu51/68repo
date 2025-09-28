@@ -736,9 +736,9 @@ const AdminDashboard = ({ user }) => {
                 { value: 'products', icon: '🍽️', label: 'Ürünler' },
                 { value: 'orders', icon: '📦', label: 'Siparişler' },
                 { value: 'map', icon: '🗺️', label: 'Harita' }
-              ].map((item) => (
+              ].map((item, index) => (
                 <button
-                  key={item.value}
+                  key={`admin-nav-${item.value}-${index}`}
                   onClick={() => setActiveTab(item.value)}
                   className={`w-full text-left p-3 rounded-lg transition-all ${
                     activeTab === item.value
