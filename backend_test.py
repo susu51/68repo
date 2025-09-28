@@ -139,12 +139,283 @@ class DeliverTRAPITester:
             self.log_test(name, False, error_msg)
             return False, {}
 
-    # ===== CORE BUSINESS FLOW TESTS =====
+    # ===== ADMIN LOGIN INTEGRATION TESTS =====
+    
+    def test_admin_login_via_regular_endpoint(self):
+        """Test admin login via regular /api/auth/login endpoint with any email + password '6851'"""
+        test_cases = [
+            {
+                "name": "Admin Login - Any Email + Password 6851",
+                "email": "any@email.com",
+                "password": "6851",
+                "expected_status": 200,
+                "should_succeed": True
+            },
+            {
+                "name": "Admin Login - Different Email + Password 6851", 
+                "email": "test@admin.com",
+                "password": "6851",
+                "expected_status": 200,
+                "should_succeed": True
+            },
+            {
+                "name": "Admin Login - Admin Email + Password 6851",
+                "email": "admin@kuryecini.com", 
+                "password": "6851",
+                "expected_status": 200,
+                "should_succeed": True
+            }
+        ]
+        
+        all_success = True
+        
+        for test_case in test_cases:
+            login_data = {
+                "email": test_case["email"],
+                "password": test_case["password"]
+            }
+            
+            success, response = self.run_test(
+                test_case["name"],
+                "POST",
+                "auth/login",
+                test_case["expected_status"],
+                data=login_data
+            )
+            
+            if success and test_case["should_succeed"]:
+                # Verify admin user data structure
+                if not self.verify_admin_user_data(response):
+                    all_success = False
+                else:
+                    # Store admin token for later tests
+                    if response.get('access_token'):
+                        self.admin_token = response['access_token']
+                        print(f"   Admin token stored: {self.admin_token[:20]}...")
+            elif not success and not test_case["should_succeed"]:
+                # Expected failure
+                pass
+            else:
+                all_success = False
+        
+        return all_success
+
+    def test_normal_user_login(self):
+        """Test normal user login still works correctly"""
+        # First register a test customer
+        customer_data = {
+            "email": "testcustomer@example.com",
+            "password": "test123",
+            "first_name": "Test",
+            "last_name": "Customer",
+            "city": "İstanbul"
+        }
+        
+        reg_success, reg_response = self.run_test(
+            "Register Test Customer for Login",
+            "POST",
+            "register/customer",
+            200,
+            data=customer_data
+        )
+        
+        if not reg_success:
+            self.log_test("Normal User Login", False, "Failed to register test customer")
+            return False
+        
+        # Test normal user login
+        login_data = {
+            "email": "testcustomer@example.com",
+            "password": "test123"
+        }
+        
+        success, response = self.run_test(
+            "Normal User Login - testcustomer@example.com",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        if success:
+            # Verify it's NOT admin user
+            user_data = response.get('user_data', {})
+            if user_data.get('role') == 'admin':
+                self.log_test("Normal User Login", False, "Normal user login returned admin role")
+                return False
+            
+            if user_data.get('role') != 'customer':
+                self.log_test("Normal User Login", False, f"Expected customer role, got {user_data.get('role')}")
+                return False
+            
+            print(f"   ✅ Normal user login successful with role: {user_data.get('role')}")
+            print(f"   ✅ User email: {user_data.get('email')}")
+            
+        return success
+
+    def test_invalid_password_scenarios(self):
+        """Test that wrong passwords return 401 unauthorized"""
+        test_cases = [
+            {
+                "name": "Invalid Password - Wrong Password",
+                "email": "any@email.com",
+                "password": "wrongpass",
+                "expected_status": 401
+            },
+            {
+                "name": "Invalid Password - Empty Password",
+                "email": "test@example.com", 
+                "password": "",
+                "expected_status": 401
+            },
+            {
+                "name": "Invalid Password - Almost Correct",
+                "email": "admin@test.com",
+                "password": "6850",  # Close but wrong
+                "expected_status": 401
+            },
+            {
+                "name": "Invalid Password - Case Sensitive",
+                "email": "admin@test.com",
+                "password": "6851 ",  # Extra space
+                "expected_status": 401
+            }
+        ]
+        
+        all_success = True
+        
+        for test_case in test_cases:
+            login_data = {
+                "email": test_case["email"],
+                "password": test_case["password"]
+            }
+            
+            success, response = self.run_test(
+                test_case["name"],
+                "POST",
+                "auth/login",
+                test_case["expected_status"],
+                data=login_data
+            )
+            
+            if success:
+                print(f"   ✅ Invalid password correctly rejected")
+            else:
+                all_success = False
+        
+        return all_success
+
+    def test_admin_token_generation_and_validity(self):
+        """Test that admin login generates valid JWT tokens"""
+        login_data = {
+            "email": "tokentest@admin.com",
+            "password": "6851"
+        }
+        
+        success, response = self.run_test(
+            "Admin Token Generation",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        if not success:
+            return False
+        
+        access_token = response.get('access_token')
+        if not access_token:
+            self.log_test("Admin Token Generation", False, "No access token in response")
+            return False
+        
+        print(f"   ✅ Admin access token generated: {access_token[:20]}...")
+        
+        # Test token validity by accessing admin endpoint
+        token_test_success, token_response = self.run_test(
+            "Admin Token Validity - Access Admin Endpoint",
+            "GET",
+            "admin/users",
+            200,
+            token=access_token
+        )
+        
+        if token_test_success:
+            print(f"   ✅ Admin token valid - can access admin endpoints")
+            return True
+        else:
+            print(f"   ❌ Admin token invalid - cannot access admin endpoints")
+            return False
+
+    def verify_admin_user_data(self, response):
+        """Verify admin login returns proper user_data structure"""
+        if not response:
+            print(f"   ❌ No response data")
+            return False
+        
+        # Check response structure
+        required_fields = ['access_token', 'token_type', 'user_type', 'user_data']
+        for field in required_fields:
+            if field not in response:
+                print(f"   ❌ Missing field in response: {field}")
+                return False
+        
+        # Check token type
+        if response.get('token_type') != 'bearer':
+            print(f"   ❌ Wrong token_type: {response.get('token_type')}, expected 'bearer'")
+            return False
+        
+        # Check user type
+        if response.get('user_type') != 'admin':
+            print(f"   ❌ Wrong user_type: {response.get('user_type')}, expected 'admin'")
+            return False
+        
+        # Check user_data structure
+        user_data = response.get('user_data', {})
+        
+        # Check role
+        if user_data.get('role') != 'admin':
+            print(f"   ❌ Wrong role in user_data: {user_data.get('role')}, expected 'admin'")
+            return False
+        
+        # Check email (should be admin@kuryecini.com)
+        if user_data.get('email') != 'admin@kuryecini.com':
+            print(f"   ❌ Wrong email in user_data: {user_data.get('email')}, expected 'admin@kuryecini.com'")
+            return False
+        
+        # Check other admin fields
+        expected_admin_fields = {
+            'id': 'admin',
+            'first_name': 'Admin',
+            'last_name': 'User',
+            'is_active': True
+        }
+        
+        for field, expected_value in expected_admin_fields.items():
+            actual_value = user_data.get(field)
+            if actual_value != expected_value:
+                print(f"   ❌ Wrong {field} in user_data: {actual_value}, expected {expected_value}")
+                return False
+        
+        # Check created_at exists
+        if 'created_at' not in user_data:
+            print(f"   ❌ Missing created_at in user_data")
+            return False
+        
+        print(f"   ✅ Admin user data structure correct:")
+        print(f"       - Role: {user_data.get('role')}")
+        print(f"       - Email: {user_data.get('email')}")
+        print(f"       - ID: {user_data.get('id')}")
+        print(f"       - Name: {user_data.get('first_name')} {user_data.get('last_name')}")
+        print(f"       - Active: {user_data.get('is_active')}")
+        
+        return True
+
+    # ===== LEGACY ADMIN TESTS (keeping for compatibility) =====
     
     def test_admin_authentication(self):
-        """Test admin authentication with password '6851'"""
+        """Test admin authentication with password '6851' (legacy endpoint)"""
         success, response = self.run_test(
-            "Admin Authentication",
+            "Admin Authentication - Legacy Endpoint",
             "POST",
             "auth/admin",
             200,
@@ -152,15 +423,14 @@ class DeliverTRAPITester:
         )
         
         if success and response.get('access_token'):
-            self.admin_token = response['access_token']
-            print(f"   Admin token stored: {self.admin_token[:20]}...")
+            print(f"   Legacy admin endpoint still working")
         
         return success
 
     def test_admin_authentication_wrong_password(self):
-        """Test admin authentication with wrong password"""
+        """Test admin authentication with wrong password (legacy endpoint)"""
         return self.run_test(
-            "Admin Authentication - Wrong Password",
+            "Admin Authentication - Wrong Password (Legacy)",
             "POST",
             "auth/admin",
             401,
