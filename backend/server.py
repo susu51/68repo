@@ -3380,10 +3380,308 @@ async def verify_phone_otp(verify_data: dict):
         }
     }
 
+# ADVERTISEMENT MANAGEMENT ENDPOINTS
+
+@api_router.get("/ads/active")
+async def get_active_ads(city: str = None, category: str = None):
+    """Get active advertisements with targeting"""
+    try:
+        # Build query for active ads
+        query = {
+            "active": True,
+            "schedule.startAt": {"$lte": datetime.now(timezone.utc)},
+            "schedule.endAt": {"$gte": datetime.now(timezone.utc)}
+        }
+        
+        # Add targeting filters
+        if city:
+            query["$or"] = [
+                {"targeting.city": city},
+                {"targeting.city": {"$exists": False}}  # Global ads
+            ]
+        
+        if category:
+            if "$or" in query:
+                # Combine with city targeting
+                query["$and"] = [
+                    {"$or": query.pop("$or")},
+                    {"$or": [
+                        {"targeting.category": category},
+                        {"targeting.category": {"$exists": False}}
+                    ]}
+                ]
+            else:
+                query["$or"] = [
+                    {"targeting.category": category},
+                    {"targeting.category": {"$exists": False}}
+                ]
+        
+        # Get ads sorted by order
+        ads = await db.advertisements.find(query).sort("order", 1).to_list(length=None)
+        
+        # Convert ObjectId and datetime fields
+        for ad in ads:
+            ad["id"] = str(ad["_id"])
+            del ad["_id"]
+            if ad.get("schedule"):
+                if ad["schedule"].get("startAt"):
+                    ad["schedule"]["startAt"] = ad["schedule"]["startAt"].isoformat() if hasattr(ad["schedule"]["startAt"], 'isoformat') else ad["schedule"]["startAt"]
+                if ad["schedule"].get("endAt"):
+                    ad["schedule"]["endAt"] = ad["schedule"]["endAt"].isoformat() if hasattr(ad["schedule"]["endAt"], 'isoformat') else ad["schedule"]["endAt"]
+        
+        return ads
+        
+    except Exception as e:
+        logging.error(f"Error fetching ads: {e}")
+        return []
+
+@api_router.post("/ads/{ad_id}/impression")
+async def track_ad_impression(ad_id: str):
+    """Track advertisement impression"""
+    try:
+        # Increment impression count
+        await db.advertisements.update_one(
+            {"id": ad_id},
+            {"$inc": {"impressions": 1}}
+        )
+        
+        # Log impression with timestamp
+        impression_log = {
+            "id": str(uuid.uuid4()),
+            "ad_id": ad_id,
+            "type": "impression",
+            "timestamp": datetime.now(timezone.utc),
+            "user_agent": "web",  # Could be enhanced with request headers
+            "ip_address": "unknown"  # Could be enhanced with request IP
+        }
+        
+        await db.ad_analytics.insert_one(impression_log)
+        
+        return {"success": True}
+        
+    except Exception as e:
+        logging.error(f"Error tracking impression: {e}")
+        return {"success": False}
+
+@api_router.post("/ads/{ad_id}/click")
+async def track_ad_click(ad_id: str):
+    """Track advertisement click"""
+    try:
+        # Increment click count
+        await db.advertisements.update_one(
+            {"id": ad_id},
+            {"$inc": {"clicks": 1}}
+        )
+        
+        # Log click with timestamp
+        click_log = {
+            "id": str(uuid.uuid4()),
+            "ad_id": ad_id,
+            "type": "click",
+            "timestamp": datetime.now(timezone.utc),
+            "user_agent": "web",
+            "ip_address": "unknown"
+        }
+        
+        await db.ad_analytics.insert_one(click_log)
+        
+        return {"success": True}
+        
+    except Exception as e:
+        logging.error(f"Error tracking click: {e}")
+        return {"success": False}
+
+# ADMIN AD MANAGEMENT ENDPOINTS
+
+@api_router.get("/admin/ads")
+async def get_all_ads(current_user: dict = Depends(get_current_user)):
+    """Get all advertisements for admin"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        ads = await db.advertisements.find().sort("created_at", -1).to_list(length=None)
+        
+        for ad in ads:
+            ad["id"] = str(ad["_id"])
+            del ad["_id"]
+            # Convert datetime fields
+            for field in ["created_at", "updated_at"]:
+                if ad.get(field):
+                    ad[field] = ad[field].isoformat() if hasattr(ad[field], 'isoformat') else ad[field]
+            
+            if ad.get("schedule"):
+                if ad["schedule"].get("startAt"):
+                    ad["schedule"]["startAt"] = ad["schedule"]["startAt"].isoformat() if hasattr(ad["schedule"]["startAt"], 'isoformat') else ad["schedule"]["startAt"]
+                if ad["schedule"].get("endAt"):
+                    ad["schedule"]["endAt"] = ad["schedule"]["endAt"].isoformat() if hasattr(ad["schedule"]["endAt"], 'isoformat') else ad["schedule"]["endAt"]
+        
+        return ads
+        
+    except Exception as e:
+        logging.error(f"Error fetching all ads: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch ads")
+
+@api_router.post("/admin/ads")
+async def create_ad(ad_data: dict, current_user: dict = Depends(get_current_user)):
+    """Create new advertisement"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        new_ad = {
+            "id": str(uuid.uuid4()),
+            "title": ad_data["title"],
+            "description": ad_data.get("description", ""),
+            "imgUrl": ad_data.get("imgUrl"),
+            "targetUrl": ad_data.get("targetUrl"),
+            "ctaText": ad_data.get("ctaText", "Daha Fazla"),
+            "type": ad_data.get("type", "general"),
+            "targeting": {
+                "city": ad_data.get("targeting", {}).get("city"),
+                "category": ad_data.get("targeting", {}).get("category")
+            },
+            "schedule": {
+                "startAt": datetime.fromisoformat(ad_data["schedule"]["startAt"].replace('Z', '+00:00')) if ad_data.get("schedule", {}).get("startAt") else datetime.now(timezone.utc),
+                "endAt": datetime.fromisoformat(ad_data["schedule"]["endAt"].replace('Z', '+00:00')) if ad_data.get("schedule", {}).get("endAt") else datetime.now(timezone.utc) + timedelta(days=30)
+            },
+            "active": ad_data.get("active", True),
+            "order": ad_data.get("order", 0),
+            "clicks": 0,
+            "impressions": 0,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        await db.advertisements.insert_one(new_ad)
+        
+        return {"message": "Reklam başarıyla oluşturuldu", "ad_id": new_ad["id"]}
+        
+    except Exception as e:
+        logging.error(f"Error creating ad: {e}")
+        raise HTTPException(status_code=500, detail="Reklam oluşturulamadı")
+
+@api_router.put("/admin/ads/{ad_id}")
+async def update_ad(ad_id: str, ad_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update advertisement"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        update_data = {}
+        
+        # Update allowed fields
+        allowed_fields = ["title", "description", "imgUrl", "targetUrl", "ctaText", "type", "active", "order"]
+        for field in allowed_fields:
+            if field in ad_data:
+                update_data[field] = ad_data[field]
+        
+        # Handle targeting
+        if "targeting" in ad_data:
+            update_data["targeting"] = ad_data["targeting"]
+        
+        # Handle schedule
+        if "schedule" in ad_data:
+            schedule = {}
+            if ad_data["schedule"].get("startAt"):
+                schedule["startAt"] = datetime.fromisoformat(ad_data["schedule"]["startAt"].replace('Z', '+00:00'))
+            if ad_data["schedule"].get("endAt"):
+                schedule["endAt"] = datetime.fromisoformat(ad_data["schedule"]["endAt"].replace('Z', '+00:00'))
+            update_data["schedule"] = schedule
+        
+        update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        result = await db.advertisements.update_one(
+            {"id": ad_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Reklam bulunamadı")
+        
+        return {"message": "Reklam başarıyla güncellendi"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating ad: {e}")
+        raise HTTPException(status_code=500, detail="Reklam güncellenemedi")
+
+@api_router.delete("/admin/ads/{ad_id}")
+async def delete_ad(ad_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete advertisement"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        result = await db.advertisements.delete_one({"id": ad_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Reklam bulunamadı")
+        
+        # Also delete analytics data
+        await db.ad_analytics.delete_many({"ad_id": ad_id})
+        
+        return {"message": "Reklam başarıyla silindi"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting ad: {e}")
+        raise HTTPException(status_code=500, detail="Reklam silinemedi")
+
+@api_router.get("/admin/ads/{ad_id}/analytics")
+async def get_ad_analytics(ad_id: str, current_user: dict = Depends(get_current_user)):
+    """Get advertisement analytics"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get ad info
+        ad = await db.advertisements.find_one({"id": ad_id})
+        if not ad:
+            raise HTTPException(status_code=404, detail="Reklam bulunamadı")
+        
+        # Get analytics data
+        analytics = await db.ad_analytics.find({"ad_id": ad_id}).to_list(length=None)
+        
+        # Calculate metrics
+        total_impressions = len([a for a in analytics if a["type"] == "impression"])
+        total_clicks = len([a for a in analytics if a["type"] == "click"])
+        ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0
+        
+        # Group by date for charts
+        from collections import defaultdict
+        daily_stats = defaultdict(lambda: {"impressions": 0, "clicks": 0})
+        
+        for event in analytics:
+            date_str = event["timestamp"].strftime("%Y-%m-%d") if hasattr(event["timestamp"], 'strftime') else str(event["timestamp"])[:10]
+            daily_stats[date_str][event["type"] + "s"] += 1
+        
+        return {
+            "ad_info": {
+                "id": ad_id,
+                "title": ad["title"],
+                "active": ad["active"]
+            },
+            "metrics": {
+                "total_impressions": total_impressions,
+                "total_clicks": total_clicks,
+                "ctr": round(ctr, 2)
+            },
+            "daily_stats": dict(daily_stats)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching analytics: {e}")
+        raise HTTPException(status_code=500, detail="Analitik veriler alınamadı")
+
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "Kuryecini API v8.0 - Modern Login & Google OAuth Integration"}
+    return {"message": "Kuryecini API v9.0 - Advertisement System Integration"}
 
 # Include the router in the main app
 app.include_router(api_router)
