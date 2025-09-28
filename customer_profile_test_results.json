@@ -1,245 +1,259 @@
 {
-  "total_tests": 34,
-  "passed_tests": 21,
-  "failed_tests": 13,
-  "success_rate": 61.76470588235294,
+  "total_tests": 36,
+  "passed_tests": 32,
+  "failed_tests": 4,
+  "success_rate": 88.88888888888889,
   "test_results": [
     {
       "test": "Customer Authentication (Email)",
       "success": true,
       "details": "Logged in as customer: testcustomer@example.com",
-      "timestamp": "2025-09-28T21:46:22.501097",
+      "timestamp": "2025-09-28T21:49:44.708196",
       "response_data": null
     },
     {
       "test": "OTP Request - +905551234567",
-      "success": false,
-      "details": "Failed with status: 500",
-      "timestamp": "2025-09-28T21:46:22.575010",
+      "success": true,
+      "details": "OTP sent, formatted: +905551234567, mock: 913630",
+      "timestamp": "2025-09-28T21:49:44.745221",
       "response_data": null
     },
     {
       "test": "OTP Request - 05551234567",
-      "success": false,
-      "details": "Failed with status: 500",
-      "timestamp": "2025-09-28T21:46:22.629377",
+      "success": true,
+      "details": "OTP sent, formatted: +905551234567, mock: 537903",
+      "timestamp": "2025-09-28T21:49:44.781735",
       "response_data": null
     },
     {
       "test": "OTP Request - 905551234567",
-      "success": false,
-      "details": "Failed with status: 500",
-      "timestamp": "2025-09-28T21:46:22.679115",
+      "success": true,
+      "details": "OTP sent, formatted: +905551234567, mock: 674848",
+      "timestamp": "2025-09-28T21:49:44.815795",
       "response_data": null
     },
     {
       "test": "OTP Request - 5551234567",
-      "success": false,
-      "details": "Failed with status: 500",
-      "timestamp": "2025-09-28T21:46:22.728261",
+      "success": true,
+      "details": "OTP sent, formatted: +905551234567, mock: 966686",
+      "timestamp": "2025-09-28T21:49:44.849747",
       "response_data": null
     },
     {
       "test": "Invalid Phone Rejection - 123456789",
-      "success": false,
-      "details": "Should reject but got: 500",
-      "timestamp": "2025-09-28T21:46:22.779901",
+      "success": true,
+      "details": "Correctly rejected invalid phone",
+      "timestamp": "2025-09-28T21:49:44.883527",
       "response_data": null
     },
     {
       "test": "Invalid Phone Rejection - +1234567890",
-      "success": false,
-      "details": "Should reject but got: 500",
-      "timestamp": "2025-09-28T21:46:22.827541",
+      "success": true,
+      "details": "Correctly rejected invalid phone",
+      "timestamp": "2025-09-28T21:49:44.916022",
       "response_data": null
     },
     {
       "test": "Invalid Phone Rejection - invalid",
-      "success": false,
-      "details": "Should reject but got: 500",
-      "timestamp": "2025-09-28T21:46:22.875388",
+      "success": true,
+      "details": "Correctly rejected invalid phone",
+      "timestamp": "2025-09-28T21:49:44.949913",
       "response_data": null
     },
     {
       "test": "Invalid Phone Rejection - ",
-      "success": false,
-      "details": "Should reject but got: 500",
-      "timestamp": "2025-09-28T21:46:22.927731",
+      "success": true,
+      "details": "Correctly rejected invalid phone",
+      "timestamp": "2025-09-28T21:49:44.985051",
+      "response_data": null
+    },
+    {
+      "test": "OTP Verification Success",
+      "success": true,
+      "details": "Token received, user_id: 3054974a-ce75-4309-8bce-ce16a59c78c3",
+      "timestamp": "2025-09-28T21:49:45.642216",
       "response_data": null
     },
     {
       "test": "Wrong OTP Rejection",
       "success": true,
       "details": "Correctly rejected wrong OTP",
-      "timestamp": "2025-09-28T21:46:23.014316",
+      "timestamp": "2025-09-28T21:49:45.679104",
       "response_data": null
     },
     {
       "test": "Get Customer Profile",
-      "success": false,
-      "details": "Failed with status: 500",
-      "timestamp": "2025-09-28T21:46:23.063943",
+      "success": true,
+      "details": "Profile retrieved: Test Customer",
+      "timestamp": "2025-09-28T21:49:45.714729",
       "response_data": null
     },
     {
       "test": "Update Customer Profile",
       "success": true,
       "details": "Profile updated successfully",
-      "timestamp": "2025-09-28T21:46:23.101947",
+      "timestamp": "2025-09-28T21:49:45.751167",
+      "response_data": null
+    },
+    {
+      "test": "Profile Update Verification",
+      "success": true,
+      "details": "Changes persisted correctly",
+      "timestamp": "2025-09-28T21:49:45.783236",
       "response_data": null
     },
     {
       "test": "Invalid Profile Data Rejection",
       "success": false,
       "details": "Should reject invalid data but got: 200",
-      "timestamp": "2025-09-28T21:46:23.173335",
+      "timestamp": "2025-09-28T21:49:45.818795",
       "response_data": null
     },
     {
       "test": "Get User Addresses",
       "success": true,
       "details": "Retrieved 0 addresses",
-      "timestamp": "2025-09-28T21:46:23.206939",
+      "timestamp": "2025-09-28T21:49:45.854882",
       "response_data": null
     },
     {
       "test": "Create Address",
       "success": true,
-      "details": "Address created with ID: ac26e325-0b09-48b1-a36c-5a5d437a0f6e",
-      "timestamp": "2025-09-28T21:46:23.252840",
+      "details": "Address created with ID: 39a40c6c-de19-4e81-97af-9653048cb543",
+      "timestamp": "2025-09-28T21:49:45.891692",
       "response_data": null
     },
     {
       "test": "Create Second Address",
       "success": true,
-      "details": "Second address created with ID: a65782db-02ff-4d3f-815d-fcf5b303f269",
-      "timestamp": "2025-09-28T21:46:23.284685",
+      "details": "Second address created with ID: a4cc9807-7b72-49b9-b250-bfb3bfc0c92c",
+      "timestamp": "2025-09-28T21:49:45.924747",
       "response_data": null
     },
     {
       "test": "Get Addresses After Creation",
       "success": true,
       "details": "Now have 2 addresses",
-      "timestamp": "2025-09-28T21:46:23.321949",
+      "timestamp": "2025-09-28T21:49:45.956447",
       "response_data": null
     },
     {
       "test": "Default Address Logic",
       "success": true,
       "details": "Only one default address exists",
-      "timestamp": "2025-09-28T21:46:23.321977",
+      "timestamp": "2025-09-28T21:49:45.956475",
       "response_data": null
     },
     {
       "test": "Update Address",
       "success": true,
       "details": "Address updated successfully",
-      "timestamp": "2025-09-28T21:46:23.358495",
+      "timestamp": "2025-09-28T21:49:45.989847",
       "response_data": null
     },
     {
       "test": "Set Default Address",
       "success": true,
       "details": "Default address set successfully",
-      "timestamp": "2025-09-28T21:46:23.390300",
+      "timestamp": "2025-09-28T21:49:46.024563",
       "response_data": null
     },
     {
       "test": "Default Address Verification",
       "success": false,
       "details": "Default address not changed",
-      "timestamp": "2025-09-28T21:46:23.421812",
+      "timestamp": "2025-09-28T21:49:46.055319",
       "response_data": null
     },
     {
       "test": "Delete Address",
       "success": true,
       "details": "Address deleted successfully",
-      "timestamp": "2025-09-28T21:46:23.455879",
+      "timestamp": "2025-09-28T21:49:46.089098",
       "response_data": null
     },
     {
       "test": "Non-existent Address Access",
       "success": true,
       "details": "Correctly returned 404 for non-existent address",
-      "timestamp": "2025-09-28T21:46:23.491174",
+      "timestamp": "2025-09-28T21:49:46.126995",
       "response_data": null
     },
     {
       "test": "Get Order History",
       "success": true,
       "details": "Retrieved 0 orders, total: 0",
-      "timestamp": "2025-09-28T21:46:23.527476",
+      "timestamp": "2025-09-28T21:49:46.161887",
       "response_data": null
     },
     {
       "test": "Order History Pagination Test",
       "success": true,
       "details": "Page 2, limit 3: page=2, total=0",
-      "timestamp": "2025-09-28T21:46:23.560262",
+      "timestamp": "2025-09-28T21:49:46.195293",
       "response_data": null
     },
     {
       "test": "Unauthorized Access - GET /profile/me",
       "success": true,
       "details": "Correctly rejected unauthorized access",
-      "timestamp": "2025-09-28T21:46:23.596226",
+      "timestamp": "2025-09-28T21:49:46.227460",
       "response_data": null
     },
     {
       "test": "Unauthorized Access - PUT /profile/me",
       "success": true,
       "details": "Correctly rejected unauthorized access",
-      "timestamp": "2025-09-28T21:46:23.628594",
+      "timestamp": "2025-09-28T21:49:46.258147",
       "response_data": null
     },
     {
       "test": "Unauthorized Access - GET /addresses",
       "success": true,
       "details": "Correctly rejected unauthorized access",
-      "timestamp": "2025-09-28T21:46:23.659863",
+      "timestamp": "2025-09-28T21:49:46.288279",
       "response_data": null
     },
     {
       "test": "Unauthorized Access - POST /addresses",
       "success": true,
       "details": "Correctly rejected unauthorized access",
-      "timestamp": "2025-09-28T21:46:23.690510",
+      "timestamp": "2025-09-28T21:49:46.319141",
       "response_data": null
     },
     {
       "test": "Unauthorized Access - GET /orders/history",
       "success": true,
       "details": "Correctly rejected unauthorized access",
-      "timestamp": "2025-09-28T21:46:23.730308",
+      "timestamp": "2025-09-28T21:49:46.351513",
       "response_data": null
     },
     {
       "test": "Invalid Token Rejection",
       "success": true,
       "details": "Correctly rejected invalid token",
-      "timestamp": "2025-09-28T21:46:23.760692",
+      "timestamp": "2025-09-28T21:49:46.385649",
       "response_data": null
     },
     {
       "test": "Invalid JSON Handling",
       "success": false,
       "details": "Should reject invalid JSON but got: 405",
-      "timestamp": "2025-09-28T21:46:23.794532",
+      "timestamp": "2025-09-28T21:49:46.419898",
       "response_data": null
     },
     {
       "test": "Missing Required Fields",
       "success": false,
       "details": "Should reject missing fields but got: 500",
-      "timestamp": "2025-09-28T21:46:23.838298",
+      "timestamp": "2025-09-28T21:49:46.459290",
       "response_data": null
     },
     {
-      "test": "Cleanup Address ac26e325-0b09-48b1-a36c-5a5d437a0f6e",
+      "test": "Cleanup Address 39a40c6c-de19-4e81-97af-9653048cb543",
       "success": true,
       "details": "Address deleted",
-      "timestamp": "2025-09-28T21:46:23.871640",
+      "timestamp": "2025-09-28T21:49:46.491759",
       "response_data": null
     }
   ]
