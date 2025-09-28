@@ -3589,7 +3589,7 @@ const CustomerDashboard = ({ user }) => {
               <div className="text-2xl sm:text-3xl">🍽️</div>
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  DeliverTR
+                  Kuryecini
                 </h1>
                 <p className="text-xs sm:text-sm text-gray-600">
                   Merhaba, {user.first_name || 'Kullanıcı'}! 👋
