@@ -3147,6 +3147,137 @@ async def update_courier_rating(courier_id: str):
             }}
         )
 
+# GOOGLE OAUTH AUTHENTICATION (Emergent Integration)
+
+@api_router.post("/auth/google/session")
+async def google_auth_session(session_data: dict):
+    """Process Google OAuth session from Emergent Auth"""
+    try:
+        session_id = session_data.get("session_id")
+        if not session_id:
+            raise HTTPException(status_code=400, detail="Session ID required")
+        
+        # Call Emergent Auth API to get session data
+        import httpx
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id}
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=401, detail="Invalid session")
+            
+            auth_data = response.json()
+            
+            # Extract user information
+            google_user_id = auth_data.get("id")
+            email = auth_data.get("email")
+            name = auth_data.get("name", "")
+            picture = auth_data.get("picture")
+            session_token = auth_data.get("session_token")
+            
+            if not google_user_id or not email:
+                raise HTTPException(status_code=400, detail="Incomplete user data")
+            
+            # Check if user already exists
+            existing_user = await db.users.find_one({"email": email})
+            
+            if existing_user:
+                # Update existing user with Google info
+                user_id = existing_user["id"]
+                await db.users.update_one(
+                    {"id": user_id},
+                    {"$set": {
+                        "google_id": google_user_id,
+                        "profile_image_url": picture,
+                        "last_login": datetime.now(timezone.utc),
+                        "oauth_provider": "google"
+                    }}
+                )
+                user = existing_user
+                user["google_id"] = google_user_id
+                user["profile_image_url"] = picture
+            else:
+                # Create new user from Google data
+                name_parts = name.split(" ", 1)
+                first_name = name_parts[0] if name_parts else ""
+                last_name = name_parts[1] if len(name_parts) > 1 else ""
+                
+                user = {
+                    "id": str(uuid.uuid4()),
+                    "email": email,
+                    "google_id": google_user_id,
+                    "role": "customer",
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "profile_image_url": picture,
+                    "is_active": True,
+                    "created_at": datetime.now(timezone.utc),
+                    "last_login": datetime.now(timezone.utc),
+                    "oauth_provider": "google",
+                    "profile_completed": True
+                }
+                
+                await db.users.insert_one(user)
+                user_id = user["id"]
+            
+            # Store session token in our database
+            session_record = {
+                "id": str(uuid.uuid4()),
+                "user_id": user_id,
+                "session_token": session_token,
+                "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+                "created_at": datetime.now(timezone.utc),
+                "provider": "google"
+            }
+            
+            await db.oauth_sessions.insert_one(session_record)
+            
+            # Generate our own access token
+            token_data = {
+                "sub": user_id,
+                "email": email,
+                "role": user["role"],
+                "exp": datetime.now(timezone.utc) + timedelta(hours=24)
+            }
+            
+            access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+            
+            return {
+                "access_token": access_token,
+                "token_type": "bearer",
+                "expires_in": 86400,
+                "user": {
+                    "id": user_id,
+                    "email": email,
+                    "first_name": user.get("first_name", ""),
+                    "last_name": user.get("last_name", ""),
+                    "profile_image_url": picture,
+                    "role": user["role"],
+                    "oauth_provider": "google",
+                    "profile_completed": user.get("profile_completed", True)
+                }
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Google OAuth error: {e}")
+        raise HTTPException(status_code=500, detail="Authentication failed")
+
+@api_router.post("/auth/logout")
+async def logout_user(current_user: dict = Depends(get_current_user)):
+    """Logout user and invalidate session"""
+    try:
+        # Remove OAuth sessions if any
+        await db.oauth_sessions.delete_many({"user_id": current_user["id"]})
+        
+        return {"message": "Successfully logged out"}
+    except Exception as e:
+        logging.error(f"Logout error: {e}")
+        return {"message": "Logout completed"}
+
 # PHONE AUTHENTICATION ENDPOINTS
 
 @api_router.post("/auth/phone/request-otp")
