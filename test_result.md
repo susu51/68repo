@@ -391,13 +391,16 @@ backend:
     implemented: true
     working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
         -working: "NA"
         -agent: "testing"
         -comment: "TESTED: New user management system in admin panel with mixed results (72.2% success rate, 13/18 tests passed). ✅ WORKING FEATURES: 1) Admin login with password '6851' working perfectly - any email grants admin access with proper JWT tokens. 2) Registration APIs working for all user types - POST /api/register/customer, /api/register/business, /api/register/courier all create users successfully with proper data validation and token generation. 3) Admin user listing GET /api/admin/users working - returns comprehensive user data from system (found 300+ users). 4) User deletion for non-existent users correctly returns 404. 5) Invalid user ID format correctly returns 400. ❌ CRITICAL ISSUES FOUND: 1) USER DATA STRUCTURE INCONSISTENCY - Admin users endpoint returns different field structures for different users (some have 'email' and 'role', others have different field names like 'phone' and 'user_type'). This causes frontend compatibility issues. 2) USER DELETION API MISMATCH - DELETE /api/admin/users/{user_id} expects MongoDB ObjectId format but registration APIs create users with UUID format, causing deletion failures. Users created via registration cannot be deleted via admin API. 3) AUTHENTICATION ERROR CODES - Deletion endpoint returns 400 instead of 401 for missing authentication, should return 401 for unauthorized access. 4) FULL FLOW BROKEN - Complete user management flow fails because created users don't appear in admin list with expected field structure. URGENT FIXES NEEDED: Standardize user data structure across all endpoints and fix user ID format compatibility between registration and deletion APIs."
+        -working: false
+        -agent: "testing"
+        -comment: "🚨 COMPREHENSIVE BACKEND TESTING COMPLETE - CRITICAL ISSUES CONFIRMED: Extensive testing of Kuryecini backend reveals CRITICAL 500 INTERNAL SERVER ERRORS in core admin endpoints. ❌ CRITICAL FAILURES: 1) GET /api/admin/users returns 500 error due to datetime conversion bug in server.py line 956 - 'str' object has no attribute 'isoformat'. Some users have created_at as string, others as datetime object. 2) GET /api/products returns 500 error with same datetime conversion issue. 3) User data structure inconsistency confirmed - mixed field formats breaking admin panel functionality. ✅ WORKING FEATURES: User registration (87.5% overall success rate), authentication flows, KYC management, order system, Turkish cities integration. 🔧 IMMEDIATE FIXES REQUIRED: 1) Fix datetime conversion in server.py - check if created_at is already string before calling isoformat(). 2) Standardize user data structure across all endpoints. 3) Fix user ID format compatibility between registration and deletion APIs. These are blocking issues preventing admin panel from functioning properly."
 
 agent_communication:
     -agent: "main"
