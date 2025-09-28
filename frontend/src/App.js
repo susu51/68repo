@@ -3319,44 +3319,66 @@ const CustomerDashboard = ({ user }) => {
     }
   };
 
-  // Marketing & Loyalty fetch functions
+  // Marketing & Loyalty fetch functions with isMounted checks
   const fetchCampaigns = async () => {
+    if (!isMounted) return;
     try {
       const response = await axios.get(`${API}/campaigns`);
-      setCampaigns(response.data);
+      if (isMounted) {
+        setCampaigns(response.data);
+      }
     } catch (error) {
-      console.error('Kampanyalar yüklenemedi:', error);
+      if (isMounted) {
+        console.error('Kampanyalar yüklenemedi:', error);
+      }
     }
   };
 
   const fetchLoyaltyPoints = async () => {
+    if (!isMounted) return;
     try {
       const token = localStorage.getItem('kuryecini_access_token');
       const response = await axios.get(`${API}/loyalty/points`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setLoyaltyPoints(response.data);
+      if (isMounted) {
+        setLoyaltyPoints(response.data);
+      }
     } catch (error) {
-      console.error('Sadakat puanları yüklenemedi:', error);
+      if (isMounted) {
+        console.error('Sadakat puanları yüklenemedi:', error);
+      }
     }
   };
 
   const fetchActiveCoupons = async () => {
+    if (!isMounted) return;
     try {
       const response = await axios.get(`${API}/coupons/active`);
-      setActiveCoupons(response.data);
+      if (isMounted) {
+        setActiveCoupons(response.data);
+      }
     } catch (error) {
-      console.error('Kuponlar yüklenemedi:', error);
+      if (isMounted) {
+        console.error('Kuponlar yüklenemedi:', error);
+      }
     }
   };
 
   useEffect(() => {
-    fetchProducts();
-    fetchMyOrders();
-    fetchCampaigns();
-    fetchLoyaltyPoints();
-    fetchActiveCoupons();
-  }, []);
+    if (isMounted) {
+      fetchProducts();
+      fetchMyOrders();
+      fetchCampaigns();
+      fetchLoyaltyPoints();
+      fetchActiveCoupons();
+    }
+
+    // Cleanup function
+    return () => {
+      setIsMounted(false);
+    };
+  }, [isMounted]);
 
   const addToCart = (product) => {
     const existingItem = cart.find(item => item.product_id === product.id);
