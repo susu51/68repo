@@ -416,7 +416,7 @@ const AdminDashboard = ({ user }) => {
           <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center">
               <h1 className="text-sm sm:text-xl font-semibold text-red-600">
-                🛡️ <span className="hidden sm:inline">Admin Panel - </span>DeliverTR
+                🛡️ <span className="hidden sm:inline">Admin Panel - </span>Kuryecini
               </h1>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
