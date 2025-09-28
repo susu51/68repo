@@ -153,10 +153,10 @@ const SimpleLoginForm = ({ onRegisterClick }) => {
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-orange-600">
-          Giriş Yap
+          🚀 Kuryecini'ye Hoş Geldiniz
         </CardTitle>
         <CardDescription>
-          Kuryecini hesabınıza giriş yapın
+          Giriş yaparak hizmetlerimizden yararlanmaya başlayın
         </CardDescription>
       </CardHeader>
       <CardContent>
