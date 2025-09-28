@@ -166,28 +166,7 @@ const SimpleLoginForm = ({ onRegisterClick }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Login Method Toggle */}
-        <div className="flex space-x-2 mb-6">
-          <Button
-            type="button"
-            variant={loginMethod === 'email' ? 'default' : 'outline'}
-            onClick={() => setLoginMethod('email')}
-            className="flex-1"
-          >
-            📧 E-posta
-          </Button>
-          <Button
-            type="button"
-            variant={loginMethod === 'phone' ? 'default' : 'outline'}
-            onClick={() => setLoginMethod('phone')}
-            className="flex-1"
-          >
-            📱 Telefon
-          </Button>
-        </div>
-
-        {loginMethod === 'email' ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="email">E-posta</Label>
             <Input
@@ -214,23 +193,15 @@ const SimpleLoginForm = ({ onRegisterClick }) => {
             />
           </div>
           
-            <Button 
-              type="submit" 
-              disabled={loading}
-              className="w-full bg-orange-600 hover:bg-orange-700"
-              data-testid="login-submit-btn"
-            >
-              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-            </Button>
-          </form>
-        ) : (
-          <div className="space-y-4">
-            <PhoneAuth 
-              onLogin={login}
-              onBack={() => setLoginMethod('email')}
-            />
-          </div>
-        )}
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-orange-600 hover:bg-orange-700"
+            data-testid="login-submit-btn"
+          >
+            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          </Button>
+        </form>
         
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
