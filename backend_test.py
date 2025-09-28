@@ -3662,30 +3662,32 @@ class DeliverTRAPITester:
         return self.tests_passed == self.tests_run
 
 def main():
-    """Main test execution - Focus on Admin Login Integration as requested"""
+    """Main test execution - Focus on Food Visibility Issue as requested"""
     tester = DeliverTRAPITester()
     
-    print("🎯 RUNNING ADMIN LOGIN INTEGRATION TESTS AS REQUESTED")
-    print("📋 Review Request: Test the updated admin login integration system")
-    print("🔐 Testing admin login via regular /api/auth/login endpoint")
-    print("✅ Testing any email + password '6851' should return admin user data")
-    print("✅ Testing normal user login still works correctly")
-    print("✅ Testing invalid passwords return 401 unauthorized")
-    print("✅ Testing admin user data structure and JWT token generation")
+    print("🎯 RUNNING FOOD VISIBILITY ISSUE TEST AS REQUESTED")
+    print("📋 Review Request: Test the food visibility issue that was reported by the user")
+    print("🍽️ User reported: 'Hiçbir yemek müşteri kısmında gözükmüyor' (No food visible on customer side)")
+    print("✅ Testing GET /api/businesses endpoint - should return multiple approved businesses")
+    print("✅ Testing GET /api/businesses/{business_id}/products for each business")
+    print("✅ Testing that only businesses with kyc_status='approved' are returned")
+    print("✅ Testing expected businesses: 'Test Restoranı', 'Pizza Palace İstanbul', 'Burger Deluxe'")
+    print("✅ Testing public access (no authentication required)")
     
-    # Run admin login integration tests as requested in review
-    success = tester.run_admin_login_integration_tests()
+    # Run food visibility test as requested in review
+    success = tester.test_food_visibility_issue()
     
     if success:
-        print("\n🎉 ALL ADMIN LOGIN INTEGRATION TESTS PASSED!")
-        print("✅ Admin login via regular endpoint working with password '6851'")
-        print("✅ Normal user login working correctly")
-        print("✅ Invalid passwords properly rejected with 401")
-        print("✅ Admin user data structure correct with role 'admin'")
-        print("✅ JWT token generation and validation working")
+        print("\n🎉 FOOD VISIBILITY ISSUE TEST COMPLETED!")
+        print("✅ Businesses endpoint returning approved businesses")
+        print("✅ Products endpoint working for each business")
+        print("✅ Public access working without authentication")
+        print("✅ Food visibility issue appears to be resolved")
         return 0
     else:
-        print(f"\n⚠️  Some Admin Login Integration tests failed. Check results above.")
+        print(f"\n⚠️  Food Visibility Issue test failed. The issue may still persist.")
+        print("❌ No businesses or insufficient products found for customers")
+        print("🔍 This confirms the user's report that no food is visible on customer side")
         return 1
 
 if __name__ == "__main__":
