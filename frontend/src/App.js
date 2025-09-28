@@ -4106,25 +4106,6 @@ const HomePage = ({ onAuthStart }) => {
             </div>
           </div>
         </div>
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <h3 className="text-3xl font-bold text-orange-600">%3</h3>
-              <p className="text-gray-600">Düşük Komisyon</p>
-            </div>
-            <div>
-              <h3 className="text-3xl font-bold text-blue-600">24/7</h3>
-              <p className="text-gray-600">Hızlı Teslimat</p>
-            </div>
-            <div>
-              <h3 className="text-3xl font-bold text-green-600">∞</h3>
-              <p className="text-gray-600">Sınırsız Araç</p>
-            </div>
-            <div>
-              <h3 className="text-3xl font-bold text-purple-600">🇹🇷</h3>
-              <p className="text-gray-600">Türkiye Geneli</p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
