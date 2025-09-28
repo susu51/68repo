@@ -552,20 +552,54 @@ const AdminDashboard = ({ user }) => {
         </div>
       )}
       
-      {/* Mobile-Responsive Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <div className="flex justify-between h-14 sm:h-16">
-            <div className="flex items-center">
-              <h1 className="text-sm sm:text-xl font-semibold text-red-600">
-                🛡️ <span className="hidden sm:inline">Admin Panel - </span>Kuryecini
-              </h1>
+      {/* Modern Header with Theme Toggle */}
+      <div className={`shadow-lg border-b transition-all duration-300 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16 sm:h-20">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl">
+                <span className="text-white text-xl font-bold">🛡️</span>
+              </div>
+              <div>
+                <h1 className={`text-lg sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <span className="hidden sm:inline">Admin Panel</span>
+                  <span className="sm:hidden">Admin</span>
+                </h1>
+                <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Kuryecini Yönetim Sistemi
+                </p>
+              </div>
             </div>
+            
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <Badge variant="outline" className="bg-red-50 border-red-200 text-red-800 text-xs">
-                Admin
+              {/* Theme Toggle */}
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                size="sm"
+                className={`transition-all duration-300 ${isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`}
+              >
+                <span className="text-lg">{isDarkMode ? '🌞' : '🌙'}</span>
+                <span className="hidden sm:inline ml-2">{isDarkMode ? 'Light' : 'Dark'}</span>
+              </Button>
+              
+              {/* Admin Badge */}
+              <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-none px-3 py-1">
+                <span className="hidden sm:inline">Admin</span>
+                <span className="sm:hidden">👑</span>
               </Badge>
-              <Button onClick={logout} variant="outline" size="sm">
+              
+              {/* Logout Button */}
+              <Button
+                onClick={logout}
+                variant="outline"
+                size="sm"
+                className={`transition-all duration-300 ${
+                  isDarkMode 
+                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-gray-500' 
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
+                }`}
+              >
                 <span className="hidden sm:inline">Çıkış</span>
                 <span className="sm:hidden">🚪</span>
               </Button>
