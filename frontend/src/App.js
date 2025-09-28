@@ -3596,6 +3596,271 @@ const CustomerDashboard = ({ user }) => {
 
         {/* Tab Content */}
         <div className="space-y-6">
+          {/* Campaigns Tab */}
+          {activeTab === 'campaigns' && (
+            <div className="space-y-6">
+              {/* Loyalty Points Header */}
+              <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-2xl font-bold mb-2">🏆 Sadakat Puanlarınız</h3>
+                      <div className="flex items-center space-x-6">
+                        <div>
+                          <div className="text-3xl font-bold">{loyaltyPoints.total_points}</div>
+                          <div className="text-sm opacity-90">Aktif Puan</div>
+                        </div>
+                        <div>
+                          <div className="text-xl font-semibold">{loyaltyPoints.tier_level}</div>
+                          <div className="text-sm opacity-90">Seviye</div>
+                        </div>
+                        <div>
+                          <div className="text-xl font-semibold">{loyaltyPoints.lifetime_points}</div>
+                          <div className="text-sm opacity-90">Toplam Kazanılan</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-6xl opacity-20">⭐</div>
+                  </div>
+                  <div className="mt-4 text-sm opacity-90">
+                    💡 Her 10₺'lik siparişe 1 puan kazanın! 100 puan = 10₺ indirim
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Active Campaigns */}
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  🎉 Aktif Kampanyalar
+                  <span className="ml-3 text-sm bg-red-100 text-red-600 px-3 py-1 rounded-full font-normal">
+                    {campaigns.length} Kampanya
+                  </span>
+                </h3>
+                
+                {campaigns.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-12 text-center">
+                      <div className="text-6xl mb-4">🎁</div>
+                      <h4 className="text-xl font-semibold text-gray-800 mb-2">Henüz Aktif Kampanya Yok</h4>
+                      <p className="text-gray-600">Yeni kampanyalar için takipte kalın!</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {campaigns.map((campaign) => (
+                      <Card key={campaign.id} className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-orange-500">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <h4 className="text-lg font-bold text-gray-800 mb-2">{campaign.title}</h4>
+                              <p className="text-gray-600 text-sm">{campaign.description}</p>
+                            </div>
+                            <div className="text-2xl ml-4">
+                              {campaign.campaign_type === 'percentage_discount' ? '🏷️' :
+                               campaign.campaign_type === 'fixed_discount' ? '💰' :
+                               campaign.campaign_type === 'free_delivery' ? '🚚' : '🎯'}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2 mb-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600">İndirim:</span>
+                              <span className="font-bold text-green-600">
+                                {campaign.campaign_type === 'percentage_discount' ? `%${campaign.discount_value}` :
+                                 campaign.campaign_type === 'fixed_discount' ? `${campaign.discount_value}₺` :
+                                 'Ücretsiz Kargo'}
+                              </span>
+                            </div>
+                            {campaign.min_order_amount > 0 && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Min. Sipariş:</span>
+                                <span className="text-sm font-semibold">{campaign.min_order_amount}₺</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600">Bitiş:</span>
+                              <span className="text-sm font-semibold text-red-600">
+                                {new Date(campaign.end_date).toLocaleDateString('tr-TR')}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+                            🛍️ Kampanyayı Kullan
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Available Coupons */}
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  🎫 Kullanılabilir Kuponlar
+                  <span className="ml-3 text-sm bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-normal">
+                    {activeCoupons.length} Kupon
+                  </span>
+                </h3>
+                
+                {activeCoupons.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <div className="text-4xl mb-3">🎫</div>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-2">Kullanılabilir Kupon Yok</h4>
+                      <p className="text-gray-600">Yeni kuponlar için takipte kalın!</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {activeCoupons.map((coupon) => (
+                      <Card key={coupon.id} className="border-2 border-dashed border-blue-300 hover:border-blue-500 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="text-lg font-bold text-blue-600">{coupon.code}</div>
+                            <div className="text-2xl">🎫</div>
+                          </div>
+                          <h4 className="font-semibold text-gray-800 mb-2">{coupon.title}</h4>
+                          {coupon.description && (
+                            <p className="text-sm text-gray-600 mb-3">{coupon.description}</p>
+                          )}
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">
+                              {coupon.min_order_amount > 0 ? `Min: ${coupon.min_order_amount}₺` : 'Min sipariş yok'}
+                            </span>
+                            <span className="font-bold text-green-600">
+                              {coupon.coupon_type === 'percentage' ? `%${coupon.discount_value}` :
+                               coupon.coupon_type === 'fixed_amount' ? `${coupon.discount_value}₺` :
+                               'Ücretsiz Kargo'}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Loyalty Points Tab */}
+          {activeTab === 'loyalty' && (
+            <div className="space-y-6">
+              <Card className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
+                <CardContent className="p-8">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🏆</div>
+                    <h2 className="text-3xl font-bold mb-2">Sadakat Puanlarınız</h2>
+                    <div className="text-5xl font-bold mb-4">{loyaltyPoints.total_points}</div>
+                    <div className="text-xl opacity-90 mb-6">{loyaltyPoints.tier_level} Seviye</div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <div className="bg-white/20 rounded-lg p-4">
+                        <div className="text-2xl font-bold">{loyaltyPoints.lifetime_points}</div>
+                        <div className="text-sm opacity-90">Toplam Kazanılan</div>
+                      </div>
+                      <div className="bg-white/20 rounded-lg p-4">
+                        <div className="text-2xl font-bold">{Math.floor(loyaltyPoints.total_points / 100)}</div>
+                        <div className="text-sm opacity-90">Kullanılabilir İndirim</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Points Usage Options */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    ⭐ Puanlarınızı Kullanın
+                  </CardTitle>
+                  <CardDescription>
+                    Kazandığınız puanları indirim olarak kullanabilirsiniz
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="text-center p-6 border-2 border-dashed border-gray-200 rounded-lg">
+                      <div className="text-3xl mb-3">💰</div>
+                      <h4 className="font-semibold mb-2">100 Puan</h4>
+                      <p className="text-green-600 font-bold">10₺ İndirim</p>
+                      <Button 
+                        className="mt-3 w-full" 
+                        disabled={loyaltyPoints.total_points < 100}
+                        variant={loyaltyPoints.total_points >= 100 ? "default" : "secondary"}
+                      >
+                        Kullan
+                      </Button>
+                    </div>
+                    <div className="text-center p-6 border-2 border-dashed border-gray-200 rounded-lg">
+                      <div className="text-3xl mb-3">🚚</div>
+                      <h4 className="font-semibold mb-2">50 Puan</h4>
+                      <p className="text-blue-600 font-bold">Ücretsiz Kargo</p>
+                      <Button 
+                        className="mt-3 w-full" 
+                        disabled={loyaltyPoints.total_points < 50}
+                        variant={loyaltyPoints.total_points >= 50 ? "default" : "secondary"}
+                      >
+                        Kullan
+                      </Button>
+                    </div>
+                    <div className="text-center p-6 border-2 border-dashed border-gray-200 rounded-lg">
+                      <div className="text-3xl mb-3">🎁</div>
+                      <h4 className="font-semibold mb-2">200 Puan</h4>
+                      <p className="text-purple-600 font-bold">Sürpriz Hediye</p>
+                      <Button 
+                        className="mt-3 w-full" 
+                        disabled={loyaltyPoints.total_points < 200}
+                        variant={loyaltyPoints.total_points >= 200 ? "default" : "secondary"}
+                      >
+                        Kullan
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Points Earning Guide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>💡 Puan Nasıl Kazanılır?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <span className="text-xl">🛍️</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Sipariş Verin</h4>
+                        <p className="text-gray-600">Her 10₺'lik sipariş için 1 puan kazanın</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-xl">⭐</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Yorum Yapın</h4>
+                        <p className="text-gray-600">Siparişinizi değerlendirin, 5 puan kazanın</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <span className="text-xl">👥</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Arkadaş Davet Edin</h4>
+                        <p className="text-gray-600">Her davet için 25 puan kazanın</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {/* Products Tab - Professional Food Order System */}
           {activeTab === 'products' && (
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
