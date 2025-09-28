@@ -1313,6 +1313,260 @@ const AdminDashboard = ({ user }) => {
           </div>
         )}
       </div>
+
+      {/* Add User Dialog */}
+      {showAddUserDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={`w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl ${getCardThemeClass()}`}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  ➕ Yeni Kullanıcı Ekle
+                </h3>
+                <Button
+                  onClick={() => {
+                    setShowAddUserDialog(false);
+                    resetNewUserData();
+                  }}
+                  variant="ghost"
+                  size="sm"
+                >
+                  ✕
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                {/* User Role Selection */}
+                <div>
+                  <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Kullanıcı Rolü
+                  </Label>
+                  <Select value={newUserData.role} onValueChange={(value) => setNewUserData({...newUserData, role: value})}>
+                    <SelectTrigger className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="customer">👤 Müşteri</SelectItem>
+                      <SelectItem value="business">🏪 İşletme</SelectItem>
+                      <SelectItem value="courier">🚴 Kurye</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    E-posta *
+                  </Label>
+                  <Input
+                    type="email"
+                    placeholder="ornek@email.com"
+                    value={newUserData.email}
+                    onChange={(e) => setNewUserData({...newUserData, email: e.target.value})}
+                    className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}
+                    required
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Şifre *
+                  </Label>
+                  <Input
+                    type="password"
+                    placeholder="Güçlü şifre girin"
+                    value={newUserData.password}
+                    onChange={(e) => setNewUserData({...newUserData, password: e.target.value})}
+                    className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}
+                    required
+                  />
+                </div>
+
+                {/* Customer & Courier Fields */}
+                {(newUserData.role === 'customer' || newUserData.role === 'courier') && (
+                  <>
+                    <div>
+                      <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Ad
+                      </Label>
+                      <Input
+                        placeholder="Ad"
+                        value={newUserData.first_name}
+                        onChange={(e) => setNewUserData({...newUserData, first_name: e.target.value})}
+                        className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}
+                      />
+                    </div>
+                    <div>
+                      <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Soyad
+                      </Label>
+                      <Input
+                        placeholder="Soyad"
+                        value={newUserData.last_name}
+                        onChange={(e) => setNewUserData({...newUserData, last_name: e.target.value})}
+                        className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Business Fields */}
+                {newUserData.role === 'business' && (
+                  <>
+                    <div>
+                      <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        İşletme Adı
+                      </Label>
+                      <Input
+                        placeholder="İşletme adı"
+                        value={newUserData.business_name}
+                        onChange={(e) => setNewUserData({...newUserData, business_name: e.target.value})}
+                        className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}
+                      />
+                    </div>
+                    <div>
+                      <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Vergi Numarası
+                      </Label>
+                      <Input
+                        placeholder="1234567890"
+                        value={newUserData.tax_number}
+                        onChange={(e) => setNewUserData({...newUserData, tax_number: e.target.value})}
+                        className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}
+                      />
+                    </div>
+                    <div>
+                      <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Adres
+                      </Label>
+                      <Textarea
+                        placeholder="İşletme adresi"
+                        value={newUserData.address}
+                        onChange={(e) => setNewUserData({...newUserData, address: e.target.value})}
+                        className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* City for all roles */}
+                {newUserData.role !== 'admin' && (
+                  <div>
+                    <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Şehir
+                    </Label>
+                    <CitySelector 
+                      value={newUserData.city}
+                      onChange={(value) => setNewUserData({...newUserData, city: value})}
+                    />
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3 pt-4">
+                  <Button
+                    onClick={() => {
+                      setShowAddUserDialog(false);
+                      resetNewUserData();
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    İptal
+                  </Button>
+                  <Button
+                    onClick={addUser}
+                    disabled={loading || !newUserData.email || !newUserData.password}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                  >
+                    {loading ? 'Ekleniyor...' : 'Kullanıcı Ekle'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete User Dialog */}
+      {showDeleteUserDialog && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={`w-full max-w-md rounded-xl shadow-2xl ${getCardThemeClass()}`}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className={`text-lg font-bold text-red-600`}>
+                  🗑️ Kullanıcı Sil
+                </h3>
+                <Button
+                  onClick={() => {
+                    setShowDeleteUserDialog(false);
+                    setSelectedUser(null);
+                  }}
+                  variant="ghost"
+                  size="sm"
+                >
+                  ✕
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${
+                      selectedUser.role === 'courier' ? 'bg-orange-100' :
+                      selectedUser.role === 'business' ? 'bg-green-100' :
+                      selectedUser.role === 'customer' ? 'bg-blue-100' : 'bg-red-100'
+                    }`}>
+                      {selectedUser.role === 'courier' ? '🚴' : 
+                       selectedUser.role === 'business' ? '🏪' :
+                       selectedUser.role === 'customer' ? '👤' : '👑'}
+                    </div>
+                    <div>
+                      <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {selectedUser.first_name && selectedUser.last_name ? 
+                          `${selectedUser.first_name} ${selectedUser.last_name}` :
+                          selectedUser.business_name || 'İsimsiz Kullanıcı'
+                        }
+                      </p>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {selectedUser.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`p-4 rounded-lg border-l-4 border-l-red-500 ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                    ⚠️ Bu işlem geri alınamaz! Kullanıcı ve tüm verileri kalıcı olarak silinecektir.
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3 pt-4">
+                  <Button
+                    onClick={() => {
+                      setShowDeleteUserDialog(false);
+                      setSelectedUser(null);
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    İptal
+                  </Button>
+                  <Button
+                    onClick={() => deleteUser(selectedUser.id)}
+                    disabled={loading}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {loading ? 'Siliniyor...' : 'Sil'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
