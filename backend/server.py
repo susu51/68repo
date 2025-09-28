@@ -609,7 +609,18 @@ async def get_products(business_id: Optional[str] = None, category: Optional[str
     for product in products:
         product["id"] = str(product["_id"])
         del product["_id"]
-        product["created_at"] = product["created_at"].isoformat()
+        
+        # Handle datetime conversion safely
+        if "created_at" in product:
+            if isinstance(product["created_at"], str):
+                # Already a string, keep as is
+                pass
+            elif hasattr(product["created_at"], 'isoformat'):
+                # It's a datetime object, convert to string
+                product["created_at"] = product["created_at"].isoformat()
+            else:
+                # Fallback for any other type
+                product["created_at"] = str(product["created_at"])
     
     return products
 
@@ -622,7 +633,18 @@ async def get_my_products(current_user: dict = Depends(get_business_user)):
     for product in products:
         product["id"] = str(product["_id"])
         del product["_id"]
-        product["created_at"] = product["created_at"].isoformat()
+        
+        # Handle datetime conversion safely
+        if "created_at" in product:
+            if isinstance(product["created_at"], str):
+                # Already a string, keep as is
+                pass
+            elif hasattr(product["created_at"], 'isoformat'):
+                # It's a datetime object, convert to string
+                product["created_at"] = product["created_at"].isoformat()
+            else:
+                # Fallback for any other type
+                product["created_at"] = str(product["created_at"])
     
     return products
 
@@ -1010,7 +1032,18 @@ async def get_all_products(current_user: dict = Depends(get_admin_user)):
     for product in products:
         product["id"] = str(product["_id"])
         del product["_id"]
-        product["created_at"] = product["created_at"].isoformat()
+        
+        # Handle datetime conversion safely
+        if "created_at" in product:
+            if isinstance(product["created_at"], str):
+                # Already a string, keep as is
+                pass
+            elif hasattr(product["created_at"], 'isoformat'):
+                # It's a datetime object, convert to string
+                product["created_at"] = product["created_at"].isoformat()
+            else:
+                # Fallback for any other type
+                product["created_at"] = str(product["created_at"])
     
     return products
 
