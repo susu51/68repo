@@ -4227,23 +4227,15 @@ const HomePage = ({ onAuthStart }) => {
       <div className="container mx-auto px-4 py-8">
         {/* Main Hero */}
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6" key="logo-container">
-            <div 
-              key="logo-icon"
-              className="w-20 h-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg mr-4"
-            >
-              <span className="text-white text-3xl font-bold">🍕</span>
-            </div>
-            <div>
-              <h1 
-                key="logo-text"
-                className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"
-              >
-                Kuryecini
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">Türkiye'nin En Hızlı Teslimat Platformu</p>
-            </div>
+          <div className="flex justify-center mb-6">
+            <KuryeciniTextLogo size="xl" />
           </div>
+          <h1 className="text-4xl sm:text-6xl font-bold text-gray-800 mb-6">
+            <span className="bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+              Türkiye'nin En Hızlı{" "}
+            </span>
+            Teslimat Platformu
+          </h1>
           
           {/* Marketing Slogan */}
           <h2 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 leading-tight">
