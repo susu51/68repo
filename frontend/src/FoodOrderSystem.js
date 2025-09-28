@@ -505,8 +505,12 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const removeFromCart = (productId) => {
+    if (!isMounted) return; // Prevent cart updates if component is unmounted
+    
     setCart(cart.filter(item => item.product_id !== productId));
-    toast.success('Ürün sepetten kaldırıldı');
+    if (isMounted) {
+      toast.success('Ürün sepetten kaldırıldı');
+    }
   };
 
   const handleCheckout = () => {
