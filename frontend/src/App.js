@@ -3645,6 +3645,9 @@ const CustomerDashboard = ({ user }) => {
           {/* Campaigns Tab */}
           {activeTab === 'campaigns' && (
             <div className="space-y-6">
+              {/* Advertisement Carousel */}
+              <AdCarousel city={selectedCity} category="food" />
+              
               {/* Loyalty Points Header */}
               <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
                 <CardContent className="p-6">
