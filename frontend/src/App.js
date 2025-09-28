@@ -137,17 +137,11 @@ const SimpleLoginForm = ({ onRegisterClick }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/auth/login`, {
-        email: formData.email,
-        password: formData.password
-      });
-      login(response.data);
+      const response = await axios.post(`${API}/auth/login`, formData);
       
-      // Show appropriate success message based on user type
-      if (response.data.user_type === 'admin') {
-        toast.success('Admin girişi başarılı!');
-      } else {
-        toast.success('Başarıyla giriş yaptınız!');
+      if (response.data.access_token) {
+        login(response.data);
+        toast.success('Giriş başarılı!');
       }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Giriş başarısız');
