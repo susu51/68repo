@@ -2336,8 +2336,12 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
           </div>
 
           <div>
-            <Label>Şehir</Label>
-            <Select onValueChange={(value) => setFormData({...formData, city: value})} required>
+            <Label>Şehir *</Label>
+            <Select 
+              value={formData.city} 
+              onValueChange={(value) => setFormData({...formData, city: value})} 
+              required
+            >
               <SelectTrigger data-testid="customer-city-select">
                 <SelectValue placeholder="Şehir seçin" />
               </SelectTrigger>
