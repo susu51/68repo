@@ -112,10 +112,20 @@ const useAuth = () => {
   return context;
 };
 
-// Login Component - Unified Email/Password Authentication (Admin: any email + password 6851)
+// Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
   const { login } = useAuth();
-  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
+  return (
+    <ModernLogin 
+      onLogin={login}
+      onRegisterClick={onRegisterClick}
+    />
+  );
+};
+
+// Simple Login Component for backward compatibility
+const SimpleLoginForm = ({ onRegisterClick }) => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
