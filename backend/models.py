@@ -176,3 +176,79 @@ def validate_turkish_phone(phone: str) -> str:
                 return '+90' + cleaned
     
     raise ValueError('Invalid Turkish phone number format')
+
+# Marketing & Loyalty Models
+class CampaignType(str, Enum):
+    PERCENTAGE_DISCOUNT = "percentage_discount"  # %20 indirim
+    FIXED_DISCOUNT = "fixed_discount"            # 10₺ indirim
+    FREE_DELIVERY = "free_delivery"              # Ücretsiz kargo
+    BUY_X_GET_Y = "buy_x_get_y"                 # 2 al 1 öde
+
+class CampaignStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    EXPIRED = "expired"
+
+class Campaign(BaseModel):
+    id: Optional[str] = None
+    business_id: str
+    title: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(..., min_length=1, max_length=500)
+    campaign_type: CampaignType
+    discount_value: float = Field(..., gt=0)  # % or ₺ amount
+    min_order_amount: Optional[float] = 0
+    max_discount_amount: Optional[float] = None  # For percentage discounts
+    start_date: datetime
+    end_date: datetime
+    usage_limit: Optional[int] = None  # Total usage limit
+    used_count: int = 0
+    status: CampaignStatus = CampaignStatus.ACTIVE
+    created_at: datetime = Field(default_factory=datetime.now)
+
+class LoyaltyTransaction(BaseModel):
+    id: Optional[str] = None
+    user_id: str
+    points: int  # Positive for earning, negative for spending
+    transaction_type: str  # "earned", "spent", "expired"
+    order_id: Optional[str] = None
+    description: str
+    created_at: datetime = Field(default_factory=datetime.now)
+
+class UserLoyalty(BaseModel):
+    id: Optional[str] = None
+    user_id: str
+    total_points: int = 0
+    lifetime_points: int = 0  # Total points ever earned
+    tier_level: str = "Bronze"  # Bronze, Silver, Gold, Platinum
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+class CouponType(str, Enum):
+    PERCENTAGE = "percentage"
+    FIXED_AMOUNT = "fixed_amount"
+    FREE_DELIVERY = "free_delivery"
+
+class Coupon(BaseModel):
+    id: Optional[str] = None
+    code: str = Field(..., min_length=3, max_length=50)
+    title: str = Field(..., min_length=1, max_length=100)
+    description: Optional[str] = None
+    coupon_type: CouponType
+    discount_value: float = Field(..., gt=0)
+    min_order_amount: Optional[float] = 0
+    max_discount_amount: Optional[float] = None
+    usage_limit: Optional[int] = None
+    used_count: int = 0
+    valid_from: datetime
+    valid_until: datetime
+    is_active: bool = True
+    created_by: Optional[str] = None  # Admin or business_id
+    created_at: datetime = Field(default_factory=datetime.now)
+
+class CouponUsage(BaseModel):
+    id: Optional[str] = None
+    coupon_id: str
+    user_id: str
+    order_id: str
+    discount_amount: float
+    used_at: datetime = Field(default_factory=datetime.now)
