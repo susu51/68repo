@@ -3411,28 +3411,30 @@ class DeliverTRAPITester:
         return self.tests_passed == self.tests_run
 
 def main():
-    """Main test execution - Focus on City Field Validation as requested"""
+    """Main test execution - Focus on Admin Login Integration as requested"""
     tester = DeliverTRAPITester()
     
-    print("🎯 RUNNING BUSINESS REGISTRATION CITY FIELD VALIDATION TESTS AS REQUESTED")
-    print("📋 Review Request: Test business registration endpoint focusing on city field validation")
-    print("🏙️  Testing Turkish city names: Istanbul, Ankara, Izmir")
-    print("✅ Testing complete business registration flow with city selection")
-    print("📝 Testing sample business registration data from request")
+    print("🎯 RUNNING ADMIN LOGIN INTEGRATION TESTS AS REQUESTED")
+    print("📋 Review Request: Test the updated admin login integration system")
+    print("🔐 Testing admin login via regular /api/auth/login endpoint")
+    print("✅ Testing any email + password '6851' should return admin user data")
+    print("✅ Testing normal user login still works correctly")
+    print("✅ Testing invalid passwords return 401 unauthorized")
+    print("✅ Testing admin user data structure and JWT token generation")
     
-    # Run city field validation tests as requested in review
-    success = tester.run_city_field_validation_tests()
+    # Run admin login integration tests as requested in review
+    success = tester.run_admin_login_integration_tests()
     
     if success:
-        print("\n🎉 ALL CITY FIELD VALIDATION TESTS PASSED!")
-        print("✅ Business registration endpoint working with city field")
-        print("✅ Turkish city names (Istanbul, Ankara, Izmir) accepted")
-        print("✅ City field validation and acceptance working")
-        print("✅ Complete business registration flow with city selection working")
-        print("✅ Sample business registration data working perfectly")
+        print("\n🎉 ALL ADMIN LOGIN INTEGRATION TESTS PASSED!")
+        print("✅ Admin login via regular endpoint working with password '6851'")
+        print("✅ Normal user login working correctly")
+        print("✅ Invalid passwords properly rejected with 401")
+        print("✅ Admin user data structure correct with role 'admin'")
+        print("✅ JWT token generation and validation working")
         return 0
     else:
-        print(f"\n⚠️  Some City Field Validation tests failed. Check results above.")
+        print(f"\n⚠️  Some Admin Login Integration tests failed. Check results above.")
         return 1
 
 if __name__ == "__main__":
