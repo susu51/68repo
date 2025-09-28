@@ -1290,7 +1290,9 @@ const AdminDashboard = ({ user }) => {
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
+            </Tabs>
+          </div>
+        </div>
 
         {/* KYC Reject Dialog */}
         {showRejectDialog && (
