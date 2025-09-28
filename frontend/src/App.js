@@ -682,71 +682,30 @@ const AdminDashboard = ({ user }) => {
           </Card>
         </div>
 
-        {/* Sidebar Layout */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Mobile Navigation Pills */}
-          <div className={`lg:hidden flex overflow-x-auto space-x-2 p-2 ${getCardThemeClass()} rounded-xl shadow-lg`}>
-            {[
-              { value: 'users', icon: '👥', label: 'Kullanıcılar' },
-              { value: 'kyc', icon: '📋', label: 'KYC' },
-              { value: 'products', icon: '🍽️', label: 'Ürünler' },
-              { value: 'orders', icon: '📦', label: 'Siparişler' },
-              { value: 'map', icon: '🗺️', label: 'Harita' }
-            ].map((item) => (
-              <button
-                key={item.value}
-                onClick={() => setActiveTab(item.value)}
-                className={`flex-shrink-0 flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 text-sm font-medium ${
-                  activeTab === item.value
-                    ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-md'
-                    : isDarkMode
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                <span>{item.icon}</span>
-                <span className="whitespace-nowrap">{item.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Desktop Sidebar Navigation */}
-          <div className={`hidden lg:block w-64 flex-shrink-0 transition-all duration-300 ${getCardThemeClass()} rounded-xl shadow-lg p-4`}>
+        {/* Simple Sidebar Layout */}
+        <div className="flex gap-6">
+          {/* Sidebar Navigation */}
+          <div className="w-64 flex-shrink-0 bg-white rounded-xl shadow-lg p-4">
             <div className="space-y-2">
               {[
-                { value: 'users', icon: '👥', label: 'Kullanıcı Yönetimi', color: 'blue', desc: 'Tüm kullanıcıları yönet' },
-                { value: 'kyc', icon: '📋', label: 'KYC Onayları', color: 'yellow', desc: 'Kurye belgelerini onayla' },
-                { value: 'products', icon: '🍽️', label: 'Ürün Yönetimi', color: 'green', desc: 'Ürünleri görüntüle' },
-                { value: 'orders', icon: '📦', label: 'Sipariş Yönetimi', color: 'orange', desc: 'Siparişleri takip et' },
-                { value: 'map', icon: '🗺️', label: 'Harita Görünümü', color: 'purple', desc: 'Kuryeleri haritada gör' }
+                { value: 'users', icon: '👥', label: 'Kullanıcılar' },
+                { value: 'kyc', icon: '📋', label: 'KYC Onay' },
+                { value: 'products', icon: '🍽️', label: 'Ürünler' },
+                { value: 'orders', icon: '📦', label: 'Siparişler' },
+                { value: 'map', icon: '🗺️', label: 'Harita' }
               ].map((item) => (
                 <button
                   key={item.value}
                   onClick={() => setActiveTab(item.value)}
-                  className={`w-full text-left p-4 rounded-xl transition-all duration-300 group ${
+                  className={`w-full text-left p-3 rounded-lg transition-all ${
                     activeTab === item.value
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105'
-                      : isDarkMode
-                      ? 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-md'
-                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 hover:shadow-md'
+                      ? 'bg-blue-500 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className={`text-xl transition-transform duration-300 ${
-                      activeTab === item.value ? 'scale-110' : 'group-hover:scale-105'
-                    }`}>
-                      {item.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">
-                        {item.label}
-                      </div>
-                      <div className={`text-xs opacity-75 truncate ${
-                        activeTab === item.value ? 'text-white/80' : ''
-                      }`}>
-                        {item.desc}
-                      </div>
-                    </div>
+                    <span className="text-lg">{item.icon}</span>
+                    <span className="font-medium">{item.label}</span>
                   </div>
                 </button>
               ))}
@@ -754,7 +713,7 @@ const AdminDashboard = ({ user }) => {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
 
           {/* KYC Tab */}
