@@ -4265,7 +4265,7 @@ const HomePage = ({ onAuthStart }) => {
               { name: "Tavuk Döner", price: "25₺", image: "🌯", rating: "4.7", orders: "950+" },
               { name: "Sushi Set", price: "85₺", image: "🍣", rating: "4.9", orders: "420+" }
             ].map((product, index) => (
-              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+              <Card key={`popular-product-${index}`} className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="text-4xl mb-3">{product.image}</div>
                   <h4 className="font-semibold text-gray-800 mb-2">{product.name}</h4>
