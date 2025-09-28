@@ -4145,8 +4145,68 @@ const CustomerDashboard = ({ user }) => {
               </Card>
             </div>
           )}
+
+          {/* Profile Tab */}
+          {activeTab === 'profile' && (
+            <div className="space-y-6">
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <div className="text-6xl mb-4">👤</div>
+                  <h3 className="text-2xl font-bold mb-4">Profilim</h3>
+                  <p className="text-gray-600 mb-6">
+                    Kişisel bilgilerinizi, adreslerinizi ve sipariş geçmişinizi yönetin
+                  </p>
+                  <Button 
+                    onClick={() => setShowProfile(true)}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 text-lg"
+                  >
+                    🔧 Profili Yönet
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Quick Profile Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl mb-3">📱</div>
+                    <h4 className="font-semibold mb-2">Telefon</h4>
+                    <p className="text-gray-600">{user.phone || 'Belirtilmemiş'}</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl mb-3">📧</div>
+                    <h4 className="font-semibold mb-2">E-posta</h4>
+                    <p className="text-gray-600">{user.email || 'Belirtilmemiş'}</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl mb-3">⭐</div>
+                    <h4 className="font-semibold mb-2">Sadakat Puanı</h4>
+                    <p className="text-2xl font-bold text-purple-600">{loyaltyPoints.total_points}</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+      
+      {/* Profile Modal */}
+      {showProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden">
+            <CustomerProfile 
+              user={user} 
+              onClose={() => setShowProfile(false)} 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
