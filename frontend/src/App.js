@@ -701,34 +701,54 @@ const AdminDashboard = ({ user }) => {
           </Card>
         </div>
 
-        {/* Modern Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className={`grid w-full grid-cols-5 p-1 rounded-xl transition-all duration-300 ${
-            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } border shadow-lg`}>
-            {[
-              { value: 'users', icon: '👥', label: 'Kullanıcılar', color: 'blue' },
-              { value: 'kyc', icon: '📋', label: 'KYC Onay', color: 'yellow' },
-              { value: 'products', icon: '🍽️', label: 'Ürünler', color: 'green' },
-              { value: 'orders', icon: '📦', label: 'Siparişler', color: 'orange' },
-              { value: 'map', icon: '🗺️', label: 'Harita', color: 'purple' }
-            ].map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className={`flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 px-2 py-3 rounded-lg transition-all duration-300 text-xs font-medium ${
-                  activeTab === tab.value
-                    ? `bg-gradient-to-r from-${tab.color}-500 to-${tab.color}-600 text-white shadow-md`
-                    : isDarkMode
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                <span className="text-base">{tab.icon}</span>
-                <span className="hidden sm:inline text-xs">{tab.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        {/* Sidebar Layout */}
+        <div className="flex gap-6">
+          {/* Sidebar Navigation */}
+          <div className={`w-64 flex-shrink-0 transition-all duration-300 ${getCardThemeClass()} rounded-xl shadow-lg p-4`}>
+            <div className="space-y-2">
+              {[
+                { value: 'users', icon: '👥', label: 'Kullanıcı Yönetimi', color: 'blue', desc: 'Tüm kullanıcıları yönet' },
+                { value: 'kyc', icon: '📋', label: 'KYC Onayları', color: 'yellow', desc: 'Kurye belgelerini onayla' },
+                { value: 'products', icon: '🍽️', label: 'Ürün Yönetimi', color: 'green', desc: 'Ürünleri görüntüle' },
+                { value: 'orders', icon: '📦', label: 'Sipariş Yönetimi', color: 'orange', desc: 'Siparişleri takip et' },
+                { value: 'map', icon: '🗺️', label: 'Harita Görünümü', color: 'purple', desc: 'Kuryeleri haritada gör' }
+              ].map((item) => (
+                <button
+                  key={item.value}
+                  onClick={() => setActiveTab(item.value)}
+                  className={`w-full text-left p-4 rounded-xl transition-all duration-300 group ${
+                    activeTab === item.value
+                      ? `bg-gradient-to-r from-${item.color}-500 to-${item.color}-600 text-white shadow-lg transform scale-105`
+                      : isDarkMode
+                      ? 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-md'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 hover:shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`text-xl transition-transform duration-300 ${
+                      activeTab === item.value ? 'scale-110' : 'group-hover:scale-105'
+                    }`}>
+                      {item.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">
+                        {item.label}
+                      </div>
+                      <div className={`text-xs opacity-75 truncate ${
+                        activeTab === item.value ? 'text-white/80' : ''
+                      }`}>
+                        {item.desc}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1 min-w-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
 
           {/* KYC Tab */}
           <TabsContent value="kyc" className="space-y-4 sm:space-y-6">
