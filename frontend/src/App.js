@@ -1616,6 +1616,7 @@ const AdminDashboard = ({ user }) => {
     </div>
   );
 };
+
 const CourierRegistration = ({ onComplete, onBack }) => {
   const [formData, setFormData] = useState({
     email: '',
