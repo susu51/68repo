@@ -252,6 +252,25 @@ const AdminDashboard = ({ user }) => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   
+  // User management state  
+  const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [newUserData, setNewUserData] = useState({
+    email: '',
+    password: '',
+    first_name: '',
+    last_name: '',
+    role: 'customer',
+    city: '',
+    business_name: '',
+    tax_number: '',
+    address: '',
+    business_category: 'gida'
+  });
+  
   // Theme state
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('admin_theme') === 'dark';
