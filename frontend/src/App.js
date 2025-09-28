@@ -153,7 +153,28 @@ const LoginForm = ({ onRegisterClick }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Login Method Toggle */}
+        <div className="flex space-x-2 mb-6">
+          <Button
+            type="button"
+            variant={loginMethod === 'email' ? 'default' : 'outline'}
+            onClick={() => setLoginMethod('email')}
+            className="flex-1"
+          >
+            📧 E-posta
+          </Button>
+          <Button
+            type="button"
+            variant={loginMethod === 'phone' ? 'default' : 'outline'}
+            onClick={() => setLoginMethod('phone')}
+            className="flex-1"
+          >
+            📱 Telefon
+          </Button>
+        </div>
+
+        {loginMethod === 'email' ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="email">E-posta</Label>
             <Input
