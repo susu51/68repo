@@ -9,6 +9,7 @@ import CourierBalance from "./CourierBalance";
 import FileUpload from "./FileUpload";
 import LeafletMap from "./LeafletMap";
 import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
+import { CustomerProfile } from "./CustomerProfile";
 
 // Components
 import { Button } from "./components/ui/button";
