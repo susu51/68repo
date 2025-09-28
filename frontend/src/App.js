@@ -112,6 +112,7 @@ const useAuth = () => {
 // Login Component - Unified Email/Password Authentication (Admin: any email + password 6851)
 const LoginForm = ({ onRegisterClick }) => {
   const { login } = useAuth();
+  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
   const [formData, setFormData] = useState({
     email: '',
     password: ''
