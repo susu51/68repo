@@ -166,9 +166,9 @@ const SimpleLoginForm = ({ onRegisterClick }) => {
             <Input
               id="email"
               type="email"
-              placeholder="ornek@email.com"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
+              placeholder="ornek@email.com"
               required
               data-testid="login-email"
             />
