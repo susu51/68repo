@@ -514,10 +514,12 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const handleCheckout = () => {
-    if (cart.length === 0) return;
+    if (!isMounted || cart.length === 0) return; // Check if component is mounted
     
     // Here you would integrate with the order creation system
-    toast.success('Sipariş oluşturma sayfasına yönlendiriliyorsunuz...');
+    if (isMounted) {
+      toast.success('Sipariş oluşturma sayfasına yönlendiriliyorsunuz...');
+    }
     // You could call a parent component function or navigate to checkout
   };
 
