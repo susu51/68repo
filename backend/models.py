@@ -252,3 +252,93 @@ class CouponUsage(BaseModel):
     order_id: str
     discount_amount: float
     used_at: datetime = Field(default_factory=datetime.now)
+
+# Customer Profile Management Models
+class Address(BaseModel):
+    id: Optional[str] = None
+    user_id: str
+    title: str = Field(..., min_length=1, max_length=50)  # "Ev", "İş", "Diğer"
+    address_line: str = Field(..., min_length=1, max_length=200)
+    district: Optional[str] = None
+    city: str = Field(..., min_length=1, max_length=50)
+    postal_code: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    is_default: bool = False
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+class CustomerProfile(BaseModel):
+    id: Optional[str] = None
+    user_id: str
+    phone: str
+    email: Optional[str] = None
+    first_name: str
+    last_name: str
+    birth_date: Optional[datetime] = None
+    gender: Optional[str] = None  # "male", "female", "other"
+    profile_image_url: Optional[str] = None
+    notification_preferences: Dict[str, bool] = Field(default={
+        "email_notifications": True,
+        "sms_notifications": True,
+        "push_notifications": True,
+        "marketing_emails": False
+    })
+    preferred_language: str = "tr"
+    theme_preference: str = "light"  # "light", "dark", "auto"
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+class OrderRating(BaseModel):
+    id: Optional[str] = None
+    order_id: str
+    customer_id: str
+    business_id: str
+    courier_id: Optional[str] = None
+    business_rating: Optional[int] = Field(None, ge=1, le=5)  # 1-5 stars
+    courier_rating: Optional[int] = Field(None, ge=1, le=5)   # 1-5 stars
+    business_comment: Optional[str] = Field(None, max_length=500)
+    courier_comment: Optional[str] = Field(None, max_length=500)
+    food_quality_rating: Optional[int] = Field(None, ge=1, le=5)
+    delivery_speed_rating: Optional[int] = Field(None, ge=1, le=5)
+    created_at: datetime = Field(default_factory=datetime.now)
+
+# Phone Authentication Models
+class PhoneAuthRequest(BaseModel):
+    phone: str = Field(..., description="Turkish phone number")
+    
+    @validator('phone')
+    def validate_phone_format(cls, v):
+        return validate_turkish_phone(v)
+
+class PhoneAuthVerify(BaseModel):
+    phone: str
+    otp_code: str = Field(..., min_length=6, max_length=6)
+    
+class PhoneAuthToken(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
+    user_data: dict
+
+# Profile Update Models
+class ProfileUpdateRequest(BaseModel):
+    first_name: Optional[str] = Field(None, min_length=1, max_length=50)
+    last_name: Optional[str] = Field(None, min_length=1, max_length=50)
+    email: Optional[str] = None
+    birth_date: Optional[datetime] = None
+    gender: Optional[str] = Field(None, regex="^(male|female|other)$")
+    notification_preferences: Optional[Dict[str, bool]] = None
+    preferred_language: Optional[str] = Field(None, regex="^(tr|en)$")
+    theme_preference: Optional[str] = Field(None, regex="^(light|dark|auto)$")
+
+class AddressRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=50)
+    address_line: str = Field(..., min_length=1, max_length=200)
+    district: Optional[str] = Field(None, max_length=50)
+    city: str = Field(..., min_length=1, max_length=50)
+    postal_code: Optional[str] = Field(None, max_length=10)
+    latitude: Optional[float] = Field(None, ge=-90, le=90)
+    longitude: Optional[float] = Field(None, ge=-180, le=180)
+    is_default: bool = False
