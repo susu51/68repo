@@ -1,86 +1,74 @@
 <analysis>
-The AI engineer's trajectory showcases a systematic approach to enhancing the Kuryecini application. Initially, the focus was on critical bug fixes and foundational feature additions, including a complete rebranding and 81-province support. The work then shifted to integrating admin login into the standard flow, redesigning the admin panel for mobile responsiveness and user management. This phase involved significant debugging of persistent JSX and runtime errors in , often requiring a rebuild of components. Subsequently, a comprehensive marketing-focused customer theme was introduced, including hero sections, social proof, popular products, campaigns, and loyalty systems, again requiring DOM error resolution. The most recent completed task addressed city selection issues in registration forms. The current work was interrupted by a new request regarding food visibility on the customer side, pausing the business registration KYC implementation.
+The AI engineer's work on the Kuryecini application progressed through several distinct phases. Initially, the focus was on core foundational elements: rebranding from DeliverTR to Kuryecini, implementing support for all 81 Turkish provinces, and integrating admin login into the standard flow. A significant portion of the work involved enhancing the admin panel for mobile responsiveness, incorporating a modern dark/light theme, and adding user management capabilities. A comprehensive customer-facing marketing theme was also introduced, featuring hero sections, social proof, and loyalty programs. Recurrent challenges included debugging persistent JSX and React runtime errors (), particularly in  and . More recently, the engineer successfully addressed critical issues such as the absence of food items on the customer side, implemented location-based and city-wide restaurant sorting, and resolved a specific  runtime error. Standardizing backend date serialization for MongoDB was also completed. The trajectory concludes with the user delivering a new, detailed and extensive set of product requirements, shifting the focus to future feature development.
 </analysis>
 
 <product_requirements>
-Kuryecini (formerly DeliverTR) is a Turkish package/food delivery platform with a 3% commission, allowing anyone to be a courier. It supports Customer, Courier, Business, and Admin roles, featuring JWT authentication, Admin KYC approval for couriers, an Admin panel for management, and Leaflet/OpenStreetMap integration for real-time order tracking via WebSockets. Businesses manage menus, while couriers have city-wide nearby orders and live location.
+Kuryecini (formerly DeliverTR) is a Turkish package/food delivery platform for Customer, Courier, Business, and Admin roles, featuring JWT auth, Admin KYC for couriers, Admin panel, and Leaflet/OpenStreetMap. It's fully branded Kuryecini supporting 81 Turkish provinces.
 
-Recent feature additions include a professional food order system for customers, location-based restaurant filtering, and a Show My Location button. The application is fully branded as Kuryecini, supporting 81 Turkish provinces in registration.
+**Implemented (Previous Trajectory):** Admin login integrated (pass 6851), hint removed; Admin panel redesigned (mobile-responsive, dark/light, user management, sidebar); Customer marketing theme (hero, search, CTA, social proof, popular products, campaigns, loyalty); Registration city/category selection fixed; Customer food visibility resolved; Location-based and city-wide restaurant sorting implemented; Backend date serialization for MongoDB standardized; React runtime errors fixed.
 
-Recent explicit user requests involved:
-1.  **Admin Login Simplification:** Integrate admin access into the regular login flow (any email + password 6851 grants admin access).
-2.  **Hide Admin Login Hint:** Remove the explicit Admin password: 6851 hint from the login form.
-3.  **Admin Panel Redesign:** Improve mobile responsiveness, add a modern dark/light theme, and implement user (customer, business, courier) add/delete functionality. Change tab system to a sidebar.
-4.  **Customer Marketing Theme:** Implement a marketing-focused theme for the customer side, including:
-    *   Hero section (speed, trust, search, CTA).
-    *   Campaigns area (promotions).
-    *   Loyalty system (points for orders, discounts, free delivery).
-    *   Coupon/discount codes on checkout.
-    *   User reviews/ratings (social proof on homepage).
-    *   Popular products display.
-    *   Notifications (campaigns, discounts).
-    *   Email/SMS marketing opt-in.
-    *   Social proof messages (1000+ happy customers).
-    *   Mobile-first design with dark/light mode.
-    *   Customer panel sections: My Orders, Favorite Businesses, My Points.
-5.  **Business Registration Fixes:** Resolve city selection errors in business registration. Implement a KYC approval system for new businesses (requiring admin approval before being public) and correct post-registration redirection to the business panel.
+**New Comprehensive Requirements (from Chat Message 276):**
+The user has provided a detailed product vision. Key areas for development include:
+1.  **Enhanced Branding & Theme:** Full Kuryecini rebrand, modern login/signup with phone authentication, dark/light modes.
+2.  **Customer Profile Management:** My Profile page with Address Book (CRUD, default), Loyalty Points (earn/spend, history), and Order History (reorder, product/courier rating).
+3.  **Dynamic Location Controls:** Nearest (browser geo-location) and City-Wide views for restaurants, synchronized with map.
+4.  **Refined Menu & Product Display:** Separate Food and Drink categories, rich product cards with images, prices, descriptions, badges, and quick add-to-cart.
+5.  **Marketing & Advertising:** Homepage sliding ad carousel with targetable banners; admin management for ads including analytics.
+6.  **Improved Courier Panel:** Notification/Message center, KYC-based job assignment, automated order assignment.
+7.  **Advanced Admin Panel:** Admin-only login, bulk messaging to couriers, comprehensive ad management, Featured Business subscription management.
+8.  **Business Features:** View Restaurant link, Feature Me paid promotion option (ranking, badge), refined product management with categories.
+9.  **Post-Delivery Reviews:** Customer product and courier rating system, displayed on restaurant pages.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Full-stack Architecture**: React.js frontend, FastAPI backend, MongoDB database.
--   **Authentication**: JWT for API access, Email/Password, bcrypt.
--   **Real-time Communication**: WebSockets for live updates (existing).
+-   **Authentication**: JWT, Email/Password, bcrypt.
 -   **UI/UX**: Shadcn UI, Tailwind CSS, Leaflet/OpenStreetMap.
 -   **Data Handling**: Pydantic models, UUIDs for MongoDB IDs.
--   **React Lifecycle Management**:  cleanup,  checks,  props for DOM stability.
+-   **React Lifecycle**:  cleanup,  checks,  props.
+-   **Asynchronous Ops**:  for API calls.
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a standard full-stack setup: FastAPI backend and React frontend.
-
 
 
 -   :
-    -   **Importance**: Core backend logic and API definitions.
-    -   **Changes Made**: Integrated admin login logic into  (password 6851). Fixed JWT validation for admin emails (). Added  DELETE endpoint. Added Campaign, Loyalty, and Coupon management endpoints. Began adding  and  endpoints.
+    -   **Importance**: Core backend logic and API definitions for authentication, user, business, and product management.
+    -   **Changes Made**: Integrated admin login (password 6851), fixed JWT validation for admin. Added  DELETE, Campaign, Loyalty, and Coupon management endpoints. Initiated  and  endpoints for KYC. Modified several endpoints to convert  to  and serialize  objects to ISO format for JSON compatibility.
 -   :
-    -   **Importance**: Pydantic models for API data validation.
-    -   **Changes Made**: Added , , and  models. Added  enum for KYC.
+    -   **Importance**: Defines Pydantic models for API request/response validation.
+    -   **Changes Made**: Added , ,  models, and  enum for KYC. Ensures  fields are correctly handled.
 -   :
     -   **Importance**: Main application layout, routing, and role-specific dashboards.
-    -   **Changes Made**:
-        *   **Login**: Simplified  to a single form, removed admin login hints.
-        *   **Admin Panel**: Redesigned  with modern dark/light theme, sidebar navigation, responsive layout, stat cards, and user management (add/delete users, search/filter). Fixed numerous JSX parsing and runtime errors (, , ,  not defined) during admin panel redesign by reintroducing states and functions. Implemented stable  props for map operations and  checks/cleanup for component lifecycle.
-        *   **Homepage**: Updated  with marketing theme (hero section, search, CTA, social proof, popular products, customer reviews). Fixed Adjacent JSX elements error.
-        *   **Customer Dashboard**: Integrated Campaign and Loyalty systems with new tabs (, ). Added  checks and cleanup for fetches.
-        *   **Registration Forms**: Fixed city and business category selection by adding  props to  components in , , and .
+    -   **Changes Made**: Simplified  (removed admin hint). Redesigned  with modern theme, sidebar, responsiveness, user management (fixing JSX/runtime errors,  props,  checks). Updated  with marketing theme (fixing Adjacent JSX elements error). Integrated Campaign/Loyalty into Customer Dashboard (with  checks). Fixed city/category selection in registration forms. Addressed  React runtime error for stability.
 -   :
-    -   **Importance**: New component for customer food ordering experience.
-    -   **Changes Made**: No explicit changes in this trajectory segment, but its existence is crucial for the customer dashboard.
+    -   **Importance**: Handles customer food ordering, restaurant/product display, and cart.
+    -   **Changes Made**: Implemented location-based and city-wide restaurant filtering/sorting. Resolved no food visible issue by ensuring correct data fetching and rendering. Applied fixes to  dependencies and component unmounting to resolve  runtime errors.
 -   :
     -   **Importance**: Application entry point and metadata.
     -   **Changes Made**: Updated title and description to Kuryecini.
 </code_architecture>
 
 <pending_tasks>
--   Implement comprehensive payment gateway integration (Iyzico sandbox).
--   Develop detailed commission reporting and platform wallet management.
--   Implement courier withdrawal requests and automated weekly payments.
--   Admin functionalities for user management (suspend couriers, approve business menus).
--   Advanced order flow features (live order map, assignment/cancellation reasons, SLA violations).
--   Financial reporting, complaint/support system, system rules, comprehensive logging, 2FA.
--   Complete Business KYC approval and post-registration redirection logic in the frontend.
--   Implement Customer Marketing Phase 3: Social & Trust Elements (User reviews, Notification system, E-mail/SMS marketing).
+-   Implement comprehensive payment gateway (Iyzico).
+-   Develop commission reporting, platform wallet, courier withdrawals.
+-   Admin features: user suspension, business menu approval, order flow.
+-   Financial reporting, complaint system, 2FA.
+-   Complete Business KYC frontend approval and post-registration redirection.
+-   Customer Marketing Phase 3: Social & Trust Elements (Reviews, Notifications, E-mail/SMS).
+-   All new detailed requirements from Message 276 (Customer Profile, Location Controls, Menu/Visuals, Ad Spaces, Courier/Admin Panel enhancements, Business features, Reviews/Ratings).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was addressing two issues related to business registration: 1) the registration completion not redirecting to the business panel, and 2) the requirement for every registered business to undergo KYC approval via the admin panel before being published.
+Immediately prior to receiving the new comprehensive product requirements (Chat Message 276), the AI engineer was addressing several critical issues to enhance the Kuryecini application's stability and functionality. The primary focus was resolving the user-reported Hiçbir yemek müşteri kısmında gözükmüyor (No food visible on customer side) issue. This involved detailed inspection and modification within  and  to ensure that approved businesses and their respective food items were correctly fetched, processed, and displayed to customers.
 
-The AI engineer started by investigating the  component's submit function in  and the  endpoint in . The plan was to first add  and  endpoints to the backend to facilitate the KYC flow. The backend modifications for these endpoints were successfully implemented in  and .
+Following this, the engineer implemented location-based (En Yakınım) and city-wide (Şehir Geneli) restaurant sorting functionality, as requested by the user, directly within , allowing customers to discover businesses based on proximity or across the entire city.
 
-However, this work was interrupted by a new, urgent request from the user: Hiçbir yemek müşteri kısmında gözükmüyor (No food visible on customer side). The AI engineer acknowledged this and shifted focus to investigate the 's product listing in  to resolve the food visibility issue for customers.
+Concurrently, a persistent React runtime error, specifically a  error, was diagnosed and fixed. This error, often associated with unstable keys in list renderings or improper component unmounting, was observed during navigation between tabs in components like  and . The resolution involved refining  hooks,  checks, and ensuring correct  prop usage for dynamically rendered elements, thereby stabilizing the frontend.
+
+Finally, the backend  and  were updated to standardize the JSON serialization of MongoDB s (converting them to strings) and  objects (converting to ISO format), preventing potential data transfer errors between the backend and frontend. The engineer had just concluded these bug fixes and stability improvements when the new, extensive list of product requirements was introduced.
 </current_work>
 
 <optional_next_step>
-Investigate why no food is visible on the customer side in the CustomerDashboard component.
+The next step is to analyze and plan the implementation for the comprehensive new product requirements outlined in Chat Message 276.
 </optional_next_step>
