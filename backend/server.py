@@ -379,7 +379,7 @@ async def register_business(business_data: BusinessRegister):
             detail="Email already registered"
         )
     
-    # Create new business user
+    # Create new business user with pending status for KYC approval
     hashed_password = hash_password(business_data.password)
     user_doc = {
         "id": str(uuid.uuid4()),
@@ -393,6 +393,8 @@ async def register_business(business_data: BusinessRegister):
         "business_category": business_data.business_category,
         "description": business_data.description,
         "is_active": True,
+        "business_status": "pending",  # pending, approved, rejected
+        "approved_at": None,
         "created_at": datetime.now(timezone.utc)
     }
     
