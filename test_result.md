@@ -306,10 +306,10 @@ metadata:
 
 test_plan:
   current_focus:
+    - "User Management System"
     - "Business Dashboard API Authentication Issues"
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
   test_priority: "high_first"
 
   - task: "Admin Login Integration"
