@@ -942,88 +942,177 @@ const AdminDashboard = ({ user }) => {
           </TabsContent>
 
           {/* Users Tab - Mobile Responsive */}
-          <TabsContent value="users" className="space-y-4 sm:space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm sm:text-base">Kullanıcı Yönetimi ({users.length})</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
-                  Tüm kullanıcıları görüntüleyin ve yönetin
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {users.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8 text-sm">Kullanıcı bulunamadı</p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Kullanıcı
-                          </th>
-                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Rol
-                          </th>
-                          <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Şehir
-                          </th>
-                          <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Kayıt Tarihi
-                          </th>
-                          <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Durum
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {users.map((user) => (
-                          <tr key={user.id}>
-                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
-                                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-200 flex items-center justify-center text-xs sm:text-base">
-                                    {user.role === 'courier' ? '🚴' : 
-                                     user.role === 'business' ? '🏪' :
-                                     user.role === 'customer' ? '👤' : '👑'}
-                                  </div>
-                                </div>
-                                <div className="ml-2 sm:ml-4">
-                                  <div className="text-xs sm:text-sm font-medium text-gray-900">
-                                    {user.first_name && user.last_name ? 
-                                      `${user.first_name} ${user.last_name}` :
-                                      user.business_name || user.email || 'İsimsiz Kullanıcı'
-                                    }
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {user.email || 'E-posta yok'}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                              <Badge className={getRoleColor(user.role)} size="sm">
-                                {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown'}
-                              </Badge>
-                            </td>
-                            <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {user.city || '-'}
-                            </td>
-                            <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(user.created_at).toLocaleDateString('tr-TR')}
-                            </td>
-                            <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                              <Badge variant={user.is_active ? "default" : "secondary"} size="sm">
-                                {user.is_active ? 'Aktif' : 'Pasif'}
-                              </Badge>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+          <TabsContent value="users" className="space-y-6 mt-6">
+            {/* User Management Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-xl">
+                  <span className="text-2xl">👥</span>
+                </div>
+                <div>
+                  <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    Kullanıcı Yönetimi
+                  </h2>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {filteredUsers.length} kullanıcı bulundu
+                  </p>
+                </div>
+              </div>
+              
+              <Button
+                onClick={() => setShowAddUserDialog(true)}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-none shadow-lg"
+              >
+                <span className="mr-2">➕</span>
+                <span className="hidden sm:inline">Kullanıcı Ekle</span>
+                <span className="sm:hidden">Ekle</span>
+              </Button>
+            </div>
+
+            {/* Search and Filter Controls */}
+            <Card className={`transition-all duration-300 ${getCardThemeClass()}`}>
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  {/* Search Input */}
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Kullanıcı ara (isim, email, işletme adı...)"
+                      value={userSearchTerm}
+                      onChange={(e) => setUserSearchTerm(e.target.value)}
+                      className={`transition-all duration-300 ${
+                        isDarkMode 
+                          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                          : 'bg-white border-gray-300'
+                      }`}
+                    />
                   </div>
-                )}
+                  
+                  {/* Role Filter */}
+                  <Select value={userRoleFilter} onValueChange={setUserRoleFilter}>
+                    <SelectTrigger className={`w-full sm:w-40 ${
+                      isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white' 
+                        : 'bg-white border-gray-300'
+                    }`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tüm Roller</SelectItem>
+                      <SelectItem value="customer">👤 Müşteri</SelectItem>
+                      <SelectItem value="business">🏪 İşletme</SelectItem>
+                      <SelectItem value="courier">🚴 Kurye</SelectItem>
+                      <SelectItem value="admin">👑 Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
+
+            {/* Users Grid - Mobile First */}
+            {filteredUsers.length === 0 ? (
+              <Card className={getCardThemeClass()}>
+                <CardContent className="p-12 text-center">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                      <span className="text-3xl">👥</span>
+                    </div>
+                    <div>
+                      <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        Kullanıcı bulunamadı
+                      </h3>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Arama kriterlerinizi değiştirin veya yeni kullanıcı ekleyin
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filteredUsers.map((user) => (
+                  <Card key={user.id} className={`transition-all duration-300 hover:scale-105 ${getCardThemeClass()}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${
+                            user.role === 'courier' ? 'bg-orange-100' :
+                            user.role === 'business' ? 'bg-green-100' :
+                            user.role === 'customer' ? 'bg-blue-100' : 'bg-red-100'
+                          }`}>
+                            {user.role === 'courier' ? '🚴' : 
+                             user.role === 'business' ? '🏪' :
+                             user.role === 'customer' ? '👤' : '👑'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className={`font-semibold text-sm truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                              {user.first_name && user.last_name ? 
+                                `${user.first_name} ${user.last_name}` :
+                                user.business_name || 'İsimsiz Kullanıcı'
+                              }
+                            </h3>
+                            <p className={`text-xs truncate ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {user.email || 'E-posta yok'}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <Button
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowDeleteUserDialog(true);
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2"
+                        >
+                          🗑️
+                        </Button>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Rol:
+                          </span>
+                          <Badge className={getRoleColor(user.role)} size="sm">
+                            {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown'}
+                          </Badge>
+                        </div>
+
+                        {user.city && (
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              Şehir:
+                            </span>
+                            <span className={`text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                              {user.city}
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Durum:
+                          </span>
+                          <Badge variant={user.is_active ? "default" : "secondary"} size="sm">
+                            {user.is_active ? 'Aktif' : 'Pasif'}
+                          </Badge>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Kayıt:
+                          </span>
+                          <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {new Date(user.created_at).toLocaleDateString('tr-TR')}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           {/* Products Tab */}
