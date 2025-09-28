@@ -609,84 +609,92 @@ const AdminDashboard = ({ user }) => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-        {/* Mobile-Responsive Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <Card>
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="text-lg sm:text-2xl">👥</div>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Modern Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          {/* Users Card */}
+          <Card className={`transition-all duration-300 hover:scale-105 border-l-4 border-l-blue-500 ${getCardThemeClass()}`}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Toplam Kullanıcı
+                  </p>
+                  <p className={`text-xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {users.length}
+                  </p>
+                  <p className="text-xs text-blue-500 font-medium mt-1">
+                    +{users.filter(u => new Date(u.created_at) > new Date(Date.now() - 7*24*60*60*1000)).length} bu hafta
+                  </p>
                 </div>
-                <div className="ml-2 sm:ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
-                      Kullanıcı
-                    </dt>
-                    <dd className="text-sm sm:text-lg font-medium text-gray-900">
-                      {users.length}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="text-lg sm:text-2xl">🍽️</div>
-                </div>
-                <div className="ml-2 sm:ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
-                      Ürün
-                    </dt>
-                    <dd className="text-sm sm:text-lg font-medium text-gray-900">
-                      {products.length}
-                    </dd>
-                  </dl>
+                <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl">
+                  <span className="text-2xl">👥</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="text-lg sm:text-2xl">📦</div>
+          {/* Products Card */}
+          <Card className={`transition-all duration-300 hover:scale-105 border-l-4 border-l-green-500 ${getCardThemeClass()}`}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Toplam Ürün
+                  </p>
+                  <p className={`text-xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {products.length}
+                  </p>
+                  <p className="text-xs text-green-500 font-medium mt-1">
+                    Aktif ürünler
+                  </p>
                 </div>
-                <div className="ml-2 sm:ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
-                      Sipariş
-                    </dt>
-                    <dd className="text-sm sm:text-lg font-medium text-gray-900">
-                      {orders.length}
-                    </dd>
-                  </dl>
+                <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl">
+                  <span className="text-2xl">🍽️</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-3 sm:p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="text-lg sm:text-2xl">💰</div>
+          {/* Orders Card */}
+          <Card className={`transition-all duration-300 hover:scale-105 border-l-4 border-l-orange-500 ${getCardThemeClass()}`}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Toplam Sipariş
+                  </p>
+                  <p className={`text-xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {orders.length}
+                  </p>
+                  <p className="text-xs text-orange-500 font-medium mt-1">
+                    Tüm zamanlar
+                  </p>
                 </div>
-                <div className="ml-2 sm:ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">
-                      Ciro
-                    </dt>
-                    <dd className="text-xs sm:text-lg font-medium text-gray-900">
-                      ₺{orders.reduce((sum, order) => sum + order.total_amount, 0).toFixed(2)}
-                    </dd>
-                  </dl>
+                <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl">
+                  <span className="text-2xl">📦</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Revenue Card */}
+          <Card className={`transition-all duration-300 hover:scale-105 border-l-4 border-l-purple-500 ${getCardThemeClass()}`}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Toplam Ciro
+                  </p>
+                  <p className={`text-lg sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    ₺{orders.reduce((sum, order) => sum + (order.total_amount || 0), 0).toFixed(2)}
+                  </p>
+                  <p className="text-xs text-purple-500 font-medium mt-1">
+                    Platform geliri
+                  </p>
+                </div>
+                <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-xl">
+                  <span className="text-2xl">💰</span>
                 </div>
               </div>
             </CardContent>
