@@ -489,6 +489,8 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const updateCartQuantity = (productId, change) => {
+    if (!isMounted) return; // Prevent cart updates if component is unmounted
+    
     setCart(cart.map(item => {
       if (item.product_id === productId) {
         const newQuantity = Math.max(0, item.quantity + change);
