@@ -3669,8 +3669,8 @@ const CustomerDashboard = ({ user }) => {
                   </Card>
                 ) : (
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {campaigns.map((campaign) => (
-                      <Card key={campaign.id} className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-orange-500">
+                    {campaigns.map((campaign, index) => (
+                      <Card key={`campaign-${campaign.id || index}`} className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-orange-500">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
