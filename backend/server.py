@@ -957,35 +957,36 @@ async def get_all_users(current_user: dict = Depends(get_admin_user)):
 
 @api_router.delete("/admin/users/{user_id}")
 async def delete_user(user_id: str, current_user: dict = Depends(get_admin_user)):
-    """Delete user (Admin only)"""
+    """Delete user (Admin only) - Supports both UUID and ObjectId formats"""
+    # Try to find user by both formats
+    user = None
+    
+    # First try as ObjectId (for older users)
     try:
-        # Convert user_id to ObjectId for MongoDB
         from bson import ObjectId
         object_id = ObjectId(user_id)
+        user = await db.users.find_one({"_id": object_id})
+        if user:
+            # Delete using ObjectId
+            result = await db.users.delete_one({"_id": object_id})
+            if result.deleted_count > 0:
+                return {"message": "User deleted successfully", "user_id": user_id, "format": "ObjectId"}
     except:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid user ID format"
-        )
+        pass
     
-    # Check if user exists
-    user = await db.users.find_one({"_id": object_id})
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+    # Then try as UUID string (for newer users created via registration)
+    user = await db.users.find_one({"id": user_id})
+    if user:
+        # Delete using id field
+        result = await db.users.delete_one({"id": user_id})
+        if result.deleted_count > 0:
+            return {"message": "User deleted successfully", "user_id": user_id, "format": "UUID"}
     
-    # Delete user
-    result = await db.users.delete_one({"_id": object_id})
-    
-    if result.deleted_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
-    
-    return {"message": "User deleted successfully", "user_id": user_id}
+    # If not found by either method
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User not found"
+    )
 
 @api_router.get("/admin/products")
 async def get_all_products(current_user: dict = Depends(get_admin_user)):
