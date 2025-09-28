@@ -2210,8 +2210,12 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
           </div>
           
           <div>
-            <Label>Ne satıyorsunuz?</Label>
-            <Select onValueChange={(value) => setFormData({...formData, business_category: value})} required>
+            <Label>Ne satıyorsunuz? *</Label>
+            <Select 
+              value={formData.business_category} 
+              onValueChange={(value) => setFormData({...formData, business_category: value})} 
+              required
+            >
               <SelectTrigger data-testid="business-category-select">
                 <SelectValue placeholder="Kategori seçin" />
               </SelectTrigger>
