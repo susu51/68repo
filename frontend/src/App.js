@@ -10,6 +10,7 @@ import FileUpload from "./FileUpload";
 import LeafletMap from "./LeafletMap";
 import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
 import { CustomerProfile } from "./CustomerProfile";
+import PhoneAuth from "./PhoneAuth";
 
 // Components
 import { Button } from "./components/ui/button";
