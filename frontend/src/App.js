@@ -542,12 +542,12 @@ const AdminDashboard = ({ user }) => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen transition-all duration-300 ${getThemeClass()}`}>
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 flex items-center space-x-3">
-            <div className="w-6 h-6 border-3 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-gray-700">Admin paneli yükleniyor...</span>
+          <div className={`rounded-lg p-6 flex items-center space-x-3 ${getCardThemeClass()}`}>
+            <div className="w-6 h-6 border-3 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+            <span className={isDarkMode ? 'text-white' : 'text-gray-700'}>Admin paneli yükleniyor...</span>
           </div>
         </div>
       )}
