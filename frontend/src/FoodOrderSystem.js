@@ -430,17 +430,25 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const fetchProducts = async (restaurantId) => {
+    if (!isMounted) return; // Early return if component is unmounted
+    
     try {
       const response = await axios.get(`${API}/businesses/${restaurantId}/products`);
-      setProducts(response.data);
       
-      // Extract categories
-      const productCategories = [...new Set(response.data.map(p => p.category))];
-      setCategories(['all', ...productCategories]);
-      setSelectedCategory('all');
+      // Double-check isMounted after async operation
+      if (isMounted) {
+        setProducts(response.data);
+        
+        // Extract categories
+        const productCategories = [...new Set(response.data.map(p => p.category))];
+        setCategories(['all', ...productCategories]);
+        setSelectedCategory('all');
+      }
     } catch (error) {
       console.error('Ürünler yüklenemedi:', error);
-      toast.error('Menü yüklenemedi');
+      if (isMounted) {
+        toast.error('Menü yüklenemedi');
+      }
     }
   };
 
