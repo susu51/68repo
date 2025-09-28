@@ -3565,9 +3565,7 @@ const CustomerDashboard = ({ user }) => {
             <div className="flex items-center space-x-4">
               <div className="text-2xl sm:text-3xl">🍽️</div>
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Kuryecini
-                </h1>
+                <KuryeciniTextLogo size="medium" />
                 <p className="text-xs sm:text-sm text-gray-600">
                   Merhaba, {user.first_name || 'Kullanıcı'}! 👋
                 </p>
