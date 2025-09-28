@@ -2750,6 +2750,10 @@ async def get_customer_profile(current_user: dict = Depends(get_current_user)):
             await db.customer_profiles.insert_one(profile_data)
             profile = profile_data
     
+    # Remove MongoDB ObjectId field
+    if "_id" in profile:
+        del profile["_id"]
+    
     # Convert datetime fields
     if profile.get("created_at"):
         profile["created_at"] = profile["created_at"].isoformat() if hasattr(profile["created_at"], 'isoformat') else profile["created_at"]
