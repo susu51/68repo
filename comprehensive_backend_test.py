@@ -796,7 +796,7 @@ class KuryeciniBackendTester:
         total_time = time.time() - start_time
         
         # Generate comprehensive report
-        self.generate_comprehensive_report(total_time)
+        return self.generate_comprehensive_report(total_time)
 
     def generate_comprehensive_report(self, total_time: float):
         """Generate comprehensive test report"""
