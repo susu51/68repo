@@ -702,9 +702,35 @@ const AdminDashboard = ({ user }) => {
         </div>
 
         {/* Sidebar Layout */}
-        <div className="flex gap-6">
-          {/* Sidebar Navigation */}
-          <div className={`w-64 flex-shrink-0 transition-all duration-300 ${getCardThemeClass()} rounded-xl shadow-lg p-4`}>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Mobile Navigation Pills */}
+          <div className={`lg:hidden flex overflow-x-auto space-x-2 p-2 ${getCardThemeClass()} rounded-xl shadow-lg`}>
+            {[
+              { value: 'users', icon: '👥', label: 'Kullanıcılar' },
+              { value: 'kyc', icon: '📋', label: 'KYC' },
+              { value: 'products', icon: '🍽️', label: 'Ürünler' },
+              { value: 'orders', icon: '📦', label: 'Siparişler' },
+              { value: 'map', icon: '🗺️', label: 'Harita' }
+            ].map((item) => (
+              <button
+                key={item.value}
+                onClick={() => setActiveTab(item.value)}
+                className={`flex-shrink-0 flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 text-sm font-medium ${
+                  activeTab === item.value
+                    ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-md'
+                    : isDarkMode
+                    ? 'text-gray-300 hover:text-white hover:bg-gray-700'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span className="whitespace-nowrap">{item.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Desktop Sidebar Navigation */}
+          <div className={`hidden lg:block w-64 flex-shrink-0 transition-all duration-300 ${getCardThemeClass()} rounded-xl shadow-lg p-4`}>
             <div className="space-y-2">
               {[
                 { value: 'users', icon: '👥', label: 'Kullanıcı Yönetimi', color: 'blue', desc: 'Tüm kullanıcıları yönet' },
