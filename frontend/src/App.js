@@ -3239,9 +3239,7 @@ const BusinessDashboard = ({ user }) => {
               </CardContent>
             </Card>
           </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+        </Tabs>
       </div>
     </div>
   );
