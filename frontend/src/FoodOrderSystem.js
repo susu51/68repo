@@ -463,6 +463,8 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const addToCart = (product) => {
+    if (!isMounted) return; // Prevent cart updates if component is unmounted
+    
     const existingItem = cart.find(item => item.product_id === product.id);
     
     if (existingItem) {
@@ -481,7 +483,9 @@ export const ProfessionalFoodOrderSystem = () => {
       }]);
     }
     
-    toast.success(`${product.name} sepete eklendi! ✨`);
+    if (isMounted) {
+      toast.success(`${product.name} sepete eklendi! ✨`);
+    }
   };
 
   const updateCartQuantity = (productId, change) => {
