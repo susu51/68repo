@@ -2684,10 +2684,545 @@ async def validate_coupon(coupon_code: str, order_amount: float, current_user: d
         "title": coupon["title"]
     }
 
+# CUSTOMER PROFILE MANAGEMENT ENDPOINTS
+
+@api_router.get("/profile/me")
+async def get_customer_profile(current_user: dict = Depends(get_current_user)):
+    """Get current user's profile information"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(status_code=403, detail="Only customers can access this endpoint")
+    
+    # Get profile from customer_profiles collection or user data
+    profile = await db.customer_profiles.find_one({"user_id": current_user["id"]})
+    
+    if not profile:
+        # Create profile from user data
+        user = await db.users.find_one({"id": current_user["id"]})
+        if user:
+            profile_data = {
+                "id": str(uuid.uuid4()),
+                "user_id": current_user["id"],
+                "phone": user.get("phone", ""),
+                "email": user.get("email"),
+                "first_name": user.get("first_name", ""),
+                "last_name": user.get("last_name", ""),
+                "birth_date": None,
+                "gender": None,
+                "profile_image_url": None,
+                "notification_preferences": {
+                    "email_notifications": True,
+                    "sms_notifications": True,
+                    "push_notifications": True,
+                    "marketing_emails": False
+                },
+                "preferred_language": "tr",
+                "theme_preference": "light",
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
+            }
+            await db.customer_profiles.insert_one(profile_data)
+            profile = profile_data
+    
+    # Convert datetime fields
+    if profile.get("created_at"):
+        profile["created_at"] = profile["created_at"].isoformat() if hasattr(profile["created_at"], 'isoformat') else profile["created_at"]
+    if profile.get("updated_at"):
+        profile["updated_at"] = profile["updated_at"].isoformat() if hasattr(profile["updated_at"], 'isoformat') else profile["updated_at"]
+    if profile.get("birth_date"):
+        profile["birth_date"] = profile["birth_date"].isoformat() if hasattr(profile["birth_date"], 'isoformat') else profile["birth_date"]
+    
+    return profile
+
+@api_router.put("/profile/me")
+async def update_customer_profile(
+    profile_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update current user's profile information"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(status_code=403, detail="Only customers can access this endpoint")
+    
+    # Update allowed fields only
+    allowed_fields = [
+        "first_name", "last_name", "email", "birth_date", "gender",
+        "notification_preferences", "preferred_language", "theme_preference"
+    ]
+    
+    update_data = {k: v for k, v in profile_data.items() if k in allowed_fields}
+    update_data["updated_at"] = datetime.now(timezone.utc)
+    
+    # Handle birth_date conversion
+    if "birth_date" in update_data and update_data["birth_date"]:
+        if isinstance(update_data["birth_date"], str):
+            update_data["birth_date"] = datetime.fromisoformat(update_data["birth_date"].replace('Z', '+00:00'))
+    
+    await db.customer_profiles.update_one(
+        {"user_id": current_user["id"]},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    return {"message": "Profil başarıyla güncellendi"}
+
+# ADDRESS MANAGEMENT ENDPOINTS
+
+@api_router.get("/addresses")
+async def get_user_addresses(current_user: dict = Depends(get_current_user)):
+    """Get all addresses for current user"""
+    addresses = await db.addresses.find({"user_id": current_user["id"]}).to_list(length=None)
+    
+    for address in addresses:
+        address["id"] = str(address["_id"])
+        del address["_id"]
+        if address.get("created_at"):
+            address["created_at"] = address["created_at"].isoformat() if hasattr(address["created_at"], 'isoformat') else address["created_at"]
+        if address.get("updated_at"):
+            address["updated_at"] = address["updated_at"].isoformat() if hasattr(address["updated_at"], 'isoformat') else address["updated_at"]
+    
+    return addresses
+
+@api_router.post("/addresses")
+async def create_address(
+    address_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create new address for current user"""
+    # If this is set as default, unset other default addresses
+    if address_data.get("is_default"):
+        await db.addresses.update_many(
+            {"user_id": current_user["id"]},
+            {"$set": {"is_default": False}}
+        )
+    
+    new_address = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user["id"],
+        "title": address_data["title"],
+        "address_line": address_data["address_line"],
+        "district": address_data.get("district"),
+        "city": address_data["city"],
+        "postal_code": address_data.get("postal_code"),
+        "latitude": address_data.get("latitude"),
+        "longitude": address_data.get("longitude"),
+        "is_default": address_data.get("is_default", False),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    await db.addresses.insert_one(new_address)
+    return {"message": "Adres başarıyla eklendi", "address_id": new_address["id"]}
+
+@api_router.put("/addresses/{address_id}")
+async def update_address(
+    address_id: str,
+    address_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update existing address"""
+    # Check if address belongs to current user
+    existing_address = await db.addresses.find_one({
+        "id": address_id,
+        "user_id": current_user["id"]
+    })
+    
+    if not existing_address:
+        raise HTTPException(status_code=404, detail="Adres bulunamadı")
+    
+    # If setting as default, unset other defaults
+    if address_data.get("is_default"):
+        await db.addresses.update_many(
+            {"user_id": current_user["id"], "id": {"$ne": address_id}},
+            {"$set": {"is_default": False}}
+        )
+    
+    update_data = {k: v for k, v in address_data.items() if k in [
+        "title", "address_line", "district", "city", "postal_code",
+        "latitude", "longitude", "is_default"
+    ]}
+    update_data["updated_at"] = datetime.now(timezone.utc)
+    
+    await db.addresses.update_one(
+        {"id": address_id, "user_id": current_user["id"]},
+        {"$set": update_data}
+    )
+    
+    return {"message": "Adres başarıyla güncellendi"}
+
+@api_router.delete("/addresses/{address_id}")
+async def delete_address(
+    address_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete address"""
+    result = await db.addresses.delete_one({
+        "id": address_id,
+        "user_id": current_user["id"]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Adres bulunamadı")
+    
+    return {"message": "Adres başarıyla silindi"}
+
+@api_router.post("/addresses/{address_id}/set-default")
+async def set_default_address(
+    address_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Set address as default"""
+    # Check if address exists and belongs to user
+    address = await db.addresses.find_one({
+        "id": address_id,
+        "user_id": current_user["id"]
+    })
+    
+    if not address:
+        raise HTTPException(status_code=404, detail="Adres bulunamadı")
+    
+    # Unset all other defaults
+    await db.addresses.update_many(
+        {"user_id": current_user["id"]},
+        {"$set": {"is_default": False}}
+    )
+    
+    # Set this address as default
+    await db.addresses.update_one(
+        {"id": address_id},
+        {"$set": {"is_default": True, "updated_at": datetime.now(timezone.utc)}}
+    )
+    
+    return {"message": "Varsayılan adres güncellendi"}
+
+# ORDER HISTORY AND RATINGS ENDPOINTS
+
+@api_router.get("/orders/history")
+async def get_order_history(
+    page: int = 1,
+    limit: int = 10,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get customer's order history with pagination"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(status_code=403, detail="Only customers can access this endpoint")
+    
+    skip = (page - 1) * limit
+    
+    orders = await db.orders.find({
+        "customer_id": current_user["id"]
+    }).sort("created_at", -1).skip(skip).limit(limit).to_list(length=None)
+    
+    total_orders = await db.orders.count_documents({"customer_id": current_user["id"]})
+    
+    # Enrich orders with business and rating information
+    enriched_orders = []
+    for order in orders:
+        # Get business info
+        business = await db.users.find_one({"id": order.get("business_id")})
+        
+        # Get rating info
+        rating = await db.order_ratings.find_one({
+            "order_id": order["id"],
+            "customer_id": current_user["id"]
+        })
+        
+        # Get order items
+        order_items = []
+        if "items" in order:
+            for item in order["items"]:
+                product = await db.products.find_one({"id": item.get("product_id")})
+                if product:
+                    order_items.append({
+                        "product_name": product.get("name", "Unknown Product"),
+                        "quantity": item.get("quantity", 1),
+                        "price": item.get("price", 0),
+                        "total": item.get("quantity", 1) * item.get("price", 0)
+                    })
+        
+        order_info = {
+            "id": order["id"],
+            "status": order["status"],
+            "total_amount": order.get("total_amount", 0),
+            "created_at": order["created_at"].isoformat() if hasattr(order.get("created_at"), 'isoformat') else order.get("created_at"),
+            "delivery_address": order.get("delivery_address"),
+            "business_name": business.get("business_name", "Unknown Business") if business else "Unknown Business",
+            "business_id": order.get("business_id"),
+            "courier_id": order.get("courier_id"),
+            "items": order_items,
+            "can_reorder": order["status"] == "delivered",
+            "can_rate": order["status"] == "delivered" and not rating,
+            "rating_given": bool(rating),
+            "my_rating": {
+                "business_rating": rating.get("business_rating") if rating else None,
+                "courier_rating": rating.get("courier_rating") if rating else None,
+                "business_comment": rating.get("business_comment") if rating else None,
+                "courier_comment": rating.get("courier_comment") if rating else None
+            } if rating else None
+        }
+        enriched_orders.append(order_info)
+    
+    return {
+        "orders": enriched_orders,
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total_orders,
+            "pages": math.ceil(total_orders / limit) if total_orders > 0 else 1
+        }
+    }
+
+@api_router.post("/orders/{order_id}/reorder")
+async def reorder_items(
+    order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Reorder items from a previous order"""
+    # Get the original order
+    original_order = await db.orders.find_one({
+        "id": order_id,
+        "customer_id": current_user["id"],
+        "status": "delivered"
+    })
+    
+    if not original_order:
+        raise HTTPException(status_code=404, detail="Sipariş bulunamadı veya tekrar sipariş verilemez")
+    
+    # Check if business is still active
+    business = await db.users.find_one({
+        "id": original_order["business_id"],
+        "role": "business",
+        "is_active": True
+    })
+    
+    if not business:
+        raise HTTPException(status_code=400, detail="Restoran artık aktif değil")
+    
+    # Get available products from the original order
+    available_items = []
+    unavailable_items = []
+    
+    if "items" in original_order:
+        for item in original_order["items"]:
+            product = await db.products.find_one({
+                "id": item["product_id"],
+                "is_available": True
+            })
+            
+            if product:
+                available_items.append({
+                    "product_id": item["product_id"],
+                    "product_name": product["name"],
+                    "quantity": item["quantity"],
+                    "price": product["price"],  # Use current price
+                    "original_price": item["price"]
+                })
+            else:
+                unavailable_items.append({
+                    "product_name": item.get("product_name", "Unknown Product"),
+                    "quantity": item["quantity"]
+                })
+    
+    return {
+        "business_id": original_order["business_id"],
+        "business_name": business.get("business_name"),
+        "available_items": available_items,
+        "unavailable_items": unavailable_items,
+        "message": f"{len(available_items)} ürün tekrar sipariş edilebilir"
+    }
+
+@api_router.post("/orders/{order_id}/rate")
+async def rate_order(
+    order_id: str,
+    rating_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Rate an order (business and courier)"""
+    # Verify order belongs to customer and is delivered
+    order = await db.orders.find_one({
+        "id": order_id,
+        "customer_id": current_user["id"],
+        "status": "delivered"
+    })
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Sipariş bulunamadı veya değerlendirilemez")
+    
+    # Check if already rated
+    existing_rating = await db.order_ratings.find_one({
+        "order_id": order_id,
+        "customer_id": current_user["id"]
+    })
+    
+    if existing_rating:
+        raise HTTPException(status_code=400, detail="Bu sipariş zaten değerlendirilmiş")
+    
+    # Create rating record
+    new_rating = {
+        "id": str(uuid.uuid4()),
+        "order_id": order_id,
+        "customer_id": current_user["id"],
+        "business_id": order["business_id"],
+        "courier_id": order.get("courier_id"),
+        "business_rating": rating_data.get("business_rating"),
+        "courier_rating": rating_data.get("courier_rating"),
+        "business_comment": rating_data.get("business_comment"),
+        "courier_comment": rating_data.get("courier_comment"),
+        "food_quality_rating": rating_data.get("food_quality_rating"),
+        "delivery_speed_rating": rating_data.get("delivery_speed_rating"),
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await db.order_ratings.insert_one(new_rating)
+    
+    # Update business and courier average ratings
+    if rating_data.get("business_rating"):
+        await update_business_rating(order["business_id"])
+    
+    if rating_data.get("courier_rating") and order.get("courier_id"):
+        await update_courier_rating(order["courier_id"])
+    
+    return {"message": "Değerlendirmeniz kaydedildi"}
+
+async def update_business_rating(business_id: str):
+    """Update business average rating"""
+    ratings = await db.order_ratings.find({
+        "business_id": business_id,
+        "business_rating": {"$ne": None}
+    }).to_list(length=None)
+    
+    if ratings:
+        avg_rating = sum(r["business_rating"] for r in ratings) / len(ratings)
+        await db.users.update_one(
+            {"id": business_id},
+            {"$set": {
+                "average_rating": round(avg_rating, 1),
+                "total_ratings": len(ratings)
+            }}
+        )
+
+async def update_courier_rating(courier_id: str):
+    """Update courier average rating"""
+    ratings = await db.order_ratings.find({
+        "courier_id": courier_id,
+        "courier_rating": {"$ne": None}
+    }).to_list(length=None)
+    
+    if ratings:
+        avg_rating = sum(r["courier_rating"] for r in ratings) / len(ratings)
+        await db.users.update_one(
+            {"id": courier_id},
+            {"$set": {
+                "average_rating": round(avg_rating, 1),
+                "total_ratings": len(ratings)
+            }}
+        )
+
+# PHONE AUTHENTICATION ENDPOINTS
+
+@api_router.post("/auth/phone/request-otp")
+async def request_phone_otp(phone_data: dict):
+    """Request OTP for phone authentication"""
+    from models import validate_turkish_phone
+    
+    try:
+        formatted_phone = validate_turkish_phone(phone_data["phone"])
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    # Generate OTP (6 digits)
+    import random
+    otp_code = str(random.randint(100000, 999999))
+    
+    # Store OTP in database with expiration
+    otp_record = {
+        "id": str(uuid.uuid4()),
+        "phone": formatted_phone,
+        "otp_code": otp_code,
+        "expires_at": datetime.now(timezone.utc) + timedelta(minutes=5),
+        "created_at": datetime.now(timezone.utc),
+        "used": False
+    }
+    
+    await db.phone_otps.insert_one(otp_record)
+    
+    # TODO: Send SMS (for now return mock OTP in development)
+    return {
+        "success": True,
+        "message": "OTP kodu gönderildi",
+        "mock_otp": otp_code,  # Remove in production
+        "formatted_phone": formatted_phone,
+        "expires_in": 300  # 5 minutes
+    }
+
+@api_router.post("/auth/phone/verify-otp")
+async def verify_phone_otp(verify_data: dict):
+    """Verify OTP and create/login user"""
+    phone = verify_data["phone"]
+    otp_code = verify_data["otp_code"]
+    
+    # Find valid OTP
+    otp_record = await db.phone_otps.find_one({
+        "phone": phone,
+        "otp_code": otp_code,
+        "used": False,
+        "expires_at": {"$gt": datetime.now(timezone.utc)}
+    })
+    
+    if not otp_record:
+        raise HTTPException(status_code=400, detail="Geçersiz veya süresi dolmuş OTP")
+    
+    # Mark OTP as used
+    await db.phone_otps.update_one(
+        {"id": otp_record["id"]},
+        {"$set": {"used": True}}
+    )
+    
+    # Check if user already exists
+    user = await db.users.find_one({"phone": phone})
+    
+    if not user:
+        # Create new customer user
+        user_data = {
+            "id": str(uuid.uuid4()),
+            "phone": phone,
+            "email": None,
+            "role": "customer",
+            "first_name": "",
+            "last_name": "",
+            "is_active": True,
+            "profile_completed": False,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.users.insert_one(user_data)
+        user = user_data
+    
+    # Generate JWT token
+    token_data = {
+        "sub": user["id"],
+        "phone": user["phone"],
+        "role": user["role"],
+        "exp": datetime.now(timezone.utc) + timedelta(hours=24)
+    }
+    
+    access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_data": {
+            "id": user["id"],
+            "phone": user["phone"],
+            "email": user.get("email"),
+            "role": user["role"],
+            "first_name": user.get("first_name", ""),
+            "last_name": user.get("last_name", ""),
+            "profile_completed": user.get("profile_completed", False)
+        }
+    }
+
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "Kuryecini API v6.0 - Marketing & Loyalty System"}
+    return {"message": "Kuryecini API v7.0 - Customer Profile & Phone Auth System"}
 
 # Include the router in the main app
 app.include_router(api_router)
