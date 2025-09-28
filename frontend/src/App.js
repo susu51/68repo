@@ -420,6 +420,127 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
+  // Theme functions
+  const toggleTheme = () => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    localStorage.setItem('admin_theme', newTheme ? 'dark' : 'light');
+  };
+
+  const getThemeClass = () => {
+    return isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900';
+  };
+
+  const getCardThemeClass = () => {
+    return isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
+  };
+
+  // User management functions
+  const addUser = async () => {
+    if (!newUserData.email || !newUserData.password) {
+      toast.error('E-posta ve şifre gereklidir');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      let endpoint = '';
+      let userData = {};
+
+      switch (newUserData.role) {
+        case 'customer':
+          endpoint = 'register/customer';
+          userData = {
+            email: newUserData.email,
+            password: newUserData.password,
+            first_name: newUserData.first_name,
+            last_name: newUserData.last_name,
+            city: newUserData.city
+          };
+          break;
+        case 'business':
+          endpoint = 'register/business';
+          userData = {
+            email: newUserData.email,
+            password: newUserData.password,
+            business_name: newUserData.business_name,
+            tax_number: newUserData.tax_number,
+            address: newUserData.address,
+            city: newUserData.city,
+            business_category: newUserData.business_category,
+            description: ''
+          };
+          break;
+        case 'courier':
+          endpoint = 'register/courier';
+          userData = {
+            email: newUserData.email,
+            password: newUserData.password,
+            first_name: newUserData.first_name,
+            last_name: newUserData.last_name,
+            iban: 'TR000000000000000000000000', // Placeholder IBAN
+            vehicle_type: 'motor',
+            vehicle_model: 'Model belirtilmedi',
+            license_class: 'A',
+            license_number: '00000000',
+            city: newUserData.city
+          };
+          break;
+      }
+
+      await axios.post(`${API}/${endpoint}`, userData);
+      toast.success('Kullanıcı başarıyla eklendi');
+      setShowAddUserDialog(false);
+      resetNewUserData();
+      await fetchUsers(); // Refresh user list
+    } catch (error) {
+      console.error('Add user error:', error);
+      toast.error(error.response?.data?.detail || 'Kullanıcı eklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteUser = async (userId) => {
+    setLoading(true);
+    try {
+      await axios.delete(`${API}/admin/users/${userId}`);
+      toast.success('Kullanıcı başarıyla silindi');
+      setShowDeleteUserDialog(false);
+      setSelectedUser(null);
+      await fetchUsers(); // Refresh user list
+    } catch (error) {
+      console.error('Delete user error:', error);
+      toast.error('Kullanıcı silinemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetNewUserData = () => {
+    setNewUserData({
+      email: '',
+      password: '',
+      first_name: '',
+      last_name: '',
+      role: 'customer',
+      city: '',
+      business_name: '',
+      tax_number: '',
+      address: '',
+      business_category: 'gida'
+    });
+  };
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.email?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                         user.first_name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                         user.last_name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                         user.business_name?.toLowerCase().includes(userSearchTerm.toLowerCase());
+    const matchesRole = userRoleFilter === 'all' || user.role === userRoleFilter;
+    return matchesSearch && matchesRole;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       {loading && (
