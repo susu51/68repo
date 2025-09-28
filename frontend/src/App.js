@@ -3277,7 +3277,7 @@ const BusinessDashboard = ({ user }) => {
 // Customer Dashboard - Modern Tech Design
 const CustomerDashboard = ({ user }) => {
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('campaigns'); // Start with campaigns tab
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
@@ -3286,12 +3286,18 @@ const CustomerDashboard = ({ user }) => {
   const [locationError, setLocationError] = useState(null);
   const [mapCenter, setMapCenter] = useState([39.925533, 32.866287]); // Default to Turkey center
   const [isMounted, setIsMounted] = useState(true); // Track component mount status
-  const [orderForm, setOrderForm] = useState({
+  const [orderForm, setOrderForm] = setState({
     delivery_address: '',
     delivery_lat: null,
     delivery_lng: null,
     notes: ''
   });
+
+  // Marketing & Loyalty states
+  const [campaigns, setCampaigns] = useState([]);
+  const [loyaltyPoints, setLoyaltyPoints] = useState({ total_points: 0, lifetime_points: 0, tier_level: 'Bronze' });
+  const [activeCoupons, setActiveCoupons] = useState([]);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
 
   const fetchProducts = async () => {
     setLoading(true);
