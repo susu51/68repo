@@ -1,0 +1,246 @@
+{
+  "total_tests": 34,
+  "passed_tests": 21,
+  "failed_tests": 13,
+  "success_rate": 61.76470588235294,
+  "test_results": [
+    {
+      "test": "Customer Authentication (Email)",
+      "success": true,
+      "details": "Logged in as customer: testcustomer@example.com",
+      "timestamp": "2025-09-28T21:46:22.501097",
+      "response_data": null
+    },
+    {
+      "test": "OTP Request - +905551234567",
+      "success": false,
+      "details": "Failed with status: 500",
+      "timestamp": "2025-09-28T21:46:22.575010",
+      "response_data": null
+    },
+    {
+      "test": "OTP Request - 05551234567",
+      "success": false,
+      "details": "Failed with status: 500",
+      "timestamp": "2025-09-28T21:46:22.629377",
+      "response_data": null
+    },
+    {
+      "test": "OTP Request - 905551234567",
+      "success": false,
+      "details": "Failed with status: 500",
+      "timestamp": "2025-09-28T21:46:22.679115",
+      "response_data": null
+    },
+    {
+      "test": "OTP Request - 5551234567",
+      "success": false,
+      "details": "Failed with status: 500",
+      "timestamp": "2025-09-28T21:46:22.728261",
+      "response_data": null
+    },
+    {
+      "test": "Invalid Phone Rejection - 123456789",
+      "success": false,
+      "details": "Should reject but got: 500",
+      "timestamp": "2025-09-28T21:46:22.779901",
+      "response_data": null
+    },
+    {
+      "test": "Invalid Phone Rejection - +1234567890",
+      "success": false,
+      "details": "Should reject but got: 500",
+      "timestamp": "2025-09-28T21:46:22.827541",
+      "response_data": null
+    },
+    {
+      "test": "Invalid Phone Rejection - invalid",
+      "success": false,
+      "details": "Should reject but got: 500",
+      "timestamp": "2025-09-28T21:46:22.875388",
+      "response_data": null
+    },
+    {
+      "test": "Invalid Phone Rejection - ",
+      "success": false,
+      "details": "Should reject but got: 500",
+      "timestamp": "2025-09-28T21:46:22.927731",
+      "response_data": null
+    },
+    {
+      "test": "Wrong OTP Rejection",
+      "success": true,
+      "details": "Correctly rejected wrong OTP",
+      "timestamp": "2025-09-28T21:46:23.014316",
+      "response_data": null
+    },
+    {
+      "test": "Get Customer Profile",
+      "success": false,
+      "details": "Failed with status: 500",
+      "timestamp": "2025-09-28T21:46:23.063943",
+      "response_data": null
+    },
+    {
+      "test": "Update Customer Profile",
+      "success": true,
+      "details": "Profile updated successfully",
+      "timestamp": "2025-09-28T21:46:23.101947",
+      "response_data": null
+    },
+    {
+      "test": "Invalid Profile Data Rejection",
+      "success": false,
+      "details": "Should reject invalid data but got: 200",
+      "timestamp": "2025-09-28T21:46:23.173335",
+      "response_data": null
+    },
+    {
+      "test": "Get User Addresses",
+      "success": true,
+      "details": "Retrieved 0 addresses",
+      "timestamp": "2025-09-28T21:46:23.206939",
+      "response_data": null
+    },
+    {
+      "test": "Create Address",
+      "success": true,
+      "details": "Address created with ID: ac26e325-0b09-48b1-a36c-5a5d437a0f6e",
+      "timestamp": "2025-09-28T21:46:23.252840",
+      "response_data": null
+    },
+    {
+      "test": "Create Second Address",
+      "success": true,
+      "details": "Second address created with ID: a65782db-02ff-4d3f-815d-fcf5b303f269",
+      "timestamp": "2025-09-28T21:46:23.284685",
+      "response_data": null
+    },
+    {
+      "test": "Get Addresses After Creation",
+      "success": true,
+      "details": "Now have 2 addresses",
+      "timestamp": "2025-09-28T21:46:23.321949",
+      "response_data": null
+    },
+    {
+      "test": "Default Address Logic",
+      "success": true,
+      "details": "Only one default address exists",
+      "timestamp": "2025-09-28T21:46:23.321977",
+      "response_data": null
+    },
+    {
+      "test": "Update Address",
+      "success": true,
+      "details": "Address updated successfully",
+      "timestamp": "2025-09-28T21:46:23.358495",
+      "response_data": null
+    },
+    {
+      "test": "Set Default Address",
+      "success": true,
+      "details": "Default address set successfully",
+      "timestamp": "2025-09-28T21:46:23.390300",
+      "response_data": null
+    },
+    {
+      "test": "Default Address Verification",
+      "success": false,
+      "details": "Default address not changed",
+      "timestamp": "2025-09-28T21:46:23.421812",
+      "response_data": null
+    },
+    {
+      "test": "Delete Address",
+      "success": true,
+      "details": "Address deleted successfully",
+      "timestamp": "2025-09-28T21:46:23.455879",
+      "response_data": null
+    },
+    {
+      "test": "Non-existent Address Access",
+      "success": true,
+      "details": "Correctly returned 404 for non-existent address",
+      "timestamp": "2025-09-28T21:46:23.491174",
+      "response_data": null
+    },
+    {
+      "test": "Get Order History",
+      "success": true,
+      "details": "Retrieved 0 orders, total: 0",
+      "timestamp": "2025-09-28T21:46:23.527476",
+      "response_data": null
+    },
+    {
+      "test": "Order History Pagination Test",
+      "success": true,
+      "details": "Page 2, limit 3: page=2, total=0",
+      "timestamp": "2025-09-28T21:46:23.560262",
+      "response_data": null
+    },
+    {
+      "test": "Unauthorized Access - GET /profile/me",
+      "success": true,
+      "details": "Correctly rejected unauthorized access",
+      "timestamp": "2025-09-28T21:46:23.596226",
+      "response_data": null
+    },
+    {
+      "test": "Unauthorized Access - PUT /profile/me",
+      "success": true,
+      "details": "Correctly rejected unauthorized access",
+      "timestamp": "2025-09-28T21:46:23.628594",
+      "response_data": null
+    },
+    {
+      "test": "Unauthorized Access - GET /addresses",
+      "success": true,
+      "details": "Correctly rejected unauthorized access",
+      "timestamp": "2025-09-28T21:46:23.659863",
+      "response_data": null
+    },
+    {
+      "test": "Unauthorized Access - POST /addresses",
+      "success": true,
+      "details": "Correctly rejected unauthorized access",
+      "timestamp": "2025-09-28T21:46:23.690510",
+      "response_data": null
+    },
+    {
+      "test": "Unauthorized Access - GET /orders/history",
+      "success": true,
+      "details": "Correctly rejected unauthorized access",
+      "timestamp": "2025-09-28T21:46:23.730308",
+      "response_data": null
+    },
+    {
+      "test": "Invalid Token Rejection",
+      "success": true,
+      "details": "Correctly rejected invalid token",
+      "timestamp": "2025-09-28T21:46:23.760692",
+      "response_data": null
+    },
+    {
+      "test": "Invalid JSON Handling",
+      "success": false,
+      "details": "Should reject invalid JSON but got: 405",
+      "timestamp": "2025-09-28T21:46:23.794532",
+      "response_data": null
+    },
+    {
+      "test": "Missing Required Fields",
+      "success": false,
+      "details": "Should reject missing fields but got: 500",
+      "timestamp": "2025-09-28T21:46:23.838298",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup Address ac26e325-0b09-48b1-a36c-5a5d437a0f6e",
+      "success": true,
+      "details": "Address deleted",
+      "timestamp": "2025-09-28T21:46:23.871640",
+      "response_data": null
+    }
+  ]
+}
