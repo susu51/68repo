@@ -3602,7 +3602,8 @@ const CustomerDashboard = ({ user }) => {
               { id: 'products', icon: '🍽️', label: 'Keşfet', count: products.length },
               { id: 'loyalty', icon: '⭐', label: 'Puanlarım', count: loyaltyPoints.total_points },
               { id: 'cart', icon: '🛒', label: 'Sepet', count: cart.length },
-              { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length }
+              { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length },
+              { id: 'profile', icon: '👤', label: 'Profilim', count: null }
             ].map((tab) => (
               <button
                 key={tab.id}
