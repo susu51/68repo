@@ -328,10 +328,10 @@ class ProfileUpdateRequest(BaseModel):
     last_name: Optional[str] = Field(None, min_length=1, max_length=50)
     email: Optional[str] = None
     birth_date: Optional[datetime] = None
-    gender: Optional[str] = Field(None, regex="^(male|female|other)$")
+    gender: Optional[str] = Field(None, pattern="^(male|female|other)$")
     notification_preferences: Optional[Dict[str, bool]] = None
-    preferred_language: Optional[str] = Field(None, regex="^(tr|en)$")
-    theme_preference: Optional[str] = Field(None, regex="^(light|dark|auto)$")
+    preferred_language: Optional[str] = Field(None, pattern="^(tr|en)$")
+    theme_preference: Optional[str] = Field(None, pattern="^(light|dark|auto)$")
 
 class AddressRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=50)
