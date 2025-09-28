@@ -3165,6 +3165,45 @@ class DeliverTRAPITester:
         
         return self.tests_passed == self.tests_run
 
+    def run_admin_login_integration_tests(self):
+        """Run admin login integration tests specifically"""
+        print("🔐 STARTING ADMIN LOGIN INTEGRATION TESTS")
+        print("=" * 60)
+        
+        # Test sequence focusing on admin login integration
+        test_sequence = [
+            ("Admin Login via Regular Endpoint", self.test_admin_login_via_regular_endpoint),
+            ("Normal User Login", self.test_normal_user_login),
+            ("Invalid Password Scenarios", self.test_invalid_password_scenarios),
+            ("Admin Token Generation and Validity", self.test_admin_token_generation_and_validity),
+            ("Legacy Admin Authentication", self.test_admin_authentication),
+            ("Legacy Admin Wrong Password", self.test_admin_authentication_wrong_password),
+        ]
+        
+        print(f"📋 Running {len(test_sequence)} admin login integration tests...\n")
+        
+        all_success = True
+        for test_name, test_func in test_sequence:
+            print(f"\n{'='*60}")
+            print(f"🧪 RUNNING: {test_name}")
+            print(f"{'='*60}")
+            
+            try:
+                success = test_func()
+                if not success:
+                    all_success = False
+            except Exception as e:
+                print(f"❌ Test {test_name} failed with exception: {str(e)}")
+                self.log_test(test_name, False, f"Exception: {str(e)}")
+                all_success = False
+            
+            print(f"\n✅ Completed: {test_name}")
+        
+        # Print final results
+        self.print_final_results()
+        
+        return all_success
+
     def run_city_field_validation_tests(self):
         """Run comprehensive city field validation tests for business registration"""
         print("🏙️  STARTING BUSINESS REGISTRATION CITY FIELD VALIDATION TESTS")
