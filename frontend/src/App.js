@@ -3299,6 +3299,7 @@ const CustomerDashboard = ({ user }) => {
   const [locationError, setLocationError] = useState(null);
   const [mapCenter, setMapCenter] = useState([39.925533, 32.866287]); // Default to Turkey center
   const [isMounted, setIsMounted] = useState(true); // Track component mount status
+  const [showProfile, setShowProfile] = useState(false); // For showing profile modal
   const [orderForm, setOrderForm] = useState({
     delivery_address: '',
     delivery_lat: null,
