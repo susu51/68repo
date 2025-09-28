@@ -245,6 +245,7 @@ const AdminDashboard = ({ user }) => {
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [couriers, setCouriers] = useState([]);
   const [loading, setLoading] = useState(false);
   
   // Theme state
