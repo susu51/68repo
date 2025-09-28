@@ -329,6 +329,8 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
+  completed_tasks:
+    - "Food Visibility Issue - Customer Side Business Display"
 
   - task: "Admin Login Integration"
     implemented: true
