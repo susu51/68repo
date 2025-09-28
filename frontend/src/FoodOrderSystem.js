@@ -7,7 +7,7 @@ import { Badge } from "./components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import toast from 'react-hot-toast';
 
-const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001/api';
+const API = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001'}/api`;
 
 // Restaurant Card Component
 const RestaurantCard = ({ restaurant, onClick, userLocation }) => {
