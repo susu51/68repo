@@ -459,6 +459,8 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const handleRestaurantSelect = (restaurant) => {
+    if (!isMounted) return; // Prevent restaurant selection if component is unmounted
+    
     setSelectedRestaurant(restaurant);
     setCart([]); // Clear cart when switching restaurants
     fetchProducts(restaurant.id);
