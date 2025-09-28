@@ -701,29 +701,33 @@ const AdminDashboard = ({ user }) => {
           </Card>
         </div>
 
-        {/* Mobile-Responsive Tabs */}
+        {/* Modern Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 text-xs sm:text-sm">
-            <TabsTrigger value="users" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Kullanıcılar</span>
-              <span className="sm:hidden">👥</span>
-            </TabsTrigger>
-            <TabsTrigger value="kyc" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">KYC Onay</span>
-              <span className="sm:hidden">📋</span>
-            </TabsTrigger>
-            <TabsTrigger value="products" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Ürünler</span>
-              <span className="sm:hidden">🍽️</span>
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Siparişler</span>
-              <span className="sm:hidden">📦</span>
-            </TabsTrigger>
-            <TabsTrigger value="map" className="px-1 sm:px-3">
-              <span className="hidden sm:inline">Harita</span>
-              <span className="sm:hidden">🗺️</span>
-            </TabsTrigger>
+          <TabsList className={`grid w-full grid-cols-5 p-1 rounded-xl transition-all duration-300 ${
+            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          } border shadow-lg`}>
+            {[
+              { value: 'users', icon: '👥', label: 'Kullanıcılar', color: 'blue' },
+              { value: 'kyc', icon: '📋', label: 'KYC Onay', color: 'yellow' },
+              { value: 'products', icon: '🍽️', label: 'Ürünler', color: 'green' },
+              { value: 'orders', icon: '📦', label: 'Siparişler', color: 'orange' },
+              { value: 'map', icon: '🗺️', label: 'Harita', color: 'purple' }
+            ].map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className={`flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 px-2 py-3 rounded-lg transition-all duration-300 text-xs font-medium ${
+                  activeTab === tab.value
+                    ? `bg-gradient-to-r from-${tab.color}-500 to-${tab.color}-600 text-white shadow-md`
+                    : isDarkMode
+                    ? 'text-gray-300 hover:text-white hover:bg-gray-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <span className="text-base">{tab.icon}</span>
+                <span className="hidden sm:inline text-xs">{tab.label}</span>
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           {/* KYC Tab */}
