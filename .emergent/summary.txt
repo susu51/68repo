@@ -1,41 +1,38 @@
 <analysis>
-The AI engineer's work on DeliverTR involved an iterative process of fixing critical bugs, refining existing features, and implementing new functionalities. Initial tasks focused on resolving a  JSX parsing error, followed by addressing a list of user-reported issues: KYC approval failures (couriers not disappearing from the list, no rejection reason field), business product adding errors, and responsive design flaws. Key challenges included persistent frontend JSX/runtime errors, critical ID mismatches in the KYC approval system, and issues with API integration (e.g., admin login, courier nearby orders). The engineer systematically addressed these by examining code, adding error handling, refining component logic, and correcting API interactions. The trajectory concluded with the implementation of city-wide order display and advanced map features for couriers (live location, routing), but was immediately blocked by a new JSX error in , indicating adjacent JSX elements needing a fragment.
+The AI engineer's trajectory showcases a systematic approach to enhancing the Kuryecini application. Initially, the focus was on critical bug fixes and foundational feature additions, including a complete rebranding and 81-province support. The work then shifted to integrating admin login into the standard flow, redesigning the admin panel for mobile responsiveness and user management. This phase involved significant debugging of persistent JSX and runtime errors in , often requiring a rebuild of components. Subsequently, a comprehensive marketing-focused customer theme was introduced, including hero sections, social proof, popular products, campaigns, and loyalty systems, again requiring DOM error resolution. The most recent completed task addressed city selection issues in registration forms. The current work was interrupted by a new request regarding food visibility on the customer side, pausing the business registration KYC implementation.
 </analysis>
 
 <product_requirements>
-DeliverTR is a package/food delivery platform for Turkey, operating on an anyone can be a courier model with a 3% platform commission. The application primarily uses Turkish and Europe/Istanbul timezone.
+Kuryecini (formerly DeliverTR) is a Turkish package/food delivery platform with a 3% commission, allowing anyone to be a courier. It supports Customer, Courier, Business, and Admin roles, featuring JWT authentication, Admin KYC approval for couriers, an Admin panel for management, and Leaflet/OpenStreetMap integration for real-time order tracking via WebSockets. Businesses manage menus, while couriers have city-wide nearby orders and live location.
 
-**Core Product Features & MVP Criteria (as implemented and refined):**
+Recent feature additions include a professional food order system for customers, location-based restaurant filtering, and a Show My Location button. The application is fully branded as Kuryecini, supporting 81 Turkish provinces in registration.
 
-*   **User Authentication & Registration**: Email/Password system with JWT for Customers, Couriers, and Businesses. Courier registration includes detailed fields (IBAN, vehicle type, driver's license, vehicle registration, profile photo uploads, city) and requires Admin KYC approval. Business registration covers name, tax ID, address, and menu management.
-*   **Roles**: Supports Customer, Courier, Business, and Admin roles.
-*   **Admin Panel**:
-    *   KYC Approval/Rejection: Ability to view courier documents, approve or reject KYC applications. Enhanced with a reason field for rejections.
-    *   User, Product, and Order Management.
-    *   Admin login (password: 6851).
-    *   Responsive design across all admin tabs (Users, KYC, Products, Orders, Map).
-*   **Core Order Flow**:
-    *   Map Integration: Uses Leaflet/OpenStreetMap.
-    *   Order Creation for Customers.
-    *   Order Acceptance by approved Couriers.
-    *   Real-time updates via WebSockets.
-    *   Order Statuses: Created → Assigned → On_Route → Delivered.
-    *   Package Orders: Input for details like weight/size, sensitive/cold chain, priority, floor, notes.
-*   **Content Management**: Business menu creation (category, product, description, price, photo, prep time).
-*   **Courier Specific Features**:
-    *   Nearby orders (initially proximity-based, now city-wide) with real-time updates.
-    *   Courier Balance: Display of courier earnings.
-    *   Enhanced Map: Live location tracking, package icons, and delivery routing/directions.
-*   **Responsive Design**: All main dashboards (Admin, Courier, Customer) and forms are adapted for mobile and various screen sizes.
+Recent explicit user requests involved:
+1.  **Admin Login Simplification:** Integrate admin access into the regular login flow (any email + password 6851 grants admin access).
+2.  **Hide Admin Login Hint:** Remove the explicit Admin password: 6851 hint from the login form.
+3.  **Admin Panel Redesign:** Improve mobile responsiveness, add a modern dark/light theme, and implement user (customer, business, courier) add/delete functionality. Change tab system to a sidebar.
+4.  **Customer Marketing Theme:** Implement a marketing-focused theme for the customer side, including:
+    *   Hero section (speed, trust, search, CTA).
+    *   Campaigns area (promotions).
+    *   Loyalty system (points for orders, discounts, free delivery).
+    *   Coupon/discount codes on checkout.
+    *   User reviews/ratings (social proof on homepage).
+    *   Popular products display.
+    *   Notifications (campaigns, discounts).
+    *   Email/SMS marketing opt-in.
+    *   Social proof messages (1000+ happy customers).
+    *   Mobile-first design with dark/light mode.
+    *   Customer panel sections: My Orders, Favorite Businesses, My Points.
+5.  **Business Registration Fixes:** Resolve city selection errors in business registration. Implement a KYC approval system for new businesses (requiring admin approval before being public) and correct post-registration redirection to the business panel.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Full-stack Architecture**: React.js frontend, FastAPI backend, MongoDB database.
--   **Authentication**: JWT for API access, Email/Password for login/registration, bcrypt for password hashing.
--   **Real-time Communication**: WebSockets for live updates.
--   **UI/UX**: Shadcn UI components, Tailwind CSS for styling, Leaflet and OpenStreetMap for maps.
--   **Data Handling**: Pydantic for FastAPI models, UUIDs for MongoDB IDs (critical for consistency).
--   **Deployment & Ops**: Kubernetes container environment, Supervisor for process management.
+-   **Authentication**: JWT for API access, Email/Password, bcrypt.
+-   **Real-time Communication**: WebSockets for live updates (existing).
+-   **UI/UX**: Shadcn UI, Tailwind CSS, Leaflet/OpenStreetMap.
+-   **Data Handling**: Pydantic models, UUIDs for MongoDB IDs.
+-   **React Lifecycle Management**:  cleanup,  checks,  props for DOM stability.
 </key_technical_concepts>
 
 <code_architecture>
@@ -43,50 +40,47 @@ The application uses a standard full-stack setup: FastAPI backend and React fron
 
 
 
-**Key Files and Changes Summary:**
-
-*   :
-    *   **Importance**: Core backend logic, API endpoints, auth, DB.
-    *   **Changes Made**: Refined email/password auth. Updated Admin KYC endpoints () to correctly handle courier uid=0(root) gid=0(root) groups=0(root) (UUID) instead of stringified MongoDB  and accept rejection reasons. Modified  endpoint to remove distance constraints, allowing city-wide order fetching for couriers. Added location tracking and routing logic.
-*   :
-    *   **Importance**: Main React component, routing, UI integration.
-    *   **Changes Made**: Extensive refactoring and bug fixes. Resolved multiple JSX parsing errors. Removed unused  and  imports. Fixed Admin login by changing the button's  to . Added robust error handling and loading states to  API calls. Integrated  with new location tracking and map features, including  function.
-*   :
-    *   **Importance**: Reusable component for handling file uploads.
-    *   **Changes Made**: Fixed a runtime error where  was called on an   prop by adding conditional checks.
-*   :
-    *   **Importance**: Centralized Leaflet map rendering.
-    *   **Changes Made**: Enhanced to include real-time location tracking (using ), display package icons, a Show My Location button, and route calculation (via OSRM).
-*   :
-    *   **Importance**: Component for managing and displaying orders, including nearby orders for couriers.
-    *   **Changes Made**: Updated  component to use the correct backend API endpoint (). Fixed a token mismatch ( vs ). Integrated proximity alerts and city-wide order display. Currently has a JSX parsing error related to adjacent JSX elements.
-*   :
-    *   **Importance**: Component for creating package delivery orders.
-    *   **Changes Made**: Replaced deprecated  and  imports and usage with standard input fields for coordinates.
+-   :
+    -   **Importance**: Core backend logic and API definitions.
+    -   **Changes Made**: Integrated admin login logic into  (password 6851). Fixed JWT validation for admin emails (). Added  DELETE endpoint. Added Campaign, Loyalty, and Coupon management endpoints. Began adding  and  endpoints.
+-   :
+    -   **Importance**: Pydantic models for API data validation.
+    -   **Changes Made**: Added , , and  models. Added  enum for KYC.
+-   :
+    -   **Importance**: Main application layout, routing, and role-specific dashboards.
+    -   **Changes Made**:
+        *   **Login**: Simplified  to a single form, removed admin login hints.
+        *   **Admin Panel**: Redesigned  with modern dark/light theme, sidebar navigation, responsive layout, stat cards, and user management (add/delete users, search/filter). Fixed numerous JSX parsing and runtime errors (, , ,  not defined) during admin panel redesign by reintroducing states and functions. Implemented stable  props for map operations and  checks/cleanup for component lifecycle.
+        *   **Homepage**: Updated  with marketing theme (hero section, search, CTA, social proof, popular products, customer reviews). Fixed Adjacent JSX elements error.
+        *   **Customer Dashboard**: Integrated Campaign and Loyalty systems with new tabs (, ). Added  checks and cleanup for fetches.
+        *   **Registration Forms**: Fixed city and business category selection by adding  props to  components in , , and .
+-   :
+    -   **Importance**: New component for customer food ordering experience.
+    -   **Changes Made**: No explicit changes in this trajectory segment, but its existence is crucial for the customer dashboard.
+-   :
+    -   **Importance**: Application entry point and metadata.
+    -   **Changes Made**: Updated title and description to Kuryecini.
 </code_architecture>
 
 <pending_tasks>
-- Implement comprehensive payment gateway integration (Iyzico sandbox).
-- Develop detailed commission reporting and platform wallet management.
-- Implement courier withdrawal requests and automated weekly payments.
-- Admin functionalities for user management (suspend couriers, approve business menus).
-- Advanced order flow features (live order map, assignment/cancellation reasons, SLA violations).
-- Financial reporting (commission, courier balances, business payments).
-- Complaint and support system (ticket system, refund/discount flow).
-- System rules (min/max order distance, density multiplier, maintenance mode).
-- Comprehensive logging (user actions, IP, document views).
-- Implement 2FA (admin, business), content moderation.
-- Fix the JSX parsing error in  at line 708 and continue refining courier map features.
+-   Implement comprehensive payment gateway integration (Iyzico sandbox).
+-   Develop detailed commission reporting and platform wallet management.
+-   Implement courier withdrawal requests and automated weekly payments.
+-   Admin functionalities for user management (suspend couriers, approve business menus).
+-   Advanced order flow features (live order map, assignment/cancellation reasons, SLA violations).
+-   Financial reporting, complaint/support system, system rules, comprehensive logging, 2FA.
+-   Complete Business KYC approval and post-registration redirection logic in the frontend.
+-   Implement Customer Marketing Phase 3: Social & Trust Elements (User reviews, Notification system, E-mail/SMS marketing).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was implementing advanced map features for couriers and addressing order visibility issues.
-1.  **Nearby Orders Visibility:** The engineer resolved an issue where created orders were not visible to couriers. This involved fixing a URL mismatch in  ( to ), ensuring the  correctly fetches orders, and removing distance restrictions from the backend's  endpoint to display all city orders. A token variable mismatch was also corrected in .
-2.  **Enhanced Courier Map Features**: The engineer was actively integrating real-time location tracking, package icons, a Show My Location button, and routing capabilities (using OSRM) into  and  (in ). This also included adding a  function.
-3.  **Current Blocking Issue**: During the implementation of the map features and order display in  (specifically, integrating city-wide orders and proximity alerts into the render logic), a new JSX parsing error was introduced at line 708: Adjacent JSX elements must be wrapped in an enclosing tag. This error currently prevents the frontend from compiling successfully.
+Immediately before this summary, the AI engineer was addressing two issues related to business registration: 1) the registration completion not redirecting to the business panel, and 2) the requirement for every registered business to undergo KYC approval via the admin panel before being published.
+
+The AI engineer started by investigating the  component's submit function in  and the  endpoint in . The plan was to first add  and  endpoints to the backend to facilitate the KYC flow. The backend modifications for these endpoints were successfully implemented in  and .
+
+However, this work was interrupted by a new, urgent request from the user: Hiçbir yemek müşteri kısmında gözükmüyor (No food visible on customer side). The AI engineer acknowledged this and shifted focus to investigate the 's product listing in  to resolve the food visibility issue for customers.
 </current_work>
 
 <optional_next_step>
-Fix the JSX parsing error in  at line 708 by wrapping adjacent JSX elements in a fragment.
+Investigate why no food is visible on the customer side in the CustomerDashboard component.
 </optional_next_step>
-
