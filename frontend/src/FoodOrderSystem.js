@@ -429,6 +429,8 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const handleSortChange = (newSortType) => {
+    if (!isMounted) return; // Prevent sort changes if component is unmounted
+    
     setSortType(newSortType);
     sortAndFilterRestaurants(originalRestaurants, newSortType, userLocation);
   };
