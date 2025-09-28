@@ -312,9 +312,24 @@ test_plan:
   test_priority: "high_first"
   test_priority: "high_first"
 
+  - task: "Admin Login Integration"
+    implemented: true
+    working: true
+    file: "server.py, App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "IMPLEMENTED: Integrated admin login into normal login flow. Now any email + password '6851' grants admin access. Removed separate admin login tabs, created unified login interface. Updated branding from DeliverTR to Kuryecini. Backend updated to check password '6851' and return admin user data. Frontend simplified to single login form with admin hint."
+        -working: true
+        -agent: "main"
+        -comment: "TESTED: Admin login working perfectly - any email (test@admin.com) + password '6851' successfully redirects to admin panel with proper admin badge and full functionality. Normal user login also working correctly (testcustomer@example.com + test123 redirects to customer dashboard). Unified login interface implemented successfully."
+
 agent_communication:
     -agent: "main"
-    -message: "CRITICAL COURIER FUNCTIONALITY FIXED: 1) Added missing order acceptance API endpoint 2) Completely redesigned location tracking system - now gets courier location first, then fetches orders 3) Fixed coordinate system with realistic Istanbul districts (no more 520km distances!) 4) Enhanced UX with location status indicators and error handling 5) Prevented distance calculation without location. Ready for testing to confirm all courier panel issues are resolved."
+    -message: "✅ ADMIN LOGIN INTEGRATION COMPLETE: Successfully implemented unified login system where any email + password '6851' grants admin panel access. Removed separate admin login tabs and created clean, single login form. Updated branding to Kuryecini throughout. Both admin and normal user login flows tested and working perfectly. Backend logic updated to handle admin authentication within regular login endpoint."
     -agent: "testing"
     -message: "✅ KYC MANAGEMENT SYSTEM TESTING COMPLETE: Comprehensive testing of enhanced KYC system shows excellent results (97.7% success rate). All core KYC functionality working: GET /admin/couriers/kyc returns all couriers with KYC data, PATCH endpoint handles approval/rejection workflow perfectly with proper notes handling in request body, admin authentication working (password: 6851), KYC status update flow (pending→approved→rejected) working, error scenarios handled correctly. The user-reported issues with KYC approval system and rejection reason notes have been resolved. Backend KYC APIs are fully functional and ready for frontend integration."
     -agent: "testing"
