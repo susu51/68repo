@@ -238,7 +238,7 @@ const CitySelector = ({ value, onChange, required = false }) => {
   );
 };
 
-// Admin Dashboard - Simple Working Version
+// Admin Dashboard - Simple Working Version with Theme
 const AdminDashboard = ({ user }) => {
   const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState('users');
@@ -246,6 +246,11 @@ const AdminDashboard = ({ user }) => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  // Theme state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('admin_theme') === 'dark';
+  });
 
   const fetchUsers = async () => {
     try {
