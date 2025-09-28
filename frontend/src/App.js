@@ -4366,7 +4366,7 @@ const HomePage = ({ onAuthStart }) => {
                 location: "İzmir"
               }
             ].map((review, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+              <Card key={`review-${index}`} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white font-bold">
