@@ -953,7 +953,18 @@ async def get_all_users(current_user: dict = Depends(get_admin_user)):
         del user["_id"]
         if "password" in user:
             del user["password"]
-        user["created_at"] = user["created_at"].isoformat()
+        
+        # Handle datetime conversion safely - check if it's already a string
+        if "created_at" in user:
+            if isinstance(user["created_at"], str):
+                # Already a string, keep as is
+                pass
+            elif hasattr(user["created_at"], 'isoformat'):
+                # It's a datetime object, convert to string
+                user["created_at"] = user["created_at"].isoformat()
+            else:
+                # Fallback for any other type
+                user["created_at"] = str(user["created_at"])
     
     return users
 
