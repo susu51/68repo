@@ -864,12 +864,12 @@ class KuryeciniBackendTester:
 def main():
     """Main execution function"""
     tester = KuryeciniBackendTester()
-    results = tester.run_comprehensive_tests()
+    tester.run_comprehensive_tests()
     
-    # Return appropriate exit code
-    if results["critical_issues"] > 0:
+    # Return appropriate exit code based on test results
+    if len(tester.critical_issues) > 0:
         return 1  # Critical issues found
-    elif results["success_rate"] < 80:
+    elif tester.tests_run > 0 and (tester.tests_passed / tester.tests_run * 100) < 80:
         return 1  # Low success rate
     else:
         return 0  # All good
