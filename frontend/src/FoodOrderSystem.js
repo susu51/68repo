@@ -320,7 +320,8 @@ export const ProfessionalFoodOrderSystem = () => {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
+    // Store the geolocation request ID for potential cancellation
+    const geoLocationId = navigator.geolocation.getCurrentPosition(
       (position) => {
         if (isMounted) {
           const location = {
