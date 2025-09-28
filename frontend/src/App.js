@@ -238,7 +238,7 @@ const CitySelector = ({ value, onChange, required = false }) => {
   );
 };
 
-// Admin Dashboard - System Management
+// Admin Dashboard - Modern System Management with Theme Support
 const AdminDashboard = ({ user }) => {
   const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState('users');
@@ -251,6 +251,30 @@ const AdminDashboard = ({ user }) => {
   const [selectedCourier, setSelectedCourier] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  
+  // Theme state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('admin_theme') === 'dark';
+  });
+  
+  // User management state
+  const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [newUserData, setNewUserData] = useState({
+    email: '',
+    password: '',
+    first_name: '',
+    last_name: '',
+    role: 'customer',
+    city: '',
+    business_name: '',  // for business users
+    tax_number: '',     // for business users
+    address: '',        // for business users
+    business_category: 'gida' // for business users
+  });
 
   const fetchUsers = async () => {
     try {
