@@ -149,9 +149,6 @@ const LoginForm = ({ onRegisterClick }) => {
         <CardDescription>
           Kuryecini hesabınıza giriş yapın
         </CardDescription>
-        <p className="text-xs text-gray-500 mt-2">
-          Admin girişi için şifre: 6851
-        </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
