@@ -4012,8 +4012,100 @@ const HomePage = ({ onAuthStart }) => {
           </Card>
         </div>
 
+        {/* Customer Reviews Section */}
+        <div className="mb-16">
+          <h3 className="text-3xl font-bold text-center text-gray-800 mb-8">
+            💬 Müşteri Yorumları
+          </h3>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Ayşe K.",
+                rating: 5,
+                comment: "15 dakikada pizza geldi! Çok hızlı ve lezzetli. Kesinlikle tavsiye ederim.",
+                location: "İstanbul"
+              },
+              {
+                name: "Mehmet A.",
+                rating: 5,
+                comment: "Kurye çok kibar ve profesyoneldi. Siparişim tam zamanında geldi.",
+                location: "Ankara"
+              },
+              {
+                name: "Fatma Y.",
+                rating: 4,
+                comment: "Market alışverişimi kapıma kadar getirdiler. Çok pratik bir uygulama!",
+                location: "İzmir"
+              }
+            ].map((review, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white font-bold">
+                      {review.name.charAt(0)}
+                    </div>
+                    <div className="ml-3">
+                      <div className="font-semibold text-gray-800">{review.name}</div>
+                      <div className="text-sm text-gray-500">{review.location}</div>
+                    </div>
+                  </div>
+                  <div className="flex mb-3">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className={i < review.rating ? "text-yellow-400" : "text-gray-300"}>
+                        ⭐
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-gray-600 italic">"{review.comment}"</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Final CTA Section */}
+        <div className="text-center bg-gradient-to-r from-orange-500 to-red-500 text-white p-12 rounded-2xl mb-16">
+          <h3 className="text-3xl font-bold mb-4">
+            🚀 Hemen Siparişe Başla!
+          </h3>
+          <p className="text-xl mb-6 text-orange-100">
+            İlk siparişine özel %20 indirim fırsatını kaçırma!
+          </p>
+          <Button 
+            onClick={onAuthStart}
+            className="bg-white text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+          >
+            💳 Ücretsiz Üye Ol
+          </Button>
+          <div className="flex justify-center items-center space-x-6 mt-6 text-sm text-orange-100">
+            <span>✅ Ücretsiz Üyelik</span>
+            <span>✅ İlk Siparişe İndirim</span>
+            <span>✅ 7/24 Destek</span>
+          </div>
+        </div>
+
         {/* Stats */}
-        <div className="mt-16 bg-white rounded-2xl shadow-lg p-8">
+        <div className="text-center p-8 bg-white/50 backdrop-blur-sm rounded-2xl">
+          <h3 className="text-2xl font-bold text-gray-800 mb-8">Kuryecini ile Fark Edin</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-3xl font-bold text-orange-600">%3</h3>
+              <p className="text-gray-600">Düşük Komisyon</p>
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-blue-600">24/7</h3>
+              <p className="text-gray-600">Hızlı Teslimat</p>
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-green-600">∞</h3>
+              <p className="text-gray-600">Sınırsız Araç</p>
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-purple-600">🇹🇷</h3>
+              <p className="text-gray-600">Türkiye Geneli</p>
+            </div>
+          </div>
+        </div>
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <h3 className="text-3xl font-bold text-orange-600">%3</h3>
