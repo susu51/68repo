@@ -401,6 +401,8 @@ export const ProfessionalFoodOrderSystem = () => {
   };
 
   const sortAndFilterRestaurants = (data, type, location) => {
+    if (!isMounted) return; // Early return if component is unmounted
+    
     let sortedData = [...data];
     
     if (type === 'nearest' && location) {
@@ -421,7 +423,9 @@ export const ProfessionalFoodOrderSystem = () => {
       });
     }
     
-    setRestaurants(sortedData);
+    if (isMounted) {
+      setRestaurants(sortedData);
+    }
   };
 
   const handleSortChange = (newSortType) => {
