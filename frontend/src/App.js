@@ -3955,50 +3955,59 @@ const HomePage = ({ onAuthStart }) => {
           </div>
         </div>
 
-        {/* Service Features */}
+        {/* Marketing Features */}
         <div className="grid md:grid-cols-3 gap-8 mt-16">
-          <Card key="courier-card" className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card key="speed-card" className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-l-4 border-l-orange-500">
             <CardHeader>
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🚗</span>
+              <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl text-white">⚡</span>
               </div>
-              <CardTitle className="text-orange-600">Kurye Ol</CardTitle>
+              <CardTitle className="text-orange-600">Süper Hızlı Teslimat</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
-                Araç türü serbest! Araba, motor, bisiklet veya elektrikli araçla 
-                para kazanmaya başla.
+              <p className="text-gray-600 mb-4">
+                Siparişiniz ortalama <span className="font-bold text-orange-600">15 dakikada</span> kapınızda! 
+                Türkiye'nin en hızlı teslimat ağı.
               </p>
+              <div className="bg-orange-50 p-3 rounded-lg">
+                <span className="text-sm text-orange-700 font-semibold">🎯 %98 Zamanında Teslimat</span>
+              </div>
             </CardContent>
           </Card>
 
-          <Card key="business-card" className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card key="price-card" className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-l-4 border-l-green-500">
             <CardHeader>
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🏪</span>
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl text-white">💰</span>
               </div>
-              <CardTitle className="text-blue-600">İşletme Aç</CardTitle>
+              <CardTitle className="text-green-600">En Uygun Fiyatlar</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
-                Restoranın, marketin veya nakliye şirketin var mı? 
-                Hemen kayıt ol, satışa başla.
+              <p className="text-gray-600 mb-4">
+                Sadece <span className="font-bold text-green-600">%3 komisyon</span> ile 
+                en uygun fiyatlarda sipariş verin.
               </p>
+              <div className="bg-green-50 p-3 rounded-lg">
+                <span className="text-sm text-green-700 font-semibold">🎁 İlk Siparişe %20 İndirim</span>
+              </div>
             </CardContent>
           </Card>
 
-          <Card key="customer-card" className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card key="variety-card" className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-l-4 border-l-purple-500">
             <CardHeader>
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📱</span>
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl text-white">🎯</span>
               </div>
-              <CardTitle className="text-green-600">Sipariş Ver</CardTitle>
+              <CardTitle className="text-purple-600">Binlerce Seçenek</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
-                Yemek, market alışverişi veya kargo gönderimi - 
-                her ihtiyacın için hızlı teslimat.
+              <p className="text-gray-600 mb-4">
+                <span className="font-bold text-purple-600">500+ işletme</span> ile 
+                yemekten markete her ihtiyacınız.
               </p>
+              <div className="bg-purple-50 p-3 rounded-lg">
+                <span className="text-sm text-purple-700 font-semibold">🍕 Yemek • 🛒 Market • 📦 Kargo</span>
+              </div>
             </CardContent>
           </Card>
         </div>
