@@ -244,11 +244,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except jwt.PyJWTError:
         raise credentials_exception
     
-    # Handle special admin case
-    if email == "admin@delivertr.com" and payload.get("role") == "admin":
+    # Handle special admin case - support both old and new admin emails
+    if (email in ["admin@delivertr.com", "admin@kuryecini.com"]) and payload.get("role") == "admin":
         return {
             "id": "admin",
-            "email": "admin@delivertr.com",
+            "email": email,  # Return the email from token
             "role": "admin",
             "first_name": "Admin",
             "last_name": "User",
