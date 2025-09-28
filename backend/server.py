@@ -2374,10 +2374,185 @@ async def upload_file(file: UploadFile = File(...)):
     file_url = f"/uploads/{unique_filename}"
     return {"file_url": file_url}
 
+# Campaign Management Endpoints
+@api_router.get("/campaigns")
+async def get_active_campaigns():
+    """Get all active campaigns"""
+    campaigns = await db.campaigns.find({
+        "status": "active",
+        "start_date": {"$lte": datetime.now(timezone.utc)},
+        "end_date": {"$gte": datetime.now(timezone.utc)}
+    }).to_list(length=None)
+    
+    for campaign in campaigns:
+        campaign["id"] = str(campaign["_id"])
+        del campaign["_id"]
+        campaign["start_date"] = campaign["start_date"].isoformat()
+        campaign["end_date"] = campaign["end_date"].isoformat()
+        campaign["created_at"] = campaign["created_at"].isoformat()
+    
+    return campaigns
+
+@api_router.post("/campaigns")
+async def create_campaign(campaign_data: dict, current_user: dict = Depends(get_current_user)):
+    """Create new campaign (Business owners only)"""
+    if current_user.get("role") != "business":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only business owners can create campaigns"
+        )
+    
+    campaign_data["business_id"] = current_user["id"]
+    campaign_data["id"] = str(uuid.uuid4())
+    campaign_data["created_at"] = datetime.now(timezone.utc)
+    campaign_data["start_date"] = datetime.fromisoformat(campaign_data["start_date"].replace('Z', '+00:00'))
+    campaign_data["end_date"] = datetime.fromisoformat(campaign_data["end_date"].replace('Z', '+00:00'))
+    
+    await db.campaigns.insert_one(campaign_data)
+    return {"message": "Campaign created successfully", "campaign_id": campaign_data["id"]}
+
+# Loyalty System Endpoints
+@api_router.get("/loyalty/points")
+async def get_user_loyalty_points(current_user: dict = Depends(get_current_user)):
+    """Get user's loyalty points"""
+    loyalty = await db.user_loyalty.find_one({"user_id": current_user["id"]})
+    
+    if not loyalty:
+        # Create initial loyalty record
+        loyalty = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user["id"],
+            "total_points": 0,
+            "lifetime_points": 0,
+            "tier_level": "Bronze",
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        await db.user_loyalty.insert_one(loyalty)
+    
+    return {
+        "total_points": loyalty["total_points"],
+        "lifetime_points": loyalty["lifetime_points"],
+        "tier_level": loyalty["tier_level"]
+    }
+
+@api_router.post("/loyalty/earn")
+async def earn_loyalty_points(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Earn loyalty points from order"""
+    # Get order details
+    order = await db.orders.find_one({"id": order_id, "customer_id": current_user["id"]})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Calculate points (1 point per 10₺)
+    points_earned = int(order.get("total_amount", 0) / 10)
+    
+    if points_earned <= 0:
+        return {"message": "No points earned", "points": 0}
+    
+    # Check if points already earned for this order
+    existing_transaction = await db.loyalty_transactions.find_one({
+        "user_id": current_user["id"],
+        "order_id": order_id,
+        "transaction_type": "earned"
+    })
+    
+    if existing_transaction:
+        return {"message": "Points already earned for this order", "points": 0}
+    
+    # Record loyalty transaction
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user["id"],
+        "points": points_earned,
+        "transaction_type": "earned",
+        "order_id": order_id,
+        "description": f"Sipariş #{order_id} için kazanılan puan",
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.loyalty_transactions.insert_one(transaction)
+    
+    # Update user loyalty
+    await db.user_loyalty.update_one(
+        {"user_id": current_user["id"]},
+        {
+            "$inc": {
+                "total_points": points_earned,
+                "lifetime_points": points_earned
+            },
+            "$set": {"updated_at": datetime.now(timezone.utc)}
+        },
+        upsert=True
+    )
+    
+    return {"message": f"{points_earned} puan kazandınız!", "points": points_earned}
+
+# Coupon Management Endpoints
+@api_router.get("/coupons/active")
+async def get_active_coupons():
+    """Get all active coupons"""
+    coupons = await db.coupons.find({
+        "is_active": True,
+        "valid_from": {"$lte": datetime.now(timezone.utc)},
+        "valid_until": {"$gte": datetime.now(timezone.utc)}
+    }).to_list(length=None)
+    
+    for coupon in coupons:
+        coupon["id"] = str(coupon["_id"])
+        del coupon["_id"]
+        coupon["valid_from"] = coupon["valid_from"].isoformat()
+        coupon["valid_until"] = coupon["valid_until"].isoformat()
+        coupon["created_at"] = coupon["created_at"].isoformat()
+    
+    return coupons
+
+@api_router.post("/coupons/validate")
+async def validate_coupon(coupon_code: str, order_amount: float, current_user: dict = Depends(get_current_user)):
+    """Validate coupon code and calculate discount"""
+    coupon = await db.coupons.find_one({
+        "code": coupon_code.upper(),
+        "is_active": True,
+        "valid_from": {"$lte": datetime.now(timezone.utc)},
+        "valid_until": {"$gte": datetime.now(timezone.utc)}
+    })
+    
+    if not coupon:
+        raise HTTPException(status_code=404, detail="Geçersiz veya süresi dolmuş kupon kodu")
+    
+    # Check usage limit
+    if coupon.get("usage_limit") and coupon.get("used_count", 0) >= coupon["usage_limit"]:
+        raise HTTPException(status_code=400, detail="Kupon kullanım limiti doldu")
+    
+    # Check minimum order amount
+    if coupon.get("min_order_amount", 0) > order_amount:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Minimum sipariş tutarı {coupon['min_order_amount']}₺ olmalıdır"
+        )
+    
+    # Calculate discount
+    discount_amount = 0
+    if coupon["coupon_type"] == "percentage":
+        discount_amount = (order_amount * coupon["discount_value"]) / 100
+        if coupon.get("max_discount_amount"):
+            discount_amount = min(discount_amount, coupon["max_discount_amount"])
+    elif coupon["coupon_type"] == "fixed_amount":
+        discount_amount = coupon["discount_value"]
+    elif coupon["coupon_type"] == "free_delivery":
+        discount_amount = 5.0  # Delivery fee
+    
+    return {
+        "valid": True,
+        "coupon_id": str(coupon["_id"]),
+        "discount_amount": round(discount_amount, 2),
+        "coupon_type": coupon["coupon_type"],
+        "title": coupon["title"]
+    }
+
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "DeliverTR API v5.0 - Kapsamlı Admin & Yönetim Sistemi"}
+    return {"message": "Kuryecini API v6.0 - Marketing & Loyalty System"}
 
 # Include the router in the main app
 app.include_router(api_router)
