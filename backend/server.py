@@ -3122,10 +3122,6 @@ async def update_courier_rating(courier_id: str):
 @api_router.post("/auth/phone/request-otp")
 async def request_phone_otp(phone_data: dict):
     """Request OTP for phone authentication"""
-    import sys
-    import os
-    sys.path.append(os.path.dirname(__file__))
-    from models import validate_turkish_phone
     
     try:
         formatted_phone = validate_turkish_phone(phone_data["phone"])
