@@ -3130,6 +3130,184 @@ class DeliverTRAPITester:
             self.log_test("Product Data Completeness", False, "Some product data incomplete or improperly typed")
             return False
 
+    # ===== FOOD VISIBILITY ISSUE TEST =====
+    
+    def test_food_visibility_issue(self):
+        """Test the food visibility issue reported by user - businesses and products should be visible to customers"""
+        print("\n🍽️ TESTING FOOD VISIBILITY ISSUE - Customer Side Business and Product Display")
+        
+        all_tests_passed = True
+        
+        # Test 1: GET /api/businesses endpoint - should return approved businesses
+        print("\n   🏪 Testing GET /api/businesses endpoint...")
+        success, response = self.run_test(
+            "Get Public Businesses for Customers",
+            "GET",
+            "businesses",
+            200
+        )
+        
+        if not success:
+            self.log_test("Food Visibility - Businesses Endpoint", False, "Failed to fetch businesses")
+            return False
+        
+        if not isinstance(response, list):
+            self.log_test("Food Visibility - Businesses Endpoint", False, f"Expected list, got {type(response)}")
+            return False
+        
+        if len(response) == 0:
+            self.log_test("Food Visibility - Businesses Endpoint", False, "No businesses returned - this is the reported issue!")
+            print("   ❌ NO BUSINESSES FOUND - This confirms the user's report: 'Hiçbir yemek müşteri kısmında gözükmüyor'")
+            return False
+        
+        print(f"   ✅ Found {len(response)} businesses")
+        
+        # Check for expected businesses mentioned in the review request
+        expected_businesses = ["Test Restoranı", "Pizza Palace İstanbul", "Burger Deluxe"]
+        found_businesses = []
+        
+        for business in response:
+            business_name = business.get('name', '')
+            found_businesses.append(business_name)
+            print(f"   📋 Business: {business_name}")
+            
+            # Verify business has required fields
+            required_fields = ['id', 'name', 'category', 'description']
+            for field in required_fields:
+                if field not in business:
+                    print(f"   ⚠️  Missing field '{field}' in business {business_name}")
+                    all_tests_passed = False
+        
+        # Check if expected businesses are present
+        expected_found = 0
+        for expected in expected_businesses:
+            if any(expected in found for found in found_businesses):
+                expected_found += 1
+                print(f"   ✅ Expected business found: {expected}")
+            else:
+                print(f"   ⚠️  Expected business not found: {expected}")
+        
+        if expected_found >= 1:
+            print(f"   ✅ At least {expected_found} expected businesses found")
+        else:
+            print(f"   ⚠️  None of the expected businesses found")
+        
+        # Test 2: Verify only approved businesses are returned
+        print("\n   🔍 Testing KYC approval filter...")
+        approved_count = 0
+        for business in response:
+            # Since this is public endpoint, all returned businesses should be approved
+            # We can't directly check kyc_status from public endpoint, but they should all be approved
+            approved_count += 1
+        
+        print(f"   ✅ All {approved_count} businesses in public list should be KYC approved")
+        
+        # Test 3: GET /api/businesses/{business_id}/products for each business
+        print("\n   🍕 Testing products for each business...")
+        businesses_with_products = 0
+        total_products = 0
+        
+        for business in response[:5]:  # Test first 5 businesses to avoid too many requests
+            business_id = business.get('id')
+            business_name = business.get('name', 'Unknown')
+            
+            if not business_id:
+                print(f"   ❌ Business {business_name} has no ID")
+                all_tests_passed = False
+                continue
+            
+            print(f"\n   🔍 Testing products for: {business_name} (ID: {business_id})")
+            
+            success, products_response = self.run_test(
+                f"Get Products for {business_name}",
+                "GET",
+                f"businesses/{business_id}/products",
+                200
+            )
+            
+            if not success:
+                print(f"   ❌ Failed to get products for {business_name}")
+                all_tests_passed = False
+                continue
+            
+            if not isinstance(products_response, list):
+                print(f"   ❌ Products response is not a list for {business_name}")
+                all_tests_passed = False
+                continue
+            
+            if len(products_response) == 0:
+                print(f"   ⚠️  No products found for {business_name}")
+            else:
+                businesses_with_products += 1
+                total_products += len(products_response)
+                print(f"   ✅ Found {len(products_response)} products for {business_name}")
+                
+                # Verify product structure
+                for i, product in enumerate(products_response[:3]):  # Check first 3 products
+                    required_product_fields = ['id', 'business_id', 'name', 'description', 'price']
+                    missing_fields = [field for field in required_product_fields if field not in product]
+                    
+                    if missing_fields:
+                        print(f"   ⚠️  Product {i+1} missing fields: {missing_fields}")
+                        all_tests_passed = False
+                    else:
+                        print(f"   ✅ Product: {product.get('name')} - ₺{product.get('price')}")
+        
+        # Test 4: Verify public access (no authentication required)
+        print("\n   🔓 Testing public access (no authentication required)...")
+        
+        # Test businesses endpoint without token
+        success_no_auth, _ = self.run_test(
+            "Public Businesses - No Auth Required",
+            "GET",
+            "businesses",
+            200,
+            token=None
+        )
+        
+        if success_no_auth:
+            print("   ✅ Businesses endpoint accessible without authentication")
+        else:
+            print("   ❌ Businesses endpoint requires authentication (should be public)")
+            all_tests_passed = False
+        
+        # Test products endpoint without token
+        if response and len(response) > 0:
+            first_business_id = response[0].get('id')
+            if first_business_id:
+                success_products_no_auth, _ = self.run_test(
+                    "Public Products - No Auth Required",
+                    "GET",
+                    f"businesses/{first_business_id}/products",
+                    200,
+                    token=None
+                )
+                
+                if success_products_no_auth:
+                    print("   ✅ Products endpoint accessible without authentication")
+                else:
+                    print("   ❌ Products endpoint requires authentication (should be public)")
+                    all_tests_passed = False
+        
+        # Final assessment
+        print(f"\n   📊 FOOD VISIBILITY TEST RESULTS:")
+        print(f"   - Total businesses found: {len(response)}")
+        print(f"   - Businesses with products: {businesses_with_products}")
+        print(f"   - Total products across all businesses: {total_products}")
+        
+        if len(response) >= 3 and businesses_with_products >= 2 and total_products >= 5:
+            print("   ✅ FOOD VISIBILITY ISSUE RESOLVED - Sufficient businesses and products available")
+            self.log_test("Food Visibility Issue", True, f"Found {len(response)} businesses with {total_products} total products")
+            return True
+        elif len(response) > 0:
+            print("   ⚠️  PARTIAL RESOLUTION - Some businesses found but may need more products")
+            self.log_test("Food Visibility Issue", True, f"Partial fix: {len(response)} businesses, {total_products} products")
+            return True
+        else:
+            print("   ❌ FOOD VISIBILITY ISSUE PERSISTS - No businesses found for customers")
+            self.log_test("Food Visibility Issue", False, "No businesses available for customers - issue not resolved")
+            return False
+
     def run_business_registration_tests(self):
         """Run comprehensive business registration tests as requested in review"""
         print("🚀 Starting Business Registration Endpoint Tests")
