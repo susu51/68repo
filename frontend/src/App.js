@@ -202,15 +202,23 @@ const LoginForm = ({ onRegisterClick }) => {
             />
           </div>
           
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="w-full bg-orange-600 hover:bg-orange-700"
-            data-testid="login-submit-btn"
-          >
-            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-          </Button>
-        </form>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full bg-orange-600 hover:bg-orange-700"
+              data-testid="login-submit-btn"
+            >
+              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+            </Button>
+          </form>
+        ) : (
+          <div className="space-y-4">
+            <PhoneAuth 
+              onLogin={login}
+              onBack={() => setLoginMethod('email')}
+            />
+          </div>
+        )}
         
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
