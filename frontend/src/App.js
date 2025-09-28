@@ -1978,7 +1978,7 @@ const CourierRegistration = ({ onComplete, onBack }) => {
               />
             </div>
             <div>
-              <Label>Şehir</Label>
+              <Label>Şehir *</Label>
               <CitySelector 
                 value={formData.city}
                 onChange={(value) => setFormData({...formData, city: value})}
