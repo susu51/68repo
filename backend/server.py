@@ -976,17 +976,17 @@ async def get_all_users(current_user: dict = Depends(get_admin_user)):
         if "password" in user:
             del user["password"]
         
-        # Handle datetime conversion safely - check if it's already a string
+        # Handle datetime conversion safely - handle both string and datetime types
         if "created_at" in user:
-            if isinstance(user["created_at"], str):
-                # Already a string, keep as is
-                pass
-            elif hasattr(user["created_at"], 'isoformat'):
+            if hasattr(user["created_at"], 'isoformat'):
                 # It's a datetime object, convert to string
                 user["created_at"] = user["created_at"].isoformat()
+            # If it's already a string, leave it as is
+            elif isinstance(user["created_at"], str):
+                pass
             else:
-                # Fallback for any other type
-                user["created_at"] = str(user["created_at"])
+                # If it's neither datetime nor string, convert to current time
+                user["created_at"] = datetime.now(timezone.utc).isoformat()
     
     return users
 
