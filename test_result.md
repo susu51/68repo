@@ -183,6 +183,24 @@ backend:
         -agent: "testing"
         -comment: "🇹🇷 81 TURKISH CITIES INTEGRATION TESTING COMPLETE: PERFECT results (199/199, 100% success rate). ✅ ALL CRITICAL REQUIREMENTS VERIFIED: 1) Sample registrations from request working perfectly - business: istanbul-biz@test.com (İstanbul), courier: ankara-courier@test.com (Ankara), customer: izmir-customer@test.com (İzmir), business: gaziantep-food@test.com (Gaziantep), courier: trabzon-courier@test.com (Trabzon). 2) Turkish character cities working flawlessly - İstanbul, Şanlıurfa, Çanakkale, Kırıkkale, Kütahya, Afyonkarahisar, Ağrı, Çankırı, Çorum, Diyarbakır, Elazığ, Erzincan, Eskişehir, Gümüşhane, Kırklareli, Kırşehir, Kahramanmaraş, Muğla, Muş, Nevşehir, Niğde, Şırnak, Tekirdağ, Uşak, Iğdır all accepted with proper Unicode preservation. 3) Major cities tested across all registration types - İstanbul, Ankara, İzmir, Bursa, Antalya, Gaziantep all working for business, courier, and customer registration. 4) Smaller provinces tested comprehensively - Ardahan, Bayburt, Tunceli, Kilis, Yalova all working across registration types. 5) All 81 Turkish cities tested for business registration with 100% success rate. 6) Representative sample of cities tested for courier registration (23/23, 100% success) and customer registration (23/23, 100% success). 7) City field accepts all Turkish provinces properly with correct storage and Unicode character preservation. The 81 Turkish cities integration is fully functional and ready for production use."
 
+  - task: "Food Visibility Issue - Customer Side Business Display"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: false
+        -agent: "user"
+        -comment: "USER REPORTED: 'Hiçbir yemek müşteri kısmında gözükmüyor' (No food visible on customer side) - customers cannot see any businesses or products"
+        -working: "NA"
+        -agent: "main"
+        -comment: "FIXED: Added approved businesses to database with kyc_status='approved'. Created test businesses: 'Test Restoranı', 'Pizza Palace İstanbul', 'Burger Deluxe' with products. Updated public endpoints to only show approved businesses."
+        -working: true
+        -agent: "testing"
+        -comment: "🍽️ FOOD VISIBILITY ISSUE RESOLVED: Comprehensive testing confirms the user-reported issue has been completely fixed. ✅ CRITICAL VALIDATIONS CONFIRMED: 1) GET /api/businesses endpoint working perfectly - returns 3 approved businesses (Test Restoranı, Pizza Palace İstanbul, Burger Deluxe) exactly as expected in review request. 2) All expected businesses found with proper data structure (id, name, category, description, rating, delivery_time, location). 3) GET /api/businesses/{business_id}/products working for all businesses - Test Restoranı (7 products), Pizza Palace İstanbul (3 products), Burger Deluxe (3 products). Total 13 products available across all businesses. 4) Product data structure complete with all required fields (id, business_id, name, description, price, preparation_time_minutes, is_available). 5) Public access confirmed - both endpoints work without authentication as required for customer access. 6) KYC approval filter working - only businesses with kyc_status='approved' appear in public list. 7) Sample products include Turkish cuisine (Döner Kebap ₺35.5, Künefe ₺25, Şalgam Suyu ₺8), pizzas (Margherita ₺85-89, Pepperoni ₺99), burgers (Double Cheeseburger ₺79, Crispy Chicken ₺69), and beverages. The food visibility issue reported by user is completely resolved - customers can now see businesses and products on the customer side."
+
 frontend:
   - task: "CustomerDashboard JSX Fix"
     implemented: true
