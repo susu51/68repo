@@ -179,9 +179,9 @@ const SimpleLoginForm = ({ onRegisterClick }) => {
             <Input
               id="password"
               type="password"
-              placeholder="Şifrenizi girin"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
+              placeholder="Şifreniz"
               required
               data-testid="login-password"
             />
