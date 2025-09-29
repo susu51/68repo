@@ -1262,12 +1262,14 @@ export const CourierDashboard = ({ user, onLogout }) => {
                       <Label>Ses Bildirimleri</Label>
                       <p className="text-sm text-gray-600">Yakın siparişler için ses çal</p>
                     </div>
-                    <Switch
+                    <input
+                      type="checkbox"
                       checked={profile.notifications.sound}
-                      onCheckedChange={(checked) => setProfile(prev => ({
+                      onChange={(e) => setProfile(prev => ({
                         ...prev,
-                        notifications: { ...prev.notifications, sound: checked }
+                        notifications: { ...prev.notifications, sound: e.target.checked }
                       }))}
+                      className="rounded border-gray-300"
                     />
                   </div>
                   
