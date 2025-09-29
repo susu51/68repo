@@ -1220,10 +1220,10 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-6">
+          {/* Profile Content */}
+          {activeTab === 'profile' && (
             <h2 className="text-xl font-bold">Profil & Ayarlar</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
