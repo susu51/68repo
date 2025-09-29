@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
-import { Badge } from "./components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
+import { Button } from './components/ui/button';
+import { Badge } from './components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
 import toast from 'react-hot-toast';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierDashboard = ({ user, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('orders');
+  // Navigation state
+  const [currentView, setCurrentView] = useState('orders');
   const [loading, setLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(user?.is_online || false);
   
@@ -31,6 +30,30 @@ export const CourierDashboard = ({ user, onLogout }) => {
     status: 'all',
     date: 'all'
   });
+
+  // Stats
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    totalEarnings: 0,
+    monthlyOrders: 0,
+    monthlyEarnings: 0
+  });
+
+  useEffect(() => {
+    fetchInitialData();
+    const interval = setInterval(fetchAvailableOrders, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchInitialData = async () => {
+    await Promise.all([
+      fetchAvailableOrders(),
+      fetchOrderHistory(),
+      fetchNotifications(),
+      fetchMessages(),
+      fetchStats()
+    ]);
+  };
 
   // Fetch available orders
   const fetchAvailableOrders = async () => {
@@ -61,7 +84,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const response = await axios.get(`${API}/courier/notifications`);
       setNotifications(response.data.notifications || []);
-      setUnreadCount(response.data.unread_count || 0);
+      setUnreadCount(response.data.notifications?.filter(n => !n.read).length || 0);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
@@ -77,64 +100,54 @@ export const CourierDashboard = ({ user, onLogout }) => {
     }
   };
 
-  // Toggle online status
-  const toggleOnlineStatus = async () => {
+  // Fetch stats
+  const fetchStats = async () => {
     try {
-      setLoading(true);
-      const response = await axios.post(`${API}/courier/status/toggle`);
-      setIsOnline(response.data.is_online);
-      toast.success(response.data.message);
-      
-      if (response.data.is_online) {
-        fetchAvailableOrders();
-      }
+      const response = await axios.get(`${API}/courier/stats`);
+      setStats(response.data || {
+        totalOrders: 0,
+        totalEarnings: 0,
+        monthlyOrders: 0,
+        monthlyEarnings: 0
+      });
     } catch (error) {
-      toast.error('Durum değiştirilemedi');
+      console.error('Failed to fetch stats:', error);
     }
-    setLoading(false);
   };
 
   // Accept order
   const acceptOrder = async (orderId) => {
+    setLoading(true);
     try {
-      setLoading(true);
       await axios.post(`${API}/courier/orders/${orderId}/accept`);
       toast.success('Sipariş kabul edildi!');
-      
-      // Find the accepted order and set as current
-      const acceptedOrder = availableOrders.find(order => order.id === orderId);
-      if (acceptedOrder) {
-        setCurrentOrder({ ...acceptedOrder, status: 'accepted' });
-      }
-      
       fetchAvailableOrders();
+      setCurrentOrder(availableOrders.find(o => o.id === orderId));
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Sipariş kabul edilemedi');
+      toast.error('Sipariş kabul edilemedi');
     }
     setLoading(false);
   };
 
   // Update order status
-  const updateOrderStatus = async (orderId, status, notes = '') => {
+  const updateOrderStatus = async (orderId, newStatus) => {
+    setLoading(true);
     try {
-      setLoading(true);
       await axios.post(`${API}/courier/orders/${orderId}/update-status`, {
-        status,
-        notes,
-        location: null // Could add GPS coordinates here
+        status: newStatus
       });
       
       const statusMessages = {
-        'picked_up': 'Sipariş alındı!',
+        'picked_up': 'Sipariş alındı olarak işaretlendi',
         'delivered': 'Sipariş teslim edildi!'
       };
       
-      toast.success(statusMessages[status]);
+      toast.success(statusMessages[newStatus] || 'Durum güncellendi');
       
-      if (status === 'delivered') {
+      if (newStatus === 'delivered') {
         setCurrentOrder(null);
       } else {
-        setCurrentOrder(prev => ({ ...prev, status }));
+        setCurrentOrder(prev => ({ ...prev, status: newStatus }));
       }
       
       fetchOrderHistory();
@@ -142,6 +155,17 @@ export const CourierDashboard = ({ user, onLogout }) => {
       toast.error('Durum güncellenemedi');
     }
     setLoading(false);
+  };
+
+  // Toggle online status
+  const toggleOnlineStatus = async () => {
+    try {
+      const response = await axios.post(`${API}/courier/status/toggle`);
+      setIsOnline(response.data.is_online);
+      toast.success(response.data.message || 'Durum güncellendi');
+    } catch (error) {
+      toast.error('Durum değiştirilemedi');
+    }
   };
 
   // Mark notification as read
@@ -154,374 +178,461 @@ export const CourierDashboard = ({ user, onLogout }) => {
     }
   };
 
-  // Auto-refresh data
-  useEffect(() => {
-    if (isOnline) {
-      fetchAvailableOrders();
+  // Generate monthly report
+  const generateMonthlyReport = async () => {
+    try {
+      const response = await axios.get(`${API}/courier/monthly-report`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `kurye-rapor-${new Date().getMonth() + 1}-${new Date().getFullYear()}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Aylık rapor indirildi');
+    } catch (error) {
+      toast.error('Rapor oluşturulamadı');
     }
-    fetchOrderHistory();
-    fetchNotifications(); 
-    fetchMessages();
+  };
 
-    // Set up intervals for real-time updates
-    const intervals = [];
-    
-    if (isOnline) {
-      intervals.push(setInterval(fetchAvailableOrders, 30000)); // Every 30 seconds
-    }
-    
-    intervals.push(setInterval(fetchNotifications, 60000)); // Every minute
-    intervals.push(setInterval(fetchMessages, 120000)); // Every 2 minutes
+  // Navigation items
+  const navigationItems = [
+    { id: 'orders', label: '📋 Siparişler', icon: '📋' },
+    { id: 'history', label: '📊 Geçmiş', icon: '📊' },
+    { id: 'notifications', label: '🔔 Bildirimler', icon: '🔔', badge: unreadCount },
+    { id: 'messages', label: '💬 Mesajlar', icon: '💬' },
+    { id: 'stats', label: '📈 İstatistikler', icon: '📈' }
+  ];
 
-    return () => {
-      intervals.forEach(interval => clearInterval(interval));
-    };
-  }, [isOnline, historyFilter]);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      {/* Header */}
-      <div className="bg-white/70 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="text-2xl">🚚</div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Kurye Paneli</h1>
-                <p className="text-sm text-gray-600">
-                  Hoş geldin, {user?.first_name} {user?.last_name}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Online/Offline Toggle */}
-              <div className="flex items-center space-x-2">
-                <Button
-                  onClick={toggleOnlineStatus}
-                  disabled={loading}
-                  className={`${isOnline 
-                    ? 'bg-green-600 hover:bg-green-700' 
-                    : 'bg-gray-600 hover:bg-gray-700'
-                  } text-white`}
-                >
-                  {isOnline ? '🟢 Çevrimiçi' : '🔴 Çevrimdışı'}
-                </Button>
-              </div>
-              
-              {/* Notifications Badge */}
-              <div className="relative">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setActiveTab('notifications')}
-                >
-                  🔔
-                  {unreadCount > 0 && (
-                    <Badge className="absolute -top-2 -right-2 bg-red-500 text-white min-w-5 h-5 flex items-center justify-center text-xs">
-                      {unreadCount}
-                    </Badge>
-                  )}
-                </Button>
-              </div>
-              
-              <Button onClick={onLogout} variant="outline">
-                Çıkış
-              </Button>
-            </div>
+  const renderHeader = () => (
+    <div className="bg-white shadow-sm border-b p-4">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <h1 className="text-2xl font-bold text-gray-900">Kurye Paneli</h1>
+          <Badge className="bg-orange-100 text-orange-800">
+            {user?.name || 'Kurye'}
+          </Badge>
+        </div>
+        <div className="flex items-center space-x-4">
+          {/* Online/Offline Toggle */}
+          <Button
+            onClick={toggleOnlineStatus}
+            disabled={loading}
+            className={`${isOnline 
+              ? 'bg-green-600 hover:bg-green-700' 
+              : 'bg-gray-600 hover:bg-gray-700'
+            } text-white`}
+            size="sm"
+          >
+            {isOnline ? '🟢 Çevrimiçi' : '🔴 Çevrimdışı'}
+          </Button>
+          
+          {/* Notifications Badge */}
+          <div className="relative">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setCurrentView('notifications')}
+            >
+              🔔
+              {unreadCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 bg-red-500 text-white min-w-5 h-5 flex items-center justify-center text-xs">
+                  {unreadCount}
+                </Badge>
+              )}
+            </Button>
           </div>
+          
+          <Button onClick={onLogout} variant="outline" size="sm">
+            Çıkış
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderNavbar = () => (
+    <div className="bg-gray-50 border-b">
+      <div className="max-w-7xl mx-auto">
+        <nav className="flex space-x-1 p-2">
+          {navigationItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setCurrentView(item.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors relative ${
+                currentView === item.id
+                  ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <span className="mr-2">{item.icon}</span>
+              {item.label}
+              {item.badge > 0 && (
+                <Badge className="ml-2 bg-red-500 text-white text-xs">
+                  {item.badge}
+                </Badge>
+              )}
+            </button>
+          ))}
+        </nav>
+      </div>
+    </div>
+  );
+
+  const renderOrders = () => (
+    <div className="space-y-6">
+      {/* Current Order Status */}
+      {currentOrder && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <span>📦</span>
+              <span>Mevcut Sipariş</span>
+              <Badge variant="secondary">{currentOrder.status}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p><strong>İşletme:</strong> {currentOrder.business_name}</p>
+                <p><strong>Teslimat Adresi:</strong> {currentOrder.delivery_address}</p>
+                <p><strong>Tutar:</strong> ₺{currentOrder.total_amount}</p>
+                <p><strong>Komisyon:</strong> ₺{currentOrder.commission}</p>
+              </div>
+              <div className="flex flex-col space-y-2">
+                {currentOrder.status === 'accepted' && (
+                  <Button 
+                    onClick={() => updateOrderStatus(currentOrder.id, 'picked_up')}
+                    className="bg-orange-600 hover:bg-orange-700"
+                    disabled={loading}
+                  >
+                    📤 Siparişi Aldım
+                  </Button>
+                )}
+                {currentOrder.status === 'picked_up' && (
+                  <Button 
+                    onClick={() => updateOrderStatus(currentOrder.id, 'delivered')}
+                    className="bg-green-600 hover:bg-green-700"
+                    disabled={loading}
+                  >
+                    ✅ Teslim Ettim
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Mevcut Siparişler</h2>
+        <Button onClick={fetchAvailableOrders} variant="outline" size="sm">
+          🔄 Yenile
+        </Button>
+      </div>
+
+      {availableOrders.length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-12">
+            <p className="text-gray-500 text-lg mb-4">Şu anda mevcut sipariş bulunmuyor</p>
+            <p className="text-sm text-gray-400">
+              {isOnline ? 'Yeni siparişler geldiğinde burada görünecek' : 'Sipariş almak için çevrimiçi olmalısınız'}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {availableOrders.map((order) => (
+            <Card key={order.id}>
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <h3 className="font-semibold text-lg">{order.business_name}</h3>
+                      <Badge variant="secondary">₺{order.total_amount}</Badge>
+                    </div>
+                    <p className="text-gray-600 mb-2">📍 {order.delivery_address}</p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <span>📏 {order.distance || 'Hesaplanıyor'}km</span>
+                      <span>⏱️ ~{order.estimated_time || '20'} dk</span>
+                      <span>💰 Komisyon: ₺{order.commission}</span>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <Button 
+                      onClick={() => acceptOrder(order.id)}
+                      disabled={loading}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      ✅ Kabul Et
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderHistory = () => (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Sipariş Geçmişi</h2>
+        <div className="flex space-x-2">
+          <Select 
+            value={historyFilter.status} 
+            onValueChange={(value) => setHistoryFilter(prev => ({ ...prev, status: value }))}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Durumlar</SelectItem>
+              <SelectItem value="delivered">Teslim Edildi</SelectItem>
+              <SelectItem value="cancelled">İptal Edildi</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select 
+            value={historyFilter.date} 
+            onValueChange={(value) => setHistoryFilter(prev => ({ ...prev, date: value }))}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Zamanlar</SelectItem>
+              <SelectItem value="today">Bugün</SelectItem>
+              <SelectItem value="week">Bu Hafta</SelectItem>
+              <SelectItem value="month">Bu Ay</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={fetchOrderHistory} variant="outline" size="sm">
+            🔍 Filtrele
+          </Button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Current Order Status */}
-        {currentOrder && (
-          <Card className="mb-6 border-blue-200 bg-blue-50">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <span>📦</span>
-                <span>Mevcut Sipariş</span>
-                <Badge variant="secondary">{currentOrder.status}</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid gap-4">
+        {orderHistory.map((order) => (
+          <Card key={order.id}>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-center">
                 <div>
-                  <p><strong>İşletme:</strong> {currentOrder.business_name}</p>
-                  <p><strong>Teslimat Adresi:</strong> {currentOrder.delivery_address}</p>
-                  <p><strong>Tutar:</strong> ₺{currentOrder.total_amount}</p>
-                  <p><strong>Komisyon:</strong> ₺{currentOrder.commission}</p>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  {currentOrder.status === 'accepted' && (
-                    <Button 
-                      onClick={() => updateOrderStatus(currentOrder.id, 'picked_up')}
-                      className="bg-orange-600 hover:bg-orange-700"
-                      disabled={loading}
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className="font-medium">{order.business_name}</span>
+                    <Badge 
+                      variant={order.status === 'delivered' ? 'default' : 'secondary'}
+                      className={order.status === 'delivered' ? 'bg-green-100 text-green-800' : ''}
                     >
-                      📤 Siparişi Aldım
-                    </Button>
-                  )}
-                  {currentOrder.status === 'picked_up' && (
-                    <Button 
-                      onClick={() => updateOrderStatus(currentOrder.id, 'delivered')}
-                      className="bg-green-600 hover:bg-green-700"
-                      disabled={loading}
-                    >
-                      ✅ Teslim Ettim
-                    </Button>
-                  )}
+                      {order.status === 'delivered' ? 'Teslim Edildi' : order.status}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {new Date(order.created_at).toLocaleDateString('tr-TR')} • 
+                    ₺{order.total_amount} • Komisyon: ₺{order.commission}
+                  </p>
                 </div>
+                <Button variant="outline" size="sm">
+                  Detay
+                </Button>
               </div>
             </CardContent>
           </Card>
-        )}
+        ))}
+      </div>
+    </div>
+  );
 
-        {/* Tabs Navigation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="orders">📋 Siparişler</TabsTrigger>
-            <TabsTrigger value="history">📊 Geçmiş</TabsTrigger>
-            <TabsTrigger value="notifications">
-              🔔 Bildirimler
-              {unreadCount > 0 && (
-                <Badge className="ml-1 bg-red-500">{unreadCount}</Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="messages">💬 Mesajlar</TabsTrigger>
-            <TabsTrigger value="stats">📈 İstatistikler</TabsTrigger>
-          </TabsList>
+  const renderNotifications = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Bildirimler</h2>
+      
+      {notifications.length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-12">
+            <p className="text-gray-500">Henüz bildiriminiz bulunmuyor</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {notifications.map((notification) => (
+            <Card 
+              key={notification.id} 
+              className={notification.read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'}
+            >
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-medium">{notification.title}</h3>
+                    <p className="text-gray-600 mt-1">{notification.message}</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      {new Date(notification.created_at).toLocaleString('tr-TR')}
+                    </p>
+                  </div>
+                  {!notification.read && (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => markNotificationRead(notification.id)}
+                    >
+                      Okundu
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
-          {/* Available Orders Tab */}
-          <TabsContent value="orders" className="space-y-4">
+  const renderMessages = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Admin Mesajları</h2>
+      
+      {messages.length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-12">
+            <p className="text-gray-500">Henüz mesajınız bulunmuyor</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <Card key={message.id}>
+              <CardContent className="p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-orange-100 p-2 rounded-full">
+                    <span className="text-orange-600">📢</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium">{message.title}</h3>
+                    <p className="text-gray-600 mt-1">{message.message}</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Admin • {new Date(message.created_at).toLocaleString('tr-TR')}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderStats = () => (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">İstatistikler & Raporlar</h2>
+        <Button onClick={generateMonthlyReport} variant="outline">
+          📄 Aylık Rapor İndir
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Toplam İstatistikler</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Mevcut Siparişler</h2>
-              <Button onClick={fetchAvailableOrders} variant="outline">
-                🔄 Yenile
-              </Button>
+              <span>Toplam Sipariş</span>
+              <Badge variant="secondary">{stats.totalOrders}</Badge>
             </div>
-
-            {!isOnline ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <div className="text-4xl mb-4">🔴</div>
-                  <h3 className="text-lg font-semibold mb-2">Çevrimdışı Durumdasınız</h3>
-                  <p className="text-gray-600 mb-4">
-                    Sipariş almak için çevrimiçi olmanız gerekiyor.
-                  </p>
-                  <Button onClick={toggleOnlineStatus} className="bg-green-600 hover:bg-green-700">
-                    🟢 Çevrimiçi Ol
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : availableOrders.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <div className="text-4xl mb-4">📭</div>
-                  <h3 className="text-lg font-semibold mb-2">Şu An Sipariş Yok</h3>
-                  <p className="text-gray-600">
-                    Yeni siparişler geldiğinde burada görünecek.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {availableOrders.map((order) => (
-                  <Card key={order.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h4 className="font-semibold">{order.business_name}</h4>
-                          <p className="text-sm text-gray-600">{order.business_address}</p>
-                        </div>
-                        <Badge className="bg-green-100 text-green-800">
-                          ₺{order.commission} komisyon
-                        </Badge>
-                      </div>
-                      
-                      <div className="space-y-2 text-sm">
-                        <p><strong>Teslimat:</strong> {order.delivery_address}</p>
-                        <p><strong>Tutar:</strong> ₺{order.total_amount}</p>
-                        <p><strong>Mesafe:</strong> {order.estimated_distance}</p>
-                        <p><strong>Hazırlık:</strong> ~{order.estimated_prep_time} dk</p>
-                      </div>
-                      
-                      <Button 
-                        onClick={() => acceptOrder(order.id)}
-                        disabled={loading}
-                        className="w-full mt-4 bg-blue-600 hover:bg-blue-700"
-                      >
-                        ✅ Siparişi Kabul Et
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Order History Tab */}
-          <TabsContent value="history" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Sipariş Geçmişi</h2>
-              <div className="flex space-x-2">
-                <Select 
-                  value={historyFilter.status} 
-                  onValueChange={(value) => setHistoryFilter({...historyFilter, status: value})}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tüm Durumlar</SelectItem>
-                    <SelectItem value="delivered">Teslim Edildi</SelectItem>
-                    <SelectItem value="cancelled">İptal Edildi</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select 
-                  value={historyFilter.date} 
-                  onValueChange={(value) => setHistoryFilter({...historyFilter, date: value})}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tüm Zamanlar</SelectItem>
-                    <SelectItem value="today">Bugün</SelectItem>
-                    <SelectItem value="week">Bu Hafta</SelectItem>
-                    <SelectItem value="month">Bu Ay</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <span>Toplam Kazanç</span>
+              <Badge className="bg-green-100 text-green-800">₺{stats.totalEarnings}</Badge>
             </div>
+            <div className="flex justify-between items-center">
+              <span>Ortalama Sipariş</span>
+              <Badge variant="secondary">
+                ₺{stats.totalOrders > 0 ? (stats.totalEarnings / stats.totalOrders).toFixed(2) : '0.00'}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
 
-            <div className="space-y-4">
-              {orderHistory.map((order) => (
-                <Card key={order.id}>
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3">
-                          <h4 className="font-semibold">{order.business_name}</h4>
-                          <Badge variant={order.status === 'delivered' ? 'default' : 'secondary'}>
-                            {order.status === 'delivered' ? 'Teslim Edildi' : order.status}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {new Date(order.created_at).toLocaleDateString('tr-TR')} • 
-                          {order.delivery_address}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-semibold text-green-600">₺{order.commission}</div>
-                        <div className="text-sm text-gray-500">₺{order.total_amount} sipariş</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+        <Card>
+          <CardHeader>
+            <CardTitle>Bu Ay</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span>Aylık Sipariş</span>
+              <Badge variant="secondary">{stats.monthlyOrders}</Badge>
             </div>
-          </TabsContent>
+            <div className="flex justify-between items-center">
+              <span>Aylık Kazanç</span>
+              <Badge className="bg-green-100 text-green-800">₺{stats.monthlyEarnings}</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Net Kazanç (%5 komisyon)</span>
+              <Badge className="bg-blue-100 text-blue-800">
+                ₺{(stats.monthlyEarnings * 0.95).toFixed(2)}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-4">
-            <h2 className="text-2xl font-bold">Bildirimler</h2>
-            
-            <div className="space-y-3">
-              {notifications.map((notification) => (
-                <Card 
-                  key={notification.id}
-                  className={`cursor-pointer hover:shadow-md transition-shadow ${
-                    !notification.read ? 'border-blue-200 bg-blue-50' : ''
-                  }`}
-                  onClick={() => markNotificationRead(notification.id)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="text-2xl">
-                        {notification.type === 'admin_message' ? '💬' : 
-                         notification.type === 'new_order' ? '📋' : '🔔'}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">{notification.title}</h4>
-                        <p className="text-sm text-gray-600">{notification.message}</p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {new Date(notification.created_at).toLocaleString('tr-TR')}
-                        </p>
-                      </div>
-                      {!notification.read && (
-                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+      <Card>
+        <CardHeader>
+          <CardTitle>Komisyon Bilgisi</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600 mb-2">
+              • Her siparişten %5 komisyon alınır
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              • Kazançlar haftalık olarak hesabınıza aktarılır
+            </p>
+            <p className="text-sm text-gray-600">
+              • Detaylı rapor için "Aylık Rapor İndir" butonunu kullanın
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-          {/* Messages Tab */}
-          <TabsContent value="messages" className="space-y-4">
-            <h2 className="text-2xl font-bold">Admin Mesajları</h2>
-            
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <Card key={message.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="text-2xl">👨‍💼</div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">{message.title}</h4>
-                        <p className="text-gray-700 mt-2">{message.message}</p>
-                        <p className="text-xs text-gray-400 mt-2">
-                          {new Date(message.created_at).toLocaleString('tr-TR')}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+  const renderContent = () => {
+    switch (currentView) {
+      case 'orders': return renderOrders();
+      case 'history': return renderHistory();
+      case 'notifications': return renderNotifications();
+      case 'messages': return renderMessages();
+      case 'stats': return renderStats();
+      default: return renderOrders();
+    }
+  };
 
-          {/* Statistics Tab */}
-          <TabsContent value="stats" className="space-y-4">
-            <h2 className="text-2xl font-bold">İstatistiklerim</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl mb-2">📦</div>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {orderHistory.filter(o => o.status === 'delivered').length}
-                  </div>
-                  <div className="text-sm text-gray-600">Teslim Edilen Sipariş</div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl mb-2">💰</div>
-                  <div className="text-2xl font-bold text-green-600">
-                    ₺{orderHistory.reduce((sum, order) => sum + order.commission, 0).toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-600">Toplam Kazanç</div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl mb-2">⭐</div>
-                  <div className="text-2xl font-bold text-yellow-600">
-                    {user?.average_rating || 'N/A'}
-                  </div>
-                  <div className="text-sm text-gray-600">Ortalama Puan</div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+  if (loading && currentView === 'orders') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {renderHeader()}
+      {renderNavbar()}
+      <div className="max-w-7xl mx-auto p-6">
+        {renderContent()}
       </div>
     </div>
   );
