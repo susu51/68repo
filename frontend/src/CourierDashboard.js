@@ -633,18 +633,77 @@ export const CourierDashboard = ({ user, onLogout }) => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 md:grid-cols-5 text-xs sm:text-sm">
-            <TabsTrigger value="orders" className="text-xs sm:text-sm px-2">
-              📋 <span className="hidden sm:inline">Siparişler</span><span className="sm:hidden">Orders</span>
-              {nearbyOrders.length > 0 && (
-                <Badge className="ml-1 bg-red-500 text-xs">{nearbyOrders.length}</Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="history" className="text-xs sm:text-sm px-2">📚 <span className="hidden sm:inline">Geçmiş</span><span className="sm:hidden">Hist</span></TabsTrigger>
-            <TabsTrigger value="earnings" className="text-xs sm:text-sm px-2">💰 <span className="hidden sm:inline">Kazanç</span><span className="sm:hidden">$$</span></TabsTrigger>
-            <TabsTrigger value="map" className="text-xs sm:text-sm px-2">🗺️ <span className="hidden sm:inline">Harita</span><span className="sm:hidden">Map</span></TabsTrigger>
-            <TabsTrigger value="profile" className="text-xs sm:text-sm px-2">👤 <span className="hidden sm:inline">Profil</span><span className="sm:hidden">Prof</span></TabsTrigger>
-          </TabsList>
+          {/* Clean Side Navigation Tabs */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 mb-6">
+            <div className="flex space-x-1 overflow-x-auto">
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'orders' 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-blue-500 hover:bg-blue-50'
+                }`}
+              >
+                <span className="text-lg">📋</span>
+                <span>Siparişler</span>
+                {nearbyOrders.length > 0 && (
+                  <span className={`min-w-[20px] h-5 flex items-center justify-center text-xs px-1.5 rounded-full font-bold ${
+                    activeTab === 'orders' ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {nearbyOrders.length}
+                  </span>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'history' 
+                    ? 'bg-green-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-green-500 hover:bg-green-50'
+                }`}
+              >
+                <span className="text-lg">📚</span>
+                <span>Geçmiş</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('earnings')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'earnings' 
+                    ? 'bg-purple-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-purple-500 hover:bg-purple-50'
+                }`}
+              >
+                <span className="text-lg">💰</span>
+                <span>Kazanç</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('map')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'map' 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                }`}
+              >
+                <span className="text-lg">🗺️</span>
+                <span>Harita</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'profile' 
+                    ? 'bg-gray-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <span className="text-lg">👤</span>
+                <span>Profil</span>
+              </button>
+            </div>
+          </div>
 
           {/* Orders Tab */}
           <TabsContent value="orders" className="space-y-4">
