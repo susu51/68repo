@@ -633,17 +633,17 @@ export const CourierDashboard = ({ user, onLogout }) => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 md:grid-cols-5 overflow-x-auto">
-            <TabsTrigger value="orders">
-              📋 Siparişler
+          <TabsList className="grid w-full grid-cols-5 md:grid-cols-5 text-xs sm:text-sm">
+            <TabsTrigger value="orders" className="text-xs sm:text-sm px-2">
+              📋 <span className="hidden sm:inline">Siparişler</span><span className="sm:hidden">Orders</span>
               {nearbyOrders.length > 0 && (
-                <Badge className="ml-1 bg-red-500">{nearbyOrders.length}</Badge>
+                <Badge className="ml-1 bg-red-500 text-xs">{nearbyOrders.length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="history">📚 Geçmiş</TabsTrigger>
-            <TabsTrigger value="earnings">💰 Kazanç</TabsTrigger>
-            <TabsTrigger value="map">🗺️ Harita</TabsTrigger>
-            <TabsTrigger value="profile">👤 Profil</TabsTrigger>
+            <TabsTrigger value="history" className="text-xs sm:text-sm px-2">📚 <span className="hidden sm:inline">Geçmiş</span><span className="sm:hidden">Hist</span></TabsTrigger>
+            <TabsTrigger value="earnings" className="text-xs sm:text-sm px-2">💰 <span className="hidden sm:inline">Kazanç</span><span className="sm:hidden">$$</span></TabsTrigger>
+            <TabsTrigger value="map" className="text-xs sm:text-sm px-2">🗺️ <span className="hidden sm:inline">Harita</span><span className="sm:hidden">Map</span></TabsTrigger>
+            <TabsTrigger value="profile" className="text-xs sm:text-sm px-2">👤 <span className="hidden sm:inline">Profil</span><span className="sm:hidden">Prof</span></TabsTrigger>
           </TabsList>
 
           {/* Orders Tab */}
