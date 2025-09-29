@@ -4381,7 +4381,7 @@ function App() {
 }
 
 const AuthRouter = ({ showAuth, setShowAuth }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   if (loading) {
     return (
