@@ -546,10 +546,32 @@ export const ProfessionalFoodOrderSystem = ({
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    // Filter by main category (food/drinks)
+    let matchesMainCategory = true;
+    if (activeMenuTab === 'food') {
+      // Define food categories
+      const foodCategories = ['ana yemek', 'başlangıç', 'pizza', 'burger', 'döner', 'kebap', 'pasta', 'çorba', 'salata', 'tatlı'];
+      matchesMainCategory = foodCategories.some(cat => 
+        product.category?.toLowerCase().includes(cat) || 
+        product.name?.toLowerCase().includes(cat)
+      );
+    } else if (activeMenuTab === 'drinks') {
+      // Define drink categories  
+      const drinkCategories = ['içecek', 'kahve', 'çay', 'su', 'kola', 'fanta', 'sprite', 'ayran', 'meyve suyu', 'smoothie'];
+      matchesMainCategory = drinkCategories.some(cat => 
+        product.category?.toLowerCase().includes(cat) || 
+        product.name?.toLowerCase().includes(cat)
+      );
+    }
+    
+    // Filter by subcategory
+    const matchesSubCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    
+    // Filter by search
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    
+    return matchesMainCategory && matchesSubCategory && matchesSearch;
   });
 
   if (loading) {
