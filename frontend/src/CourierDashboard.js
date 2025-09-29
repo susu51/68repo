@@ -1294,12 +1294,14 @@ export const CourierDashboard = ({ user, onLogout }) => {
                       <Label>E-posta Bildirimleri</Label>
                       <p className="text-sm text-gray-600">Önemli güncellemeler</p>
                     </div>
-                    <Switch
+                    <input
+                      type="checkbox"
                       checked={profile.notifications.email}
-                      onCheckedChange={(checked) => setProfile(prev => ({
+                      onChange={(e) => setProfile(prev => ({
                         ...prev,
-                        notifications: { ...prev.notifications, email: checked }
+                        notifications: { ...prev.notifications, email: e.target.checked }
                       }))}
+                      className="rounded border-gray-300"
                     />
                   </div>
                 </CardContent>
