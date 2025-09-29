@@ -5,9 +5,10 @@ import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Courier Nearby Orders Component (Original from GitHub - City-wide with Notifications)
 export const CourierDashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('orders');
   const [loading, setLoading] = useState(false);
