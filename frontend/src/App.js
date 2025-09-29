@@ -15,6 +15,7 @@ import { ModernLogin } from "./ModernLogin";
 import { KuryeciniTextLogo } from "./components/KuryeciniLogo";
 import { AdCarousel } from "./components/AdCarousel";
 import { LocationControls } from "./components/LocationControls";
+import { CourierDashboard } from "./CourierDashboard";
 
 // Components
 import { Button } from "./components/ui/button";
