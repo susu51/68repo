@@ -416,7 +416,10 @@ export const CourierDashboard = ({ user, onLogout }) => {
       if (order.pickup_address?.lat && order.pickup_address?.lng) {
         markers.push({
           id: `order-${order.id}`,
-          position: [order.pickup_address.lat, order.pickup_address.lng],
+          lat: order.pickup_address.lat,
+          lng: order.pickup_address.lng,
+          title: order.business_name,
+          description: `₺${order.total_amount}`,
           popup: `
             <div>
               <h3>${order.business_name}</h3>
@@ -433,7 +436,10 @@ export const CourierDashboard = ({ user, onLogout }) => {
     if (courierLocation) {
       markers.push({
         id: 'courier',
-        position: [courierLocation.lat, courierLocation.lng],
+        lat: courierLocation.lat,
+        lng: courierLocation.lng,
+        title: 'Sizin Konumunuz',
+        description: 'Canlı konum takibi aktif',
         popup: 'Sizin Konumunuz',
         type: 'user'
       });
@@ -443,7 +449,10 @@ export const CourierDashboard = ({ user, onLogout }) => {
     if (currentOrder && currentOrder.delivery_address?.lat && courierLocation) {
       markers.push({
         id: 'delivery',
-        position: [currentOrder.delivery_address.lat, currentOrder.delivery_address.lng],
+        lat: currentOrder.delivery_address.lat,
+        lng: currentOrder.delivery_address.lng,
+        title: 'Teslimat Adresi',
+        description: currentOrder.delivery_address.address,
         popup: `
           <div>
             <h3>Teslimat Adresi</h3>
