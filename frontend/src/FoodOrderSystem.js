@@ -299,7 +299,14 @@ export const ProfessionalFoodOrderSystem = ({
 
   useEffect(() => {
     setIsMounted(true);
-    getUserLocation();
+    
+    // Use prop location or get from browser
+    if (propUserLocation) {
+      setUserLocation(propUserLocation);
+    } else if (locationFilter === 'nearest') {
+      getUserLocation();
+    }
+    
     fetchRestaurants();
     
     // Cleanup function
@@ -309,7 +316,12 @@ export const ProfessionalFoodOrderSystem = ({
       setLoading(false);
       setLocationError(null);
     };
-  }, []);
+  }, [propUserLocation, locationFilter, selectedCity]);
+
+  // Update sort type when location filter changes
+  useEffect(() => {
+    setSortType(locationFilter === 'nearest' ? 'nearest' : 'citywide');
+  }, [locationFilter]);
 
   // Re-sort when user location changes (only if using nearest sort)
   useEffect(() => {
