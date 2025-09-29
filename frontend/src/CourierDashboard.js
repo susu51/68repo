@@ -539,11 +539,18 @@ export const CourierDashboard = ({ user, onLogout }) => {
             <div className="flex items-center space-x-4">
               {/* Online Status Toggle */}
               <div className="flex items-center space-x-2">
-                <Switch
-                  checked={isOnline}
-                  onCheckedChange={toggleOnlineStatus}
-                  className="data-[state=checked]:bg-green-600"
-                />
+                <button
+                  onClick={toggleOnlineStatus}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    isOnline ? 'bg-green-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                      isOnline ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
                 <span className={`text-sm font-medium ${isOnline ? 'text-green-600' : 'text-gray-500'}`}>
                   {isOnline ? '🟢 Çevrimiçi' : '🔴 Çevrimdışı'}
                 </span>
