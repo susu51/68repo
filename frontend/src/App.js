@@ -3308,6 +3308,7 @@ const CustomerDashboard = ({ user }) => {
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [selectedCity, setSelectedCity] = useState('İstanbul');
+  const [locationFilter, setLocationFilter] = useState('nearby'); // Location filter mode
   const [mapCenter, setMapCenter] = useState([39.925533, 32.866287]); // Default to Turkey center
   const [isMounted, setIsMounted] = useState(true); // Track component mount status
   const [showProfile, setShowProfile] = useState(false); // For showing profile modal
