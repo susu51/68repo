@@ -705,8 +705,8 @@ export const CourierDashboard = ({ user, onLogout }) => {
             </div>
           </div>
 
-          {/* Orders Tab */}
-          <TabsContent value="orders" className="space-y-4">
+          {/* Orders Content */}
+          {activeTab === 'orders' && (
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Yakındaki Siparişler</h2>
               <Button onClick={fetchNearbyOrders} variant="outline" size="sm">
