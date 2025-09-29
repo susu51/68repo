@@ -3983,18 +3983,6 @@ const CustomerDashboard = ({ user }) => {
               </div>
             </div>
           )}
-                </Card>
-                
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl mb-3">⭐</div>
-                    <h4 className="font-semibold mb-2">Sadakat Puanı</h4>
-                    <p className="text-2xl font-bold text-purple-600">{loyaltyPoints.total_points}</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       
