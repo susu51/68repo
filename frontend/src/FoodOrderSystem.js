@@ -276,7 +276,12 @@ const CartSummary = ({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) => {
 };
 
 // Main Food Order System Component
-export const ProfessionalFoodOrderSystem = () => {
+export const ProfessionalFoodOrderSystem = ({ 
+  user, 
+  locationFilter = 'city', 
+  userLocation: propUserLocation = null, 
+  selectedCity = 'İstanbul' 
+}) => {
   const [restaurants, setRestaurants] = useState([]);
   const [originalRestaurants, setOriginalRestaurants] = useState([]); // Store original data
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -286,10 +291,11 @@ export const ProfessionalFoodOrderSystem = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(propUserLocation);
   const [locationError, setLocationError] = useState(null);
-  const [sortType, setSortType] = useState('nearest'); // 'nearest' or 'citywide'
+  const [sortType, setSortType] = useState(locationFilter === 'nearest' ? 'nearest' : 'citywide');
   const [isMounted, setIsMounted] = useState(true); // Track component mount status
+  const [activeMenuTab, setActiveMenuTab] = useState('all'); // 'all', 'food', 'drinks'
 
   useEffect(() => {
     setIsMounted(true);
