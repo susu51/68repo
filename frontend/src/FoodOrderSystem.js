@@ -688,16 +688,37 @@ export const ProfessionalFoodOrderSystem = ({
               className="mb-4"
             />
             
-            <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-              <TabsList className="grid w-full grid-cols-auto">
-                <TabsTrigger value="all">Tümü</TabsTrigger>
-                {categories.filter(cat => cat !== 'all').map(category => (
-                  <TabsTrigger key={category} value={category}>
-                    {category}
-                  </TabsTrigger>
-                ))}
+            {/* Enhanced Menu Categories */}
+            <Tabs value={activeMenuTab} onValueChange={setActiveMenuTab}>
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="all" className="flex items-center space-x-2">
+                  <span>🍽️</span>
+                  <span>Tümü</span>
+                </TabsTrigger>
+                <TabsTrigger value="food" className="flex items-center space-x-2">
+                  <span>🍕</span>
+                  <span>Yiyecek</span>
+                </TabsTrigger>
+                <TabsTrigger value="drinks" className="flex items-center space-x-2">
+                  <span>🥤</span>
+                  <span>İçecek</span>
+                </TabsTrigger>
               </TabsList>
             </Tabs>
+            
+            {/* Secondary Category Filter */}
+            {categories.length > 0 && (
+              <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
+                <TabsList className="flex-wrap h-auto p-1 bg-gray-100">
+                  <TabsTrigger value="all" className="text-xs">Tümü</TabsTrigger>
+                  {categories.filter(cat => cat !== 'all').map(category => (
+                    <TabsTrigger key={category} value={category} className="text-xs">
+                      {category}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            )}
           </div>
 
           {/* Products */}
