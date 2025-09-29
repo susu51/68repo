@@ -680,18 +680,6 @@ export const CourierDashboard = ({ user, onLogout }) => {
               </button>
               
               <button
-                onClick={() => setActiveTab('map')}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'map' 
-                    ? 'bg-orange-500 text-white shadow-md' 
-                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
-                }`}
-              >
-                <span className="text-lg">🗺️</span>
-                <span>Harita</span>
-              </button>
-              
-              <button
                 onClick={() => setActiveTab('profile')}
                 className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
                   activeTab === 'profile' 
