@@ -1058,31 +1058,53 @@ export const CourierDashboard = ({ user, onLogout }) => {
           {/* Map Tab */}
           <TabsContent value="map" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">Harita Görünümü</h2>
+              <h2 className="text-xl font-bold">🗺️ Harita Görünümü</h2>
               <div className="flex items-center space-x-2">
                 <Badge variant={isOnline ? 'default' : 'secondary'}>
                   {isOnline ? '🟢 Çevrimiçi' : '🔴 Çevrimdışı'}
                 </Badge>
                 {courierLocation && (
                   <Badge variant="outline">
-                    📍 {courierLocation.lat.toFixed(4)}, {courierLocation.lng.toFixed(4)}
+                    📍 Konumunuz Aktif
                   </Badge>
                 )}
               </div>
             </div>
 
-            {/* Map */}
+            {!courierLocation && (
+              <Card className="border-yellow-200 bg-yellow-50">
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    <p className="text-yellow-800 font-medium mb-2">⚠️ Konum Servisi Gerekli</p>
+                    <p className="text-yellow-600 text-sm">Haritayı kullanabilmek için konum erişimi verin</p>
+                    <Button
+                      onClick={startLocationTracking}
+                      className="mt-3 bg-yellow-600 hover:bg-yellow-700"
+                      size="sm"
+                    >
+                      📍 Konumu Etkinleştir
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Map Container */}
             <Card>
               <CardContent className="p-0">
-                <LeafletMap
-                  center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [39.925533, 32.866287]}
-                  zoom={13}
-                  height="500px"
-                  markers={mapMarkers}
-                  courierMode={true}
-                  routePolyline={routePolyline}
-                  className="rounded-lg"
-                />
+                <div style={{ height: '400px', width: '100%' }}>
+                  {typeof window !== 'undefined' && (
+                    <LeafletMap
+                      center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [41.0082, 28.9784]}
+                      zoom={13}
+                      height="400px"
+                      markers={mapMarkers || []}
+                      courierMode={true}
+                      routePolyline={routePolyline}
+                      className="rounded-lg w-full h-full"
+                    />
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -1111,6 +1133,23 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Instructions */}
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-2">🧭 Harita Kullanımı</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div>
+                    <p>• 🔵 Mavi marker: Sizin konumunuz</p>
+                    <p>• 🏪 Kırmızı marker: İşletme konumları</p>
+                  </div>
+                  <div>
+                    <p>• 👤 Yeşil marker: Teslimat adresi</p>
+                    <p>• 📏 Çizgi: Optimal rota</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Profile Tab */}
