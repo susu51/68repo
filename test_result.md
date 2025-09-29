@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "PHASE 1 IMPLEMENTATION: Comprehensive customer profile management system for Kuryecini including: 1) Enhanced branding & phone authentication 2) Customer profile management (My Profile page with Address Book CRUD, Loyalty Points, Order History) 3) Dynamic location controls 4) Phone authentication system with Turkish phone number support 5) Complete responsive design implementation."
+user_problem_statement: "PHASE 1 DEBUG & STABILIZATION: Emergency debugging of widespread runtime errors in Kuryecini platform. User reported 'Hata alıyorum' (I'm getting errors) everywhere after Phase 2 implementation. Primary focus: identify and fix blocking errors preventing basic application functionality (login, dashboards, basic workflows)."
 
 backend:
   - task: "Business Registration Endpoint"
