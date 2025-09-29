@@ -18,7 +18,7 @@ import time
 import uuid
 
 class DeliverTRAPITester:
-    def __init__(self, base_url="https://kuryecini-turk.preview.emergentagent.com"):
+    def __init__(self, base_url="https://kuryecini-delivery.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.access_token = None

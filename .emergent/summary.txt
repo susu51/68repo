@@ -1,52 +1,58 @@
 <analysis>
-The AI engineer's work on the Kuryecini application progressed through several distinct phases. Initially, the focus was on core foundational elements: rebranding from DeliverTR to Kuryecini, implementing support for all 81 Turkish provinces, and integrating admin login into the standard flow. A significant portion of the work involved enhancing the admin panel for mobile responsiveness, incorporating a modern dark/light theme, and adding user management capabilities. A comprehensive customer-facing marketing theme was also introduced, featuring hero sections, social proof, and loyalty programs. Recurrent challenges included debugging persistent JSX and React runtime errors (), particularly in  and . More recently, the engineer successfully addressed critical issues such as the absence of food items on the customer side, implemented location-based and city-wide restaurant sorting, and resolved a specific  runtime error. Standardizing backend date serialization for MongoDB was also completed. The trajectory concludes with the user delivering a new, detailed and extensive set of product requirements, shifting the focus to future feature development.
+The AI engineer's work on the Kuryecini application progressed through several distinct phases, moving from initial foundational enhancements to implementing a comprehensive set of new product requirements. Initially, the focus was on critical fixes such as  serialization and  React errors, along with core features like re-branding, admin login, and location-based sorting.
+
+Following this, the engineer embarked on a major feature expansion, structured into phases. Phase 1 involved building a robust customer profile management system, integrating phone authentication, and updating branding. Phase 2 further expanded functionality with a modern login screen (including OAuth integration), an advertising carousel, enhanced location controls, categorized menu displays for businesses, and comprehensive courier/business/admin panels.
+
+The development was iterative, involving file modifications across both frontend (, , new components) and backend (, ). Backend and frontend testing was conducted regularly. A notable challenge was a  duplicate declaration error in  and persistent frontend issues after several successful backend tests, which were eventually resolved. The trajectory concludes with the user reporting widespread errors after the AI engineer declared all systems functional, indicating a crucial pending debug task.
 </analysis>
 
 <product_requirements>
-Kuryecini (formerly DeliverTR) is a Turkish package/food delivery platform for Customer, Courier, Business, and Admin roles, featuring JWT auth, Admin KYC for couriers, Admin panel, and Leaflet/OpenStreetMap. It's fully branded Kuryecini supporting 81 Turkish provinces.
+Kuryecini (formerly DeliverTR) is a Turkish package/food delivery platform with Customer, Courier, Business, and Admin roles, featuring JWT authentication, Admin KYC, a comprehensive admin panel, and Leaflet/OpenStreetMap integration. The application is fully rebranded Kuryecini and supports all 81 Turkish provinces.
 
-**Implemented (Previous Trajectory):** Admin login integrated (pass 6851), hint removed; Admin panel redesigned (mobile-responsive, dark/light, user management, sidebar); Customer marketing theme (hero, search, CTA, social proof, popular products, campaigns, loyalty); Registration city/category selection fixed; Customer food visibility resolved; Location-based and city-wide restaurant sorting implemented; Backend date serialization for MongoDB standardized; React runtime errors fixed.
+**Implemented (Previous Trajectory & Current Work):** Admin login (password 6851) with hint removed; Admin panel redesigned for mobile, dark/light theme, and user management; Customer marketing theme with hero section, social proof, and loyalty programs; Fixed city/category selection in registration; Resolved no food visible issue for customers; Implemented location-based (En Yakınım) and city-wide (Şehir Geneli) restaurant sorting; Standardized backend date serialization and MongoDB  handling; Resolved various React runtime errors (e.g., ). New additions include customer profile management with address book, loyalty points, and order history placeholders, modern login with phone authentication and Google/Apple OAuth, homepage ad carousel, enhanced menu display with food/drink categories, and initial structures for courier/business/admin dashboards.
 
-**New Comprehensive Requirements (from Chat Message 276):**
-The user has provided a detailed product vision. Key areas for development include:
-1.  **Enhanced Branding & Theme:** Full Kuryecini rebrand, modern login/signup with phone authentication, dark/light modes.
-2.  **Customer Profile Management:** My Profile page with Address Book (CRUD, default), Loyalty Points (earn/spend, history), and Order History (reorder, product/courier rating).
-3.  **Dynamic Location Controls:** Nearest (browser geo-location) and City-Wide views for restaurants, synchronized with map.
-4.  **Refined Menu & Product Display:** Separate Food and Drink categories, rich product cards with images, prices, descriptions, badges, and quick add-to-cart.
-5.  **Marketing & Advertising:** Homepage sliding ad carousel with targetable banners; admin management for ads including analytics.
-6.  **Improved Courier Panel:** Notification/Message center, KYC-based job assignment, automated order assignment.
-7.  **Advanced Admin Panel:** Admin-only login, bulk messaging to couriers, comprehensive ad management, Featured Business subscription management.
-8.  **Business Features:** View Restaurant link, Feature Me paid promotion option (ranking, badge), refined product management with categories.
-9.  **Post-Delivery Reviews:** Customer product and courier rating system, displayed on restaurant pages.
+**New Comprehensive Requirements (from Chat Message 114 - in Turkish):**
+1.  **Enhanced Branding & Login:** Full Kuryecini rebrand, modern login/signup with phone authentication, email/password, Google/Apple OAuth, dark/light modes, Kuryecini logo prominence.
+2.  **Customer Panel:** My Profile (Address Book CRUD, Loyalty Points, Order History with reorder/rating, Notification Preferences). Dynamic Location Controls (Nearest via GPS, City-Wide all businesses, synchronized with map). Refined Menu & Product Display (separate Food/Drink tabs, rich product cards with images, prices, descriptions, badges like Popular/New/Discount).
+3.  **Customer Advertising:** Homepage sliding ad carousel (auto-scroll, controls), banner model with targeting (city, category), scheduling, analytics (clicks, impressions), frequency limits.
+4.  **Courier Panel:** Order List (location-based), Order Flow (Accept → Picked Up → Delivered, live updates), Past Orders (filterable), Monthly Report/Invoice (PDF export), Notification Center, Admin Messages, Online/Offline toggle, Navigation.
+5.  **Business Features:** View Restaurant button (customer view), Feature Me paid promotion (ranking, badge, priority in banners), refined product management with mandatory food/drink categories.
+6.  **Admin Panel:** Admin-only login (button, static password 6851), bulk messaging to couriers, comprehensive ad management (CRUD, targeting, analytics), Featured Business subscription management (approve/end, manage plans), dummy data loading.
+7.  **Reviews & Ratings:** Post-delivery customer product ratings (1-5 stars + text) and courier ratings (1-5 stars). Average courier rating in profile, product reviews on restaurant page (sorted).
+8.  **Commission & Fees:** Existing commission model (5% business + 5% courier) continues. Feature Me fees are separate income.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Architecture**: React.js frontend, FastAPI backend, MongoDB database.
--   **Authentication**: JWT, Email/Password, bcrypt.
--   **UI/UX**: Shadcn UI, Tailwind CSS, Leaflet/OpenStreetMap.
--   **Data Handling**: Pydantic models, UUIDs for MongoDB IDs.
--   **React Lifecycle**:  cleanup,  checks,  props.
+-   **Full-stack Architecture**: React.js (frontend), FastAPI (backend), MongoDB (database).
+-   **Authentication**: JWT, Email/Password, Phone/OTP, Google/Apple OAuth (via ).
+-   **UI/UX**: Shadcn UI, Tailwind CSS, Leaflet/OpenStreetMap, Glassmorphism design.
+-   **Data Handling**: Pydantic models, UUIDs for MongoDB IDs, ISO format for .
+-   **React Lifecycle**:  cleanup,  checks,  props, Context API ().
 -   **Asynchronous Ops**:  for API calls.
 </key_technical_concepts>
 
 <code_architecture>
 
 
--   :
-    -   **Importance**: Core backend logic and API definitions for authentication, user, business, and product management.
-    -   **Changes Made**: Integrated admin login (password 6851), fixed JWT validation for admin. Added  DELETE, Campaign, Loyalty, and Coupon management endpoints. Initiated  and  endpoints for KYC. Modified several endpoints to convert  to  and serialize  objects to ISO format for JSON compatibility.
--   :
-    -   **Importance**: Defines Pydantic models for API request/response validation.
-    -   **Changes Made**: Added , ,  models, and  enum for KYC. Ensures  fields are correctly handled.
--   :
-    -   **Importance**: Main application layout, routing, and role-specific dashboards.
-    -   **Changes Made**: Simplified  (removed admin hint). Redesigned  with modern theme, sidebar, responsiveness, user management (fixing JSX/runtime errors,  props,  checks). Updated  with marketing theme (fixing Adjacent JSX elements error). Integrated Campaign/Loyalty into Customer Dashboard (with  checks). Fixed city/category selection in registration forms. Addressed  React runtime error for stability.
--   :
-    -   **Importance**: Handles customer food ordering, restaurant/product display, and cart.
-    -   **Changes Made**: Implemented location-based and city-wide restaurant filtering/sorting. Resolved no food visible issue by ensuring correct data fetching and rendering. Applied fixes to  dependencies and component unmounting to resolve  runtime errors.
--   :
-    -   **Importance**: Application entry point and metadata.
+-   : Core backend logic and API definitions.
+    -   **Changes Made**: Integrated admin login (password 6851), fixed JWT validation. Added  DELETE, Campaign, Loyalty, and Coupon management endpoints. Initiated  and  for KYC. Modified several endpoints to convert  to  and serialize  to ISO format. Added new endpoints for customer profile management (address book, loyalty, orders), ad management, courier features (order lists, status), business features (feature me, view restaurant), and admin messaging/ad/feature management. Integrated  for OAuth.
+-   : Pydantic models for API request/response validation.
+    -   **Changes Made**: Added , ,  models,  enum for KYC. New models for , , , , , ,  to support new features. Ensures  fields are correctly handled.
+-   : Main application layout, routing, and role-specific dashboards.
+    -   **Changes Made**: Simplified  (removed admin hint). Redesigned . Updated  with marketing theme. Integrated Campaign/Loyalty into Customer Dashboard. Fixed city/category selection in registration forms. Addressed  React runtime error. Integrated , , , , , , . Implemented . Updated branding to Kuryecini throughout. Refactored  to use . Fixed a duplicate  component declaration.
+-   : Handles customer food ordering, restaurant/product display, and cart.
+    -   **Changes Made**: Implemented location-based and city-wide restaurant filtering/sorting. Resolved no food visible issue. Applied fixes to  dependencies and component unmounting. Refactored to separate Food and Drink categories, enhanced product cards with badges and quick add-to-cart.
+-   : Application entry point and metadata.
     -   **Changes Made**: Updated title and description to Kuryecini.
+-   : **New file.** Component for customer profile management including Address Book, Loyalty Points, Order History.
+-   : **New file.** React Context for managing dark/light theme state.
+-   : **New file.** Implements the glassmorphism-themed login screen with Email/Password, Phone Auth, and OAuth options.
+-   : **New file.** Component for the Kuryecini logo.
+-   : **New file.** Component for the homepage advertising carousel.
+-   : **New file.** Component for En Yakınım / Şehir Geneli location filtering.
+-   : **New file.** New dashboard for couriers with orders, history, and status.
+-   : **New file.** New dashboard for businesses with View Restaurant and Feature Me options.
+-   : **New file.** New administrative panel with messaging, ad, and featured business management.
 </code_architecture>
 
 <pending_tasks>
@@ -56,19 +62,26 @@ The user has provided a detailed product vision. Key areas for development inclu
 -   Financial reporting, complaint system, 2FA.
 -   Complete Business KYC frontend approval and post-registration redirection.
 -   Customer Marketing Phase 3: Social & Trust Elements (Reviews, Notifications, E-mail/SMS).
--   All new detailed requirements from Message 276 (Customer Profile, Location Controls, Menu/Visuals, Ad Spaces, Courier/Admin Panel enhancements, Business features, Reviews/Ratings).
+-   Address user's current report of widespread errors.
 </pending_tasks>
 
 <current_work>
-Immediately prior to receiving the new comprehensive product requirements (Chat Message 276), the AI engineer was addressing several critical issues to enhance the Kuryecini application's stability and functionality. The primary focus was resolving the user-reported Hiçbir yemek müşteri kısmında gözükmüyor (No food visible on customer side) issue. This involved detailed inspection and modification within  and  to ensure that approved businesses and their respective food items were correctly fetched, processed, and displayed to customers.
+Immediately prior to this summary request, the AI engineer had completed the implementation of a significant portion of the new comprehensive product requirements (Phases 1 and 2). This included:
 
-Following this, the engineer implemented location-based (En Yakınım) and city-wide (Şehir Geneli) restaurant sorting functionality, as requested by the user, directly within , allowing customers to discover businesses based on proximity or across the entire city.
+1.  **Backend Extensions:** Added numerous API endpoints and Pydantic models in  and  for customer profile management, ad management, courier features, business feature me functionality, and expanded admin controls. OAuth integration via  was also set up on the backend.
+2.  **Frontend Enhancements:**
+    *   Full Kuryecini rebranding across the application.
+    *   Developed a  component featuring glassmorphism design, dark/light theme toggle, and integrated options for email/password, phone authentication (using existing ), and OAuth (Google/Apple).
+    *   Created a  component for customer profile management, including placeholders for Address Book, Loyalty Points, and Order History, integrated into the  in .
+    *   Implemented an  component for the homepage and integrated it into .
+    *   Developed  for En Yakınım (nearest) and Şehir Geneli (city-wide) restaurant filtering, integrated into .
+    *   Refactored  to display menu items in separate Food and Drink categories with enhanced  components featuring badges and quick add-to-cart.
+    *   Created and integrated , , and  into  to lay the groundwork for their respective new features.
+3.  **Debugging & Stabilization:** Resolved several React runtime errors, especially a persistent  issue. Fixed  serialization inconsistencies in backend API responses. Crucially, a duplicate  component declaration in  was identified and fixed after a frontend compilation error.
 
-Concurrently, a persistent React runtime error, specifically a  error, was diagnosed and fixed. This error, often associated with unstable keys in list renderings or improper component unmounting, was observed during navigation between tabs in components like  and . The resolution involved refining  hooks,  checks, and ensuring correct  prop usage for dynamically rendered elements, thereby stabilizing the frontend.
-
-Finally, the backend  and  were updated to standardize the JSON serialization of MongoDB s (converting them to strings) and  objects (converting to ISO format), preventing potential data transfer errors between the backend and frontend. The engineer had just concluded these bug fixes and stability improvements when the new, extensive list of product requirements was introduced.
+The AI engineer had just declared all systems MÜTHİŞ! Tüm sistem çalışıyor! (Great! The entire system is working!) based on successful backend tests and frontend screenshots when the user reported Hata alıyorum (I'm getting errors) everywhere, indicating a critical, widespread issue that needs immediate attention.
 </current_work>
 
 <optional_next_step>
-The next step is to analyze and plan the implementation for the comprehensive new product requirements outlined in Chat Message 276.
+Debug the widespread errors reported by the user across the application.
 </optional_next_step>
