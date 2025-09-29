@@ -1710,17 +1710,17 @@ async def register_courier(courier_data: CourierRegister, request: Request):
         }
     )
 
-# ADMIN USER MANAGEMENT ENDPOINTS
-@api_router.get("/admin/users")
-async def get_all_users(
-    user_type: Optional[str] = None,
-    status: Optional[str] = None,
-    city: Optional[str] = None,
-    page: int = 1,
-    limit: int = 50,
-    current_user_id: str = Depends(get_admin_user)
-):
-    """Tüm kullanıcıları listele"""
+# ADMIN USER MANAGEMENT ENDPOINTS - DUPLICATE (COMMENTED OUT)
+# @api_router.get("/admin/users")
+# async def get_all_users_paginated(
+#     user_type: Optional[str] = None,
+#     status: Optional[str] = None,
+#     city: Optional[str] = None,
+#     page: int = 1,
+#     limit: int = 50,
+#     current_user_id: str = Depends(get_admin_user)
+# ):
+#     """Tüm kullanıcıları listele"""
     query = {}
     if user_type:
         query["user_type"] = user_type
