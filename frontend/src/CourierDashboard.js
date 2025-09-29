@@ -50,69 +50,101 @@ export const CourierDashboard = ({ user, onLogout }) => {
     }
   }, [courierLocation, isMounted]);
 
-  const fetchInitialData = async () => {
-    await Promise.all([
-      fetchAvailableOrders(),
-      fetchOrderHistory(),
-      fetchNotifications(),
-      fetchMessages(),
-      fetchStats()
-    ]);
+  const fetchNearbyOrders = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const response = await axios.get(`${API}/orders/nearby`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (isMounted) {
+        const orders = response.data || [];
+        setNearbyOrders(orders);
+
+        // Check for very close orders and send notifications
+        if (courierLocation && orders.length > 0) {
+          checkForCloseOrders(orders);
+        }
+      }
+
+    } catch (error) {
+      console.error('Siparişler alınamadı:', error);
+      if (isMounted) {
+        setNearbyOrders([]);
+      }
+    }
+    if (isMounted) {
+      setLoading(false);
+    }
   };
 
-  // Location tracking
   const startLocationTracking = () => {
-    if (navigator.geolocation) {
-      const watchId = navigator.geolocation.watchPosition(
-        (position) => {
+    if (!navigator.geolocation) {
+      if (isMounted) {
+        setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor');
+        setLoading(false);
+      }
+      return;
+    }
+
+    if (isMounted) {
+      setLoading(true);
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (isMounted) {
           const location = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
           };
           setCourierLocation(location);
-          updateLocationOnServer(location);
-        },
-        (error) => {
-          console.error('Location error:', error);
-          toast.error('Konum bilgisi alınamadı');
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000
+          setLocationError(null);
+          console.log('Konum alındı:', location);
         }
-      );
-      
-      localStorage.setItem('locationWatchId', watchId);
-    }
+      },
+      (error) => {
+        if (isMounted) {
+          console.error('Konum alınamadı:', error);
+          setLocationError('Konum erişimi reddedildi veya kullanılamıyor');
+          setLoading(false);
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
-  const stopLocationTracking = () => {
-    const watchId = localStorage.getItem('locationWatchId');
-    if (watchId) {
-      navigator.geolocation.clearWatch(parseInt(watchId));
-      localStorage.removeItem('locationWatchId');
-    }
-  };
+  const updateLocation = () => {
+    if (!navigator.geolocation || !isMounted) return;
 
-  const updateLocationOnServer = async (location) => {
-    try {
-      await axios.post(`${API}/courier/location/update`, location);
-    } catch (error) {
-      console.error('Failed to update location:', error);
-    }
-  };
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (isMounted) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setCourierLocation(location);
 
-  // Fetch available orders
-  const fetchAvailableOrders = async () => {
-    try {
-      const response = await axios.get(`${API}/courier/orders/available`);
-      const orders = response.data.orders || [];
-      setAvailableOrders(orders);
-      updateMapMarkers(orders);
-    } catch (error) {
-      console.error('Failed to fetch available orders:', error);
-    }
+          // Refresh orders when location updates
+          if (nearbyOrders.length > 0) {
+            checkForCloseOrders(nearbyOrders);
+          }
+        }
+      },
+      (error) => {
+        if (isMounted) {
+          console.error('Konum güncellenemedi:', error);
+        }
+      },
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
   };
 
   // Update map markers with order locations
