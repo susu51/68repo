@@ -1457,6 +1457,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 </CardContent>
               </Card>
             </div>
+            </div>
           )}
         </Tabs>
       </div>
