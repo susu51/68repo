@@ -697,10 +697,12 @@ export const CourierDashboard = ({ user, onLogout }) => {
           {activeTab === 'orders' && (
             <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">Yakındaki Siparişler</h2>
-              <Button onClick={fetchNearbyOrders} variant="outline" size="sm">
-                🔄 Yenile
-              </Button>
+              <h2 className="text-xl font-bold">🚚 Sipariş Yönetimi</h2>
+              <div className="flex space-x-2">
+                <Button onClick={fetchNearbyOrders} variant="outline" size="sm">
+                  🔄 Yenile
+                </Button>
+              </div>
             </div>
 
             {/* Location Status */}
