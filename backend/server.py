@@ -3678,10 +3678,436 @@ async def get_ad_analytics(ad_id: str, current_user: dict = Depends(get_current_
         logging.error(f"Error fetching analytics: {e}")
         raise HTTPException(status_code=500, detail="Analitik veriler alınamadı")
 
+# COURIER PANEL ENHANCEMENTS
+
+@api_router.get("/courier/orders/available")
+async def get_available_orders(current_user: dict = Depends(get_current_user)):
+    """Get available orders for courier based on location"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    # Check if courier is online and KYC approved
+    courier = await db.users.find_one({"id": current_user["id"]})
+    if not courier:
+        raise HTTPException(status_code=404, detail="Courier not found")
+    
+    if not courier.get("kyc_approved"):
+        raise HTTPException(status_code=403, detail="KYC approval required")
+    
+    if not courier.get("is_online", False):
+        return {"orders": [], "message": "Çevrimiçi olmanız gerekiyor"}
+    
+    try:
+        # Get pending orders
+        query = {
+            "status": "pending",
+            "courier_id": {"$exists": False}  # Not assigned to any courier yet
+        }
+        
+        orders = await db.orders.find(query).sort("created_at", 1).to_list(length=20)  # Max 20 orders
+        
+        # Enrich orders with business and customer info
+        enriched_orders = []
+        for order in orders:
+            # Get business info
+            business = await db.users.find_one({"id": order.get("business_id")})
+            
+            # Calculate estimated delivery time and distance
+            order_info = {
+                "id": order["id"],
+                "created_at": order["created_at"].isoformat() if hasattr(order["created_at"], 'isoformat') else order["created_at"],
+                "business_name": business.get("business_name", "Unknown Business") if business else "Unknown Business",
+                "business_address": business.get("address", "Address not available") if business else "Address not available",
+                "delivery_address": order.get("delivery_address", "Delivery address not specified"),
+                "total_amount": order.get("total_amount", 0),
+                "commission": round(order.get("total_amount", 0) * 0.05, 2),  # 5% commission
+                "estimated_distance": order.get("estimated_distance", "Unknown"),
+                "estimated_prep_time": order.get("estimated_prep_time", 15),  # Default 15 min
+                "priority": order.get("priority", "normal"),
+                "payment_method": order.get("payment_method", "online")
+            }
+            enriched_orders.append(order_info)
+        
+        return {
+            "orders": enriched_orders,
+            "total_available": len(enriched_orders),
+            "message": f"{len(enriched_orders)} sipariş mevcut"
+        }
+        
+    except Exception as e:
+        logging.error(f"Error fetching available orders: {e}")
+        raise HTTPException(status_code=500, detail="Siparişler yüklenemedi")
+
+@api_router.post("/courier/orders/{order_id}/accept")
+async def accept_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Accept an order as courier"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        # Check if order is still available
+        order = await db.orders.find_one({
+            "id": order_id,
+            "status": "pending",
+            "courier_id": {"$exists": False}
+        })
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Sipariş bulunamadı veya başka kurye tarafından alındı")
+        
+        # Assign order to courier
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {
+                "courier_id": current_user["id"],
+                "status": "accepted",
+                "accepted_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        # Create order tracking entry
+        tracking_entry = {
+            "id": str(uuid.uuid4()),
+            "order_id": order_id,
+            "courier_id": current_user["id"],
+            "status": "accepted",
+            "location": None,  # Can be updated with GPS coordinates
+            "timestamp": datetime.now(timezone.utc),
+            "notes": "Sipariş kurye tarafından kabul edildi"
+        }
+        
+        await db.order_tracking.insert_one(tracking_entry)
+        
+        return {"message": "Sipariş başarıyla kabul edildi", "order_id": order_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error accepting order: {e}")
+        raise HTTPException(status_code=500, detail="Sipariş kabul edilemedi")
+
+@api_router.post("/courier/orders/{order_id}/update-status")
+async def update_order_status(order_id: str, status_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update order status (PICKED_UP, DELIVERED)"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    allowed_statuses = ["picked_up", "delivered"]
+    new_status = status_data.get("status")
+    
+    if new_status not in allowed_statuses:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    try:
+        # Check if order belongs to this courier
+        order = await db.orders.find_one({
+            "id": order_id,
+            "courier_id": current_user["id"]
+        })
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Sipariş bulunamadı")
+        
+        # Update order status
+        update_data = {
+            "status": new_status,
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        if new_status == "picked_up":
+            update_data["picked_up_at"] = datetime.now(timezone.utc)
+        elif new_status == "delivered":
+            update_data["delivered_at"] = datetime.now(timezone.utc)
+        
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": update_data}
+        )
+        
+        # Create tracking entry
+        tracking_entry = {
+            "id": str(uuid.uuid4()),
+            "order_id": order_id,
+            "courier_id": current_user["id"],
+            "status": new_status,
+            "location": status_data.get("location"),  # GPS coordinates
+            "timestamp": datetime.now(timezone.utc),
+            "notes": status_data.get("notes", "")
+        }
+        
+        await db.order_tracking.insert_one(tracking_entry)
+        
+        status_messages = {
+            "picked_up": "Sipariş alındı olarak işaretlendi",
+            "delivered": "Sipariş teslim edildi olarak işaretlendi"
+        }
+        
+        return {"message": status_messages[new_status], "order_id": order_id, "status": new_status}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating order status: {e}")
+        raise HTTPException(status_code=500, detail="Durum güncellenemedi")
+
+@api_router.get("/courier/orders/history")
+async def get_courier_order_history(
+    page: int = 1,
+    limit: int = 20,
+    status_filter: str = None,
+    date_filter: str = None,  # today, week, month
+    current_user: dict = Depends(get_current_user)
+):
+    """Get courier's order history with filters"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        skip = (page - 1) * limit
+        
+        # Build query
+        query = {"courier_id": current_user["id"]}
+        
+        if status_filter:
+            query["status"] = status_filter
+        
+        if date_filter:
+            now = datetime.now(timezone.utc)
+            if date_filter == "today":
+                start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            elif date_filter == "week":
+                start_date = now - timedelta(days=7)
+            elif date_filter == "month":
+                start_date = now - timedelta(days=30)
+            else:
+                start_date = None
+            
+            if start_date:
+                query["created_at"] = {"$gte": start_date}
+        
+        # Get orders
+        orders = await db.orders.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(length=None)
+        total_orders = await db.orders.count_documents(query)
+        
+        # Enrich orders
+        enriched_orders = []
+        total_earnings = 0
+        
+        for order in orders:
+            # Get business info
+            business = await db.users.find_one({"id": order.get("business_id")})
+            
+            commission = round(order.get("total_amount", 0) * 0.05, 2)
+            total_earnings += commission
+            
+            order_info = {
+                "id": order["id"],
+                "created_at": order["created_at"].isoformat() if hasattr(order["created_at"], 'isoformat') else order["created_at"],
+                "business_name": business.get("business_name", "Unknown") if business else "Unknown",
+                "delivery_address": order.get("delivery_address", ""),
+                "total_amount": order.get("total_amount", 0),
+                "commission": commission,
+                "status": order["status"],
+                "delivered_at": order.get("delivered_at").isoformat() if order.get("delivered_at") and hasattr(order.get("delivered_at"), 'isoformat') else order.get("delivered_at")
+            }
+            enriched_orders.append(order_info)
+        
+        return {
+            "orders": enriched_orders,
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total": total_orders,
+                "pages": math.ceil(total_orders / limit) if total_orders > 0 else 1
+            },
+            "summary": {
+                "total_earnings": round(total_earnings, 2),
+                "total_orders": len(enriched_orders)
+            }
+        }
+        
+    except Exception as e:
+        logging.error(f"Error fetching courier history: {e}")
+        raise HTTPException(status_code=500, detail="Geçmiş siparişler yüklenemedi")
+
+@api_router.post("/courier/status/toggle")
+async def toggle_courier_status(current_user: dict = Depends(get_current_user)):
+    """Toggle courier online/offline status"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        courier = await db.users.find_one({"id": current_user["id"]})
+        if not courier:
+            raise HTTPException(status_code=404, detail="Courier not found")
+        
+        new_status = not courier.get("is_online", False)
+        
+        await db.users.update_one(
+            {"id": current_user["id"]},
+            {"$set": {
+                "is_online": new_status,
+                "last_status_change": datetime.now(timezone.utc)
+            }}
+        )
+        
+        status_text = "çevrimiçi" if new_status else "çevrimdışı"
+        return {
+            "is_online": new_status,
+            "message": f"Durum {status_text} olarak güncellendi"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error toggling courier status: {e}")
+        raise HTTPException(status_code=500, detail="Durum değiştirilemedi")
+
+# COURIER MESSAGING AND NOTIFICATIONS
+
+@api_router.get("/courier/notifications")
+async def get_courier_notifications(current_user: dict = Depends(get_current_user)):
+    """Get courier notifications"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        # Get unread notifications
+        notifications = await db.courier_notifications.find({
+            "courier_id": current_user["id"],
+            "read": False
+        }).sort("created_at", -1).limit(50).to_list(length=None)
+        
+        for notification in notifications:
+            notification["id"] = str(notification["_id"])
+            del notification["_id"]
+            notification["created_at"] = notification["created_at"].isoformat() if hasattr(notification["created_at"], 'isoformat') else notification["created_at"]
+        
+        return {
+            "notifications": notifications,
+            "unread_count": len(notifications)
+        }
+        
+    except Exception as e:
+        logging.error(f"Error fetching notifications: {e}")
+        raise HTTPException(status_code=500, detail="Bildirimler yüklenemedi")
+
+@api_router.post("/courier/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: dict = Depends(get_current_user)):
+    """Mark notification as read"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        await db.courier_notifications.update_one(
+            {"_id": notification_id, "courier_id": current_user["id"]},
+            {"$set": {"read": True, "read_at": datetime.now(timezone.utc)}}
+        )
+        
+        return {"message": "Bildirim okundu olarak işaretlendi"}
+        
+    except Exception as e:
+        logging.error(f"Error marking notification read: {e}")
+        raise HTTPException(status_code=500, detail="Bildirim güncellenemedi")
+
+@api_router.get("/courier/messages")
+async def get_courier_messages(current_user: dict = Depends(get_current_user)):
+    """Get admin messages for courier"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        messages = await db.courier_messages.find({
+            "$or": [
+                {"courier_id": current_user["id"]},  # Direct messages
+                {"courier_id": None}  # Broadcast messages
+            ]
+        }).sort("created_at", -1).limit(50).to_list(length=None)
+        
+        for message in messages:
+            message["id"] = str(message["_id"])
+            del message["_id"]
+            message["created_at"] = message["created_at"].isoformat() if hasattr(message["created_at"], 'isoformat') else message["created_at"]
+        
+        return {"messages": messages}
+        
+    except Exception as e:
+        logging.error(f"Error fetching messages: {e}")
+        raise HTTPException(status_code=500, detail="Mesajlar yüklenemedi")
+
+# ADMIN COURIER MESSAGING
+
+@api_router.post("/admin/courier/message")
+async def send_courier_message(message_data: dict, current_user: dict = Depends(get_current_user)):
+    """Send message to couriers (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        courier_ids = message_data.get("courier_ids", [])  # Empty array = broadcast to all
+        message_text = message_data.get("message", "")
+        title = message_data.get("title", "Yönetici Mesajı")
+        
+        if not message_text:
+            raise HTTPException(status_code=400, detail="Message text required")
+        
+        if not courier_ids:
+            # Broadcast to all active couriers
+            couriers = await db.users.find({"role": "courier", "is_active": True}).to_list(length=None)
+            courier_ids = [courier["id"] for courier in couriers]
+        
+        # Send message to each courier
+        messages_sent = 0
+        for courier_id in courier_ids:
+            # Get courier name for personalized message
+            courier = await db.users.find_one({"id": courier_id})
+            courier_name = f"{courier.get('first_name', '')} {courier.get('last_name', '')}".strip() if courier else "Kurye"
+            
+            personalized_message = f"{courier_name}, {message_text}"
+            
+            # Create message record
+            message_record = {
+                "id": str(uuid.uuid4()),
+                "courier_id": courier_id,
+                "title": title,
+                "message": personalized_message,
+                "sent_by": current_user["id"],
+                "created_at": datetime.now(timezone.utc),
+                "read": False
+            }
+            
+            await db.courier_messages.insert_one(message_record)
+            
+            # Create notification
+            notification = {
+                "id": str(uuid.uuid4()),
+                "courier_id": courier_id,
+                "type": "admin_message",
+                "title": title,
+                "message": f"Yeni admin mesajı: {message_text[:50]}...",
+                "created_at": datetime.now(timezone.utc),
+                "read": False
+            }
+            
+            await db.courier_notifications.insert_one(notification)
+            messages_sent += 1
+        
+        return {
+            "message": f"{messages_sent} kuryeye mesaj gönderildi",
+            "recipients": messages_sent
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error sending courier message: {e}")
+        raise HTTPException(status_code=500, detail="Mesaj gönderilemedi")
+
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "Kuryecini API v9.0 - Advertisement System Integration"}
+    return {"message": "Kuryecini API v10.0 - Courier Panel & Messaging System"}
 
 # Include the router in the main app
 app.include_router(api_router)
