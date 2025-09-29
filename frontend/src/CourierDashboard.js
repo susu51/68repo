@@ -1128,10 +1128,12 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 </div>
               </CardContent>
             </Card>
+            </div>
           )}
 
           {/* Map Content */}
           {activeTab === 'map' && (
+            <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">🗺️ Harita Görünümü</h2>
               <div className="flex items-center space-x-2">
