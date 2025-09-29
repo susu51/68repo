@@ -2958,7 +2958,7 @@ const BusinessDashboard = ({ user }) => {
 // Customer Dashboard - Modern Tech Design
 const CustomerDashboard = ({ user }) => {
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('campaigns'); // Start with campaigns tab
+  const [activeTab, setActiveTab] = useState('products'); // Start with Keşfet (discover) tab
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
