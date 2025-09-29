@@ -850,6 +850,124 @@ export const CourierDashboard = ({ user, onLogout }) => {
               </div>
             )}
 
+            {/* Orders List with Map Integration */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  📋 Mevcut Siparişler ({nearbyOrders.length} adet)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {nearbyOrders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-6xl mb-4">📦</div>
+                    <p className="text-xl font-semibold mb-2">Şu anda müsait sipariş yok</p>
+                    <p className="text-gray-600">Yeni siparişler geldiğinde haritada gösterilecek</p>
+                    {courierLocation && isOnline && (
+                      <p className="text-xs text-blue-600 mt-2">
+                        📍 Konumunuz aktif • Yakın siparişler için bildirim alacaksınız
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {nearbyOrders.map((order) => {
+                      const isVeryClose = courierLocation && order.pickup_address &&
+                        calculateDistance(
+                          courierLocation.lat, courierLocation.lng,
+                          order.pickup_address.lat, order.pickup_address.lng
+                        ) <= 1;
+
+                      return (
+                        <Card
+                          key={order.id}
+                          className={`hover:shadow-lg transition-all duration-300 cursor-pointer ${
+                            isVeryClose ? 'border-green-400 bg-green-50' : 'border-gray-200'
+                          }`}
+                        >
+                          <CardContent className="p-4">
+                            {isVeryClose && (
+                              <div className="mb-3 p-2 bg-green-100 border border-green-300 rounded-lg">
+                                <p className="text-sm font-semibold text-green-800 flex items-center">
+                                  🎯 Çok Yakın Sipariş - 1km İçinde!
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="flex justify-between items-start mb-3">
+                              <div>
+                                <h3 className="font-semibold text-lg flex items-center gap-2">
+                                  🏪 {order.business_name}
+                                  {order.priority === 'high' && (
+                                    <Badge className="bg-red-500 text-white text-xs">🔥 Yüksek Ücret</Badge>
+                                  )}
+                                </h3>
+                                <p className="text-sm text-gray-600">📍 {order.pickup_address?.address}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-green-600 text-lg">₺{order.total_amount}</p>
+                                <p className="text-sm text-purple-600 font-medium">
+                                  +₺{(order.total_amount * 0.05).toFixed(2)} komisyon
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
+                              <div>
+                                <span className="font-medium">📍 Mesafe:</span>
+                                <span className={isVeryClose ? 'text-green-600 font-bold ml-1' : 'ml-1'}>
+                                  {courierLocation && order.pickup_address ?
+                                    `${calculateDistance(
+                                      courierLocation.lat, courierLocation.lng,
+                                      order.pickup_address.lat, order.pickup_address.lng
+                                    ).toFixed(1)} km` :
+                                    <span className="text-orange-600">Konum bekleniyor...</span>}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="font-medium">👤 Müşteri:</span>
+                                <span className="ml-1">{order.customer_name || 'Müşteri'}</span>
+                              </div>
+                            </div>
+
+                            <div className="mb-3 p-2 bg-gray-50 rounded">
+                              <p className="text-sm">
+                                <strong>🏠 Teslimat:</strong> {order.delivery_address?.address || 'Teslimat adresi'}
+                              </p>
+                            </div>
+
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => acceptOrder(order.id)}
+                                disabled={!isOnline}
+                                className={`flex-1 ${
+                                  isVeryClose ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+                                }`}
+                              >
+                                {isVeryClose ? '🎯 Hemen Kabul Et!' : '✅ Kabul Et'}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="px-3"
+                                onClick={() => {
+                                  if (order.pickup_address?.lat && order.pickup_address?.lng) {
+                                    const mapsUrl = `https://www.google.com/maps/dir/${courierLocation?.lat || 41.0082},${courierLocation?.lng || 28.9784}/${order.pickup_address.lat},${order.pickup_address.lng}`;
+                                    window.open(mapsUrl, '_blank');
+                                  }
+                                }}
+                              >
+                                🗺️ Yol Tarifi
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Online Status Warning */}
             {!isOnline && (
               <Card className="border-red-200 bg-red-50">
