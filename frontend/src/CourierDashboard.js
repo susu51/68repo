@@ -1012,10 +1012,12 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 ))
               )}
             </div>
+            </div>
           )}
 
           {/* Earnings Content */}
           {activeTab === 'earnings' && (
+            <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Kazanç Raporu</h2>
               
