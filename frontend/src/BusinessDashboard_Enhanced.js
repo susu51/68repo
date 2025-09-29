@@ -547,7 +547,491 @@ export const BusinessDashboard = ({ user, onLogout }) => {
             <TabsTrigger value="settings">⚙️ Ayarlar</TabsTrigger>
           </TabsList>
 
-          {/* Orders Tab - İlk kısmı buraya kadar */}
+          {/* Orders Tab */}
+          <TabsContent value="orders" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">Sipariş Yönetimi</h2>
+              <Button onClick={fetchIncomingOrders} variant="outline" size="sm">
+                🔄 Yenile
+              </Button>
+            </div>
+
+            {!restaurantStatus.isOpen && (
+              <Card className="border-orange-200 bg-orange-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="text-orange-600">⚠️</div>
+                    <div>
+                      <p className="font-semibold text-orange-800">Restoran Kapalı</p>
+                      <p className="text-orange-600">Yeni sipariş alamazsınız. Restoranı açmak için yukarıdaki butonu kullanın.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Incoming Orders */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <span>🔔 Gelen Siparişler</span>
+                  {unprocessedCount > 0 && (
+                    <Badge className="bg-red-600">{unprocessedCount} Bekliyor</Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {incomingOrders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">Şu anda bekleyen sipariş yok</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {incomingOrders.map((order) => (
+                      <Card key={order.id} className="border-blue-200 bg-blue-50">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h3 className="font-semibold">Sipariş #{order.order_number}</h3>
+                                <Badge variant="secondary">{order.status}</Badge>
+                                <Badge className="bg-green-600">₺{order.total_amount}</Badge>
+                              </div>
+                              
+                              <p className="text-sm text-gray-600 mb-2">
+                                👤 {order.customer_name} • 📞 {order.customer_phone}
+                              </p>
+                              
+                              <p className="text-sm text-gray-600 mb-3">
+                                📍 {order.delivery_address}
+                              </p>
+                              
+                              <div className="space-y-1">
+                                {order.items?.map((item, index) => (
+                                  <div key={index} className="flex justify-between text-sm">
+                                    <span>{item.quantity}x {item.name}</span>
+                                    <span>₺{(item.price * item.quantity).toFixed(2)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              <p className="text-xs text-gray-500 mt-2">
+                                🕐 {new Date(order.created_at).toLocaleString('tr-TR')}
+                              </p>
+                            </div>
+                            
+                            <div className="ml-4 space-y-2">
+                              <Button
+                                onClick={() => acceptOrder(order.id)}
+                                className="w-full bg-green-600 hover:bg-green-700"
+                                size="sm"
+                              >
+                                ✅ Kabul Et
+                              </Button>
+                              <Button
+                                onClick={() => rejectOrder(order.id)}
+                                variant="outline"
+                                className="w-full border-red-200 text-red-600 hover:bg-red-50"
+                                size="sm"
+                              >
+                                ❌ Reddet
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Active Orders */}
+            <Card>
+              <CardHeader>
+                <CardTitle>🔥 Aktif Siparişler</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {activeOrders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">Şu anda aktif sipariş yok</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {activeOrders.map((order) => (
+                      <Card key={order.id} className="border-green-200 bg-green-50">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h3 className="font-semibold">Sipariş #{order.order_number}</h3>
+                                <Badge variant={
+                                  order.status === 'preparing' ? 'default' :
+                                  order.status === 'ready' ? 'secondary' :
+                                  'outline'
+                                }>
+                                  {order.status === 'preparing' ? '👨‍🍳 Hazırlanıyor' :
+                                   order.status === 'ready' ? '✅ Hazır' :
+                                   order.status === 'picked_up' ? '🚚 Kuryede' : order.status}
+                                </Badge>
+                              </div>
+                              
+                              <p className="text-sm text-gray-600">
+                                👤 {order.customer_name} • ₺{order.total_amount}
+                              </p>
+                              
+                              <p className="text-xs text-gray-500 mt-1">
+                                ⏱️ {Math.floor((Date.now() - new Date(order.created_at)) / 60000)} dakika önce
+                              </p>
+                            </div>
+                            
+                            <div className="ml-4 space-y-2">
+                              {order.status === 'accepted' && (
+                                <Button
+                                  onClick={() => updateOrderStatus(order.id, 'preparing')}
+                                  className="w-full bg-orange-600 hover:bg-orange-700"
+                                  size="sm"
+                                >
+                                  👨‍🍳 Hazırla
+                                </Button>
+                              )}
+                              {order.status === 'preparing' && (
+                                <Button
+                                  onClick={() => updateOrderStatus(order.id, 'ready')}
+                                  className="w-full bg-green-600 hover:bg-green-700"
+                                  size="sm"
+                                >
+                                  ✅ Hazır
+                                </Button>
+                              )}
+                              {order.status === 'ready' && (
+                                <div className="text-center">
+                                  <Badge className="bg-blue-600">🚚 Kurye Bekleniyor</Badge>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Menu Tab */}
+          <TabsContent value="menu" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">Menü Yönetimi</h2>
+              <Button 
+                onClick={() => {
+                  setEditingProduct(null);
+                  setProductForm({
+                    name: '',
+                    description: '',
+                    price: '',
+                    category: 'food',
+                    preparation_time: 15,
+                    is_available: true,
+                    image_url: ''
+                  });
+                  setShowProductModal(true);
+                }}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                ➕ Yeni Ürün Ekle
+              </Button>
+            </div>
+
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.map((product) => (
+                <Card key={product.id} className={`hover:shadow-lg transition-shadow ${!product.is_available ? 'opacity-60' : ''}`}>
+                  <CardContent className="p-4">
+                    {product.image_url && (
+                      <img 
+                        src={product.image_url} 
+                        alt={product.name}
+                        className="w-full h-32 object-cover rounded-lg mb-3"
+                      />
+                    )}
+                    
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-lg">{product.name}</h3>
+                      <Badge variant={product.is_available ? 'default' : 'secondary'}>
+                        {product.is_available ? '✅ Stokta' : '❌ Tükendi'}
+                      </Badge>
+                    </div>
+                    
+                    <p className="text-gray-600 text-sm mb-2">{product.description}</p>
+                    
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-lg font-bold text-green-600">₺{product.price}</span>
+                      <Badge variant="outline">{product.category === 'food' ? 'Yiyecek' : 'İçecek'}</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                      <span>⏱️ {product.preparation_time || 15} dk</span>
+                      <span>🔥 {product.order_count || 0} sipariş</span>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <Button
+                        onClick={() => openEditProduct(product)}
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                      >
+                        ✏️ Düzenle
+                      </Button>
+                      <Button
+                        onClick={() => toggleProductAvailability(product.id, !product.is_available)}
+                        variant="outline"
+                        size="sm"
+                        className={`flex-1 ${product.is_available ? 'border-red-200 text-red-600' : 'border-green-200 text-green-600'}`}
+                      >
+                        {product.is_available ? '❌' : '✅'}
+                      </Button>
+                      <Button
+                        onClick={() => deleteProduct(product.id)}
+                        variant="outline"
+                        size="sm"
+                        className="border-red-200 text-red-600 hover:bg-red-50"
+                      >
+                        🗑️
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Product Modal */}
+            {showProductModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                  <h3 className="text-lg font-semibold mb-4">
+                    {editingProduct ? 'Ürün Düzenle' : 'Yeni Ürün Ekle'}
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="product-name">Ürün Adı</Label>
+                      <Input
+                        id="product-name"
+                        value={productForm.name}
+                        onChange={(e) => setProductForm(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Örn: Margherita Pizza"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="product-description">Açıklama</Label>
+                      <Textarea
+                        id="product-description"
+                        value={productForm.description}
+                        onChange={(e) => setProductForm(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Ürün açıklaması..."
+                        rows={3}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="product-price">Fiyat (₺)</Label>
+                        <Input
+                          id="product-price"
+                          type="number"
+                          value={productForm.price}
+                          onChange={(e) => setProductForm(prev => ({ ...prev, price: e.target.value }))}
+                          placeholder="0.00"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="product-prep-time">Hazırlık Süresi (dk)</Label>
+                        <Input
+                          id="product-prep-time"
+                          type="number"
+                          value={productForm.preparation_time}
+                          onChange={(e) => setProductForm(prev => ({ ...prev, preparation_time: parseInt(e.target.value) }))}
+                          min="1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="product-category">Kategori</Label>
+                      <Select 
+                        value={productForm.category} 
+                        onValueChange={(value) => setProductForm(prev => ({ ...prev, category: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Kategori seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="food">Yiyecek</SelectItem>
+                          <SelectItem value="drink">İçecek</SelectItem>
+                          <SelectItem value="dessert">Tatlı</SelectItem>
+                          <SelectItem value="appetizer">Meze</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="product-image">Görsel URL</Label>
+                      <Input
+                        id="product-image"
+                        value={productForm.image_url}
+                        onChange={(e) => setProductForm(prev => ({ ...prev, image_url: e.target.value }))}
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="product-available"
+                        checked={productForm.is_available}
+                        onChange={(e) => setProductForm(prev => ({ ...prev, is_available: e.target.checked }))}
+                        className="rounded border-gray-300"
+                      />
+                      <Label htmlFor="product-available">Stokta mevcut</Label>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowProductModal(false);
+                        setEditingProduct(null);
+                      }}
+                    >
+                      İptal
+                    </Button>
+                    <Button onClick={saveProduct}>
+                      {editingProduct ? '💾 Güncelle' : '➕ Ekle'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <h2 className="text-xl font-bold">📊 Raporlar & İstatistikler</h2>
+
+            {/* Revenue Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+                <CardContent className="p-6 text-center">
+                  <p className="text-3xl font-bold mb-2">₺{stats.todayRevenue.toFixed(2)}</p>
+                  <p className="text-green-100">Bugün</p>
+                  <p className="text-xs text-green-200 mt-1">
+                    {stats.todayOrders} sipariş
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                <CardContent className="p-6 text-center">
+                  <p className="text-3xl font-bold mb-2">₺{stats.weeklyRevenue.toFixed(2)}</p>
+                  <p className="text-blue-100">Bu Hafta</p>
+                  <p className="text-xs text-blue-200 mt-1">
+                    {stats.weeklyOrders} sipariş
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                <CardContent className="p-6 text-center">
+                  <p className="text-3xl font-bold mb-2">₺{stats.monthlyRevenue.toFixed(2)}</p>
+                  <p className="text-purple-100">Bu Ay</p>
+                  <p className="text-xs text-purple-200 mt-1">
+                    {stats.monthlyOrders} sipariş
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+                <CardContent className="p-6 text-center">
+                  <p className="text-3xl font-bold mb-2">₺{stats.totalRevenue.toFixed(2)}</p>
+                  <p className="text-orange-100">Toplam</p>
+                  <p className="text-xs text-orange-200 mt-1">
+                    {stats.totalOrders} sipariş
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Performance Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle>📈 İşletme Performansı</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-blue-600">₺{stats.averageOrderValue.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">Ortalama Sipariş Tutarı</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-1">
+                      <p className="text-2xl font-bold text-yellow-600">{stats.customerRating}</p>
+                      <span className="text-yellow-500">⭐</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Müşteri Memnuniyeti</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-600">₺{(stats.monthlyRevenue * 0.95).toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">Aylık Net Kazanç (%5 komisyon sonrası)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <h2 className="text-xl font-bold">⚙️ Restoran Ayarları</h2>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>📊 Mevcut Durum</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <p className={`text-2xl font-bold ${restaurantStatus.isOpen ? 'text-green-600' : 'text-red-600'}`}>
+                      {restaurantStatus.isOpen ? '🟢 Açık' : '🔴 Kapalı'}
+                    </p>
+                    <p className="text-sm text-gray-600">Restoran Durumu</p>
+                  </div>
+                  <div className="text-center">
+                    <p className={`text-2xl font-bold ${restaurantStatus.isAcceptingOrders ? 'text-green-600' : 'text-orange-600'}`}>
+                      {restaurantStatus.isAcceptingOrders ? '✅ Alıyor' : '⏸️ Durdu'}
+                    </p>
+                    <p className="text-sm text-gray-600">Sipariş Durumu</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-semibold mb-2">💡 İpuçları</h3>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Yoğun saatlerde siparişleri hızlı kabul edin</li>
+                    <li>• Ürün stok durumlarını güncel tutun</li>
+                    <li>• Müşteri memnuniyeti için teslimat sürelerini kısa tutun</li>
+                    <li>• Popüler ürünlerinizi öne çıkarın</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
