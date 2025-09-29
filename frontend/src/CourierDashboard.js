@@ -733,6 +733,123 @@ export const CourierDashboard = ({ user, onLogout }) => {
               </Card>
             )}
 
+            {/* Interactive Map with Orders */}
+            {courierLocation && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Map Section */}
+                <Card>
+                  <CardContent className="p-0">
+                    <div style={{ height: '400px', width: '100%' }}>
+                      {typeof window !== 'undefined' && (
+                        <LeafletMap
+                          center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [41.0082, 28.9784]}
+                          zoom={13}
+                          height="400px"
+                          markers={mapMarkers || []}
+                          courierMode={true}
+                          routePolyline={routePolyline}
+                          className="rounded-lg w-full h-full"
+                        />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Orders Control Panel */}
+                <div className="space-y-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <span className="mr-2">🎯</span>
+                        Sipariş Kontrol Paneli
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">{nearbyOrders.length}</div>
+                          <div className="text-sm text-gray-600">Mevcut Sipariş</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-600">{currentOrder ? 1 : 0}</div>
+                          <div className="text-sm text-gray-600">Aktif Teslimat</div>
+                        </div>
+                        <div className="text-center">
+                          <div className={`text-2xl font-bold ${isOnline ? 'text-green-600' : 'text-gray-400'}`}>
+                            {isOnline ? 'Çevrimiçi' : 'Çevrimdışı'}
+                          </div>
+                          <div className="text-sm text-gray-600">Durum</div>
+                        </div>
+                      </div>
+                      
+                      {currentOrder && (
+                        <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                          <h4 className="font-semibold text-blue-800 mb-2">
+                            📦 Aktif Teslimat: {currentOrder.business_name}
+                          </h4>
+                          <p className="text-sm text-blue-700 mb-2">
+                            👤 Müşteri: {currentOrder.customer_name}
+                          </p>
+                          <div className="flex space-x-2">
+                            {currentOrder.status === 'accepted' && (
+                              <Button
+                                onClick={() => updateOrderStatus(currentOrder.id, 'picked_up')}
+                                className="bg-orange-600 hover:bg-orange-700"
+                                size="sm"
+                              >
+                                📤 Teslim Aldım
+                              </Button>
+                            )}
+                            {currentOrder.status === 'picked_up' && (
+                              <Button
+                                onClick={() => updateOrderStatus(currentOrder.id, 'on_way')}
+                                className="bg-yellow-600 hover:bg-yellow-700"
+                                size="sm"
+                              >
+                                🚗 Yola Çıktım
+                              </Button>
+                            )}
+                            {currentOrder.status === 'on_way' && (
+                              <Button
+                                onClick={() => updateOrderStatus(currentOrder.id, 'delivered')}
+                                className="bg-green-600 hover:bg-green-700"
+                                size="sm"
+                              >
+                                ✅ Teslim Ettim
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Quick Actions */}
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold mb-3">🚀 Hızlı İşlemler</h4>
+                      <div className="space-y-2">
+                        <Button
+                          onClick={() => setActiveTab('history')}
+                          variant="outline"
+                          className="w-full justify-start"
+                        >
+                          📚 Teslimat Geçmişi
+                        </Button>
+                        <Button
+                          onClick={() => setActiveTab('earnings')}
+                          variant="outline"
+                          className="w-full justify-start"
+                        >
+                          💰 Kazanç Raporu
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+
             {/* Online Status Warning */}
             {!isOnline && (
               <Card className="border-red-200 bg-red-50">
