@@ -4483,7 +4483,7 @@ async def admin_simple_login():
     
     # Generate admin token
     token_data = {
-        "sub": "admin",
+        "sub": "admin@kuryecini.com",  # Fixed: use email as subject
         "role": "admin",
         "email": "admin@kuryecini.com",
         "exp": datetime.now(timezone.utc) + timedelta(hours=24)
