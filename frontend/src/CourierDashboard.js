@@ -707,6 +707,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
           {/* Orders Content */}
           {activeTab === 'orders' && (
+            <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Yakındaki Siparişler</h2>
               <Button onClick={fetchNearbyOrders} variant="outline" size="sm">
