@@ -4036,6 +4036,216 @@ async def get_courier_messages(current_user: dict = Depends(get_current_user)):
         logging.error(f"Error fetching messages: {e}")
         raise HTTPException(status_code=500, detail="Mesajlar yüklenemedi")
 
+# ADDITIONAL COURIER ENDPOINTS
+
+@api_router.post("/courier/location/update")
+async def update_courier_location(location_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update courier's current location"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        await db.users.update_one(
+            {"id": current_user["id"]},
+            {"$set": {
+                "current_location": {
+                    "lat": location_data.get("lat"),
+                    "lng": location_data.get("lng")
+                },
+                "location_updated_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        return {"status": "Location updated successfully"}
+        
+    except Exception as e:
+        logging.error(f"Error updating location: {e}")
+        raise HTTPException(status_code=500, detail="Konum güncellenemedi")
+
+@api_router.get("/courier/earnings")
+async def get_courier_earnings(current_user: dict = Depends(get_current_user)):
+    """Get courier earnings breakdown"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        # Get completed orders for earnings calculation
+        completed_orders = await db.orders.find({
+            "courier_id": current_user["id"],
+            "status": "delivered"
+        }).to_list(length=None)
+        
+        # Calculate earnings
+        now = datetime.now(timezone.utc)
+        today = now.date()
+        week_start = today - timedelta(days=today.weekday())
+        month_start = today.replace(day=1)
+        
+        daily_earnings = 0
+        weekly_earnings = 0
+        monthly_earnings = 0
+        total_earnings = 0
+        
+        for order in completed_orders:
+            if order.get("delivered_at"):
+                commission = order.get("commission_amount", order.get("total_amount", 0) * 0.05)
+                total_earnings += commission
+                
+                # Convert datetime for comparison
+                delivered_date = order["delivered_at"]
+                if isinstance(delivered_date, str):
+                    delivered_date = datetime.fromisoformat(delivered_date).date()
+                elif hasattr(delivered_date, 'date'):
+                    delivered_date = delivered_date.date()
+                
+                if delivered_date == today:
+                    daily_earnings += commission
+                if delivered_date >= week_start:
+                    weekly_earnings += commission
+                if delivered_date >= month_start:
+                    monthly_earnings += commission
+        
+        return {
+            "daily": daily_earnings,
+            "weekly": weekly_earnings,
+            "monthly": monthly_earnings,
+            "total": total_earnings
+        }
+        
+    except Exception as e:
+        logging.error(f"Error calculating earnings: {e}")
+        raise HTTPException(status_code=500, detail="Kazanç bilgisi alınamadı")
+
+@api_router.get("/courier/stats")
+async def get_courier_stats(current_user: dict = Depends(get_current_user)):
+    """Get courier statistics"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        # Get all courier orders
+        all_orders = await db.orders.find({
+            "courier_id": current_user["id"]
+        }).to_list(length=None)
+        
+        completed_orders = [o for o in all_orders if o.get("status") == "delivered"]
+        cancelled_orders = [o for o in all_orders if o.get("status") == "cancelled"]
+        
+        # Calculate average delivery time
+        total_delivery_time = 0
+        delivery_count = 0
+        
+        for order in completed_orders:
+            if order.get("accepted_at") and order.get("delivered_at"):
+                accepted = order["accepted_at"]
+                delivered = order["delivered_at"]
+                
+                if isinstance(accepted, str):
+                    accepted = datetime.fromisoformat(accepted)
+                if isinstance(delivered, str):
+                    delivered = datetime.fromisoformat(delivered)
+                    
+                delivery_time = (delivered - accepted).total_seconds() / 60  # minutes
+                total_delivery_time += delivery_time
+                delivery_count += 1
+        
+        avg_delivery_time = total_delivery_time / delivery_count if delivery_count > 0 else 0
+        
+        # Get courier rating (mock for now)
+        rating = 4.5  # Mock rating - could be calculated from actual ratings
+        
+        return {
+            "totalOrders": len(all_orders),
+            "completedOrders": len(completed_orders),
+            "cancelledOrders": len(cancelled_orders),
+            "avgDeliveryTime": round(avg_delivery_time),
+            "rating": rating,
+            "totalDistance": 150  # Mock distance - would need GPS tracking
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting stats: {e}")
+        raise HTTPException(status_code=500, detail="İstatistik bilgisi alınamadı")
+
+@api_router.get("/courier/profile")
+async def get_courier_profile(current_user: dict = Depends(get_current_user)):
+    """Get courier profile"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        courier = await db.users.find_one({"id": current_user["id"]})
+        if not courier:
+            raise HTTPException(status_code=404, detail="Courier not found")
+        
+        profile = {
+            "firstName": courier.get("first_name", ""),
+            "lastName": courier.get("last_name", ""),
+            "phone": courier.get("phone", ""),
+            "email": courier.get("email", ""),
+            "iban": courier.get("iban", ""),
+            "workingHours": courier.get("working_hours", {
+                "start": "09:00",
+                "end": "22:00",
+                "workDays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+            }),
+            "notifications": courier.get("notifications", {
+                "sound": True,
+                "push": True,
+                "email": False
+            })
+        }
+        
+        return profile
+        
+    except Exception as e:
+        logging.error(f"Error getting profile: {e}")
+        raise HTTPException(status_code=500, detail="Profil bilgisi alınamadı")
+
+@api_router.put("/courier/profile")
+async def update_courier_profile(profile_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update courier profile"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    try:
+        update_data = {}
+        
+        if "firstName" in profile_data:
+            update_data["first_name"] = profile_data["firstName"]
+        if "lastName" in profile_data:
+            update_data["last_name"] = profile_data["lastName"]
+        if "phone" in profile_data:
+            update_data["phone"] = profile_data["phone"]
+        if "iban" in profile_data:
+            update_data["iban"] = profile_data["iban"]
+        if "workingHours" in profile_data:
+            update_data["working_hours"] = profile_data["workingHours"]
+        if "notifications" in profile_data:
+            update_data["notifications"] = profile_data["notifications"]
+        
+        update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        await db.users.update_one(
+            {"id": current_user["id"]},
+            {"$set": update_data}
+        )
+        
+        return {"message": "Profil güncellendi"}
+        
+    except Exception as e:
+        logging.error(f"Error updating profile: {e}")
+        raise HTTPException(status_code=500, detail="Profil güncellenemedi")
+
+@api_router.get("/courier/report/{report_type}")
+async def generate_courier_report(report_type: str, current_user: dict = Depends(get_current_user)):
+    """Generate courier report (PDF)"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Courier access required")
+    
+    # Mock PDF generation - would need actual PDF library
+    return {"message": "Report generation not implemented yet"}
+
 # ADMIN COURIER MESSAGING
 
 @api_router.post("/admin/courier/message")
