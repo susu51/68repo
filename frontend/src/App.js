@@ -3262,40 +3262,84 @@ const CustomerDashboard = ({ user }) => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Modern Tab Navigation */}
+        {/* Organized Tab Navigation */}
         <div className="mb-8">
-          <div className="flex space-x-2 sm:space-x-4 p-2 bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50">
-            {[
-              { id: 'campaigns', icon: '🎉', label: 'Kampanyalar', count: campaigns.length },
-              { id: 'products', icon: '🍽️', label: 'Keşfet', count: products.length },
-              { id: 'loyalty', icon: '⭐', label: 'Puanlarım', count: loyaltyPoints.total_points },
-              { id: 'cart', icon: '🛒', label: 'Sepet', count: cart.length },
-              { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length },
-              { id: 'profile', icon: '👤', label: 'Profilim', count: null }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  flex items-center space-x-2 px-3 sm:px-6 py-3 rounded-xl transition-all duration-300 text-sm sm:text-base font-medium
-                  ${activeTab === tab.id 
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg transform scale-105' 
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-                  }
-                `}
-              >
-                <span className="text-lg sm:text-xl">{tab.icon}</span>
-                <span className="hidden sm:inline">{tab.label}</span>
-                {tab.count !== null && tab.count > 0 && (
-                  <span className={`
-                    text-xs px-2 py-1 rounded-full font-semibold
-                    ${activeTab === tab.id ? 'bg-white/20' : 'bg-indigo-100 text-indigo-600'}
-                  `}>
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            ))}
+          {/* Primary Actions - Main Tabs */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-1 mb-4">
+            <div className="grid grid-cols-4 gap-1">
+              {[
+                { id: 'products', icon: '🍽️', label: 'Keşfet', count: products.length, desc: 'Restoranları keşfedin' },
+                { id: 'cart', icon: '🛒', label: 'Sepet', count: cart.length, desc: 'Sipariş verin' },
+                { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length, desc: 'Siparişleriniz' },
+                { id: 'profile', icon: '👤', label: 'Hesabım', count: null, desc: 'Profil & Ayarlar' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    relative flex flex-col items-center justify-center p-4 rounded-lg transition-all duration-200 text-center
+                    ${activeTab === tab.id 
+                      ? 'bg-orange-500 text-white shadow-md' 
+                      : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                    }
+                  `}
+                >
+                  <div className="flex items-center justify-center mb-1">
+                    <span className="text-xl">{tab.icon}</span>
+                    {tab.count !== null && tab.count > 0 && (
+                      <span className={`
+                        absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center 
+                        text-xs px-1.5 rounded-full font-bold text-white
+                        ${activeTab === tab.id ? 'bg-white/20' : 'bg-red-500'}
+                      `}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium">{tab.label}</span>
+                  <span className="text-xs opacity-75 mt-0.5 hidden sm:block">{tab.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Secondary Actions - Quick Access Bar */}
+          <div className="flex items-center justify-center space-x-4">
+            <button
+              onClick={() => setActiveTab('campaigns')}
+              className={`
+                flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 text-sm
+                ${activeTab === 'campaigns' 
+                  ? 'bg-purple-500 text-white shadow-md' 
+                  : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                }
+              `}
+            >
+              <span>🎉</span>
+              <span>Kampanyalar</span>
+              {campaigns.length > 0 && (
+                <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
+                  {campaigns.length}
+                </span>
+              )}
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('loyalty')}
+              className={`
+                flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 text-sm
+                ${activeTab === 'loyalty' 
+                  ? 'bg-yellow-500 text-white shadow-md' 
+                  : 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
+                }
+              `}
+            >
+              <span>⭐</span>
+              <span>Puanlarım</span>
+              <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
+                {loyaltyPoints.total_points}
+              </span>
+            </button>
           </div>
         </div>
 
