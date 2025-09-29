@@ -1721,69 +1721,69 @@ async def register_courier(courier_data: CourierRegister, request: Request):
 #     current_user_id: str = Depends(get_admin_user)
 # ):
 #     """Tüm kullanıcıları listele"""
-    query = {}
-    if user_type:
-        query["user_type"] = user_type
-    if status:
-        query["status"] = status
-    
-    skip = (page - 1) * limit
-    users = await db.users.find(query).skip(skip).limit(limit).sort("created_at", -1).to_list(length=None)
-    total_count = await db.users.count_documents(query)
-    
-    # Enrich user data
-    enriched_users = []
-    for user in users:
-        user_info = {
-            "id": user["id"],
-            "email": user["email"],
-            "user_type": user["user_type"],
-            "status": user.get("status", "active"),
-            "created_at": user["created_at"],
-            "last_login": user.get("last_login")
-        }
-        
-        if user["user_type"] == "courier":
-            courier = await db.couriers.find_one({"user_id": user["id"]})
-            if courier:
-                balance = await db.courier_balances.find_one({"courier_id": courier["id"]})
-                user_info.update({
-                    "name": f"{courier['first_name']} {courier['last_name']}",
-                    "city": courier["city"],
-                    "vehicle_type": courier["vehicle_type"],
-                    "kyc_status": courier["kyc_status"],
-                    "is_online": courier.get("is_online", False),
-                    "total_deliveries": balance.get("total_deliveries", 0) if balance else 0,
-                    "total_earnings": balance.get("total_earnings", 0) if balance else 0
-                })
-        elif user["user_type"] == "business":
-            business = await db.businesses.find_one({"user_id": user["id"]})
-            if business:
-                user_info.update({
-                    "business_name": business["business_name"],
-                    "city": business["city"],
-                    "category": business["business_category"],
-                    "is_open": business.get("is_open", False)
-                })
-        elif user["user_type"] == "customer":
-            customer = await db.customers.find_one({"user_id": user["id"]})
-            if customer:
-                user_info.update({
-                    "name": f"{customer['first_name']} {customer['last_name']}",
-                    "city": customer["city"]
-                })
-        
-        enriched_users.append(user_info)
-    
-    return {
-        "users": enriched_users,
-        "pagination": {
-            "page": page,
-            "limit": limit,
-            "total": total_count,
-            "pages": math.ceil(total_count / limit)
-        }
-    }
+#     query = {}
+#     if user_type:
+#         query["user_type"] = user_type
+#     if status:
+#         query["status"] = status
+#     
+#     skip = (page - 1) * limit
+#     users = await db.users.find(query).skip(skip).limit(limit).sort("created_at", -1).to_list(length=None)
+#     total_count = await db.users.count_documents(query)
+#     
+#     # Enrich user data
+#     enriched_users = []
+#     for user in users:
+#         user_info = {
+#             "id": user["id"],
+#             "email": user["email"],
+#             "user_type": user["user_type"],
+#             "status": user.get("status", "active"),
+#             "created_at": user["created_at"],
+#             "last_login": user.get("last_login")
+#         }
+#         
+#         if user["user_type"] == "courier":
+#             courier = await db.couriers.find_one({"user_id": user["id"]})
+#             if courier:
+#                 balance = await db.courier_balances.find_one({"courier_id": courier["id"]})
+#                 user_info.update({
+#                     "name": f"{courier['first_name']} {courier['last_name']}",
+#                     "city": courier["city"],
+#                     "vehicle_type": courier["vehicle_type"],
+#                     "kyc_status": courier["kyc_status"],
+#                     "is_online": courier.get("is_online", False),
+#                     "total_deliveries": balance.get("total_deliveries", 0) if balance else 0,
+#                     "total_earnings": balance.get("total_earnings", 0) if balance else 0
+#                 })
+#         elif user["user_type"] == "business":
+#             business = await db.businesses.find_one({"user_id": user["id"]})
+#             if business:
+#                 user_info.update({
+#                     "business_name": business["business_name"],
+#                     "city": business["city"],
+#                     "category": business["business_category"],
+#                     "is_open": business.get("is_open", False)
+#                 })
+#         elif user["user_type"] == "customer":
+#             customer = await db.customers.find_one({"user_id": user["id"]})
+#             if customer:
+#                 user_info.update({
+#                     "name": f"{customer['first_name']} {customer['last_name']}",
+#                     "city": customer["city"]
+#                 })
+#         
+#         enriched_users.append(user_info)
+#     
+#     return {
+#         "users": enriched_users,
+#         "pagination": {
+#             "page": page,
+#             "limit": limit,
+#             "total": total_count,
+#             "pages": math.ceil(total_count / limit)
+#         }
+#     }
 
 @api_router.post("/admin/users/{user_id}/update-status")
 async def update_user_status(
