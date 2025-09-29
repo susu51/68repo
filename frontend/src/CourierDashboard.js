@@ -1226,9 +1226,11 @@ export const CourierDashboard = ({ user, onLogout }) => {
                         { key: 'sunday', label: 'Pazar' }
                       ].map((day) => (
                         <div key={day.key} className="flex items-center space-x-2">
-                          <Switch
+                          <input
+                            type="checkbox"
                             checked={profile.workingHours.workDays.includes(day.key)}
-                            onCheckedChange={(checked) => {
+                            onChange={(e) => {
+                              const checked = e.target.checked;
                               setProfile(prev => ({
                                 ...prev,
                                 workingHours: {
@@ -1239,6 +1241,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
                                 }
                               }));
                             }}
+                            className="rounded border-gray-300"
                           />
                           <span className="text-sm">{day.label}</span>
                         </div>
