@@ -16,6 +16,8 @@ import { KuryeciniTextLogo } from "./components/KuryeciniLogo";
 import { AdCarousel } from "./components/AdCarousel";
 import { LocationControls } from "./components/LocationControls";
 import { CourierDashboard } from "./CourierDashboard";
+import { EnhancedBusinessDashboard } from "./EnhancedBusinessDashboard";
+import { EnhancedAdminPanel } from "./EnhancedAdminPanel";
 
 // Components
 import { Button } from "./components/ui/button";
