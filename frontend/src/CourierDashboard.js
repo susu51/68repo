@@ -716,7 +716,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
                           <p className="text-blue-600">1km yakınınızdaki siparişler için bildirim alacaksınız</p>
                         </div>
                       </div>
-                    </div>
+                    </CardContent>
                   </Card>
                 )}
 
