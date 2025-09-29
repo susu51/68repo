@@ -886,10 +886,10 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 })}
               </div>
             )}
-          </TabsContent>
+          )}
 
-          {/* History Tab */}
-          <TabsContent value="history" className="space-y-4">
+          {/* History Content */}
+          {activeTab === 'history' && (
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Sipariş Geçmişi</h2>
               
