@@ -3912,8 +3912,30 @@ const CustomerDashboard = ({ user }) => {
 
           {/* Products Tab - Professional Food Order System */}
           {activeTab === 'products' && (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <ProfessionalFoodOrderSystem key="food-order-system" />
+            <div className="space-y-4">
+              {/* Location Controls */}
+              <LocationControls 
+                onLocationChange={(location) => {
+                  setUserLocation(location);
+                  if (location.city) {
+                    setSelectedCity(location.city);
+                  }
+                }}
+                currentLocation={userLocation}
+                locationMode={locationFilter}
+                onLocationModeChange={setLocationFilter}
+              />
+              
+              {/* Professional Food Order System */}
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <ProfessionalFoodOrderSystem 
+                  key="food-order-system"
+                  user={user}
+                  locationFilter={locationFilter}
+                  userLocation={userLocation}
+                  selectedCity={selectedCity}
+                />
+              </div>
             </div>
           )}
 
