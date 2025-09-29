@@ -10,52 +10,45 @@ const API = `${BACKEND_URL}/api`;
 
 // Courier Nearby Orders Component (Original from GitHub - City-wide with Notifications)
 export const CourierDashboard = ({ user, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('orders');
-  const [loading, setLoading] = useState(false);
-  const [isOnline, setIsOnline] = useState(user?.is_online || false);
-  
-  // Orders states
-  const [availableOrders, setAvailableOrders] = useState([]);
-  const [orderHistory, setOrderHistory] = useState([]);
-  const [currentOrder, setCurrentOrder] = useState(null);
-  
-  // Map states
+  const [nearbyOrders, setNearbyOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [courierLocation, setCourierLocation] = useState(null);
-  const [mapMarkers, setMapMarkers] = useState([]);
-  const [routePolyline, setRoutePolyline] = useState(null);
-  
-  // Notifications and messages
-  const [notifications, setNotifications] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  
-  // Filters
-  const [historyFilter, setHistoryFilter] = useState({
-    status: 'all',
-    date: 'all'
-  });
-
-  // Stats
-  const [stats, setStats] = useState({
-    totalOrders: 0,
-    totalEarnings: 0,
-    monthlyOrders: 0,
-    monthlyEarnings: 0
-  });
+  const [locationError, setLocationError] = useState(null);
+  const [lastNotificationTime, setLastNotificationTime] = useState(0);
+  const [isMounted, setIsMounted] = useState(true);
 
   useEffect(() => {
-    fetchInitialData();
-    const interval = setInterval(fetchAvailableOrders, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
+    setIsMounted(true);
+    // First get location, then fetch orders
+    startLocationTracking();
+
+    // Fetch orders every 30 seconds, but only after we have location
+    const ordersInterval = setInterval(() => {
+      if (courierLocation && isMounted) {
+        fetchNearbyOrders();
+      }
+    }, 30000);
+
+    // Update location every 3 minutes
+    const locationInterval = setInterval(() => {
+      if (isMounted) {
+        updateLocation();
+      }
+    }, 180000);
+
+    return () => {
+      setIsMounted(false);
+      clearInterval(ordersInterval);
+      clearInterval(locationInterval);
+    };
   }, []);
 
+  // Fetch orders after location is obtained
   useEffect(() => {
-    if (isOnline) {
-      startLocationTracking();
-    } else {
-      stopLocationTracking();
+    if (courierLocation && isMounted) {
+      fetchNearbyOrders();
     }
-  }, [isOnline]);
+  }, [courierLocation, isMounted]);
 
   const fetchInitialData = async () => {
     await Promise.all([
