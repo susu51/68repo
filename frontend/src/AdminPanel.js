@@ -545,7 +545,7 @@ const AdminPanel = ({ user, onLogout }) => {
             Kuryelere önemli duyurular, güncellemeler ve bilgilendirmeler gönderebilirsiniz.
             Mesajlar kurye panelinde bildirim olarak görünecektir.
           </p>
-        </div>
+        </CardContent>
       </Card>
 
       {/* Message Modal */}
