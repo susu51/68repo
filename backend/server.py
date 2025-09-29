@@ -4104,10 +4104,541 @@ async def send_courier_message(message_data: dict, current_user: dict = Depends(
         logging.error(f"Error sending courier message: {e}")
         raise HTTPException(status_code=500, detail="Mesaj gönderilemedi")
 
+# BUSINESS PANEL ENHANCEMENTS
+
+@api_router.get("/business/restaurant-view")
+async def get_restaurant_public_view(current_user: dict = Depends(get_current_user)):
+    """Get public view data for restaurant (for 'View My Restaurant' feature)"""
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    try:
+        # Get business info
+        business = await db.users.find_one({"id": current_user["id"]})
+        if not business:
+            raise HTTPException(status_code=404, detail="Business not found")
+        
+        # Get products
+        products = await db.products.find({
+            "business_id": current_user["id"],
+            "is_available": True
+        }).to_list(length=None)
+        
+        # Convert ObjectIds and datetime fields
+        for product in products:
+            product["id"] = str(product["_id"])
+            del product["_id"]
+            if product.get("created_at"):
+                product["created_at"] = product["created_at"].isoformat() if hasattr(product["created_at"], 'isoformat') else product["created_at"]
+        
+        # Get ratings and reviews
+        ratings = await db.order_ratings.find({
+            "business_id": current_user["id"],
+            "business_rating": {"$ne": None}
+        }).to_list(length=None)
+        
+        avg_rating = sum(r["business_rating"] for r in ratings) / len(ratings) if ratings else 0
+        
+        # Check if featured
+        featured_status = await db.featured_businesses.find_one({
+            "business_id": current_user["id"],
+            "active": True,
+            "expires_at": {"$gt": datetime.now(timezone.utc)}
+        })
+        
+        restaurant_data = {
+            "business_info": {
+                "id": business["id"],
+                "business_name": business.get("business_name", ""),
+                "description": business.get("description", ""),
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "phone": business.get("phone", ""),
+                "email": business.get("email", ""),
+                "business_category": business.get("business_category", ""),
+                "average_rating": round(avg_rating, 1),
+                "total_ratings": len(ratings),
+                "is_featured": bool(featured_status)
+            },
+            "products": products,
+            "categories": list(set(p.get("category", "other") for p in products)),
+            "recent_reviews": [
+                {
+                    "rating": r["business_rating"],
+                    "comment": r.get("business_comment", ""),
+                    "created_at": r["created_at"].isoformat() if hasattr(r["created_at"], 'isoformat') else r["created_at"]
+                }
+                for r in sorted(ratings, key=lambda x: x.get("created_at", datetime.min), reverse=True)[:10]
+            ]
+        }
+        
+        return restaurant_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching restaurant view: {e}")
+        raise HTTPException(status_code=500, detail="Restaurant data could not be loaded")
+
+@api_router.get("/business/featured-status")
+async def get_featured_status(current_user: dict = Depends(get_current_user)):
+    """Get current featured status for business"""
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    try:
+        featured_record = await db.featured_businesses.find_one({
+            "business_id": current_user["id"],
+            "active": True,
+            "expires_at": {"$gt": datetime.now(timezone.utc)}
+        })
+        
+        if featured_record:
+            return {
+                "is_featured": True,
+                "plan": featured_record["plan"],
+                "expires_at": featured_record["expires_at"].isoformat() if hasattr(featured_record["expires_at"], 'isoformat') else featured_record["expires_at"],
+                "remaining_days": (featured_record["expires_at"] - datetime.now(timezone.utc)).days if hasattr(featured_record["expires_at"], 'days') else 0
+            }
+        else:
+            return {
+                "is_featured": False,
+                "available_plans": [
+                    {"id": "daily", "name": "1 Gün", "price": 50, "duration_days": 1},
+                    {"id": "weekly", "name": "1 Hafta", "price": 300, "duration_days": 7},
+                    {"id": "monthly", "name": "1 Ay", "price": 1000, "duration_days": 30}
+                ]
+            }
+    except Exception as e:
+        logging.error(f"Error fetching featured status: {e}")
+        raise HTTPException(status_code=500, detail="Featured status could not be loaded")
+
+@api_router.post("/business/request-featured")
+async def request_featured_promotion(plan_data: dict, current_user: dict = Depends(get_current_user)):
+    """Request featured promotion for business"""
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    plan_id = plan_data.get("plan")
+    if plan_id not in ["daily", "weekly", "monthly"]:
+        raise HTTPException(status_code=400, detail="Invalid plan")
+    
+    plan_configs = {
+        "daily": {"price": 50, "duration_days": 1, "name": "1 Gün"},
+        "weekly": {"price": 300, "duration_days": 7, "name": "1 Hafta"},
+        "monthly": {"price": 1000, "duration_days": 30, "name": "1 Ay"}
+    }
+    
+    plan_config = plan_configs[plan_id]
+    
+    try:
+        # Check if already featured
+        existing_featured = await db.featured_businesses.find_one({
+            "business_id": current_user["id"],
+            "active": True,
+            "expires_at": {"$gt": datetime.now(timezone.utc)}
+        })
+        
+        if existing_featured:
+            raise HTTPException(status_code=400, detail="Business is already featured")
+        
+        # Create featured request (pending admin approval)
+        featured_request = {
+            "id": str(uuid.uuid4()),
+            "business_id": current_user["id"],
+            "plan": plan_id,
+            "plan_name": plan_config["name"],
+            "price": plan_config["price"],
+            "duration_days": plan_config["duration_days"],
+            "status": "pending",  # pending, approved, rejected
+            "requested_at": datetime.now(timezone.utc),
+            "active": False
+        }
+        
+        await db.featured_requests.insert_one(featured_request)
+        
+        # Create notification for admin
+        admin_notification = {
+            "id": str(uuid.uuid4()),
+            "type": "featured_request",
+            "business_id": current_user["id"],
+            "message": f"Yeni öne çıkarma talebi: {plan_config['name']} planı",
+            "created_at": datetime.now(timezone.utc),
+            "read": False
+        }
+        
+        await db.admin_notifications.insert_one(admin_notification)
+        
+        return {
+            "message": "Öne çıkarma talebiniz gönderildi",
+            "request_id": featured_request["id"],
+            "status": "pending"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error requesting featured promotion: {e}")
+        raise HTTPException(status_code=500, detail="Featured request could not be processed")
+
+@api_router.get("/business/products/categories") 
+async def get_business_product_categories(current_user: dict = Depends(get_current_user)):
+    """Get product categories for business with food/drinks classification"""
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    try:
+        products = await db.products.find({"business_id": current_user["id"]}).to_list(length=None)
+        
+        # Classify products into food and drinks
+        categories = {
+            "food_categories": set(),
+            "drink_categories": set(),
+            "all_categories": set()
+        }
+        
+        food_keywords = ['ana yemek', 'başlangıç', 'pizza', 'burger', 'döner', 'kebap', 'pasta', 'çorba', 'salata', 'tatlı', 'yemek']
+        drink_keywords = ['içecek', 'kahve', 'çay', 'su', 'kola', 'fanta', 'sprite', 'ayran', 'meyve suyu', 'smoothie']
+        
+        for product in products:
+            category = product.get("category", "other").lower()
+            categories["all_categories"].add(category)
+            
+            # Classify as food or drink
+            is_drink = any(keyword in category or keyword in product.get("name", "").lower() for keyword in drink_keywords)
+            
+            if is_drink:
+                categories["drink_categories"].add(category)
+            else:
+                categories["food_categories"].add(category)
+        
+        return {
+            "food_categories": sorted(list(categories["food_categories"])),
+            "drink_categories": sorted(list(categories["drink_categories"])),
+            "all_categories": sorted(list(categories["all_categories"])),
+            "total_products": len(products)
+        }
+        
+    except Exception as e:
+        logging.error(f"Error fetching product categories: {e}")
+        raise HTTPException(status_code=500, detail="Categories could not be loaded")
+
+# ADMIN FEATURED BUSINESS MANAGEMENT
+
+@api_router.get("/admin/featured-requests")
+async def get_featured_requests(current_user: dict = Depends(get_current_user)):
+    """Get all featured promotion requests (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        requests = await db.featured_requests.find().sort("requested_at", -1).to_list(length=None)
+        
+        # Enrich with business info
+        enriched_requests = []
+        for request in requests:
+            business = await db.users.find_one({"id": request["business_id"]})
+            
+            request_info = {
+                "id": str(request["_id"]),
+                "request_id": request["id"],
+                "business_id": request["business_id"],
+                "business_name": business.get("business_name", "Unknown") if business else "Unknown",
+                "plan": request["plan"],
+                "plan_name": request["plan_name"],
+                "price": request["price"],
+                "duration_days": request["duration_days"],
+                "status": request["status"],
+                "requested_at": request["requested_at"].isoformat() if hasattr(request["requested_at"], 'isoformat') else request["requested_at"],
+                "approved_at": request.get("approved_at").isoformat() if request.get("approved_at") and hasattr(request.get("approved_at"), 'isoformat') else request.get("approved_at")
+            }
+            enriched_requests.append(request_info)
+        
+        return {"requests": enriched_requests}
+        
+    except Exception as e:
+        logging.error(f"Error fetching featured requests: {e}")
+        raise HTTPException(status_code=500, detail="Featured requests could not be loaded")
+
+@api_router.post("/admin/featured-requests/{request_id}/approve")
+async def approve_featured_request(request_id: str, current_user: dict = Depends(get_current_user)):
+    """Approve featured promotion request (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get the request
+        request_record = await db.featured_requests.find_one({"id": request_id})
+        if not request_record:
+            raise HTTPException(status_code=404, detail="Request not found")
+        
+        if request_record["status"] != "pending":
+            raise HTTPException(status_code=400, detail="Request already processed")
+        
+        # Update request status
+        await db.featured_requests.update_one(
+            {"id": request_id},
+            {"$set": {
+                "status": "approved",
+                "approved_at": datetime.now(timezone.utc),
+                "approved_by": current_user["id"]
+            }}
+        )
+        
+        # Create featured business record
+        start_date = datetime.now(timezone.utc)
+        end_date = start_date + timedelta(days=request_record["duration_days"])
+        
+        featured_business = {
+            "id": str(uuid.uuid4()),
+            "business_id": request_record["business_id"],
+            "plan": request_record["plan"],
+            "plan_name": request_record["plan_name"],
+            "price": request_record["price"],
+            "starts_at": start_date,
+            "expires_at": end_date,
+            "active": True,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.featured_businesses.insert_one(featured_business)
+        
+        return {
+            "message": "Featured promotion approved and activated",
+            "expires_at": end_date.isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error approving featured request: {e}")
+        raise HTTPException(status_code=500, detail="Request could not be approved")
+
+@api_router.post("/admin/featured-requests/{request_id}/reject")
+async def reject_featured_request(request_id: str, rejection_data: dict, current_user: dict = Depends(get_current_user)):
+    """Reject featured promotion request (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Update request status
+        await db.featured_requests.update_one(
+            {"id": request_id},
+            {"$set": {
+                "status": "rejected",
+                "rejected_at": datetime.now(timezone.utc),
+                "rejected_by": current_user["id"],
+                "rejection_reason": rejection_data.get("reason", "No reason provided")
+            }}
+        )
+        
+        return {"message": "Featured promotion request rejected"}
+        
+    except Exception as e:
+        logging.error(f"Error rejecting featured request: {e}")
+        raise HTTPException(status_code=500, detail="Request could not be rejected")
+
+@api_router.get("/admin/featured-businesses")
+async def get_active_featured_businesses(current_user: dict = Depends(get_current_user)):
+    """Get all active featured businesses (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        featured = await db.featured_businesses.find({
+            "active": True,
+            "expires_at": {"$gt": datetime.now(timezone.utc)}
+        }).sort("expires_at", 1).to_list(length=None)
+        
+        # Enrich with business info
+        enriched_featured = []
+        for item in featured:
+            business = await db.users.find_one({"id": item["business_id"]})
+            
+            featured_info = {
+                "id": str(item["_id"]),
+                "business_id": item["business_id"],
+                "business_name": business.get("business_name", "Unknown") if business else "Unknown",
+                "plan": item["plan"],
+                "plan_name": item["plan_name"],
+                "price": item["price"],
+                "starts_at": item["starts_at"].isoformat() if hasattr(item["starts_at"], 'isoformat') else item["starts_at"],
+                "expires_at": item["expires_at"].isoformat() if hasattr(item["expires_at"], 'isoformat') else item["expires_at"],
+                "remaining_days": (item["expires_at"] - datetime.now(timezone.utc)).days if hasattr(item["expires_at"], 'days') else 0
+            }
+            enriched_featured.append(featured_info)
+        
+        return {"featured_businesses": enriched_featured}
+        
+    except Exception as e:
+        logging.error(f"Error fetching featured businesses: {e}")
+        raise HTTPException(status_code=500, detail="Featured businesses could not be loaded")
+
+# ENHANCED ADMIN PANEL FEATURES
+
+@api_router.post("/admin/login-simple")
+async def admin_simple_login():
+    """Simple admin login without email (password: 6851)"""
+    password = "6851"  # Fixed admin password
+    
+    # Generate admin token
+    token_data = {
+        "sub": "admin",
+        "role": "admin",
+        "email": "admin@kuryecini.com",
+        "exp": datetime.now(timezone.utc) + timedelta(hours=24)
+    }
+    
+    access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": 86400,
+        "user_data": {
+            "id": "admin",
+            "role": "admin",
+            "email": "admin@kuryecini.com",
+            "first_name": "Admin",
+            "last_name": "User"
+        }
+    }
+
+# DUMMY DATA CREATION FOR TESTING
+
+@api_router.post("/admin/generate-dummy-data")
+async def generate_dummy_data(current_user: dict = Depends(get_current_user)):
+    """Generate dummy data for testing (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        created_items = {
+            "customers": 0,
+            "couriers": 0,
+            "businesses": 0,
+            "products": 0,
+            "orders": 0
+        }
+        
+        # Create dummy customers
+        dummy_customers = [
+            {"email": "alice@test.com", "first_name": "Alice", "last_name": "Johnson", "city": "İstanbul"},
+            {"email": "bob@test.com", "first_name": "Bob", "last_name": "Smith", "city": "Ankara"},
+            {"email": "carol@test.com", "first_name": "Carol", "last_name": "Brown", "city": "İzmir"}
+        ]
+        
+        for customer_data in dummy_customers:
+            customer = {
+                "id": str(uuid.uuid4()),
+                "email": customer_data["email"],
+                "password": bcrypt.hashpw("test123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+                "role": "customer",
+                "first_name": customer_data["first_name"],
+                "last_name": customer_data["last_name"],
+                "city": customer_data["city"],
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc)
+            }
+            
+            # Check if exists
+            existing = await db.users.find_one({"email": customer_data["email"]})
+            if not existing:
+                await db.users.insert_one(customer)
+                created_items["customers"] += 1
+        
+        # Create dummy couriers
+        dummy_couriers = [
+            {"email": "david@courier.com", "first_name": "David", "last_name": "Wilson", "city": "İstanbul"},
+            {"email": "emma@courier.com", "first_name": "Emma", "last_name": "Davis", "city": "Ankara"}
+        ]
+        
+        for courier_data in dummy_couriers:
+            courier = {
+                "id": str(uuid.uuid4()),
+                "email": courier_data["email"],
+                "password": bcrypt.hashpw("test123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+                "role": "courier",
+                "first_name": courier_data["first_name"],
+                "last_name": courier_data["last_name"],
+                "city": courier_data["city"],
+                "vehicle_type": "motor",
+                "vehicle_model": "Honda CB150R",
+                "is_active": True,
+                "kyc_approved": True,
+                "is_online": False,
+                "created_at": datetime.now(timezone.utc)
+            }
+            
+            existing = await db.users.find_one({"email": courier_data["email"]})
+            if not existing:
+                await db.users.insert_one(courier)
+                created_items["couriers"] += 1
+        
+        # Create dummy businesses
+        dummy_businesses = [
+            {"email": "pizza@business.com", "business_name": "Pizza Palace", "city": "İstanbul", "category": "gida"},
+            {"email": "burger@business.com", "business_name": "Burger House", "city": "Ankara", "category": "gida"}
+        ]
+        
+        for business_data in dummy_businesses:
+            business = {
+                "id": str(uuid.uuid4()),
+                "email": business_data["email"],
+                "password": bcrypt.hashpw("test123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+                "role": "business",
+                "business_name": business_data["business_name"],
+                "city": business_data["city"],
+                "business_category": business_data["category"],
+                "tax_number": f"123456789{created_items['businesses']}",
+                "address": f"Test Address {created_items['businesses']}, {business_data['city']}",
+                "description": f"Test restaurant - {business_data['business_name']}",
+                "is_active": True,
+                "is_approved": True,
+                "created_at": datetime.now(timezone.utc)
+            }
+            
+            existing = await db.users.find_one({"email": business_data["email"]})
+            if not existing:
+                await db.users.insert_one(business)
+                created_items["businesses"] += 1
+                
+                # Create dummy products for this business
+                dummy_products = [
+                    {"name": f"Margherita Pizza", "category": "pizza", "price": 45.0, "type": "food"},
+                    {"name": f"Cola", "category": "içecek", "price": 8.0, "type": "drink"},
+                    {"name": f"Chicken Burger", "category": "burger", "price": 35.0, "type": "food"}
+                ]
+                
+                for product_data in dummy_products:
+                    product = {
+                        "id": str(uuid.uuid4()),
+                        "business_id": business["id"],
+                        "name": product_data["name"],
+                        "category": product_data["category"],
+                        "price": product_data["price"],
+                        "description": f"Delicious {product_data['name']} from {business['business_name']}",
+                        "is_available": True,
+                        "preparation_time_minutes": 15,
+                        "created_at": datetime.now(timezone.utc)
+                    }
+                    
+                    await db.products.insert_one(product)
+                    created_items["products"] += 1
+        
+        return {
+            "message": "Dummy data generated successfully",
+            "created": created_items
+        }
+        
+    except Exception as e:
+        logging.error(f"Error generating dummy data: {e}")
+        raise HTTPException(status_code=500, detail="Dummy data could not be generated")
+
 # Test endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "Kuryecini API v10.0 - Courier Panel & Messaging System"}
+    return {"message": "Kuryecini API v11.0 - Business Panel & Admin Enhancements"}
 
 # Include the router in the main app
 app.include_router(api_router)
