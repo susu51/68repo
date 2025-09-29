@@ -94,41 +94,98 @@ const RestaurantCard = ({ restaurant, onClick, userLocation }) => {
   );
 };
 
-// Product Card Component
+// Enhanced Product Card Component
 const ProductCard = ({ product, onAddToCart, quantity = 0 }) => {
   const [selectedQuantity, setSelectedQuantity] = useState(quantity);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const handleAddToCart = () => {
+  const handleQuickAdd = () => {
     onAddToCart(product);
     setSelectedQuantity(selectedQuantity + 1);
   };
 
+  // Determine product badges
+  const getProductBadges = () => {
+    const badges = [];
+    
+    if (product.is_popular) badges.push({ text: 'Popüler', color: 'bg-red-500', icon: '🔥' });
+    if (product.is_new) badges.push({ text: 'Yeni', color: 'bg-green-500', icon: '✨' });
+    if (product.discount_percentage) badges.push({ text: `%${product.discount_percentage} İndirim`, color: 'bg-orange-500', icon: '💸' });
+    if (product.is_spicy) badges.push({ text: 'Acılı', color: 'bg-red-600', icon: '🌶️' });
+    if (product.is_vegetarian) badges.push({ text: 'Vejeteryan', color: 'bg-green-600', icon: '🥗' });
+    
+    return badges;
+  };
+
+  const badges = getProductBadges();
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card 
+      className="hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="flex">
         {/* Product Image */}
-        <div className="w-1/3">
+        <div className="w-1/3 relative">
           {product.photo_url ? (
             <img 
               src={`${API.replace('/api', '')}${product.photo_url}`}
               alt={product.name}
-              className="w-full h-full object-cover rounded-l-lg"
+              className="w-full h-32 object-cover rounded-l-lg group-hover:scale-105 transition-transform"
               onError={(e) => {
                 e.target.src = 'https://via.placeholder.com/200x150/f97316/ffffff?text=🍽️';
               }}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-orange-300 to-red-400 rounded-l-lg flex items-center justify-center">
+            <div className="w-full h-32 bg-gradient-to-br from-orange-300 to-red-400 rounded-l-lg flex items-center justify-center group-hover:scale-105 transition-transform">
               <span className="text-white text-4xl">🍽️</span>
             </div>
+          )}
+          
+          {/* Product Badges */}
+          <div className="absolute top-2 left-2 space-y-1">
+            {badges.slice(0, 2).map((badge, index) => (
+              <Badge 
+                key={index}
+                className={`${badge.color} text-white text-xs shadow-sm`}
+              >
+                <span className="mr-1">{badge.icon}</span>
+                {badge.text}
+              </Badge>
+            ))}
+          </div>
+
+          {/* Quick Add Button (appears on hover) */}
+          {product.is_available && isHovered && (
+            <Button
+              onClick={handleQuickAdd}
+              className="absolute bottom-2 right-2 bg-orange-600 hover:bg-orange-700 text-white rounded-full w-8 h-8 p-0 shadow-lg transform transition-all duration-200"
+            >
+              +
+            </Button>
           )}
         </div>
         
         {/* Product Details */}
         <div className="flex-1 p-4">
           <div className="flex justify-between items-start mb-2">
-            <h4 className="font-semibold text-lg">{product.name}</h4>
-            <span className="font-bold text-green-600 text-lg">₺{product.price}</span>
+            <div className="flex-1">
+              <h4 className="font-semibold text-lg group-hover:text-orange-600 transition-colors">{product.name}</h4>
+              {product.category && (
+                <span className="text-xs text-gray-500 capitalize">{product.category}</span>
+              )}
+            </div>
+            <div className="text-right ml-3">
+              {product.discount_percentage ? (
+                <div>
+                  <span className="font-bold text-green-600 text-lg">₺{(product.price * (1 - product.discount_percentage / 100)).toFixed(2)}</span>
+                  <span className="text-sm text-gray-500 line-through ml-1">₺{product.price}</span>
+                </div>
+              ) : (
+                <span className="font-bold text-green-600 text-lg">₺{product.price}</span>
+              )}
+            </div>
           </div>
           
           <p className="text-sm text-gray-600 mb-3 line-clamp-2">
@@ -137,7 +194,16 @@ const ProductCard = ({ product, onAddToCart, quantity = 0 }) => {
           
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3 text-xs text-gray-500">
-              <span>⏱️ {product.preparation_time_minutes} dk</span>
+              <span className="flex items-center">
+                <span className="mr-1">⏱️</span>
+                {product.preparation_time_minutes || 15} dk
+              </span>
+              {product.rating && (
+                <span className="flex items-center">
+                  <span className="mr-1">⭐</span>
+                  {product.rating}
+                </span>
+              )}
               <Badge 
                 variant={product.is_available ? "default" : "secondary"}
                 className="text-xs"
