@@ -3886,38 +3886,103 @@ const CustomerDashboard = ({ user }) => {
           {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="space-y-6">
+              {/* User Info Header */}
               <Card>
-                <CardContent className="p-8 text-center">
-                  <div className="text-6xl mb-4">👤</div>
-                  <h3 className="text-2xl font-bold mb-4">Profilim</h3>
-                  <p className="text-gray-600 mb-6">
-                    Kişisel bilgilerinizi, adreslerinizi ve sipariş geçmişinizi yönetin
-                  </p>
-                  <Button 
-                    onClick={() => setShowProfile(true)}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 text-lg"
-                  >
-                    🔧 Profili Yönet
-                  </Button>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      {user?.first_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || '👤'}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-800">
+                        {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Müşteri'}
+                      </h3>
+                      <p className="text-gray-600">{user?.email}</p>
+                      <div className="flex items-center space-x-4 mt-2">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                          ✅ Aktif Hesap
+                        </span>
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                          ⭐ {loyaltyPoints.tier_level || 'Bronze'} Üye
+                        </span>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => setShowProfile(true)}
+                      className="bg-orange-500 hover:bg-orange-600 text-white"
+                    >
+                      ⚙️ Düzenle
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 
-              {/* Quick Profile Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl mb-3">📱</div>
-                    <h4 className="font-semibold mb-2">Telefon</h4>
-                    <p className="text-gray-600">{user.phone || 'Belirtilmemiş'}</p>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="text-center">
+                  <CardContent className="p-4">
+                    <div className="text-2xl mb-2">📦</div>
+                    <div className="text-2xl font-bold text-orange-600">{orders.length}</div>
+                    <div className="text-sm text-gray-600">Toplam Sipariş</div>
+                  </CardContent>
+                </Card>
+                <Card className="text-center">
+                  <CardContent className="p-4">
+                    <div className="text-2xl mb-2">⭐</div>
+                    <div className="text-2xl font-bold text-purple-600">{loyaltyPoints.total_points}</div>
+                    <div className="text-sm text-gray-600">Puan</div>
+                  </CardContent>
+                </Card>
+                <Card className="text-center">
+                  <CardContent className="p-4">
+                    <div className="text-2xl mb-2">🎉</div>
+                    <div className="text-2xl font-bold text-pink-600">{campaigns.length}</div>
+                    <div className="text-sm text-gray-600">Kampanya</div>
+                  </CardContent>
+                </Card>
+                <Card className="text-center">
+                  <CardContent className="p-4">
+                    <div className="text-2xl mb-2">🛒</div>
+                    <div className="text-2xl font-bold text-blue-600">{cart.length}</div>
+                    <div className="text-sm text-gray-600">Sepette</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setActiveTab('orders')}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span className="text-2xl">📦</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800">Siparişlerim</h4>
+                        <p className="text-gray-600 text-sm">Aktif ve geçmiş siparişleri görüntüle</p>
+                      </div>
+                      <span className="text-gray-400">→</span>
+                    </div>
                   </CardContent>
                 </Card>
                 
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl mb-3">📧</div>
-                    <h4 className="font-semibold mb-2">E-posta</h4>
-                    <p className="text-gray-600">{user.email || 'Belirtilmemiş'}</p>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setActiveTab('loyalty')}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <span className="text-2xl">⭐</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800">Puan & Avantajlar</h4>
+                        <p className="text-gray-600 text-sm">Kazandığınız puanları görüntüle</p>
+                      </div>
+                      <span className="text-gray-400">→</span>
+                    </div>
                   </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
                 </Card>
                 
                 <Card className="hover:shadow-lg transition-shadow">
