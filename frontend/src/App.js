@@ -17,7 +17,7 @@ import { AdCarousel } from "./components/AdCarousel";
 import { LocationControls } from "./components/LocationControls";
 import { CourierDashboard } from "./CourierDashboard";
 import { EnhancedBusinessDashboard } from "./EnhancedBusinessDashboard";
-import { EnhancedAdminPanel } from "./EnhancedAdminPanel";
+import AdminPanel from "./AdminPanel";
 
 // Components
 import { Button } from "./components/ui/button";
