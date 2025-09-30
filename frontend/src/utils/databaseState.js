@@ -1,0 +1,519 @@
+"""
+Frontend utility for localStorage cleanup and API-based state management
+Replaces all localStorage operations with API calls
+"""
+
+// CSRF token management
+let csrfToken = null;
+
+// Get CSRF token from cookie
+export const getCsrfToken = () => {
+  if (csrfToken) return csrfToken;
+  
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'kuryecini_csrf') {
+      csrfToken = decodeURIComponent(value);
+      return csrfToken;
+    }
+  }
+  return null;
+};
+
+// API client with CSRF protection
+class SecureApiClient {
+  constructor(baseURL = process.env.VITE_API_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001') {
+    this.baseURL = baseURL;
+    this.retryAttempts = 3;
+  }
+
+  async request(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+    const csrf = getCsrfToken();
+    
+    const defaultHeaders = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add CSRF token for state-changing operations
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method?.toUpperCase())) {
+      if (csrf) {
+        defaultHeaders['X-CSRF-Token'] = csrf;
+      }
+    }
+    
+    const config = {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers,
+      },
+      credentials: 'include', // Include cookies
+    };
+
+    try {
+      const response = await fetch(url, config);
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Authentication failed - redirect to login
+          window.location.href = '/login';
+          return null;
+        }
+        
+        if (response.status === 403) {
+          // CSRF error - refresh token and retry
+          await this.refreshCSRF();
+          return this.request(endpoint, options);
+        }
+        
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data;
+      
+    } catch (error) {
+      console.error(`API Error ${options.method || 'GET'} ${endpoint}:`, error);
+      throw error;
+    }
+  }
+
+  async refreshCSRF() {
+    // This would be implemented to refresh the CSRF token
+    // For now, just clear the cached token
+    csrfToken = null;
+  }
+
+  // Convenience methods
+  get(endpoint, options = {}) {
+    return this.request(endpoint, { ...options, method: 'GET' });
+  }
+
+  post(endpoint, data, options = {}) {
+    return this.request(endpoint, {
+      ...options,
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  put(endpoint, data, options = {}) {
+    return this.request(endpoint, {
+      ...options,
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  patch(endpoint, data, options = {}) {
+    return this.request(endpoint, {
+      ...options,
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  delete(endpoint, options = {}) {
+    return this.request(endpoint, { ...options, method: 'DELETE' });
+  }
+}
+
+// Global API client instance
+export const apiClient = new SecureApiClient();
+
+// State management utilities (NO localStorage)
+export class DatabaseStateManager {
+  constructor() {
+    this.cache = new Map(); // In-memory cache only
+    this.subscribers = new Map();
+  }
+
+  // Subscribe to state changes
+  subscribe(key, callback) {
+    if (!this.subscribers.has(key)) {
+      this.subscribers.set(key, new Set());
+    }
+    this.subscribers.get(key).add(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      this.subscribers.get(key)?.delete(callback);
+    };
+  }
+
+  // Notify subscribers of state changes
+  notify(key, data) {
+    this.cache.set(key, data);
+    const subscribers = this.subscribers.get(key);
+    if (subscribers) {
+      subscribers.forEach(callback => callback(data));
+    }
+  }
+
+  // Get cached data
+  getCached(key) {
+    return this.cache.get(key);
+  }
+
+  // Clear cache
+  clearCache(key) {
+    if (key) {
+      this.cache.delete(key);
+    } else {
+      this.cache.clear();
+    }
+  }
+}
+
+// Global state manager
+export const stateManager = new DatabaseStateManager();
+
+// Address Management (replaces localStorage)
+export class AddressManager {
+  static async getAddresses() {
+    try {
+      const addresses = await apiClient.get('/api/addresses');
+      stateManager.notify('addresses', addresses);
+      return addresses;
+    } catch (error) {
+      console.error('Failed to fetch addresses:', error);
+      throw error;
+    }
+  }
+
+  static async addAddress(addressData) {
+    try {
+      const newAddress = await apiClient.post('/api/addresses', addressData);
+      
+      // Refresh addresses list
+      const updatedAddresses = await this.getAddresses();
+      
+      return newAddress;
+    } catch (error) {
+      console.error('Failed to add address:', error);
+      throw error;
+    }
+  }
+
+  static async updateAddress(addressId, updates) {
+    try {
+      const updatedAddress = await apiClient.patch(`/api/addresses/${addressId}`, updates);
+      
+      // Refresh addresses list
+      await this.getAddresses();
+      
+      return updatedAddress;
+    } catch (error) {
+      console.error('Failed to update address:', error);
+      throw error;
+    }
+  }
+
+  static async deleteAddress(addressId) {
+    try {
+      await apiClient.delete(`/api/addresses/${addressId}`);
+      
+      // Refresh addresses list
+      await this.getAddresses();
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to delete address:', error);
+      throw error;
+    }
+  }
+}
+
+// Cart Management (replaces localStorage)
+export class CartManager {
+  static async getCart() {
+    try {
+      const cart = await apiClient.get('/api/cart');
+      stateManager.notify('cart', cart);
+      return cart;
+    } catch (error) {
+      console.error('Failed to fetch cart:', error);
+      throw error;
+    }
+  }
+
+  static async updateCart(cartData) {
+    try {
+      const updatedCart = await apiClient.put('/api/cart', cartData);
+      stateManager.notify('cart', updatedCart);
+      return updatedCart;
+    } catch (error) {
+      console.error('Failed to update cart:', error);
+      throw error;
+    }
+  }
+
+  static async addToCart(productId, quantity = 1) {
+    try {
+      // Get current cart
+      let cart = stateManager.getCached('cart');
+      if (!cart) {
+        cart = await this.getCart();
+      }
+
+      // Find existing item or add new one
+      const existingItemIndex = cart.items.findIndex(item => item.product_id === productId);
+      
+      if (existingItemIndex >= 0) {
+        cart.items[existingItemIndex].qty += quantity;
+      } else {
+        cart.items.push({
+          product_id: productId,
+          qty: quantity
+        });
+      }
+
+      return await this.updateCart({ items: cart.items });
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      throw error;
+    }
+  }
+
+  static async removeFromCart(productId) {
+    try {
+      let cart = stateManager.getCached('cart');
+      if (!cart) {
+        cart = await this.getCart();
+      }
+
+      cart.items = cart.items.filter(item => item.product_id !== productId);
+      return await this.updateCart({ items: cart.items });
+    } catch (error) {
+      console.error('Failed to remove from cart:', error);
+      throw error;
+    }
+  }
+
+  static async updateQuantity(productId, quantity) {
+    try {
+      if (quantity <= 0) {
+        return await this.removeFromCart(productId);
+      }
+
+      let cart = stateManager.getCached('cart');
+      if (!cart) {
+        cart = await this.getCart();
+      }
+
+      const itemIndex = cart.items.findIndex(item => item.product_id === productId);
+      if (itemIndex >= 0) {
+        cart.items[itemIndex].qty = quantity;
+        return await this.updateCart({ items: cart.items });
+      }
+
+      return cart;
+    } catch (error) {
+      console.error('Failed to update cart quantity:', error);
+      throw error;
+    }
+  }
+
+  static async clearCart() {
+    try {
+      return await this.updateCart({ items: [] });
+    } catch (error) {
+      console.error('Failed to clear cart:', error);
+      throw error;
+    }
+  }
+}
+
+// Preferences Management (replaces localStorage)
+export class PreferencesManager {
+  static async getPreferences() {
+    try {
+      const preferences = await apiClient.get('/api/preferences');
+      stateManager.notify('preferences', preferences);
+      return preferences;
+    } catch (error) {
+      console.error('Failed to fetch preferences:', error);
+      throw error;
+    }
+  }
+
+  static async updatePreferences(updates) {
+    try {
+      const updatedPreferences = await apiClient.put('/api/preferences', updates);
+      stateManager.notify('preferences', updatedPreferences);
+      return updatedPreferences;
+    } catch (error) {
+      console.error('Failed to update preferences:', error);
+      throw error;
+    }
+  }
+}
+
+// Loyalty Points Management
+export class LoyaltyManager {
+  static async getPoints() {
+    try {
+      const loyaltyData = await apiClient.get('/api/loyalty/points');
+      stateManager.notify('loyalty', loyaltyData);
+      return loyaltyData;
+    } catch (error) {
+      console.error('Failed to fetch loyalty points:', error);
+      throw error;
+    }
+  }
+
+  static async spendPoints(points, description) {
+    try {
+      const result = await apiClient.post('/api/loyalty/consume', {
+        points,
+        description
+      });
+      
+      // Refresh loyalty data
+      await this.getPoints();
+      
+      return result;
+    } catch (error) {
+      console.error('Failed to spend loyalty points:', error);
+      throw error;
+    }
+  }
+}
+
+// Migration utility for existing localStorage data
+export class LocalStorageMigration {
+  static async migrateToDatabase() {
+    try {
+      // Check if migration already completed
+      const migrationKey = 'kuryecini_migrated';
+      if (sessionStorage.getItem(migrationKey)) {
+        return { skipped: true, reason: 'Already migrated this session' };
+      }
+
+      // Collect all localStorage data
+      const migrationData = {};
+
+      // Cart data
+      const cartData = localStorage.getItem('kuryecini_cart');
+      if (cartData) {
+        try {
+          migrationData.cart = JSON.parse(cartData);
+        } catch (e) {
+          console.warn('Failed to parse cart data for migration:', e);
+        }
+      }
+
+      // Address data
+      const addressData = localStorage.getItem('kuryecini_addresses');
+      if (addressData) {
+        try {
+          migrationData.addresses = JSON.parse(addressData);
+        } catch (e) {
+          console.warn('Failed to parse address data for migration:', e);
+        }
+      }
+
+      // Preferences data
+      const prefsData = localStorage.getItem('kuryecini_preferences');
+      if (prefsData) {
+        try {
+          migrationData.preferences = JSON.parse(prefsData);
+        } catch (e) {
+          console.warn('Failed to parse preferences data for migration:', e);
+        }
+      }
+
+      // Loyalty points data
+      const loyaltyData = localStorage.getItem('kuryecini_loyalty_points');
+      if (loyaltyData) {
+        try {
+          migrationData.loyalty_points = parseInt(loyaltyData, 10);
+        } catch (e) {
+          console.warn('Failed to parse loyalty points for migration:', e);
+        }
+      }
+
+      // Only migrate if we have data
+      if (Object.keys(migrationData).length === 0) {
+        sessionStorage.setItem(migrationKey, 'no_data');
+        return { skipped: true, reason: 'No data to migrate' };
+      }
+
+      // Send to backend
+      const result = await apiClient.post('/api/migrate-localstorage', migrationData);
+
+      if (result.skipped) {
+        sessionStorage.setItem(migrationKey, 'already_done');
+        return result;
+      }
+
+      // Clear localStorage after successful migration
+      localStorage.removeItem('kuryecini_cart');
+      localStorage.removeItem('kuryecini_addresses');
+      localStorage.removeItem('kuryecini_preferences');
+      localStorage.removeItem('kuryecini_loyalty_points');
+
+      // Mark migration as complete for this session
+      sessionStorage.setItem(migrationKey, 'completed');
+
+      console.log('localStorage migration completed:', result);
+      return result;
+
+    } catch (error) {
+      console.error('Migration failed:', error);
+      throw error;
+    }
+  }
+}
+
+// Anti-localStorage utility - prevents accidental localStorage usage
+export const AntiLocalStorage = {
+  // Override localStorage methods to prevent usage
+  preventLocalStorageUsage() {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const originalSetItem = window.localStorage.setItem;
+      const originalGetItem = window.localStorage.getItem;
+      
+      window.localStorage.setItem = function(key, value) {
+        if (key.startsWith('kuryecini_') || key.includes('cart') || key.includes('address') || key.includes('preferences')) {
+          console.warn(`⚠️ Prevented localStorage.setItem for ${key}. Use API managers instead.`);
+          return;
+        }
+        return originalSetItem.call(this, key, value);
+      };
+      
+      window.localStorage.getItem = function(key) {
+        if (key.startsWith('kuryecini_') || key.includes('cart') || key.includes('address') || key.includes('preferences')) {
+          console.warn(`⚠️ Prevented localStorage.getItem for ${key}. Use API managers instead.`);
+          return null;
+        }
+        return originalGetItem.call(this, key);
+      };
+    }
+  }
+};
+
+// Toast utility for API errors
+export const showApiError = (error, defaultMessage = 'Bir hata oluştu') => {
+  let message = defaultMessage;
+  
+  if (error?.message) {
+    message = error.message;
+  } else if (typeof error === 'string') {
+    message = error;
+  }
+  
+  // Use your existing toast system
+  if (window.toast) {
+    window.toast.error(message);
+  } else {
+    console.error('API Error:', message);
+  }
+};
+
+// Initialize anti-localStorage protection
+if (typeof window !== 'undefined') {
+  AntiLocalStorage.preventLocalStorageUsage();
+}
