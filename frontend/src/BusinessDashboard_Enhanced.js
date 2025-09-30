@@ -922,34 +922,6 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                 ))}
               </div>
             )}
-                        onClick={() => openEditProduct(product)}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                      >
-                        ✏️ Düzenle
-                      </Button>
-                      <Button
-                        onClick={() => toggleProductAvailability(product.id, !product.is_available)}
-                        variant="outline"
-                        size="sm"
-                        className={`flex-1 ${product.is_available ? 'border-red-200 text-red-600' : 'border-green-200 text-green-600'}`}
-                      >
-                        {product.is_available ? '❌' : '✅'}
-                      </Button>
-                      <Button
-                        onClick={() => deleteProduct(product.id)}
-                        variant="outline"
-                        size="sm"
-                        className="border-red-200 text-red-600 hover:bg-red-50"
-                      >
-                        🗑️
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
 
             {/* Product Modal */}
             {showProductModal && (
