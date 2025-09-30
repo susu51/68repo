@@ -770,7 +770,12 @@ export const ProfessionalFoodOrderSystem = ({
     
     // Use the prop function if available
     if (onUpdateCart) {
-      onUpdateCart(productId, change);
+      // Get current quantity from cart
+      const currentItem = cart.find(item => item.product_id === productId);
+      if (currentItem) {
+        const newQuantity = Math.max(0, currentItem.quantity + change);
+        onUpdateCart(productId, newQuantity);
+      }
     } else {
       // Fallback to local handling (for backward compatibility)
       console.warn('onUpdateCart prop not provided, cart functionality may be limited');
