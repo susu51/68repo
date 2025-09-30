@@ -688,14 +688,14 @@ export const ProfessionalFoodOrderSystem = ({
       // Sort by distance (En Yakın)
       sortedData = data.map(business => {
         // Handle different location data structures (Turkish/English keys)
-        const location = business.location || {};
-        const lat = location.lat || location.enlem || 41.0082; // Default to Istanbul center
-        const lng = location.lng || location.uzunluk || 28.9784;
+        const businessLocation = business.location || {};
+        const lat = businessLocation.lat || businessLocation.enlem || 41.0082; // Default to Istanbul center
+        const lng = businessLocation.lng || businessLocation.uzunluk || 28.9784;
         
         return {
           ...business,
           distance: calculateDistance(
-            location.lat || 41.0082, location.lng || 28.9784,
+            location.lat, location.lng,
             lat, lng
           )
         };
