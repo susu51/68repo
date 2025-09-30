@@ -69,7 +69,13 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     },
     topProducts: [],
     peakHours: [],
-    customerSatisfaction: 4.5
+    customerSatisfaction: 4.5,
+    // Additional properties to prevent toFixed errors
+    todayRevenue: 0,
+    weeklyRevenue: 0,
+    monthlyRevenue: 0,
+    totalRevenue: 0,
+    averageOrderValue: 0
   });
 
   // Financial data
