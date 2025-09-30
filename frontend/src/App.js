@@ -3715,17 +3715,19 @@ const CustomerDashboard = ({ user }) => {
               
               {/* Professional Food Order System */}
               <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                <ProfessionalFoodOrderSystem 
-                  key="food-order-system"
-                  user={user}
-                  locationFilter={locationFilter}
-                  userLocation={userLocation}
-                  selectedCity={selectedCity}
-                  cart={cart}
-                  onUpdateCart={updateCartQuantity}
-                  onAddToCart={addToCart}
-                  onRemoveFromCart={removeFromCart}
-                />
+                <FoodOrderErrorBoundary>
+                  <ProfessionalFoodOrderSystem 
+                    key="food-order-system"
+                    user={user}
+                    locationFilter={locationFilter}
+                    userLocation={userLocation}
+                    selectedCity={selectedCity}
+                    cart={cart}
+                    onUpdateCart={updateCartQuantity}
+                    onAddToCart={addToCart}
+                    onRemoveFromCart={removeFromCart}
+                  />
+                </FoodOrderErrorBoundary>
               </div>
             </div>
           )}
