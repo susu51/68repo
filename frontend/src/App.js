@@ -3067,6 +3067,12 @@ const CustomerDashboard = ({ user }) => {
   }, [isMounted]);
 
   const addToCart = (product) => {
+    // Safety check to prevent runtime errors
+    if (!cart || !Array.isArray(cart)) {
+      console.error('Cart is not initialized properly:', cart);
+      return;
+    }
+    
     const existingItem = cart.find(item => item.product_id === product.id);
     
     if (existingItem) {
@@ -3089,6 +3095,12 @@ const CustomerDashboard = ({ user }) => {
   };
 
   const removeFromCart = (productId) => {
+    // Safety check to prevent runtime errors
+    if (!cart || !Array.isArray(cart)) {
+      console.error('Cart is not initialized properly:', cart);
+      return;
+    }
+    
     setCart(cart.filter(item => item.product_id !== productId));
   };
 
