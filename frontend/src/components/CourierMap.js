@@ -180,6 +180,9 @@ const CourierMap = ({ orders = [], onOrderSelect, selectedOrder }) => {
     setShowRoute(false);
     toast.success('Rota temizlendi');
   };
+
+  // Calculate distance between two points
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Earth's radius in kilometers
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
