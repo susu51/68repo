@@ -825,7 +825,10 @@ export const ProfessionalFoodOrderSystem = ({
       
       // Mock order creation for demo
       toast.success('Siparişiniz başarıyla alındı!');
-      setCart([]);
+      // Clear cart after successful order - use prop function if available
+      if (onUpdateCart) {
+        cart.forEach(item => onRemoveFromCart && onRemoveFromCart(item.product_id));
+      }
       setShowCheckoutModal(false);
       localStorage.removeItem('kuryecini_cart');
       
