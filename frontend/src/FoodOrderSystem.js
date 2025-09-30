@@ -451,6 +451,25 @@ export const ProfessionalFoodOrderSystem = ({
     return R * c;
   };
 
+  const getCategoryIcon = (category) => {
+    const icons = {
+      'Tümü': '🍽️',
+      'Ana Yemek': '🍖',
+      'Pizza': '🍕',
+      'Burger': '🍔',
+      'Döner': '🥙',
+      'Kebap': '🍢',
+      'Pasta': '🍝',
+      'Çorba': '🍲',
+      'Salata': '🥗',
+      'Tatlı': '🍰',
+      'İçecek': '🥤',
+      'Kahve': '☕',
+      'Çay': '🍵'
+    };
+    return icons[category] || '🍽️';
+  };
+
   const fetchRestaurants = async () => {
     if (!isMounted) return; // Early return if component is unmounted
     
