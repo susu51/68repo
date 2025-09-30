@@ -828,7 +828,32 @@ export const ProfessionalFoodOrderSystem = ({
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    return matchesMainCategory && matchesSubCategory && matchesSearch;
+    // Filter by price range
+    const matchesPrice = (!priceRange.min || product.price >= parseFloat(priceRange.min)) &&
+                        (!priceRange.max || product.price <= parseFloat(priceRange.max));
+    
+    // Filter by availability
+    const matchesAvailability = !showAvailableOnly || product.is_available;
+    
+    return matchesMainCategory && matchesSubCategory && matchesSearch && matchesPrice && matchesAvailability;
+  }).sort((a, b) => {
+    // Sort products based on sortBy criteria
+    switch (sortBy) {
+      case 'price_asc':
+        return a.price - b.price;
+      case 'price_desc':
+        return b.price - a.price;
+      case 'rating':
+        return (b.rating || 0) - (a.rating || 0);
+      case 'prep_time':
+        return (a.preparation_time_minutes || 15) - (b.preparation_time_minutes || 15);
+      case 'popularity':
+      default:
+        // Sort by popularity (popular items first, then by rating)
+        if (a.is_popular && !b.is_popular) return -1;
+        if (!a.is_popular && b.is_popular) return 1;
+        return (b.rating || 0) - (a.rating || 0);
+    }
   });
 
   if (loading) {
