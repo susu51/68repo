@@ -1164,6 +1164,133 @@ export const ProfessionalFoodOrderSystem = ({
           />
         </div>
       </div>
+
+      {/* Enhanced Checkout Modal */}
+      {showCheckoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Modal Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">🛒 Siparişi Tamamla</h2>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowCheckoutModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </Button>
+              </div>
+
+              {/* Order Summary */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  📋 Sipariş Özeti
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  {cart.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-sm">
+                        {item.name} x {item.quantity}
+                      </span>
+                      <span className="font-medium">
+                        ₺{(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex justify-between items-center font-bold text-lg">
+                      <span>Toplam:</span>
+                      <span className="text-green-600">₺{getCartTotal()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Address Selection */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  📍 Teslimat Adresi
+                </h3>
+                <AddressSelector 
+                  onAddressSelect={setSelectedAddress}
+                  selectedAddress={selectedAddress}
+                />
+              </div>
+
+              {/* Payment Method */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  💳 Ödeme Yöntemi
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Button
+                    variant={paymentMethod === 'card' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('card')}
+                    className="flex items-center justify-center space-x-2 p-4 h-auto"
+                  >
+                    <span>💳</span>
+                    <span>Kredi Kartı</span>
+                  </Button>
+                  <Button
+                    variant={paymentMethod === 'cash' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('cash')}
+                    className="flex items-center justify-center space-x-2 p-4 h-auto"
+                  >
+                    <span>💵</span>
+                    <span>Nakit</span>
+                  </Button>
+                  <Button
+                    variant={paymentMethod === 'wallet' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('wallet')}
+                    className="flex items-center justify-center space-x-2 p-4 h-auto"
+                  >
+                    <span>📱</span>
+                    <span>Dijital Cüzdan</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Delivery Notes */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  📝 Teslimat Notları (İsteğe Bağlı)
+                </h3>
+                <textarea
+                  placeholder="Kurye için özel talimatlar..."
+                  className="w-full border rounded-lg p-3 text-sm h-20 resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  rows="3"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCheckoutModal(false)}
+                  className="flex-1"
+                >
+                  🔙 Geri Dön
+                </Button>
+                <Button
+                  onClick={handleCompleteOrder}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  disabled={!selectedAddress}
+                >
+                  {selectedAddress ? '✅ Siparişi Onayla' : '📍 Önce Adres Seçin'}
+                </Button>
+              </div>
+
+              {/* Order Info */}
+              <div className="mt-4 text-xs text-gray-500 text-center">
+                <p>Tahmini teslimat süresi: 25-45 dakika</p>
+                <p>Sipariş sonrası iptal mümkün değildir</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
