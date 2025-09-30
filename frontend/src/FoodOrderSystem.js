@@ -801,17 +801,31 @@ export const ProfessionalFoodOrderSystem = ({
   const updateCartQuantity = (productId, change) => {
     if (!isMounted) return; // Prevent cart updates if component is unmounted
     
-    // Use the prop function if available
-    if (onUpdateCart) {
-      // Get current quantity from cart
-      const currentItem = cart.find(item => item.product_id === productId);
-      if (currentItem) {
-        const newQuantity = Math.max(0, currentItem.quantity + change);
-        onUpdateCart(productId, newQuantity);
+    try {
+      // Use the prop function if available
+      if (onUpdateCart) {
+        // Get current quantity from cart
+        const currentItem = cart.find(item => item.product_id === productId);
+        if (currentItem) {
+          const newQuantity = Math.max(0, currentItem.quantity + change);
+          onUpdateCart(productId, newQuantity);
+          
+          if (newQuantity === 0) {
+            toast.success('Ürün sepetten çıkarıldı');
+          } else {
+            toast.success(`Sepet güncellendi (${newQuantity})`);
+          }
+        } else {
+          toast.error('Ürün sepette bulunamadı');
+        }
+      } else {
+        // Fallback to local handling (for backward compatibility)
+        console.warn('onUpdateCart prop not provided, cart functionality may be limited');
+        toast.error('Sepet güncellemesi şu anda mümkün değil');
       }
-    } else {
-      // Fallback to local handling (for backward compatibility)
-      console.warn('onUpdateCart prop not provided, cart functionality may be limited');
+    } catch (error) {
+      console.error('Cart update error:', error);
+      toast.error('Sepet güncellenirken hata oluştu');
     }
   };
 
