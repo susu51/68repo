@@ -776,13 +776,14 @@ export const ProfessionalFoodOrderSystem = ({
   const removeFromCart = (productId) => {
     if (!isMounted) return; // Prevent cart updates if component is unmounted
     
-    // Safety check to prevent runtime errors
-    if (!cart || !Array.isArray(cart)) {
-      console.error('Cart is not initialized properly in FoodOrderSystem:', cart);
-      return;
+    // Use the prop function if available
+    if (onRemoveFromCart) {
+      onRemoveFromCart(productId);
+    } else {
+      // Fallback to local handling (for backward compatibility)
+      console.warn('onRemoveFromCart prop not provided, cart functionality may be limited');
     }
     
-    setCart(cart.filter(item => item.product_id !== productId));
     if (isMounted) {
       toast.success('Ürün sepetten kaldırıldı');
     }
