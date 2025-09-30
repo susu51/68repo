@@ -3262,49 +3262,83 @@ const CustomerDashboard = ({ user }) => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Organized Tab Navigation */}
+        {/* Side Tab Navigation for Customer */}
         <div className="mb-8">
-          {/* Primary Actions - Main Tabs */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-1 mb-4">
-            <div className="grid grid-cols-4 gap-1">
-              {[
-                { id: 'products', icon: '🍽️', label: 'Keşfet', count: products.length, desc: 'Restoranları keşfedin' },
-                { id: 'cart', icon: '🛒', label: 'Sepet', count: cart.length, desc: 'Sipariş verin' },
-                { id: 'orders', icon: '📦', label: 'Siparişler', count: orders.length, desc: 'Siparişleriniz' },
-                { id: 'profile', icon: '👤', label: 'Hesabım', count: null, desc: 'Profil & Ayarlar' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`
-                    relative flex flex-col items-center justify-center p-4 rounded-lg transition-all duration-200 text-center
-                    ${activeTab === tab.id 
-                      ? 'bg-orange-500 text-white shadow-md' 
-                      : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
-                    }
-                  `}
-                >
-                  <div className="flex items-center justify-center mb-1">
-                    <span className="text-xl">{tab.icon}</span>
-                    {tab.count !== null && tab.count > 0 && (
-                      <span className={`
-                        absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center 
-                        text-xs px-1.5 rounded-full font-bold text-white
-                        ${activeTab === tab.id ? 'bg-white/20' : 'bg-red-500'}
-                      `}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-sm font-medium">{tab.label}</span>
-                  <span className="text-xs opacity-75 mt-0.5 hidden sm:block">{tab.desc}</span>
-                </button>
-              ))}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+            <div className="flex space-x-1 overflow-x-auto">
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'products' 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                }`}
+              >
+                <span className="text-lg">🍽️</span>
+                <span>Keşfet</span>
+                {products.length > 0 && (
+                  <span className={`min-w-[20px] h-5 flex items-center justify-center text-xs px-1.5 rounded-full font-bold ${
+                    activeTab === 'products' ? 'bg-white/20 text-white' : 'bg-orange-500 text-white'
+                  }`}>
+                    {products.length}
+                  </span>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('cart')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'cart' 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-blue-500 hover:bg-blue-50'
+                }`}
+              >
+                <span className="text-lg">🛒</span>
+                <span>Sepet</span>
+                {cart.length > 0 && (
+                  <span className={`min-w-[20px] h-5 flex items-center justify-center text-xs px-1.5 rounded-full font-bold ${
+                    activeTab === 'cart' ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {cart.length}
+                  </span>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'orders' 
+                    ? 'bg-green-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-green-500 hover:bg-green-50'
+                }`}
+              >
+                <span className="text-lg">📦</span>
+                <span>Siparişler</span>
+                {orders.length > 0 && (
+                  <span className={`min-w-[20px] h-5 flex items-center justify-center text-xs px-1.5 rounded-full font-bold ${
+                    activeTab === 'orders' ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {orders.length}
+                  </span>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'profile' 
+                    ? 'bg-gray-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <span className="text-lg">👤</span>
+                <span>Profil</span>
+              </button>
             </div>
           </div>
           
-          {/* Secondary Actions - Quick Access Bar */}
-          <div className="flex items-center justify-center space-x-4">
+          {/* Secondary Actions Row */}
+          <div className="flex items-center justify-center space-x-4 mt-4">
             <button
               onClick={() => setActiveTab('campaigns')}
               className={`
