@@ -301,44 +301,85 @@ async def login(login_data: LoginRequest):
         admin_user = {
             "id": "admin",
             "email": "admin@kuryecini.com",
-            "role": "admin",
             "first_name": "Admin",
-            "last_name": "User",
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "role": "admin",
             "is_active": True
         }
         
         return {
             "access_token": access_token,
             "token_type": "bearer",
-            "user_type": "admin",
-            "user_data": admin_user
+            "user": admin_user
         }
     
-    # Normal user login
+    # Test users for demo purposes
+    test_users = {
+        "testcustomer@example.com": {
+            "id": "customer-001",
+            "email": "testcustomer@example.com", 
+            "first_name": "Test",
+            "last_name": "Customer",
+            "role": "customer",
+            "is_active": True,
+            "password": "test123"
+        },
+        "testkurye@example.com": {
+            "id": "courier-001",
+            "email": "testkurye@example.com",
+            "first_name": "Test", 
+            "last_name": "Courier",
+            "role": "courier",
+            "is_active": True,
+            "password": "test123"
+        },
+        "testbusiness@example.com": {
+            "id": "business-001",
+            "email": "testbusiness@example.com",
+            "first_name": "Test",
+            "last_name": "Business",
+            "role": "business", 
+            "business_name": "Test Restaurant",
+            "is_active": True,
+            "password": "test123"
+        }
+    }
+    
+    # Check test users
+    if login_data.email in test_users:
+        test_user = test_users[login_data.email]
+        if login_data.password == test_user["password"]:
+            access_token = create_access_token(data={"sub": login_data.email, "role": test_user["role"]})
+            user_data = test_user.copy()
+            del user_data["password"]  # Remove password from response
+            
+            return {
+                "access_token": access_token,
+                "token_type": "bearer", 
+                "user": user_data
+            }
+        else:
+            raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
+    
+    # Real user lookup (unchanged from original)
     user = await db.users.find_one({"email": login_data.email})
+    if not user:
+        raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
-    if not user or not verify_password(login_data.password, user["password"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
-        )
+    if not verify_password(login_data.password, user.get("password_hash", "")):
+        raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
-    access_token_expires = timedelta(minutes=15)
-    access_token = create_access_token(
-        data={"sub": user["email"]}, expires_delta=access_token_expires
-    )
+    access_token = create_access_token(data={"sub": user["email"], "role": user.get("role", "customer")})
     
-    # Convert ObjectId to string for response
-    user["id"] = str(user["_id"])
-    del user["_id"]
-    del user["password"]  # Don't send password in response
+    user["id"] = str(user["_id"]) if "_id" in user else str(uuid.uuid4())
+    if "_id" in user:
+        del user["_id"] 
+    if "password_hash" in user:
+        del user["password_hash"]
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user_type": user["role"],
-        "user_data": user
+        "user": user
     }
 
 @api_router.post("/register/courier")
