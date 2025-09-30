@@ -4975,6 +4975,37 @@ async def generate_dummy_data(current_user: dict = Depends(get_current_user)):
 async def root():
     return {"message": "Kuryecini API v11.0 - Business Panel & Admin Enhancements"}
 
+# Add health check and menus endpoints to API router for production deployment
+@api_router.get("/healthz")
+async def api_health_check():
+    """Health check endpoint for deployment monitoring (API version)"""
+    return {"status": "ok"}
+
+@api_router.get("/menus")
+async def api_get_menus():
+    """Get all menu items in standardized format (API version)"""
+    try:
+        # Get all products from all businesses
+        businesses = await db.businesses.find({"kyc_status": "approved"}).to_list(None)
+        all_menu_items = []
+        
+        for business in businesses:
+            # Get products for this business
+            products = await db.products.find({"business_id": business["id"]}).to_list(None)
+            for product in products:
+                menu_item = {
+                    "id": product.get("id", str(product.get("_id", ""))),
+                    "title": product.get("name", ""),
+                    "price": float(product.get("price", 0)),
+                    "imageUrl": product.get("image_url", ""),
+                    "category": product.get("category", "uncategorized")
+                }
+                all_menu_items.append(menu_item)
+        
+        return all_menu_items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
