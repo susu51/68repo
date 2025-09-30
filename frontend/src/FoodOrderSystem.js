@@ -523,6 +523,12 @@ export const ProfessionalFoodOrderSystem = ({
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
 
+  // Menu categories for filtering
+  const categories = [
+    'Tümü', 'Ana Yemek', 'Pizza', 'Burger', 'Döner', 'Kebap', 
+    'Pasta', 'Çorba', 'Salata', 'Tatlı', 'İçecek', 'Kahve', 'Çay'
+  ];
+
   useEffect(() => {
     setIsMounted(true);
     
