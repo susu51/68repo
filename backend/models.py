@@ -19,63 +19,228 @@ class UserRole(str, Enum):
     BUSINESS = "business"
     ADMIN = "admin"
 
-# Request Models
-class OTPRequestModel(BaseModel):
-    phone: str = Field(..., description="Turkish phone number (+90xxxxxxxxxx)")
-    device_id: Optional[str] = Field(None, description="Device identifier for tracking")
+class User(BaseModel):
+    """User document model"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    role: UserRole
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+    loyalty_points: int = Field(default=0, ge=0)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
+    
+    # Auth fields
+    password_hash: Optional[str] = None
+    is_active: bool = True
+    is_verified: bool = False
+    
+    # Additional profile fields
+    birth_date: Optional[datetime] = None
+    gender: Optional[str] = None
     
     @validator('phone')
     def validate_phone(cls, v):
-        # Basic validation - detailed validation happens in service layer
-        if not v or len(v.strip()) < 10:
-            raise ValueError('Phone number is required and must be valid')
-        return v.strip()
-
-class OTPVerifyModel(BaseModel):
-    phone: str = Field(..., description="Turkish phone number")
-    otp: str = Field(..., min_length=6, max_length=6, description="6-digit OTP code")
-    
-    @validator('otp')
-    def validate_otp(cls, v):
-        if not v.isdigit():
-            raise ValueError('OTP must contain only digits')
+        if v and not v.startswith('+90'):
+            v = f"+90{v.lstrip('+').lstrip('90').lstrip('0')}"
         return v
+    
+    class Config:
+        populate_by_name = True
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
 
-class RefreshTokenModel(BaseModel):
-    refresh_token: str = Field(..., description="JWT refresh token")
+class Address(BaseModel):
+    """Address document model"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    user_id: str
+    label: str  # "Ev", "İş", "Diğer"
+    full_address: str
+    city: str
+    district: Optional[str] = None
+    loc: Dict[str, float]  # {"lat": 41.0082, "lng": 28.9784}
+    is_default: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
+    
+    @validator('loc')
+    def validate_location(cls, v):
+        if 'lat' not in v or 'lng' not in v:
+            raise ValueError('Location must have lat and lng keys')
+        return v
+    
+    class Config:
+        populate_by_name = True
 
-class UserUpdateModel(BaseModel):
-    email: Optional[str] = Field(None, description="Email address (optional)")
-    first_name: Optional[str] = Field(None, max_length=50)
-    last_name: Optional[str] = Field(None, max_length=50)
+class CartItem(BaseModel):
+    """Cart item model"""
+    product_id: str
+    qty: int = Field(ge=1)
+    price: Optional[float] = None  # Server-validated price
+    product_name: Optional[str] = None  # Cached for display
 
-class CourierRegistrationModel(BaseModel):
-    phone: str = Field(..., description="Phone number (verified via OTP)")
-    email: Optional[str] = Field(None, description="Email address (optional)")
-    first_name: str = Field(..., max_length=50)
-    last_name: str = Field(..., max_length=50)
-    iban: str = Field(..., description="Turkish IBAN for payments")
-    vehicle_type: VehicleType
-    vehicle_model: str = Field(..., max_length=100)
-    license_class: str = Field(..., max_length=10, description="Driver license class")
-    city: str = Field(..., max_length=50)
+class Cart(BaseModel):
+    """Cart document model"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    user_id: str
+    items: List[CartItem] = []
+    city: Optional[str] = None  # For delivery validation
+    business_id: Optional[str] = None  # Lock cart to specific business
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    class Config:
+        populate_by_name = True
 
-class BusinessRegistrationModel(BaseModel):
-    phone: str = Field(..., description="Phone number (verified via OTP)")
-    email: Optional[str] = Field(None, description="Email address (optional)")
-    business_name: str = Field(..., max_length=100)
-    tax_number: str = Field(..., description="Turkish tax number")
-    address: str = Field(..., max_length=500)
-    city: str = Field(..., max_length=50)
-    business_category: BusinessCategory
-    description: Optional[str] = Field(None, max_length=1000)
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    PREPARING = "preparing"
+    READY = "ready"
+    PICKED_UP = "picked_up"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
 
-class CustomerRegistrationModel(BaseModel):
-    phone: str = Field(..., description="Phone number (verified via OTP)")
-    email: Optional[str] = Field(None, description="Email address (optional)")
-    first_name: str = Field(..., max_length=50)
-    last_name: str = Field(..., max_length=50)
-    city: str = Field(..., max_length=50)
+class OrderTotals(BaseModel):
+    """Order financial totals"""
+    gross: float = Field(ge=0)
+    delivery_fee: float = Field(default=0, ge=0)
+    service_fee: float = Field(default=0, ge=0)
+    discount: float = Field(default=0, ge=0)
+    net: float = Field(ge=0)
+    commission: float = Field(default=0, ge=0)  # Platform commission
+
+class RoutePoint(BaseModel):
+    """Route waypoint"""
+    lat: float
+    lng: float
+    address: str
+    timestamp: Optional[datetime] = None
+
+class Order(BaseModel):
+    """Order document model"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    order_number: str = Field(default_factory=lambda: f"KUR{int(datetime.now().timestamp())}")
+    
+    # Participants
+    customer_id: str
+    business_id: str
+    courier_id: Optional[str] = None
+    
+    # Items and pricing
+    items: List[CartItem]
+    totals: OrderTotals
+    
+    # Status and tracking
+    status: OrderStatus = OrderStatus.PENDING
+    route: List[RoutePoint] = []
+    
+    # Delivery information
+    delivery_address: str
+    delivery_lat: float
+    delivery_lng: float
+    customer_phone: str
+    
+    # Timestamps
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    confirmed_at: Optional[datetime] = None
+    picked_up_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
+    
+    # Additional fields
+    notes: Optional[str] = None
+    rating: Optional[int] = Field(None, ge=1, le=5)
+    
+    class Config:
+        populate_by_name = True
+
+class NotificationPreferences(BaseModel):
+    """Notification preferences model"""
+    sms: bool = True
+    email: bool = True
+    push: bool = True
+
+class MarketingPreferences(BaseModel):
+    """Marketing preferences model"""
+    city: Optional[str] = None
+    categories: List[str] = []
+    allow_promotional: bool = True
+
+class UserPreferences(BaseModel):
+    """User preferences document model"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    user_id: str
+    notifications: NotificationPreferences = NotificationPreferences()
+    marketing: MarketingPreferences = MarketingPreferences()
+    theme: str = "auto"  # "light", "dark", "auto"
+    language: str = "tr"
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    class Config:
+        populate_by_name = True
+
+class BannerTargeting(BaseModel):
+    """Banner targeting criteria"""
+    cities: List[str] = []
+    user_roles: List[UserRole] = []
+    age_range: Optional[Dict[str, int]] = None  # {"min": 18, "max": 65}
+
+class BannerSchedule(BaseModel):
+    """Banner schedule model"""
+    start_date: datetime
+    end_date: datetime
+    active_hours: Optional[Dict[str, str]] = None  # {"start": "09:00", "end": "22:00"}
+
+class Banner(BaseModel):
+    """Banner document model"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    title: str
+    img_url: str
+    target_url: Optional[str] = None
+    targeting: BannerTargeting = BannerTargeting()
+    schedule: BannerSchedule
+    active: bool = True
+    order: int = 0  # Display order
+    clicks: int = 0
+    impressions: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    class Config:
+        populate_by_name = True
+
+class CourierReportTotals(BaseModel):
+    """Courier monthly report totals"""
+    order_count: int = 0
+    gross_earnings: float = 0.0
+    commission: float = 0.0
+    net_earnings: float = 0.0
+    distance_km: float = 0.0
+    average_delivery_time: float = 0.0  # minutes
+
+class CourierReport(BaseModel):
+    """Courier monthly report document"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    courier_id: str
+    month: str  # Format: "YYYY-MM"
+    totals: CourierReportTotals
+    pdf_url: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    class Config:
+        populate_by_name = True
+
+class LoyaltyTransaction(BaseModel):
+    """Loyalty points transaction"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    user_id: str
+    points: int  # Positive for earning, negative for spending
+    transaction_type: str  # "order_reward", "referral", "spend", "expire"
+    reference_id: Optional[str] = None  # Order ID, referral ID, etc.
+    description: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    class Config:
+        populate_by_name = True
 
 # Response Models
 class TokenResponse(BaseModel):
