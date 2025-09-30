@@ -156,13 +156,13 @@ class ProductionDeploymentTester:
         return success
 
     def test_menus_endpoint(self):
-        """Test menus endpoint: GET /menus - should return array with proper schema"""
+        """Test menus endpoint: GET /api/menus - should return array with proper schema"""
         print("\n🍽️ TESTING MENUS ENDPOINT")
         
         success, response = self.run_test(
             "Menus Endpoint",
             "GET",
-            "/menus",
+            "menus",
             200
         )
         
