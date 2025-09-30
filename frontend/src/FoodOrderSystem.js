@@ -807,6 +807,11 @@ export const ProfessionalFoodOrderSystem = ({
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('card');
 
+  // Calculate cart total
+  const getCartTotal = () => {
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+  };
+
   const handleCheckout = () => {
     if (!isMounted || cart.length === 0) return;
     setShowCheckoutModal(true);
