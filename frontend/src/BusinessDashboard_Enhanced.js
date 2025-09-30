@@ -847,7 +847,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl mb-2">✅</div>
-                    <div className="text-2xl font-bold text-orange-600">{stats.today.completionRate.toFixed(1)}%</div>
+                    <div className="text-2xl font-bold text-orange-600">{(stats.today?.completionRate || 0).toFixed(1)}%</div>
                     <div className="text-sm text-gray-600">Tamamlanma</div>
                   </CardContent>
                 </Card>
