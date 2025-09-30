@@ -262,6 +262,215 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       }
     }));
   };
+
+  // Professional Business Functions
+  const acceptOrder = async (orderId) => {
+    try {
+      const order = incomingOrders.find(o => o.id === orderId);
+      if (order) {
+        // Move from incoming to active
+        setIncomingOrders(prev => prev.filter(o => o.id !== orderId));
+        setActiveOrders(prev => [...prev, {
+          ...order,
+          status: 'accepted',
+          accepted_at: new Date(),
+          estimated_ready: new Date(Date.now() + order.items[0]?.preparation_time * 60000 || 900000)
+        }]);
+        setUnprocessedCount(prev => Math.max(0, prev - 1));
+        
+        toast.success(`Sipariş #${orderId} kabul edildi!`);
+        
+        // Update stats
+        setStats(prev => ({
+          ...prev,
+          today: {
+            ...prev.today,
+            orders: prev.today.orders + 1,
+            revenue: prev.today.revenue + order.total_amount
+          }
+        }));
+      }
+    } catch (error) {
+      toast.error('Sipariş kabul edilemedi');
+    }
+  };
+
+  const rejectOrder = async (orderId, reason = 'İşletme tarafından reddedildi') => {
+    try {
+      setIncomingOrders(prev => prev.filter(o => o.id !== orderId));
+      setUnprocessedCount(prev => Math.max(0, prev - 1));
+      toast.success(`Sipariş #${orderId} reddedildi`);
+    } catch (error) {
+      toast.error('Sipariş reddedilemedi');
+    }
+  };
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const statusLabels = {
+        'preparing': '👨‍🍳 Hazırlanıyor',
+        'ready': '✅ Hazır',
+        'picked_up': '🚚 Kurye Aldı',
+        'delivered': '🎉 Teslim Edildi',
+        'cancelled': '❌ İptal Edildi'
+      };
+
+      setActiveOrders(prev => prev.map(order => 
+        order.id === orderId 
+          ? { ...order, status: newStatus, [`${newStatus}_at`]: new Date() }
+          : order
+      ));
+
+      toast.success(`${statusLabels[newStatus]} - Sipariş #${orderId}`);
+
+      // If delivered, move to history
+      if (newStatus === 'delivered') {
+        setTimeout(() => {
+          const completedOrder = activeOrders.find(o => o.id === orderId);
+          if (completedOrder) {
+            setActiveOrders(prev => prev.filter(o => o.id !== orderId));
+            setOrderHistory(prev => [{ ...completedOrder, status: 'delivered', delivered_at: new Date() }, ...prev]);
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      toast.error('Durum güncellenemedi');
+    }
+  };
+
+  const toggleRestaurantStatus = async (field, value) => {
+    try {
+      setRestaurantStatus(prev => ({ ...prev, [field]: value }));
+      
+      const messages = {
+        isOpen: value ? '✅ Restoran açıldı' : '🔒 Restoran kapatıldı',
+        isAcceptingOrders: value ? '📥 Sipariş alımı açık' : '🚫 Sipariş alımı kapalı',
+        busyMode: value ? '🔥 Yoğun mod aktif - teslimat süresi uzatıldı' : '✅ Normal mod'
+      };
+      
+      toast.success(messages[field]);
+    } catch (error) {
+      toast.error('Durum güncellenemedi');
+    }
+  };
+
+  const addProduct = async () => {
+    try {
+      if (!productForm.name || !productForm.price) {
+        toast.error('Ürün adı ve fiyat zorunludur');
+        return;
+      }
+
+      const newProduct = {
+        id: `PRD-${Date.now()}`,
+        ...productForm,
+        price: parseFloat(productForm.price),
+        order_count: 0,
+        rating: 0,
+        created_at: new Date()
+      };
+
+      if (editingProduct) {
+        // Update existing
+        setProducts(prev => prev.map(p => p.id === editingProduct.id ? newProduct : p));
+        toast.success('Ürün güncellendi!');
+      } else {
+        // Add new
+        setProducts(prev => [...prev, newProduct]);
+        toast.success('Yeni ürün eklendi!');
+      }
+
+      resetProductForm();
+    } catch (error) {
+      toast.error('Ürün kaydedilemedi');
+    }
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!window.confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
+    
+    try {
+      setProducts(prev => prev.filter(p => p.id !== productId));
+      toast.success('Ürün silindi');
+    } catch (error) {
+      toast.error('Ürün silinemedi');
+    }
+  };
+
+  const toggleProductAvailability = async (productId, isAvailable) => {
+    try {
+      setProducts(prev => prev.map(p => 
+        p.id === productId ? { ...p, is_available: isAvailable } : p
+      ));
+      toast.success(isAvailable ? '✅ Ürün stokta' : '❌ Ürün stoktan çıkarıldı');
+    } catch (error) {
+      toast.error('Stok durumu güncellenemedi');
+    }
+  };
+
+  const updateProductPrice = (productId, newPrice) => {
+    if (!newPrice || isNaN(newPrice)) {
+      toast.error('Geçerli bir fiyat girin');
+      return;
+    }
+
+    setProducts(prev => prev.map(p => 
+      p.id === productId ? { ...p, price: parseFloat(newPrice) } : p
+    ));
+    toast.success('Fiyat güncellendi!');
+  };
+
+  const resetProductForm = () => {
+    setProductForm({
+      name: '',
+      description: '',
+      price: '',
+      category: 'Ana Yemekler',
+      preparation_time: 15,
+      is_available: true,
+      image_url: '',
+      ingredients: '',
+      allergens: ''
+    });
+    setEditingProduct(null);
+    setShowProductModal(false);
+  };
+
+  const exportData = (type) => {
+    try {
+      let data = [];
+      let filename = '';
+
+      switch (type) {
+        case 'orders':
+          data = [...orderHistory, ...activeOrders];
+          filename = 'siparisler.json';
+          break;
+        case 'products':
+          data = products;
+          filename = 'urunler.json';
+          break;
+        case 'stats':
+          data = stats;
+          filename = 'istatistikler.json';
+          break;
+      }
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Veri başarıyla dışa aktarıldı!');
+    } catch (error) {
+      toast.error('Dışa aktarma başarısız');
+    }
+  };
     todayOrders: 0,
     todayRevenue: 0,
     weeklyOrders: 0,
