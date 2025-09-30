@@ -375,13 +375,32 @@ const CourierMap = ({ orders = [], onOrderSelect, selectedOrder }) => {
                   {selectedOrder.status}
                 </Badge>
               </div>
-              <div className="flex space-x-2 mt-4">
-                <Button size="sm" className="flex-1">
-                  🚚 Teslimata Başla
+              <div className="flex space-x-1 mt-4">
+                <Button 
+                  size="sm" 
+                  className="flex-1" 
+                  onClick={() => createRoute(selectedOrder)}
+                  disabled={!courierLocation}
+                >
+                  🚚 Rota
                 </Button>
-                <Button size="sm" variant="outline" className="flex-1">
-                  📞 Müşteriyi Ara
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => window.open(`tel:${selectedOrder.customer_phone}`)}
+                >
+                  📞 Ara
                 </Button>
+                {showRoute && (
+                  <Button 
+                    size="sm" 
+                    variant="destructive" 
+                    onClick={clearRoute}
+                  >
+                    ✕
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
