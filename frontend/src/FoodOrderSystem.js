@@ -7,6 +7,7 @@ import { Badge } from "./components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import toast from 'react-hot-toast';
 import AddressSelector from './components/AddressSelector';
+import { renderLocation } from './utils/renderSafe';
 
 const API = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001'}/api`;
 
