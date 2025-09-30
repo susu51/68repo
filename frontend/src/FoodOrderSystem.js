@@ -668,7 +668,7 @@ export const ProfessionalFoodOrderSystem = ({
       const businessData = response.data;
       
       // Double-check isMounted after async operation
-      if (isMounted) {
+      if (isMounted && businessData) {
         setOriginalRestaurants(businessData); // Store original data
         sortAndFilterRestaurants(businessData, sortType, userLocation);
         console.log('Restaurants fetched:', businessData);
