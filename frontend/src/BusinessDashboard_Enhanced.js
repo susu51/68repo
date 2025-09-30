@@ -1511,7 +1511,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-blue-600">₺{stats.averageOrderValue.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-blue-600">₺{(stats.averageOrderValue || 0).toFixed(2)}</p>
                     <p className="text-sm text-gray-600">Ortalama Sipariş Tutarı</p>
                   </div>
                   <div className="text-center">
