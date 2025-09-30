@@ -515,6 +515,64 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      // Mock products data for demo
+      const mockProducts = [
+        {
+          id: 'PRD-001',
+          name: 'Chicken Burger',
+          description: 'Sulu tavuk göğsü, taze sebzeler ve özel sosumuzla',
+          price: 45.00,
+          category: 'Burger',
+          preparation_time: 15,
+          is_available: true,
+          image_url: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=300',
+          ingredients: 'Tavuk göğsü, marul, domates, soğan, turşu',
+          allergens: 'Gluten',
+          order_count: 245,
+          rating: 4.8
+        },
+        {
+          id: 'PRD-002',
+          name: 'Margarita Pizza',
+          description: 'Klasik İtalyan pizzası - mozzarella, domates, fesleğen',
+          price: 65.00,
+          category: 'Pizza',
+          preparation_time: 20,
+          is_available: true,
+          image_url: 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=300',
+          ingredients: 'Pizza hamuru, mozzarella, domates sosu, fesleğen',
+          allergens: 'Gluten, Süt',
+          order_count: 189,
+          rating: 4.9
+        },
+        {
+          id: 'PRD-003',
+          name: 'Adana Kebap',
+          description: 'Geleneksel Adana kebabı, lavash ekmeği ile',
+          price: 55.00,
+          category: 'Ana Yemekler',
+          preparation_time: 25,
+          is_available: false,
+          image_url: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=300',
+          ingredients: 'Dana kıyma, soğan, baharat, lavash',
+          allergens: 'Gluten',
+          order_count: 156,
+          rating: 4.7
+        }
+      ];
+      
+      setProducts(mockProducts);
+      toast.success('Menü güncellendi');
+    } catch (error) {
+      toast.error('Menü yüklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
