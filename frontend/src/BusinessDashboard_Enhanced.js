@@ -618,7 +618,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                   </span>
                 </div>
                 <div className="text-sm text-gray-600">
-                  Bugün: <span className="font-bold text-green-600">₺{stats.today.revenue.toFixed(2)}</span>
+                  Bugün: <span className="font-bold text-green-600">₺{(stats.today?.revenue || 0).toFixed(2)}</span>
                 </div>
                 {unprocessedCount > 0 && (
                   <Badge className="bg-red-500 animate-pulse">
