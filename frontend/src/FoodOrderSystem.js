@@ -529,7 +529,7 @@ export const ProfessionalFoodOrderSystem = ({
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
 
   // Menu categories for filtering
-  const categories = [
+  const menuCategories = [
     'Tümü', 'Ana Yemek', 'Pizza', 'Burger', 'Döner', 'Kebap', 
     'Pasta', 'Çorba', 'Salata', 'Tatlı', 'İçecek', 'Kahve', 'Çay'
   ];
