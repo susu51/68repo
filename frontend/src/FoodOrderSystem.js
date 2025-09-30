@@ -589,7 +589,7 @@ export const ProfessionalFoodOrderSystem = ({
             lng: position.coords.longitude
           };
           setUserLocation(location);
-          console.log('Kullanıcı konumu alındı:', location);
+          console.log('Kullanıcı konumu alındı:', `${location.lat}, ${location.lng}`);
         }
       },
       (error) => {
