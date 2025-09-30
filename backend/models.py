@@ -1,39 +1,23 @@
-from pydantic import BaseModel, validator, Field
-from typing import Optional, List, Dict
-from datetime import datetime
-from enum import Enum
+"""
+MongoDB Data Models for Kuryecini
+All persistent data structures for localStorage migration
+"""
 
-# Enums
+from pydantic import BaseModel, Field, EmailStr, validator
+from typing import List, Optional, Dict, Any, Union
+from datetime import datetime, timezone
+from enum import Enum
+import uuid
+
+def generate_id() -> str:
+    """Generate unique ID for documents"""
+    return str(uuid.uuid4())
+
 class UserRole(str, Enum):
     CUSTOMER = "customer"
-    COURIER = "courier" 
+    COURIER = "courier"
     BUSINESS = "business"
     ADMIN = "admin"
-
-class KYCStatus(str, Enum):
-    PENDING = "pending"
-    APPROVED = "approved"
-    REJECTED = "rejected"
-
-class VehicleType(str, Enum):
-    CAR = "araba"
-    MOTORCYCLE = "motor"
-    ELECTRIC_MOTORCYCLE = "elektrikli_motor"
-    BICYCLE = "bisiklet"
-
-class BusinessCategory(str, Enum):
-    FOOD = "gida"
-    SHIPPING = "nakliye"
-
-class OrderStatus(str, Enum):
-    PENDING = "pending"
-    ACCEPTED = "accepted"
-    PREPARING = "preparing"
-    READY = "ready"
-    PICKED_UP = "picked_up"
-    DELIVERING = "delivering"
-    DELIVERED = "delivered"
-    CANCELLED = "cancelled"
 
 # Request Models
 class OTPRequestModel(BaseModel):
