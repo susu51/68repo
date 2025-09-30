@@ -471,17 +471,6 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       toast.error('Dışa aktarma başarısız');
     }
   };
-    todayOrders: 0,
-    todayRevenue: 0,
-    weeklyOrders: 0,
-    weeklyRevenue: 0,
-    monthlyOrders: 0,
-    monthlyRevenue: 0,
-    totalOrders: 0,
-    totalRevenue: 0,
-    averageOrderValue: 0,
-    customerRating: 4.2
-  });
 
   useEffect(() => {
     fetchInitialData();
