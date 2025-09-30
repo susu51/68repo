@@ -897,27 +897,130 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Professional Header */}
       <div className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <div className="text-2xl">🏪</div>
+              <div className="text-3xl">🏪</div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">İşletme Paneli</h1>
+                <h1 className="text-xl font-bold text-gray-900">İşletme Yönetim Paneli</h1>
                 <p className="text-sm text-gray-600">
-                  {user?.business_name || 'Restoranım'}
+                  {user?.business_name || 'Test Restaurant'} • {user?.email}
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              {/* Restaurant Status Toggle */}
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={toggleRestaurantOpen}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    restaurantStatus.isOpen ? 'bg-green-600' : 'bg-gray-200'
+            <div className="flex items-center space-x-6">
+              {/* Live Status Indicators */}
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-3 h-3 rounded-full ${restaurantStatus.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <span className="text-sm font-medium">
+                    {restaurantStatus.isOpen ? 'Açık' : 'Kapalı'}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  Bugün: <span className="font-bold text-green-600">₺{stats.today.revenue.toFixed(2)}</span>
+                </div>
+                {unprocessedCount > 0 && (
+                  <Badge className="bg-red-500 animate-pulse">
+                    {unprocessedCount} yeni sipariş
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Quick Actions */}
+              <Button
+                onClick={() => setActiveTab('orders')}
+                variant={unprocessedCount > 0 ? 'default' : 'outline'}
+                size="sm"
+                className={unprocessedCount > 0 ? 'bg-red-600 hover:bg-red-700 animate-pulse' : ''}
+              >
+                {unprocessedCount > 0 ? `🔔 ${unprocessedCount} Yeni` : '📋 Siparişler'}
+              </Button>
+              
+              <Button onClick={onLogout} variant="outline" size="sm">
+                Çıkış
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Professional Navigation Tabs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 mb-6">
+            <div className="flex space-x-1 overflow-x-auto">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'dashboard' 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-blue-500 hover:bg-blue-50'
+                }`}
+              >
+                <span className="text-lg">📊</span>
+                <span>Dashboard</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'orders' 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                }`}
+              >
+                <span className="text-lg">📋</span>
+                <span>Siparişler</span>
+                {unprocessedCount > 0 && (
+                  <span className={`min-w-[20px] h-5 flex items-center justify-center text-xs px-1.5 rounded-full font-bold ${
+                    activeTab === 'orders' ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {unprocessedCount}
+                  </span>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('menu')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'menu' 
+                    ? 'bg-green-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-green-500 hover:bg-green-50'
+                }`}
+              >
+                <span className="text-lg">🍽️</span>
+                <span>Menü</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'analytics' 
+                    ? 'bg-purple-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-purple-500 hover:bg-purple-50'
+                }`}
+              >
+                <span className="text-lg">📈</span>
+                <span>Raporlar</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'settings' 
+                    ? 'bg-gray-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <span className="text-lg">⚙️</span>
+                <span>Ayarlar</span>
+              </button>
+            </div>
+          </div>
                   }`}
                 >
                   <span
