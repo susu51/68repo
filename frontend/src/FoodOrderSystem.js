@@ -748,28 +748,12 @@ export const ProfessionalFoodOrderSystem = ({
   const addToCart = (product) => {
     if (!isMounted) return; // Prevent cart updates if component is unmounted
     
-    // Safety check to prevent runtime errors
-    if (!cart || !Array.isArray(cart)) {
-      console.error('Cart is not initialized properly in FoodOrderSystem:', cart);
-      return;
-    }
-    
-    const existingItem = cart.find(item => item.product_id === product.id);
-    
-    if (existingItem) {
-      setCart(cart.map(item => 
-        item.product_id === product.id 
-          ? { ...item, quantity: item.quantity + 1, subtotal: (item.quantity + 1) * item.product_price }
-          : item
-      ));
+    // Use the prop function if available, otherwise handle locally
+    if (onAddToCart) {
+      onAddToCart(product);
     } else {
-      setCart([...cart, {
-        product_id: product.id,
-        product_name: product.name,
-        product_price: product.price,
-        quantity: 1,
-        subtotal: product.price
-      }]);
+      // Fallback to local handling (for backward compatibility)
+      console.warn('onAddToCart prop not provided, cart functionality may be limited');
     }
     
     if (isMounted) {
