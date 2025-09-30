@@ -59,7 +59,39 @@ UPLOAD_DIR = Path("/app/backend/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 # Create the main app without a prefix
-app = FastAPI(title="DeliverTR API", description="Türkiye Teslimat Platformu - Email Authentication")
+app = FastAPI(title="Kuryecini API", description="Turkish Food Delivery Platform API")
+
+# Health check endpoint (required for deployment)
+@app.get("/healthz")
+async def health_check():
+    """Health check endpoint for deployment monitoring"""
+    return {"status": "ok"}
+
+# Add required menus endpoint
+@app.get("/menus")
+async def get_menus():
+    """Get all menu items in standardized format"""
+    try:
+        # Get all products from all businesses
+        businesses = await db.businesses.find({"kyc_status": "approved"}).to_list(None)
+        all_menu_items = []
+        
+        for business in businesses:
+            # Get products for this business
+            products = await db.products.find({"business_id": business["id"]}).to_list(None)
+            for product in products:
+                menu_item = {
+                    "id": product.get("id", str(product.get("_id", ""))),
+                    "title": product.get("name", ""),
+                    "price": float(product.get("price", 0)),
+                    "imageUrl": product.get("image_url", ""),
+                    "category": product.get("category", "uncategorized")
+                }
+                all_menu_items.append(menu_item)
+        
+        return all_menu_items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Serve uploaded files
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
