@@ -1250,32 +1250,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
               </div>
             </div>
           )}
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      restaurantStatus.isOpen ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-                <span className={`text-sm font-medium ${restaurantStatus.isOpen ? 'text-green-600' : 'text-gray-500'}`}>
-                  {restaurantStatus.isOpen ? '🟢 Açık' : '🔴 Kapalı'}
-                </span>
-              </div>
-
-              {/* Unprocessed Orders Indicator */}
-              {unprocessedCount > 0 && (
-                <Badge className="bg-red-600 animate-pulse">
-                  {unprocessedCount} Yeni Sipariş
-                </Badge>
-              )}
-
-              <Button onClick={onLogout} variant="outline" size="sm">
-                Çıkış
-              </Button>
-            </div>
-          </div>
-        </div>
+        </Tabs>
       </div>
 
       {/* Main Content */}
