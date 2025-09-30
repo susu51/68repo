@@ -282,6 +282,40 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             "is_active": True
         }
     
+    # Handle test users for demo purposes (same as in login endpoint)
+    test_users = {
+        "testcustomer@example.com": {
+            "id": "customer-001",
+            "email": "testcustomer@example.com", 
+            "first_name": "Test",
+            "last_name": "Customer",
+            "role": "customer",
+            "is_active": True
+        },
+        "testkurye@example.com": {
+            "id": "courier-001",
+            "email": "testkurye@example.com",
+            "first_name": "Test", 
+            "last_name": "Courier",
+            "role": "courier",
+            "is_active": True,
+            "kyc_status": "approved"  # Important: approve test courier for testing
+        },
+        "testbusiness@example.com": {
+            "id": "business-001",
+            "email": "testbusiness@example.com",
+            "first_name": "Test",
+            "last_name": "Business",
+            "role": "business", 
+            "business_name": "Test Restaurant",
+            "is_active": True
+        }
+    }
+    
+    # Check if it's a test user
+    if email in test_users:
+        return test_users[email]
+    
     user = await db.users.find_one({"email": email})
     if user is None:
         raise credentials_exception
