@@ -840,7 +840,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl mb-2">📊</div>
-                    <div className="text-2xl font-bold text-purple-600">₺{stats.today.avgOrderValue.toFixed(2)}</div>
+                    <div className="text-2xl font-bold text-purple-600">₺{(stats.today?.avgOrderValue || 0).toFixed(2)}</div>
                     <div className="text-sm text-gray-600">Ortalama Sepet</div>
                   </CardContent>
                 </Card>
