@@ -916,7 +916,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                         </div>
                         <div className="text-right">
                           <Badge className="bg-blue-100 text-blue-800">
-                            +{stats.month.growth.toFixed(1)}% büyüme
+                            +{(stats.month?.growth || 0).toFixed(1)}% büyüme
                           </Badge>
                         </div>
                       </div>
