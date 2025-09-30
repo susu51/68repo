@@ -15,19 +15,71 @@ const API = `${BACKEND_URL}/api`;
 
 export const BusinessDashboard = ({ user, onLogout }) => {
   // Navigation state
-  const [activeTab, setActiveTab] = useState('orders');
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [loading, setLoading] = useState(false);
 
-  // Restaurant status
+  // Restaurant status and settings
   const [restaurantStatus, setRestaurantStatus] = useState({
     isOpen: true,
-    isAcceptingOrders: true
+    isAcceptingOrders: true,
+    busyMode: false,
+    preparationTime: 25
   });
 
   // Orders management
   const [incomingOrders, setIncomingOrders] = useState([]);
   const [activeOrders, setActiveOrders] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
+  const [unprocessedCount, setUnprocessedCount] = useState(0);
+
+  // Menu & Product management
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState(['Başlangıçlar', 'Ana Yemekler', 'Tatlılar', 'İçecekler', 'Pizza', 'Burger']);
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productForm, setProductForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: 'Ana Yemekler',
+    preparation_time: 15,
+    is_available: true,
+    image_url: '',
+    ingredients: '',
+    allergens: ''
+  });
+
+  // Analytics and Statistics
+  const [stats, setStats] = useState({
+    today: {
+      orders: 0,
+      revenue: 0,
+      avgOrderValue: 0,
+      completionRate: 0
+    },
+    week: {
+      orders: 0,
+      revenue: 0,
+      growth: 0
+    },
+    month: {
+      orders: 0,
+      revenue: 0,
+      growth: 0
+    },
+    topProducts: [],
+    peakHours: [],
+    customerSatisfaction: 4.5
+  });
+
+  // Financial data
+  const [financials, setFinancials] = useState({
+    dailyRevenue: [],
+    monthlyRevenue: 0,
+    pendingPayouts: 0,
+    commission: 0.15,
+    totalEarnings: 0
+  });
   const [unprocessedCount, setUnprocessedCount] = useState(0);
 
   // Menu & Product management
