@@ -1025,10 +1025,82 @@ export const ProfessionalFoodOrderSystem = ({
             )}
           </div>
 
-          {/* Products */}
-          <div className="space-y-4">
+          {/* Enhanced Menu Categories & Filters */}
+          <div className="space-y-4 mb-6">
+            {/* Category Tabs */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => setActiveMenuTab(category)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    activeMenuTab === category
+                      ? 'bg-orange-500 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {getCategoryIcon(category)} {category}
+                </button>
+              ))}
+            </div>
+
+            {/* Advanced Filters */}
+            <div className="flex items-center space-x-4 p-4 bg-white rounded-lg border">
+              <div className="flex items-center space-x-2">
+                <label className="text-sm font-medium text-gray-700">Sıralama:</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="border rounded px-3 py-1 text-sm"
+                >
+                  <option value="popularity">Popülerlik</option>
+                  <option value="price_asc">Fiyat (Düşük-Yüksek)</option>
+                  <option value="price_desc">Fiyat (Yüksek-Düşük)</option>
+                  <option value="rating">Puan</option>
+                  <option value="prep_time">Hazırlık Süresi</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <label className="text-sm font-medium text-gray-700">Fiyat:</label>
+                <div className="flex space-x-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={priceRange.min}
+                    onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
+                    className="w-16 border rounded px-2 py-1 text-sm"
+                  />
+                  <span className="text-gray-500">-</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={priceRange.max}
+                    onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
+                    className="w-16 border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="availableOnly"
+                  checked={showAvailableOnly}
+                  onChange={(e) => setShowAvailableOnly(e.target.checked)}
+                  className="rounded"
+                />
+                <label htmlFor="availableOnly" className="text-sm text-gray-700">
+                  Sadece Mevcut Olanlar
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Product Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredProducts.map(product => (
-              <ProductCard
+              <EnhancedProductCard
                 key={product.id}
                 product={product}
                 onAddToCart={addToCart}
