@@ -155,8 +155,31 @@ const CourierMap = ({ orders = [], onOrderSelect, selectedOrder }) => {
     toast.success('Konum takibi durduruldu');
   };
 
-  // Calculate distance between two points
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  // Create simple route polyline
+  const createRoute = (selectedOrder) => {
+    if (!courierLocation || !selectedOrder) return;
+    
+    const routeCoordinates = [
+      [courierLocation.lat, courierLocation.lng],
+      [selectedOrder.delivery_lat, selectedOrder.delivery_lng]
+    ];
+    
+    setRoute(routeCoordinates);
+    setShowRoute(true);
+    toast.success(`Rota oluşturuldu: ${calculateDistance(
+      courierLocation.lat,
+      courierLocation.lng,
+      selectedOrder.delivery_lat,
+      selectedOrder.delivery_lng
+    )} km`);
+  };
+
+  // Clear route
+  const clearRoute = () => {
+    setRoute(null);
+    setShowRoute(false);
+    toast.success('Rota temizlendi');
+  };
     const R = 6371; // Earth's radius in kilometers
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
