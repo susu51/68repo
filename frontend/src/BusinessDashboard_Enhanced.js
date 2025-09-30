@@ -878,7 +878,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-green-600">₺{product.revenue.toFixed(2)}</p>
+                            <p className="font-bold text-green-600">₺{(product.revenue || 0).toFixed(2)}</p>
                           </div>
                         </div>
                       ))}
