@@ -741,7 +741,11 @@ export const ProfessionalFoodOrderSystem = ({
     if (!isMounted) return; // Prevent restaurant selection if component is unmounted
     
     setSelectedRestaurant(restaurant);
-    setCart([]); // Clear cart when switching restaurants
+    // Clear cart when switching restaurants - use prop function if available
+    if (onUpdateCart) {
+      // Clear all items from cart
+      cart.forEach(item => onRemoveFromCart && onRemoveFromCart(item.product_id));
+    }
     fetchProducts(restaurant.id);
   };
 
