@@ -68,7 +68,7 @@ const RestaurantCard = ({ restaurant, onClick, userLocation }) => {
         <div className="flex justify-between items-center text-xs text-gray-500 mb-2">
           <span className="flex items-center">
             <span className="mr-1">📍</span>
-            {restaurant.address || restaurant.location?.name}
+            {restaurant.address || restaurant.location?.name || 'Adres bilgisi yok'}
           </span>
         </div>
         
