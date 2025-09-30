@@ -305,6 +305,19 @@ const CourierMap = ({ orders = [], onOrderSelect, selectedOrder }) => {
             </>
           )}
 
+          {/* Route Polyline */}
+          {showRoute && route && (
+            <Polyline 
+              positions={route} 
+              pathOptions={{ 
+                color: '#EF4444', 
+                weight: 4, 
+                opacity: 0.8,
+                dashArray: '10, 5'
+              }} 
+            />
+          )}
+
           {/* Order Markers */}
           {orders.map((order) => (
             <Marker
