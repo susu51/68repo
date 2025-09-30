@@ -134,13 +134,13 @@ class ProductionDeploymentTester:
             return False, {}
 
     def test_health_check_endpoint(self):
-        """Test health check endpoint: GET /healthz - should return {"status": "ok"}"""
+        """Test health check endpoint: GET /api/healthz - should return {"status": "ok"}"""
         print("\n🏥 TESTING HEALTH CHECK ENDPOINT")
         
         success, response = self.run_test(
             "Health Check Endpoint",
             "GET",
-            "/healthz",
+            "healthz",
             200
         )
         
