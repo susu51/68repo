@@ -482,10 +482,14 @@ const CartSummary = ({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) => {
         
         <Button 
           onClick={onCheckout}
-          className="w-full mt-4 bg-green-600 hover:bg-green-700"
+          className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
           disabled={cart.length === 0}
         >
-          Siparişi Tamamla 🚀
+          <div className="flex items-center justify-center space-x-2">
+            <span>🛒</span>
+            <span>Siparişi Tamamla</span>
+            <span className="font-bold">₺{getCartTotal().toFixed(2)}</span>
+          </div>
         </Button>
         
         {getCartTotal() < 100 && (
