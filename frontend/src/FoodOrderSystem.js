@@ -550,14 +550,24 @@ export const ProfessionalFoodOrderSystem = ({
       getUserLocation();
     }
     
-    fetchRestaurants();
+    // Always fetch restaurants on mount
+    const timeoutId = setTimeout(() => {
+      if (isMounted) {
+        fetchRestaurants();
+      }
+    }, 100);
     
     // Cleanup function
     return () => {
       setIsMounted(false);
+      clearTimeout(timeoutId);
       // Clear any pending state updates
       setLoading(false);
       setLocationError(null);
+      // Clear all state to prevent memory leaks
+      setRestaurants([]);
+      setProducts([]);
+      setSelectedRestaurant(null);
     };
   }, [propUserLocation, locationFilter, selectedCity]);
 
