@@ -742,9 +742,9 @@ export const ProfessionalFoodOrderSystem = ({
     
     setSelectedRestaurant(restaurant);
     // Clear cart when switching restaurants - use prop function if available
-    if (onUpdateCart) {
+    if (onRemoveFromCart && cart.length > 0) {
       // Clear all items from cart
-      cart.forEach(item => onRemoveFromCart && onRemoveFromCart(item.product_id));
+      cart.forEach(item => onRemoveFromCart(item.product_id));
     }
     fetchProducts(restaurant.id);
   };
