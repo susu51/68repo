@@ -1021,6 +1021,235 @@ export const BusinessDashboard = ({ user, onLogout }) => {
               </button>
             </div>
           </div>
+
+          {/* Professional Dashboard Content */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              {/* Status Control Panel */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">Restoran Durumu</h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600">Açık/Kapalı</span>
+                            <button
+                              onClick={() => toggleRestaurantStatus('isOpen', !restaurantStatus.isOpen)}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                restaurantStatus.isOpen ? 'bg-green-600' : 'bg-gray-200'
+                              }`}
+                            >
+                              <span
+                                className={`${
+                                  restaurantStatus.isOpen ? 'translate-x-6' : 'translate-x-1'
+                                } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600">Sipariş Alımı</span>
+                            <button
+                              onClick={() => toggleRestaurantStatus('isAcceptingOrders', !restaurantStatus.isAcceptingOrders)}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                restaurantStatus.isAcceptingOrders ? 'bg-green-600' : 'bg-gray-200'
+                              }`}
+                            >
+                              <span
+                                className={`${
+                                  restaurantStatus.isAcceptingOrders ? 'translate-x-6' : 'translate-x-1'
+                                } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600">Yoğun Mod</span>
+                            <button
+                              onClick={() => toggleRestaurantStatus('busyMode', !restaurantStatus.busyMode)}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                restaurantStatus.busyMode ? 'bg-orange-600' : 'bg-gray-200'
+                              }`}
+                            >
+                              <span
+                                className={`${
+                                  restaurantStatus.busyMode ? 'translate-x-6' : 'translate-x-1'
+                                } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl mb-2">⏰</div>
+                    <h3 className="text-lg font-semibold mb-2">Ortalama Hazırlık</h3>
+                    <div className="text-2xl font-bold text-blue-600 mb-1">
+                      {restaurantStatus.preparationTime} dk
+                    </div>
+                    <div className="space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setRestaurantStatus(prev => ({...prev, preparationTime: Math.max(5, prev.preparationTime - 5)}))}
+                      >
+                        -5
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setRestaurantStatus(prev => ({...prev, preparationTime: prev.preparationTime + 5}))}
+                      >
+                        +5
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl mb-2">⭐</div>
+                    <h3 className="text-lg font-semibold mb-2">Müşteri Memnuniyeti</h3>
+                    <div className="text-2xl font-bold text-yellow-600 mb-1">
+                      {stats.customerSatisfaction}/5.0
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {stats.today.orders} değerlendirme
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Today's Performance */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl mb-2">📦</div>
+                    <div className="text-2xl font-bold text-blue-600">{stats.today.orders}</div>
+                    <div className="text-sm text-gray-600">Bugünkü Sipariş</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl mb-2">💰</div>
+                    <div className="text-2xl font-bold text-green-600">₺{stats.today.revenue.toFixed(2)}</div>
+                    <div className="text-sm text-gray-600">Bugünkü Gelir</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl mb-2">📊</div>
+                    <div className="text-2xl font-bold text-purple-600">₺{stats.today.avgOrderValue.toFixed(2)}</div>
+                    <div className="text-sm text-gray-600">Ortalama Sepet</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl mb-2">✅</div>
+                    <div className="text-2xl font-bold text-orange-600">{stats.today.completionRate.toFixed(1)}%</div>
+                    <div className="text-sm text-gray-600">Tamamlanma</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Charts and Analytics */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <span className="mr-2">🔥</span>
+                      En Popüler Ürünler
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {stats.topProducts.map((product, index) => (
+                        <div key={product.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                              index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : 'bg-orange-400'
+                            }`}>
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="font-medium">{product.name}</p>
+                              <p className="text-sm text-gray-600">{product.sales} sipariş</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-green-600">₺{product.revenue.toFixed(2)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <span className="mr-2">📈</span>
+                      Haftalık Trend
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">Bu Hafta</p>
+                          <p className="text-xl font-bold text-green-700">{stats.week.orders} sipariş</p>
+                          <p className="text-lg font-semibold text-green-600">₺{stats.week.revenue.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <Badge className="bg-green-100 text-green-800">
+                            +{stats.week.growth.toFixed(1)}% büyüme
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">Bu Ay</p>
+                          <p className="text-xl font-bold text-blue-700">{stats.month.orders} sipariş</p>
+                          <p className="text-lg font-semibold text-blue-600">₺{stats.month.revenue.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <Badge className="bg-blue-100 text-blue-800">
+                            +{stats.month.growth.toFixed(1)}% büyüme
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      {/* Peak Hours */}
+                      <div className="mt-4">
+                        <h4 className="font-medium mb-2">🕐 Yoğun Saatler</h4>
+                        <div className="space-y-2">
+                          {stats.peakHours.map((hour) => (
+                            <div key={hour.hour} className="flex justify-between items-center text-sm">
+                              <span>{hour.hour}</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className="bg-orange-500 h-2 rounded-full" 
+                                    style={{ width: `${(hour.orders / 25) * 100}%` }}
+                                  ></div>
+                                </div>
+                                <span className="font-medium">{hour.orders}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
                   }`}
                 >
                   <span
