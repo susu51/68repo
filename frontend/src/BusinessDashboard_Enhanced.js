@@ -723,61 +723,205 @@ export const BusinessDashboard = ({ user, onLogout }) => {
           {/* Menu Tab */}
           <TabsContent value="menu" className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">Menü Yönetimi</h2>
-              <Button 
-                onClick={() => {
-                  setEditingProduct(null);
-                  setProductForm({
-                    name: '',
-                    description: '',
-                    price: '',
-                    category: 'food',
-                    preparation_time: 15,
-                    is_available: true,
-                    image_url: ''
-                  });
-                  setShowProductModal(true);
-                }}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                ➕ Yeni Ürün Ekle
-              </Button>
+              <h2 className="text-xl font-bold">🍽️ Menü & Fiyat Yönetimi</h2>
+              <div className="flex space-x-2">
+                <Button 
+                  onClick={() => {
+                    setEditingProduct(null);
+                    setProductForm({
+                      name: '',
+                      description: '',
+                      price: '',
+                      category: 'food',
+                      preparation_time: 15,
+                      is_available: true,
+                      image_url: ''
+                    });
+                    setShowProductModal(true);
+                  }}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  ➕ Yeni Menü Ekle
+                </Button>
+                <Button 
+                  onClick={fetchProducts}
+                  variant="outline"
+                >
+                  🔄 Yenile
+                </Button>
+              </div>
             </div>
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <Card key={product.id} className={`hover:shadow-lg transition-shadow ${!product.is_available ? 'opacity-60' : ''}`}>
-                  <CardContent className="p-4">
-                    {product.image_url && (
-                      <img 
-                        src={product.image_url} 
-                        alt={product.name}
-                        className="w-full h-32 object-cover rounded-lg mb-3"
-                      />
-                    )}
-                    
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-lg">{product.name}</h3>
-                      <Badge variant={product.is_available ? 'default' : 'secondary'}>
-                        {product.is_available ? '✅ Stokta' : '❌ Tükendi'}
-                      </Badge>
-                    </div>
-                    
-                    <p className="text-gray-600 text-sm mb-2">{product.description}</p>
-                    
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-lg font-bold text-green-600">₺{product.price}</span>
-                      <Badge variant="outline">{product.category === 'food' ? 'Yiyecek' : 'İçecek'}</Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                      <span>⏱️ {product.preparation_time || 15} dk</span>
-                      <span>🔥 {product.order_count || 0} sipariş</span>
-                    </div>
-                    
-                    <div className="flex space-x-2">
-                      <Button
+            {/* Menu Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl mb-2">🍽️</div>
+                  <div className="text-2xl font-bold text-blue-600">{products.length}</div>
+                  <div className="text-sm text-gray-600">Toplam Menü</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl mb-2">✅</div>
+                  <div className="text-2xl font-bold text-green-600">{products.filter(p => p.is_available).length}</div>
+                  <div className="text-sm text-gray-600">Stokta</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl mb-2">❌</div>
+                  <div className="text-2xl font-bold text-red-600">{products.filter(p => !p.is_available).length}</div>
+                  <div className="text-sm text-gray-600">Stok Yok</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl mb-2">💰</div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    ₺{products.length > 0 ? (products.reduce((sum, p) => sum + (p.price || 0), 0) / products.length).toFixed(2) : '0.00'}
+                  </div>
+                  <div className="text-sm text-gray-600">Ortalama Fiyat</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Enhanced Products Grid */}
+            {products.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <div className="text-6xl mb-4">🍽️</div>
+                  <h3 className="text-xl font-semibold mb-2">Henüz menü eklenmemiş</h3>
+                  <p className="text-gray-600 mb-4">İlk menü öğenizi ekleyerek başlayın</p>
+                  <Button 
+                    onClick={() => {
+                      setEditingProduct(null);
+                      setProductForm({
+                        name: '',
+                        description: '',
+                        price: '',
+                        category: 'food',
+                        preparation_time: 15,
+                        is_available: true,
+                        image_url: ''
+                      });
+                      setShowProductModal(true);
+                    }}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    ➕ İlk Menüyü Ekle
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <Card key={product.id} className={`hover:shadow-lg transition-all duration-300 ${!product.is_available ? 'opacity-60 border-red-200' : 'border-green-200'}`}>
+                    <CardContent className="p-4">
+                      {product.image_url && (
+                        <div className="relative mb-3">
+                          <img 
+                            src={product.image_url} 
+                            alt={product.name}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          {!product.is_available && (
+                            <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                              <span className="text-white font-bold">STOK YOK</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-lg flex-1">{product.name}</h3>
+                        <Badge variant={product.is_available ? 'default' : 'secondary'} className="ml-2">
+                          {product.is_available ? '✅' : '❌'}
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-gray-600 text-sm mb-3">{product.description || 'Açıklama yok'}</p>
+                      
+                      {/* Enhanced Price Display */}
+                      <div className="bg-green-50 p-3 rounded-lg mb-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-bold text-green-700">₺{product.price}</span>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={() => {
+                                const newPrice = prompt(`${product.name} için yeni fiyat:`, product.price);
+                                if (newPrice && !isNaN(newPrice)) {
+                                  // Update price
+                                  setProducts(prev => prev.map(p => 
+                                    p.id === product.id ? { ...p, price: parseFloat(newPrice) } : p
+                                  ));
+                                  toast.success('Fiyat güncellendi (Demo)');
+                                }
+                              }}
+                              variant="outline"
+                              size="sm"
+                              className="text-xs px-2 py-1 h-auto"
+                            >
+                              💰 Fiyat Değiştir
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-xs text-green-600 mt-1">
+                          💡 Hızlı fiyat değişimi
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                        <span>⏱️ {product.preparation_time || 15} dk</span>
+                        <Badge variant="outline" className="text-xs">
+                          {product.category === 'food' ? '🍽️ Yemek' : '🥤 İçecek'}
+                        </Badge>
+                        <span>🔥 {product.order_count || 0} sipariş</span>
+                      </div>
+                      
+                      <div className="flex space-x-1">
+                        <Button
+                          onClick={() => {
+                            setEditingProduct(product);
+                            setProductForm({
+                              name: product.name,
+                              description: product.description || '',
+                              price: product.price.toString(),
+                              category: product.category,
+                              preparation_time: product.preparation_time || 15,
+                              is_available: product.is_available,
+                              image_url: product.image_url || ''
+                            });
+                            setShowProductModal(true);
+                          }}
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-xs"
+                        >
+                          ✏️ Düzenle
+                        </Button>
+                        <Button
+                          onClick={() => toggleProductAvailability(product.id, !product.is_available)}
+                          variant="outline"
+                          size="sm"
+                          className={`flex-1 text-xs ${product.is_available ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-green-200 text-green-600 hover:bg-green-50'}`}
+                        >
+                          {product.is_available ? '❌ Stokta Yok' : '✅ Stokta Var'}
+                        </Button>
+                        <Button
+                          onClick={() => deleteProduct(product.id)}
+                          variant="outline"
+                          size="sm"
+                          className="border-red-200 text-red-600 hover:bg-red-50 px-2"
+                        >
+                          🗑️
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
                         onClick={() => openEditProduct(product)}
                         variant="outline"
                         size="sm"
