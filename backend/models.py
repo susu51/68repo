@@ -311,4 +311,3 @@ MONGODB_INDEXES = {
         {"user_id": 1}
     ]
 }
-    is_default: bool = False
