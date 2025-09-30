@@ -367,6 +367,9 @@ export const ProfessionalFoodOrderSystem = ({
   const [sortType, setSortType] = useState(locationFilter === 'nearest' ? 'nearest' : 'citywide');
   const [isMounted, setIsMounted] = useState(true); // Track component mount status
   const [activeMenuTab, setActiveMenuTab] = useState('all'); // 'all', 'food', 'drinks'
+  const [sortBy, setSortBy] = useState('popularity');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [showAvailableOnly, setShowAvailableOnly] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
