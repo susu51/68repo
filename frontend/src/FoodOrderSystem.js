@@ -1354,6 +1354,16 @@ export const ProfessionalFoodOrderSystem = ({
           </div>
         </div>
       )}
+
+      {/* Sticky Cart */}
+      <StickyCart
+        cart={cart}
+        onUpdateQuantity={updateCartQuantity}
+        onRemoveItem={removeFromCart}
+        onCheckout={() => setShowCheckoutModal(true)}
+        restaurantName={selectedRestaurant?.name || ''}
+        isVisible={cart.length > 0 && selectedRestaurant}
+      />
     </div>
   );
 };
