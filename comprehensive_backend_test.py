@@ -17,7 +17,7 @@ from typing import Dict, List, Any, Optional
 class KuryeciniBackendTester:
     def __init__(self):
         # Get backend URL from environment
-        self.base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://foodlogistic.preview.emergentagent.com')
+        self.base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://food-express-85.preview.emergentagent.com')
         self.api_url = f"{self.base_url}/api"
         
         # Test results tracking
