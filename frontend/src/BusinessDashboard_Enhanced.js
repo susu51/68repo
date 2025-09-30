@@ -1522,7 +1522,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                     <p className="text-sm text-gray-600">Müşteri Memnuniyeti</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-green-600">₺{(stats.monthlyRevenue * 0.95).toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-green-600">₺{((stats.monthlyRevenue || 0) * 0.95).toFixed(2)}</p>
                     <p className="text-sm text-gray-600">Aylık Net Kazanç (%5 komisyon sonrası)</p>
                   </div>
                 </div>
