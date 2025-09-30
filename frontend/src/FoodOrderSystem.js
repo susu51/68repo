@@ -686,13 +686,20 @@ export const ProfessionalFoodOrderSystem = ({
     
     if (type === 'nearest' && location) {
       // Sort by distance (En Yakın)
-      sortedData = data.map(business => ({
-        ...business,
-        distance: calculateDistance(
-          location.lat, location.lng,
-          business.location.lat, business.location.lng
-        )
-      })).sort((a, b) => a.distance - b.distance);
+      sortedData = data.map(business => {
+        // Handle different location data structures (Turkish/English keys)
+        const location = business.location || {};
+        const lat = location.lat || location.enlem || 41.0082; // Default to Istanbul center
+        const lng = location.lng || location.uzunluk || 28.9784;
+        
+        return {
+          ...business,
+          distance: calculateDistance(
+            location.lat || 41.0082, location.lng || 28.9784,
+            lat, lng
+          )
+        };
+      }).sort((a, b) => a.distance - b.distance);
     } else if (type === 'citywide') {
       // Sort by rating for citywide (Şehir Geneli)
       sortedData = data.sort((a, b) => {
