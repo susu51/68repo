@@ -3308,7 +3308,14 @@ const CustomerDashboard = ({ user }) => {
                 }`}
               >
                 <span className="text-lg">🛒</span>
-                <span>Sepet</span>
+                <div className="flex flex-col items-center">
+                  <span>Sepet</span>
+                  {cart.length > 0 && (
+                    <span className="text-xs opacity-75">
+                      ₺{cart.reduce((total, item) => total + (item.subtotal || item.product_price * item.quantity), 0).toFixed(2)}
+                    </span>
+                  )}
+                </div>
                 {cart.length > 0 && (
                   <span className={`min-w-[20px] h-5 flex items-center justify-center text-xs px-1.5 rounded-full font-bold ${
                     activeTab === 'cart' ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
