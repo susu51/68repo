@@ -9,6 +9,7 @@ import CourierBalance from "./CourierBalance";
 import FileUpload from "./FileUpload";
 import LeafletMap from "./LeafletMap";
 import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
+import FoodOrderErrorBoundary from "./components/FoodOrderErrorBoundary";
 import { CustomerProfile } from "./CustomerProfile";
 import PhoneAuth from "./PhoneAuth";
 import { ModernLogin } from "./ModernLogin";
