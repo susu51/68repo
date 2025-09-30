@@ -803,14 +803,40 @@ export const ProfessionalFoodOrderSystem = ({
     }
   };
 
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+
   const handleCheckout = () => {
-    if (!isMounted || cart.length === 0) return; // Check if component is mounted
-    
-    // Here you would integrate with the order creation system
-    if (isMounted) {
-      toast.success('Sipariş oluşturma sayfasına yönlendiriliyorsunuz...');
+    if (!isMounted || cart.length === 0) return;
+    setShowCheckoutModal(true);
+  };
+
+  const handleCompleteOrder = async () => {
+    if (!selectedAddress) {
+      toast.error('Lütfen teslimat adresi seçin');
+      return;
     }
-    // You could call a parent component function or navigate to checkout
+
+    try {
+      // Here you would create the order with the selected address and cart items
+      const orderData = {
+        restaurant_id: selectedRestaurant?.id,
+        items: cart,
+        delivery_address: selectedAddress,
+        payment_method: paymentMethod,
+        total_amount: getCartTotal()
+      };
+      
+      // Mock order creation for demo
+      toast.success('Siparişiniz başarıyla alındı!');
+      setCart([]);
+      setShowCheckoutModal(false);
+      localStorage.removeItem('kuryecini_cart');
+      
+    } catch (error) {
+      toast.error('Sipariş oluşturulamadı');
+    }
   };
 
   const filteredProducts = products.filter(product => {
