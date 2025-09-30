@@ -1610,70 +1610,7 @@ class RefundProcessRequest(BaseModel):
     refund_type: str  # full, partial
     notify_customer: bool = True
 
-# EXISTING AUTH ENDPOINTS (keeping previous implementation)
-@api_router.post("/auth/login", response_model=LoginResponse)
-async def login(login_data: UserLogin, request: Request):
-    """Kullanıcı girişi"""
-    user = await db.users.find_one({"email": login_data.email})
-    if not user:
-        raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
-    
-    if not verify_password(login_data.password, user["password_hash"]):
-        raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
-    
-    # Log login attempt
-    await log_action(
-        action_type="login",
-        target_type="user",
-        target_id=user["id"],
-        user_id=user["id"],
-        ip_address=request.client.host,
-        description=f"User login: {user['email']}",
-        user_agent=request.headers.get("user-agent", "")
-    )
-    
-    access_token = create_access_token(data={"sub": user["id"], "email": user["email"]})
-    
-    user_data = {"email": user["email"], "user_type": user["user_type"]}
-    
-    if user["user_type"] == "courier":
-        courier = await db.couriers.find_one({"user_id": user["id"]})
-        if courier:
-            balance = await db.courier_balances.find_one({"courier_id": courier["id"]})
-            user_data.update({
-                "name": f"{courier.get('first_name', '')} {courier.get('last_name', '')}",
-                "kyc_status": courier.get("kyc_status", "pending"),
-                "city": courier.get("city", ""),
-                "is_online": courier.get("is_online", False),
-                "balance": balance.get("available_balance", 0) if balance else 0,
-                "status": user.get("status", "active")
-            })
-    elif user["user_type"] == "business":
-        business = await db.businesses.find_one({"user_id": user["id"]})
-        if business:
-            user_data.update({
-                "business_id": business["id"],
-                "business_name": business.get("business_name", ""),
-                "city": business.get("city", ""),
-                "category": business.get("business_category", ""),
-                "is_approved": user.get("is_active", False),
-                "status": user.get("status", "active")
-            })
-    elif user["user_type"] == "customer":
-        customer = await db.customers.find_one({"user_id": user["id"]})
-        if customer:
-            user_data.update({
-                "name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}",
-                "city": customer.get("city", ""),
-                "status": user.get("status", "active")
-            })
-    
-    return LoginResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user_type=user["user_type"],
-        user_data=user_data
-    )
+# DUPLICATE LOGIN ENDPOINT REMOVED - Using the first login endpoint instead
 
 # EXISTING REGISTRATION ENDPOINTS (keeping previous implementation)
 @api_router.post("/register/courier", response_model=LoginResponse)
