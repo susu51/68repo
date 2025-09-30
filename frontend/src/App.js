@@ -3066,6 +3066,34 @@ const CustomerDashboard = ({ user }) => {
     };
   }, [isMounted]);
 
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    if (isMounted) {
+      try {
+        const savedCart = localStorage.getItem('kuryecini_cart');
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart);
+          if (Array.isArray(parsedCart)) {
+            setCart(parsedCart);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+      }
+    }
+  }, [isMounted]);
+
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    if (isMounted && cart.length >= 0) {
+      try {
+        localStorage.setItem('kuryecini_cart', JSON.stringify(cart));
+      } catch (error) {
+        console.error('Error saving cart to localStorage:', error);
+      }
+    }
+  }, [cart, isMounted]);
+
   const addToCart = (product) => {
     // Safety check to prevent runtime errors
     if (!cart || !Array.isArray(cart)) {
