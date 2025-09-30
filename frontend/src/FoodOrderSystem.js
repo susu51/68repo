@@ -606,6 +606,12 @@ export const ProfessionalFoodOrderSystem = ({
   const removeFromCart = (productId) => {
     if (!isMounted) return; // Prevent cart updates if component is unmounted
     
+    // Safety check to prevent runtime errors
+    if (!cart || !Array.isArray(cart)) {
+      console.error('Cart is not initialized properly in FoodOrderSystem:', cart);
+      return;
+    }
+    
     setCart(cart.filter(item => item.product_id !== productId));
     if (isMounted) {
       toast.success('Ürün sepetten kaldırıldı');
