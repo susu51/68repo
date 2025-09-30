@@ -912,7 +912,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                         <div>
                           <p className="text-sm text-gray-600">Bu Ay</p>
                           <p className="text-xl font-bold text-blue-700">{stats.month.orders} sipariş</p>
-                          <p className="text-lg font-semibold text-blue-600">₺{stats.month.revenue.toFixed(2)}</p>
+                          <p className="text-lg font-semibold text-blue-600">₺{(stats.month?.revenue || 0).toFixed(2)}</p>
                         </div>
                         <div className="text-right">
                           <Badge className="bg-blue-100 text-blue-800">
