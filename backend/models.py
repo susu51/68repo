@@ -242,252 +242,73 @@ class LoyaltyTransaction(BaseModel):
     class Config:
         populate_by_name = True
 
-# Response Models
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-    expires_in: int  # seconds
-    user_type: str
-    user_data: dict
+# Migration models for localStorage data
+class MigrationData(BaseModel):
+    """Model for localStorage migration data"""
+    cart: Optional[List[Dict[str, Any]]] = None
+    addresses: Optional[List[Dict[str, Any]]] = None
+    preferences: Optional[Dict[str, Any]] = None
+    loyalty_points: Optional[int] = None
 
-class OTPResponse(BaseModel):
-    success: bool
-    message: str
-    otp_id: Optional[str] = None
-    expires_in: Optional[int] = None
-    formatted_phone: Optional[str] = None
-    mock_otp: Optional[str] = None  # Only in development mode
-    retry_after: Optional[int] = None
-    error_code: Optional[str] = None
+class MigrationStatus(BaseModel):
+    """Track migration status per user"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    user_id: str
+    migrated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    data_types: List[str] = []  # ["cart", "addresses", "preferences"]
+    
+    class Config:
+        populate_by_name = True
 
-class UserResponse(BaseModel):
-    id: str
-    phone: str
-    email: Optional[str]
-    role: UserRole
-    first_name: Optional[str]
-    last_name: Optional[str]
-    profile_completed: bool
-    kyc_status: Optional[KYCStatus]
-    created_at: datetime
-    
-    # Role-specific fields
-    city: Optional[str] = None
-    
-    # Courier fields
-    iban: Optional[str] = None
-    vehicle_type: Optional[VehicleType] = None
-    vehicle_model: Optional[str] = None
-    license_class: Optional[str] = None
-    balance: Optional[float] = None
-    is_online: Optional[bool] = None
-    
-    # Business fields
-    business_name: Optional[str] = None
-    tax_number: Optional[str] = None
-    address: Optional[str] = None
-    business_category: Optional[BusinessCategory] = None
-    description: Optional[str] = None
+# MongoDB collection names
+COLLECTION_NAMES = {
+    "users": "users",
+    "addresses": "addresses", 
+    "carts": "carts",
+    "orders": "orders",
+    "preferences": "user_preferences",
+    "banners": "banners",
+    "courier_reports": "courier_reports",
+    "loyalty_transactions": "loyalty_transactions",
+    "migration_status": "migration_status"
+}
 
-class APIResponse(BaseModel):
-    success: bool
-    message: str
-    data: Optional[dict] = None
-    error_code: Optional[str] = None
-
-# Phone validation function
-def validate_turkish_phone(phone: str) -> str:
-    """Validate and format Turkish phone number"""
-    import re
-    
-    # Remove all non-digit characters except +
-    cleaned = re.sub(r'[^\d+]', '', phone)
-    
-    # Turkish phone patterns
-    patterns = [
-        r'^\+90[5-9]\d{9}$',  # +90 5xx xxx xx xx
-        r'^90[5-9]\d{9}$',    # 90 5xx xxx xx xx  
-        r'^0[5-9]\d{9}$',     # 0 5xx xxx xx xx
-        r'^[5-9]\d{9}$'       # 5xx xxx xx xx
+# Indexes for optimal performance
+MONGODB_INDEXES = {
+    "users": [
+        {"email": 1},
+        {"phone": 1},
+        {"role": 1}
+    ],
+    "addresses": [
+        {"user_id": 1},
+        {"user_id": 1, "is_default": -1}
+    ],
+    "carts": [
+        {"user_id": 1}
+    ],
+    "orders": [
+        {"customer_id": 1, "created_at": -1},
+        {"business_id": 1, "created_at": -1},
+        {"courier_id": 1, "created_at": -1},
+        {"status": 1},
+        {"order_number": 1}
+    ],
+    "preferences": [
+        {"user_id": 1}
+    ],
+    "banners": [
+        {"active": 1, "order": 1},
+        {"schedule.start_date": 1, "schedule.end_date": 1}
+    ],
+    "courier_reports": [
+        {"courier_id": 1, "month": -1}
+    ],
+    "loyalty_transactions": [
+        {"user_id": 1, "created_at": -1}
+    ],
+    "migration_status": [
+        {"user_id": 1}
     ]
-    
-    for pattern in patterns:
-        if re.match(pattern, cleaned):
-            # Normalize to +90 format
-            if cleaned.startswith('+90'):
-                return cleaned
-            elif cleaned.startswith('90'):
-                return '+' + cleaned
-            elif cleaned.startswith('0'):
-                return '+90' + cleaned[1:]
-            else:
-                return '+90' + cleaned
-    
-    raise ValueError('Invalid Turkish phone number format')
-
-# Marketing & Loyalty Models
-class CampaignType(str, Enum):
-    PERCENTAGE_DISCOUNT = "percentage_discount"  # %20 indirim
-    FIXED_DISCOUNT = "fixed_discount"            # 10₺ indirim
-    FREE_DELIVERY = "free_delivery"              # Ücretsiz kargo
-    BUY_X_GET_Y = "buy_x_get_y"                 # 2 al 1 öde
-
-class CampaignStatus(str, Enum):
-    ACTIVE = "active"
-    INACTIVE = "inactive"
-    EXPIRED = "expired"
-
-class Campaign(BaseModel):
-    id: Optional[str] = None
-    business_id: str
-    title: str = Field(..., min_length=1, max_length=100)
-    description: str = Field(..., min_length=1, max_length=500)
-    campaign_type: CampaignType
-    discount_value: float = Field(..., gt=0)  # % or ₺ amount
-    min_order_amount: Optional[float] = 0
-    max_discount_amount: Optional[float] = None  # For percentage discounts
-    start_date: datetime
-    end_date: datetime
-    usage_limit: Optional[int] = None  # Total usage limit
-    used_count: int = 0
-    status: CampaignStatus = CampaignStatus.ACTIVE
-    created_at: datetime = Field(default_factory=datetime.now)
-
-class LoyaltyTransaction(BaseModel):
-    id: Optional[str] = None
-    user_id: str
-    points: int  # Positive for earning, negative for spending
-    transaction_type: str  # "earned", "spent", "expired"
-    order_id: Optional[str] = None
-    description: str
-    created_at: datetime = Field(default_factory=datetime.now)
-
-class UserLoyalty(BaseModel):
-    id: Optional[str] = None
-    user_id: str
-    total_points: int = 0
-    lifetime_points: int = 0  # Total points ever earned
-    tier_level: str = "Bronze"  # Bronze, Silver, Gold, Platinum
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
-
-class CouponType(str, Enum):
-    PERCENTAGE = "percentage"
-    FIXED_AMOUNT = "fixed_amount"
-    FREE_DELIVERY = "free_delivery"
-
-class Coupon(BaseModel):
-    id: Optional[str] = None
-    code: str = Field(..., min_length=3, max_length=50)
-    title: str = Field(..., min_length=1, max_length=100)
-    description: Optional[str] = None
-    coupon_type: CouponType
-    discount_value: float = Field(..., gt=0)
-    min_order_amount: Optional[float] = 0
-    max_discount_amount: Optional[float] = None
-    usage_limit: Optional[int] = None
-    used_count: int = 0
-    valid_from: datetime
-    valid_until: datetime
-    is_active: bool = True
-    created_by: Optional[str] = None  # Admin or business_id
-    created_at: datetime = Field(default_factory=datetime.now)
-
-class CouponUsage(BaseModel):
-    id: Optional[str] = None
-    coupon_id: str
-    user_id: str
-    order_id: str
-    discount_amount: float
-    used_at: datetime = Field(default_factory=datetime.now)
-
-# Customer Profile Management Models
-class Address(BaseModel):
-    id: Optional[str] = None
-    user_id: str
-    title: str = Field(..., min_length=1, max_length=50)  # "Ev", "İş", "Diğer"
-    address_line: str = Field(..., min_length=1, max_length=200)
-    district: Optional[str] = None
-    city: str = Field(..., min_length=1, max_length=50)
-    postal_code: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    is_default: bool = False
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
-
-class CustomerProfile(BaseModel):
-    id: Optional[str] = None
-    user_id: str
-    phone: str
-    email: Optional[str] = None
-    first_name: str
-    last_name: str
-    birth_date: Optional[datetime] = None
-    gender: Optional[str] = None  # "male", "female", "other"
-    profile_image_url: Optional[str] = None
-    notification_preferences: Dict[str, bool] = Field(default={
-        "email_notifications": True,
-        "sms_notifications": True,
-        "push_notifications": True,
-        "marketing_emails": False
-    })
-    preferred_language: str = "tr"
-    theme_preference: str = "light"  # "light", "dark", "auto"
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
-
-class OrderRating(BaseModel):
-    id: Optional[str] = None
-    order_id: str
-    customer_id: str
-    business_id: str
-    courier_id: Optional[str] = None
-    business_rating: Optional[int] = Field(None, ge=1, le=5)  # 1-5 stars
-    courier_rating: Optional[int] = Field(None, ge=1, le=5)   # 1-5 stars
-    business_comment: Optional[str] = Field(None, max_length=500)
-    courier_comment: Optional[str] = Field(None, max_length=500)
-    food_quality_rating: Optional[int] = Field(None, ge=1, le=5)
-    delivery_speed_rating: Optional[int] = Field(None, ge=1, le=5)
-    created_at: datetime = Field(default_factory=datetime.now)
-
-# Phone Authentication Models
-class PhoneAuthRequest(BaseModel):
-    phone: str = Field(..., description="Turkish phone number")
-    
-    @validator('phone')
-    def validate_phone_format(cls, v):
-        return validate_turkish_phone(v)
-
-class PhoneAuthVerify(BaseModel):
-    phone: str
-    otp_code: str = Field(..., min_length=6, max_length=6)
-    
-class PhoneAuthToken(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-    expires_in: int
-    user_data: dict
-
-# Profile Update Models
-class ProfileUpdateRequest(BaseModel):
-    first_name: Optional[str] = Field(None, min_length=1, max_length=50)
-    last_name: Optional[str] = Field(None, min_length=1, max_length=50)
-    email: Optional[str] = None
-    birth_date: Optional[datetime] = None
-    gender: Optional[str] = Field(None, pattern="^(male|female|other)$")
-    notification_preferences: Optional[Dict[str, bool]] = None
-    preferred_language: Optional[str] = Field(None, pattern="^(tr|en)$")
-    theme_preference: Optional[str] = Field(None, pattern="^(light|dark|auto)$")
-
-class AddressRequest(BaseModel):
-    title: str = Field(..., min_length=1, max_length=50)
-    address_line: str = Field(..., min_length=1, max_length=200)
-    district: Optional[str] = Field(None, max_length=50)
-    city: str = Field(..., min_length=1, max_length=50)
-    postal_code: Optional[str] = Field(None, max_length=10)
-    latitude: Optional[float] = Field(None, ge=-90, le=90)
-    longitude: Optional[float] = Field(None, ge=-180, le=180)
+}
     is_default: bool = False
