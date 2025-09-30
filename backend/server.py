@@ -669,6 +669,87 @@ async def get_business_user(current_user: dict = Depends(get_current_user)):
         )
     return current_user
 
+# BUSINESS MANAGEMENT ENDPOINTS
+
+@api_router.put("/business/status")
+async def update_business_status(status_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update business status (open/closed)"""
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    try:
+        # For demo purposes, return success with mock data
+        return {
+            "success": True,
+            "status": status_data.get("isOpen", True),
+            "message": "Restaurant status updated successfully"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Status update failed")
+
+@api_router.get("/business/stats")
+async def get_business_stats(current_user: dict = Depends(get_current_user)):
+    """Get business statistics and analytics"""
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    try:
+        # Return mock statistics data
+        return {
+            "today": {
+                "orders": 23,
+                "revenue": 1247.50,
+                "avgOrderValue": 54.24,
+                "completionRate": 96.5
+            },
+            "week": {
+                "orders": 187,
+                "revenue": 9876.25,
+                "growth": 12.5
+            },
+            "month": {
+                "orders": 756,
+                "revenue": 42315.75,
+                "growth": 18.7
+            },
+            "topProducts": [
+                {"name": "Chicken Burger", "sales": 245, "revenue": 11025.00},
+                {"name": "Margarita Pizza", "sales": 189, "revenue": 12285.00},
+                {"name": "Adana Kebap", "sales": 156, "revenue": 8580.00}
+            ],
+            "customerSatisfaction": 4.6
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Stats retrieval failed")
+
+@api_router.get("/business/orders/incoming")
+async def get_incoming_orders(current_user: dict = Depends(get_current_user)):
+    """Get incoming orders for business"""
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    try:
+        # Return mock incoming orders
+        mock_orders = [
+            {
+                "id": "ORD-001",
+                "customer_name": "Ahmet Yılmaz",
+                "customer_phone": "+90 532 123 4567",
+                "items": [
+                    {"name": "Chicken Burger", "quantity": 2, "price": 45.00},
+                    {"name": "Patates Kızartması", "quantity": 1, "price": 15.00}
+                ],
+                "total_amount": 105.00,
+                "delivery_address": {"address": "Kadıköy, Moda Cad. No:15"},
+                "status": "pending",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        
+        return {"orders": mock_orders}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Orders retrieval failed")
+
 # Product Management Endpoints
 @api_router.post("/products")
 async def create_product(product_data: ProductCreate, current_user: dict = Depends(get_business_user)):
