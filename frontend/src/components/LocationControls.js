@@ -141,33 +141,19 @@ export const LocationControls = ({
     <Card className="mb-6">
       <CardContent className="p-4">
         <div className="flex flex-col space-y-4">
-          {/* Mode Selection */}
-          <div className="flex flex-col sm:flex-row gap-2">
+          {/* Location Mode Selector - Only "En Yakınım" */}
+          <div className="bg-white rounded-lg border border-gray-200 p-1">
             <Button
               variant={locationMode === 'nearest' ? 'default' : 'outline'}
               onClick={() => handleModeChange('nearest')}
               disabled={locationLoading}
-              className="flex-1 flex items-center justify-center space-x-2"
+              className="w-full flex items-center justify-center space-x-2"
             >
               <span className="text-lg">📍</span>
               <span>En Yakınım</span>
               {locationMode === 'nearest' && userLocation && (
                 <Badge variant="secondary" className="ml-2">
                   {userLocation.city}
-                </Badge>
-              )}
-            </Button>
-            
-            <Button
-              variant={locationMode === 'city' ? 'default' : 'outline'}
-              onClick={() => handleModeChange('city')}
-              className="flex-1 flex items-center justify-center space-x-2"
-            >
-              <span className="text-lg">🏙️</span>
-              <span>Şehir Geneli</span>
-              {locationMode === 'city' && (
-                <Badge variant="secondary" className="ml-2">
-                  {selectedCity}
                 </Badge>
               )}
             </Button>
