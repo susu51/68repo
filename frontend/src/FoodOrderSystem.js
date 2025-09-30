@@ -558,6 +558,12 @@ export const ProfessionalFoodOrderSystem = ({
   const addToCart = (product) => {
     if (!isMounted) return; // Prevent cart updates if component is unmounted
     
+    // Safety check to prevent runtime errors
+    if (!cart || !Array.isArray(cart)) {
+      console.error('Cart is not initialized properly in FoodOrderSystem:', cart);
+      return;
+    }
+    
     const existingItem = cart.find(item => item.product_id === product.id);
     
     if (existingItem) {
