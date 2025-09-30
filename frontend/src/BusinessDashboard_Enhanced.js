@@ -80,24 +80,188 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     commission: 0.15,
     totalEarnings: 0
   });
-  const [unprocessedCount, setUnprocessedCount] = useState(0);
 
-  // Menu & Product management
-  const [products, setProducts] = useState([]);
-  const [showProductModal, setShowProductModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [productForm, setProductForm] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: 'food',
-    preparation_time: 15,
-    is_available: true,
-    image_url: ''
-  });
+  // Initialize with professional mock data
+  useEffect(() => {
+    initializeBusinessData();
+    const interval = setInterval(fetchLiveData, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
-  // Statistics
-  const [stats, setStats] = useState({
+  const initializeBusinessData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([
+        loadMockOrders(),
+        loadMockProducts(),
+        loadMockStats(),
+        loadMockFinancials()
+      ]);
+    } catch (error) {
+      console.error('Initialization error:', error);
+      toast.error('Veri yüklenirken hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMockOrders = () => {
+    // Incoming orders
+    setIncomingOrders([
+      {
+        id: 'ORD-001',
+        customer_name: 'Ahmet Yılmaz',
+        customer_phone: '+90 532 123 4567',
+        items: [
+          { name: 'Chicken Burger', quantity: 2, price: 45.00 },
+          { name: 'Patates Kızartması', quantity: 1, price: 15.00 }
+        ],
+        total_amount: 105.00,
+        pickup_address: 'Beşiktaş Merkez',
+        delivery_address: { address: 'Kadıköy, Moda Cad. No:15', lat: 40.9876, lng: 29.0234 },
+        order_date: new Date(),
+        status: 'pending',
+        payment_method: 'card',
+        notes: 'Acılı sos ekle lütfen'
+      },
+      {
+        id: 'ORD-002', 
+        customer_name: 'Zeynep Kaya',
+        customer_phone: '+90 533 987 6543',
+        items: [
+          { name: 'Margarita Pizza', quantity: 1, price: 65.00 },
+          { name: 'Cola', quantity: 2, price: 10.00 }
+        ],
+        total_amount: 85.00,
+        pickup_address: 'Beşiktaş Merkez',
+        delivery_address: { address: 'Şişli, Nişantaşı Cad. No:42', lat: 41.0567, lng: 28.9876 },
+        order_date: new Date(Date.now() - 10000),
+        status: 'pending',
+        payment_method: 'cash',
+        notes: 'İnce hamur'
+      }
+    ]);
+
+    // Active orders  
+    setActiveOrders([
+      {
+        id: 'ORD-003',
+        customer_name: 'Mehmet Demir',
+        items: [{ name: 'Adana Kebap', quantity: 1, price: 55.00 }],
+        total_amount: 55.00,
+        status: 'preparing',
+        accepted_at: new Date(Date.now() - 600000), // 10 minutes ago
+        preparation_time: 20
+      }
+    ]);
+
+    setUnprocessedCount(2);
+  };
+
+  const loadMockProducts = () => {
+    setProducts([
+      {
+        id: 'PRD-001',
+        name: 'Chicken Burger',
+        description: 'Sulu tavuk göğsü, taze sebzeler ve özel sosumuzla',
+        price: 45.00,
+        category: 'Burger',
+        preparation_time: 15,
+        is_available: true,
+        image_url: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=300',
+        ingredients: 'Tavuk göğsü, marul, domates, soğan, turşu',
+        allergens: 'Gluten',
+        order_count: 245,
+        rating: 4.8
+      },
+      {
+        id: 'PRD-002',
+        name: 'Margarita Pizza',
+        description: 'Klasik İtalyan pizzası - mozzarella, domates, fesleğen',
+        price: 65.00,
+        category: 'Pizza',
+        preparation_time: 20,
+        is_available: true,
+        image_url: 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=300',
+        ingredients: 'Pizza hamuru, mozzarella, domates sosu, fesleğen',
+        allergens: 'Gluten, Süt',
+        order_count: 189,
+        rating: 4.9
+      },
+      {
+        id: 'PRD-003',
+        name: 'Adana Kebap',
+        description: 'Geleneksel Adana kebabı, lavash ekmeği ile',
+        price: 55.00,
+        category: 'Ana Yemekler',
+        preparation_time: 25,
+        is_available: false,
+        image_url: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=300',
+        ingredients: 'Dana kıyma, soğan, baharat, lavash',
+        allergens: 'Gluten',
+        order_count: 156,
+        rating: 4.7
+      }
+    ]);
+  };
+
+  const loadMockStats = () => {
+    setStats({
+      today: {
+        orders: 23,
+        revenue: 1247.50,
+        avgOrderValue: 54.24,
+        completionRate: 96.5
+      },
+      week: {
+        orders: 187,
+        revenue: 9876.25,
+        growth: 12.5
+      },
+      month: {
+        orders: 756,
+        revenue: 42315.75,
+        growth: 18.7
+      },
+      topProducts: [
+        { name: 'Chicken Burger', sales: 245, revenue: 11025.00 },
+        { name: 'Margarita Pizza', sales: 189, revenue: 12285.00 },
+        { name: 'Adana Kebap', sales: 156, revenue: 8580.00 }
+      ],
+      peakHours: [
+        { hour: '12:00-13:00', orders: 15 },
+        { hour: '19:00-20:00', orders: 22 },
+        { hour: '20:00-21:00', orders: 18 }
+      ],
+      customerSatisfaction: 4.6
+    });
+  };
+
+  const loadMockFinancials = () => {
+    setFinancials({
+      dailyRevenue: [
+        { date: '2024-01-01', revenue: 1247.50 },
+        { date: '2024-01-02', revenue: 1456.25 },
+        { date: '2024-01-03', revenue: 987.75 }
+      ],
+      monthlyRevenue: 42315.75,
+      pendingPayouts: 3567.25,
+      commission: 0.15,
+      totalEarnings: 35968.50
+    });
+  };
+
+  const fetchLiveData = async () => {
+    // Simulate live data updates
+    setStats(prev => ({
+      ...prev,
+      today: {
+        ...prev.today,
+        orders: prev.today.orders + Math.floor(Math.random() * 2),
+        revenue: prev.today.revenue + (Math.random() * 100)
+      }
+    }));
+  };
     todayOrders: 0,
     todayRevenue: 0,
     weeklyOrders: 0,
