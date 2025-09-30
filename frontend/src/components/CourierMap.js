@@ -59,6 +59,8 @@ const CourierMap = ({ orders = [], onOrderSelect, selectedOrder }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [locationError, setLocationError] = useState(null);
   const [mapCenter, setMapCenter] = useState([41.0082, 28.9784]); // Istanbul default
+  const [route, setRoute] = useState(null); // For polyline route
+  const [showRoute, setShowRoute] = useState(false);
   const watchIdRef = useRef(null);
 
   // Get courier location
