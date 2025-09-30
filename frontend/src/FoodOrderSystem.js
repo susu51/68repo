@@ -104,6 +104,11 @@ const ProductCard = ({ product, onAddToCart, quantity = 0 }) => {
     setSelectedQuantity(selectedQuantity + 1);
   };
 
+  const handleAddToCart = () => {
+    onAddToCart(product);
+    setSelectedQuantity(selectedQuantity + 1);
+  };
+
   // Determine product badges
   const getProductBadges = () => {
     const badges = [];
