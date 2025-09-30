@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./com
 import { Badge } from "./components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import toast from 'react-hot-toast';
+import AddressSelector from './components/AddressSelector';
 
 const API = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001'}/api`;
 
