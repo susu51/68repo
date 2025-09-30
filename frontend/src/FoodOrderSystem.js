@@ -764,17 +764,13 @@ export const ProfessionalFoodOrderSystem = ({
   const updateCartQuantity = (productId, change) => {
     if (!isMounted) return; // Prevent cart updates if component is unmounted
     
-    setCart(cart.map(item => {
-      if (item.product_id === productId) {
-        const newQuantity = Math.max(0, item.quantity + change);
-        return {
-          ...item,
-          quantity: newQuantity,
-          subtotal: newQuantity * item.product_price
-        };
-      }
-      return item;
-    }).filter(item => item.quantity > 0));
+    // Use the prop function if available
+    if (onUpdateCart) {
+      onUpdateCart(productId, change);
+    } else {
+      // Fallback to local handling (for backward compatibility)
+      console.warn('onUpdateCart prop not provided, cart functionality may be limited');
+    }
   };
 
   const removeFromCart = (productId) => {
