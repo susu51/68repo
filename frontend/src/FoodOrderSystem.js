@@ -832,11 +832,23 @@ export const ProfessionalFoodOrderSystem = ({
   const removeFromCart = (productId) => {
     if (!isMounted) return; // Prevent cart updates if component is unmounted
     
-    // Use the prop function if available
-    if (onRemoveFromCart) {
-      onRemoveFromCart(productId);
-    } else {
-      // Fallback to local handling (for backward compatibility)
+    try {
+      // Use the prop function if available
+      if (onRemoveFromCart) {
+        const currentItem = cart.find(item => item.product_id === productId);
+        const productName = currentItem ? currentItem.product_name || currentItem.name : 'Ürün';
+        onRemoveFromCart(productId);
+        toast.success(`${productName} sepetten çıkarıldı`);
+      } else {
+        // Fallback to local handling (for backward compatibility)
+        console.warn('onRemoveFromCart prop not provided, cart functionality may be limited');
+        toast.error('Sepetten çıkarma şu anda mümkün değil');
+      }
+    } catch (error) {
+      console.error('Cart removal error:', error);
+      toast.error('Sepetten çıkarılırken hata oluştu');
+    }
+  };
       console.warn('onRemoveFromCart prop not provided, cart functionality may be limited');
     }
     
