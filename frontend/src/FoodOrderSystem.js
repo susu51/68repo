@@ -508,13 +508,18 @@ export const ProfessionalFoodOrderSystem = ({
   user, 
   locationFilter = 'city', 
   userLocation: propUserLocation = null, 
-  selectedCity = 'İstanbul' 
+  selectedCity = 'İstanbul',
+  cart = [],
+  onUpdateCart,
+  onAddToCart,
+  onRemoveFromCart
 }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [originalRestaurants, setOriginalRestaurants] = useState([]); // Store original data
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  // Remove local cart state - now using props
+  // const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
