@@ -850,13 +850,6 @@ export const ProfessionalFoodOrderSystem = ({
       toast.error('Sepetten çıkarılırken hata oluştu');
     }
   };
-      console.warn('onRemoveFromCart prop not provided, cart functionality may be limited');
-    }
-    
-    if (isMounted) {
-      toast.success('Ürün sepetten kaldırıldı');
-    }
-  };
 
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
