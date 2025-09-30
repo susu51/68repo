@@ -1484,7 +1484,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
               
               <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
                 <CardContent className="p-6 text-center">
-                  <p className="text-3xl font-bold mb-2">₺{stats.monthlyRevenue.toFixed(2)}</p>
+                  <p className="text-3xl font-bold mb-2">₺{(stats.monthlyRevenue || 0).toFixed(2)}</p>
                   <p className="text-purple-100">Bu Ay</p>
                   <p className="text-xs text-purple-200 mt-1">
                     {stats.monthlyOrders} sipariş
