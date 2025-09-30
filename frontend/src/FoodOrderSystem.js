@@ -239,6 +239,158 @@ const ProductCard = ({ product, onAddToCart, quantity = 0 }) => {
     </Card>
   );
 };
+// Enhanced Product Card Component with more features
+const EnhancedProductCard = ({ product, onAddToCart, quantity = 0 }) => {
+  const [selectedQuantity, setSelectedQuantity] = useState(quantity);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleQuickAdd = () => {
+    onAddToCart(product);
+    setSelectedQuantity(selectedQuantity + 1);
+  };
+
+  const handleAddToCart = () => {
+    onAddToCart(product);
+    setSelectedQuantity(selectedQuantity + 1);
+  };
+
+  // Determine product badges
+  const getProductBadges = () => {
+    const badges = [];
+    
+    if (product.is_popular) badges.push({ text: 'Popüler', color: 'bg-red-500', icon: '🔥' });
+    if (product.is_new) badges.push({ text: 'Yeni', color: 'bg-green-500', icon: '✨' });
+    if (product.discount_percentage) badges.push({ text: `%${product.discount_percentage} İndirim`, color: 'bg-orange-500', icon: '💸' });
+    if (product.is_spicy) badges.push({ text: 'Acılı', color: 'bg-red-600', icon: '🌶️' });
+    if (product.is_vegetarian) badges.push({ text: 'Vejeteryan', color: 'bg-green-600', icon: '🥗' });
+    
+    return badges;
+  };
+
+  const badges = getProductBadges();
+
+  return (
+    <Card 
+      className="hover:shadow-xl transition-all duration-300 group relative overflow-hidden border-2 hover:border-orange-200"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative">
+        {/* Product Image */}
+        <div className="relative h-48 overflow-hidden">
+          {product.photo_url ? (
+            <img 
+              src={`${API.replace('/api', '')}${product.photo_url}`}
+              alt={product.name}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/400x200/f97316/ffffff?text=🍽️';
+              }}
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-orange-300 to-red-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <span className="text-white text-6xl">🍽️</span>
+            </div>
+          )}
+          
+          {/* Product Badges */}
+          <div className="absolute top-3 left-3 space-y-2">
+            {badges.slice(0, 2).map((badge, index) => (
+              <Badge 
+                key={index}
+                className={`${badge.color} text-white text-xs shadow-lg`}
+              >
+                <span className="mr-1">{badge.icon}</span>
+                {badge.text}
+              </Badge>
+            ))}
+          </div>
+
+          {/* Price Badge */}
+          <div className="absolute top-3 right-3">
+            {product.discount_percentage ? (
+              <div className="bg-white rounded-lg p-2 shadow-lg">
+                <span className="font-bold text-green-600 text-lg">₺{(product.price * (1 - product.discount_percentage / 100)).toFixed(2)}</span>
+                <span className="text-sm text-gray-500 line-through block">₺{product.price}</span>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg p-2 shadow-lg">
+                <span className="font-bold text-green-600 text-lg">₺{product.price}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Add Button (appears on hover) */}
+          {product.is_available && isHovered && (
+            <Button
+              onClick={handleQuickAdd}
+              className="absolute bottom-3 right-3 bg-orange-600 hover:bg-orange-700 text-white rounded-full w-12 h-12 p-0 shadow-lg transform transition-all duration-200 hover:scale-110"
+            >
+              <span className="text-xl">+</span>
+            </Button>
+          )}
+
+          {/* Availability Overlay */}
+          {!product.is_available && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <Badge className="bg-red-500 text-white text-lg px-4 py-2">
+                ❌ Tükendi
+              </Badge>
+            </div>
+          )}
+        </div>
+        
+        {/* Product Details */}
+        <div className="p-4">
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex-1">
+              <h4 className="font-bold text-xl group-hover:text-orange-600 transition-colors">{product.name}</h4>
+              {product.category && (
+                <span className="text-sm text-gray-500 capitalize">{product.category}</span>
+              )}
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+            {product.description}
+          </p>
+          
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-4 text-sm text-gray-500">
+              <span className="flex items-center">
+                <span className="mr-1">⏱️</span>
+                {product.preparation_time_minutes || 15} dk
+              </span>
+              {product.rating && (
+                <span className="flex items-center">
+                  <span className="mr-1">⭐</span>
+                  {product.rating}
+                </span>
+              )}
+            </div>
+            
+            {product.is_available && (
+              <div className="flex items-center space-x-2">
+                {selectedQuantity > 0 && (
+                  <Badge className="bg-orange-100 text-orange-800">
+                    Sepette: {selectedQuantity}
+                  </Badge>
+                )}
+                <Button 
+                  onClick={handleAddToCart}
+                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                  size="sm"
+                >
+                  + Sepete Ekle
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
 
 // Cart Summary Component
 const CartSummary = ({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) => {
