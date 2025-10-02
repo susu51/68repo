@@ -58,8 +58,76 @@ db = client.delivertr_database
 UPLOAD_DIR = Path("/app/backend/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-# Create the main app without a prefix
-app = FastAPI(title="Kuryecini API", description="Turkish Food Delivery Platform API")
+# Create the main app with comprehensive API documentation
+app = FastAPI(
+    title="Kuryecini API",
+    description="""
+    🚀 **Kuryecini - Türkiye'nin En Hızlı Teslimat Platformu API**
+    
+    Bu API, Kuryecini food delivery platform için geliştirilen RESTful servislerini içerir.
+    
+    ## 🏗️ **Ana Özellikler**
+    
+    * **👤 Kullanıcı Yönetimi**: Müşteri, kurye, işletme ve admin rolleri
+    * **🏪 İşletme Yönetimi**: Restoran kaydı, menü yönetimi, sipariş takibi
+    * **🚚 Kurye Sistemi**: KYC onay süreci, harita entegrasyonu, kazanç takibi  
+    * **📦 Sipariş Yönetimi**: Sepet, ödeme, teslimat süreci
+    * **📍 Lokasyon Servisleri**: Adres yönetimi, mesafe hesaplama
+    * **⚙️ Admin Paneli**: Sistem konfigürasyonu, komisyon ayarları
+    
+    ## 🔐 **Authentication**
+    
+    API JWT (JSON Web Token) tabanlı authentication kullanır:
+    
+    1. `/api/auth/login` endpoint'i ile giriş yapın
+    2. Dönen `access_token`'ı `Authorization: Bearer <token>` header'ında kullanın
+    3. Token'lar role-based access control (RBAC) içerir
+    
+    ## 🎯 **Roller ve Yetkiler**
+    
+    * **customer**: Sipariş verme, adres yönetimi, geçmiş görüntüleme
+    * **courier**: Sipariş kabul etme, teslimat yapma, kazanç görüntüleme
+    * **business**: Menü yönetimi, sipariş yönetimi, istatistik görüntüleme
+    * **admin**: Tüm sistem yönetimi, kullanıcı onayları, konfigürasyon
+    
+    ## 🌐 **Deployment Bilgileri**
+    
+    * **Frontend**: Vercel (React SPA)
+    * **Backend**: Render (FastAPI + MongoDB)
+    * **Database**: MongoDB Atlas
+    
+    ## 📞 **Destek**
+    
+    API ile ilgili sorularınız için: admin@kuryecini.com
+    """,
+    version="1.0.0",
+    contact={
+        "name": "Kuryecini API Destek",
+        "email": "admin@kuryecini.com",
+        "url": "https://kuryecini.com/destek",
+    },
+    license_info={
+        "name": "Kuryecini Proprietary License",
+        "url": "https://kuryecini.com/lisans",
+    },
+    servers=[
+        {
+            "url": "https://api.kuryecini.com",
+            "description": "Production server"
+        },
+        {
+            "url": "https://staging-api.kuryecini.com", 
+            "description": "Staging server"
+        },
+        {
+            "url": "http://localhost:8001",
+            "description": "Development server"
+        }
+    ],
+    docs_url="/docs",  # Swagger UI
+    redoc_url="/redoc",  # ReDoc
+    openapi_url="/openapi.json"
+)
 
 # Health check endpoint (required for deployment)
 @app.get("/healthz")
