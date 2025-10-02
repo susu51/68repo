@@ -1832,6 +1832,22 @@ async def set_system_config(key: str, value: Any, user_id: str, description: str
     else:
         await db.system_configs.insert_one(config.dict())
 
+# Initialize default commission settings
+async def initialize_default_configs():
+    """Initialize default system configurations"""
+    defaults = [
+        ("platform_commission_rate", 0.05, "Platform komisyon oranı (varsayılan %5)"),
+        ("courier_commission_rate", 0.05, "Kurye komisyon oranı (varsayılan %5)"),
+        ("restaurant_fee_rate", 0.95, "Restoran gelir oranı (varsayılan %95)"),
+        ("service_fee_enabled", False, "Müşteri servis bedeli (kapalı)"),
+        ("delivery_fee_enabled", False, "Teslimat ücreti (kapalı)"),
+    ]
+    
+    for key, value, description in defaults:
+        existing = await db.system_configs.find_one({"key": key})
+        if not existing:
+            await set_system_config(key, value, "system", description)
+
 # EXISTING MODELS (keeping previous models)
 class Location(BaseModel):
     lat: float
