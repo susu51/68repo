@@ -67,6 +67,12 @@ async def health_check():
     """Health check endpoint for deployment monitoring"""
     return {"status": "ok"}
 
+# Legacy health endpoint alias
+@app.get("/health")
+async def health_check_legacy():
+    """Legacy health check endpoint alias"""
+    return {"status": "ok"}
+
 # Add required menus endpoint
 @app.get("/menus")
 async def get_menus():
