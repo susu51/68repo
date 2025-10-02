@@ -261,7 +261,7 @@ class AdminConfigTester:
         """Test commission validation ensuring restaurant gets at least 60%"""
         try:
             # Test with rates that would give restaurant < 60%
-            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", json={
+            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", params={
                 "platform_commission": 0.25,  # 25%
                 "courier_commission": 0.20   # 20% - total 45%, leaving only 55% for restaurant
             })
