@@ -1371,6 +1371,71 @@ async def get_all_orders(current_user: dict = Depends(get_admin_user)):
     return orders
 
 # KYC Management Endpoints
+@api_router.post("/couriers/kyc")
+async def upload_kyc_documents(
+    license_photo: UploadFile = File(None),
+    vehicle_registration: UploadFile = File(None),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload KYC documents for courier (license and vehicle registration)"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Only couriers can upload KYC documents")
+    
+    courier_id = current_user["id"]
+    upload_results = {}
+    
+    # Validate file types
+    allowed_extensions = {'.jpg', '.jpeg', '.png', '.pdf'}
+    
+    if license_photo:
+        file_ext = Path(license_photo.filename).suffix.lower()
+        if file_ext not in allowed_extensions:
+            raise HTTPException(status_code=400, detail="Ehliyet fotoğrafı için sadece JPG, PNG veya PDF dosyaları kabul edilir")
+        
+        # Save license photo
+        license_filename = f"kyc_license_{courier_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_ext}"
+        license_path = UPLOAD_DIR / license_filename
+        
+        with open(license_path, "wb") as buffer:
+            shutil.copyfileobj(license_photo.file, buffer)
+        
+        upload_results["license_photo_url"] = f"/uploads/{license_filename}"
+    
+    if vehicle_registration:
+        file_ext = Path(vehicle_registration.filename).suffix.lower()
+        if file_ext not in allowed_extensions:
+            raise HTTPException(status_code=400, detail="Ruhsat fotoğrafı için sadece JPG, PNG veya PDF dosyaları kabul edilir")
+        
+        # Save vehicle registration
+        vehicle_filename = f"kyc_vehicle_{courier_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_ext}"
+        vehicle_path = UPLOAD_DIR / vehicle_filename
+        
+        with open(vehicle_path, "wb") as buffer:
+            shutil.copyfileobj(vehicle_registration.file, buffer)
+        
+        upload_results["vehicle_registration_url"] = f"/uploads/{vehicle_filename}"
+    
+    # Update courier record with uploaded document URLs
+    if upload_results:
+        update_data = {}
+        if "license_photo_url" in upload_results:
+            update_data["license_photo_url"] = upload_results["license_photo_url"]
+        if "vehicle_registration_url" in upload_results:
+            update_data["vehicle_registration_url"] = upload_results["vehicle_registration_url"]
+        
+        update_data["kyc_documents_updated_at"] = datetime.now(timezone.utc)
+        update_data["kyc_status"] = "pending"  # Reset to pending when new documents are uploaded
+        
+        await db.users.update_one(
+            {"id": courier_id},
+            {"$set": update_data}
+        )
+    
+    return {
+        "message": "KYC belgeleri başarıyla yüklendi",
+        "uploaded_documents": upload_results
+    }
+
 @api_router.get("/admin/couriers/kyc")
 async def get_couriers_for_kyc(current_user: dict = Depends(get_admin_user)):
     """Get all couriers with their KYC documents for approval"""
