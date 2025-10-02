@@ -1829,6 +1829,44 @@ async def initialize_default_configs():
         if not existing:
             await set_system_config(key, value, "system", description)
 
+# Initialize default admin user
+async def initialize_admin_user():
+    """Create default admin user if not exists"""
+    admin_email = "admin@kuryecini.com"
+    existing_admin = await db.users.find_one({"email": admin_email})
+    
+    if not existing_admin:
+        # Create secure admin user
+        admin_password = "KuryeciniAdmin2024!"  # Strong default password
+        password_hash = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt())
+        
+        admin_user = {
+            "id": str(uuid.uuid4()),
+            "email": admin_email,
+            "password": password_hash.decode('utf-8'),
+            "first_name": "Admin",
+            "last_name": "Kuryecini",
+            "role": "admin",
+            "is_active": True,
+            "kyc_status": "approved",
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        await db.users.insert_one(admin_user)
+        print(f"✅ Default admin user created: {admin_email} / {admin_password}")
+        return admin_password
+    else:
+        print(f"ℹ️ Admin user already exists: {admin_email}")
+        return None
+
+# Call initialization on startup
+@app.on_event("startup")
+async def startup_event():
+    """Initialize system on startup"""
+    await initialize_default_configs()
+    await initialize_admin_user()
+
 # EXISTING MODELS (keeping previous models)
 class Location(BaseModel):
     lat: float
