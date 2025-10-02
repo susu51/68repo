@@ -2576,7 +2576,7 @@ async def update_system_configuration(
         action_type="config_update",
         target_type="system_config",
         target_id=config_key,
-        user_id=current_user_id,
+        user_id=current_user["id"],
         ip_address=request.client.host,
         description=f"System configuration updated: {config_key}",
         old_data={"value": old_value},
