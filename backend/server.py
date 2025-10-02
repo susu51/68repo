@@ -52,7 +52,7 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client.delivertr_database
+db = client.kuryecini_database
 
 # Create uploads directory
 UPLOAD_DIR = Path("/app/backend/uploads")
