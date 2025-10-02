@@ -142,9 +142,18 @@ async def health_check_legacy():
     return {"status": "ok"}
 
 # Add required menus endpoint
-@app.get("/menus")
+@app.get("/menus", 
+    tags=["Public", "Menus"],
+    summary="All Menu Items",
+    description="Get all menu items from approved businesses in standardized format."
+)
 async def get_menus():
-    """Get all menu items in standardized format"""
+    """
+    **Legacy Menu Endpoint**
+    
+    Returns all menu items from approved businesses in a standardized format.
+    Use `/api/menus/public` for enhanced restaurant structure.
+    """
     try:
         # Get all products from all businesses
         businesses = await db.businesses.find({"kyc_status": "approved"}).to_list(None)
