@@ -311,6 +311,16 @@ class OrderCreate(BaseModel):
     total_amount: float
     notes: Optional[str] = None
 
+class PriceBreakdown(BaseModel):
+    """Detailed price breakdown for transparency"""
+    subtotal: float  # Net product prices
+    restaurant_fee: float  # Restaurant's portion (95% of subtotal)
+    courier_fee: float  # Courier commission (5% of subtotal)  
+    platform_commission: float  # Platform commission (5% of subtotal)
+    service_fee: float = 0.0  # No service fee for customers
+    delivery_fee: float = 0.0  # No delivery fee for customers
+    total: float  # Final total amount
+
 class Order(BaseModel):
     id: str
     customer_id: str
@@ -325,7 +335,8 @@ class Order(BaseModel):
     delivery_lng: Optional[float] = None
     items: List[OrderItem]
     total_amount: float
-    commission_amount: float  # 3% platform commission
+    commission_amount: float  # Platform commission
+    price_breakdown: Optional[PriceBreakdown] = None
     notes: Optional[str] = None
     created_at: datetime
     assigned_at: Optional[datetime] = None
