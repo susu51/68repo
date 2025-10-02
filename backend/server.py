@@ -728,9 +728,31 @@ async def register_business(business_data: BusinessRegister):
         "user_data": user_doc
     }
 
-@api_router.post("/register/customer")
+@api_router.post("/register/customer",
+    tags=["Authentication", "Customer"],
+    summary="Customer Registration",
+    description="Register a new customer account with email verification.",
+    status_code=201
+)
 async def register_customer(customer_data: CustomerRegistration):
-    """Register a new customer"""
+    """
+    **Customer Registration**
+    
+    Creates a new customer account for placing food orders.
+    
+    **Required Fields:**
+    - `email`: Valid email address (will be username)
+    - `password`: Secure password (min 6 characters)
+    - `first_name`: Customer's first name
+    - `last_name`: Customer's last name
+    - `city`: Customer's city (from 81 Turkish cities)
+    
+    **Features:**
+    - Automatic email validation
+    - Password hashing for security
+    - Turkish city validation
+    - Duplicate email prevention
+    """
     # Check if email already exists
     existing_user = await db.users.find_one({"email": customer_data.email})
     if existing_user:
