@@ -330,7 +330,7 @@ class AdminConfigTester:
             test_platform_rate = 0.06  # 6%
             test_courier_rate = 0.04   # 4%
             
-            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", json={
+            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", params={
                 "platform_commission": test_platform_rate,
                 "courier_commission": test_courier_rate
             })
