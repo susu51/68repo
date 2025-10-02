@@ -406,21 +406,37 @@ class Phase2ImprovementsTest:
                 response_time = time.time() - start_time
                 
                 if response.status_code == 200:
-                    data = response.json()
-                    if data.get("status") == "ok":
-                        self.log_result(
-                            f"Health Endpoint {endpoint}",
-                            True,
-                            f"Health check passed: {data}",
-                            response_time
-                        )
-                    else:
-                        self.log_result(
-                            f"Health Endpoint {endpoint}",
-                            False,
-                            f"Health check returned unexpected data: {data}",
-                            response_time
-                        )
+                    try:
+                        data = response.json()
+                        if data.get("status") == "ok":
+                            self.log_result(
+                                f"Health Endpoint {endpoint}",
+                                True,
+                                f"Health check passed: {data}",
+                                response_time
+                            )
+                        else:
+                            self.log_result(
+                                f"Health Endpoint {endpoint}",
+                                False,
+                                f"Health check returned unexpected data: {data}",
+                                response_time
+                            )
+                    except json.JSONDecodeError:
+                        if "<!doctype html>" in response.text:
+                            self.log_result(
+                                f"Health Endpoint {endpoint}",
+                                False,
+                                f"Frontend routing intercepting {endpoint} - health endpoint not accessible due to deployment configuration",
+                                response_time
+                            )
+                        else:
+                            self.log_result(
+                                f"Health Endpoint {endpoint}",
+                                False,
+                                f"Health check returned non-JSON response: {response.text[:100]}",
+                                response_time
+                            )
                 else:
                     self.log_result(
                         f"Health Endpoint {endpoint}",
