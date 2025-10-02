@@ -222,7 +222,7 @@ class AdminConfigTester:
                 )
                 
                 # Test with invalid high courier commission (> 20%)
-                response2 = self.session.post(f"{BACKEND_URL}/admin/config/commission", json={
+                response2 = self.session.post(f"{BACKEND_URL}/admin/config/commission", params={
                     "platform_commission": 0.05,
                     "courier_commission": 0.25  # 25% - should be rejected
                 })
