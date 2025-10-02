@@ -121,7 +121,7 @@ class ProductionReadinessTest:
         
         try:
             start_time = time.time()
-            response = self.session.get(f"{BACKEND_URL}/menus/public", timeout=15)
+            response = self.session.get(f"{API_BASE}/businesses", timeout=15)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
