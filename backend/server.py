@@ -510,9 +510,51 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     return user
 
 # Authentication Endpoints
-@api_router.post("/auth/login")
+@api_router.post("/auth/login", 
+    tags=["Authentication"],
+    summary="User Login",
+    description="Authenticate user with email and password. Returns JWT token for API access.",
+    response_description="JWT access token and user information"
+)
 async def login(login_data: LoginRequest):
-    """Login with email and password - Standard authentication only"""
+    """
+    **User Authentication Endpoint**
+    
+    Authenticates users across all roles (customer, courier, business, admin) and returns a JWT token.
+    
+    **Supported Roles:**
+    - `customer`: Regular customers who place orders
+    - `courier`: Delivery personnel who fulfill orders  
+    - `business`: Restaurant/business owners who manage menus
+    - `admin`: Platform administrators with full access
+    
+    **Authentication Flow:**
+    1. Submit email and password via this endpoint
+    2. Receive JWT `access_token` in response
+    3. Include token in `Authorization: Bearer <token>` header for protected endpoints
+    
+    **Example Usage:**
+    ```json
+    {
+        "email": "customer@example.com",
+        "password": "userpassword123"
+    }
+    ```
+    
+    **Response:**
+    ```json
+    {
+        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+        "token_type": "bearer",
+        "user": {
+            "id": "user-uuid",
+            "email": "customer@example.com", 
+            "role": "customer",
+            "first_name": "John"
+        }
+    }
+    ```
+    """
     
     # Test users for demo purposes
     test_users = {
