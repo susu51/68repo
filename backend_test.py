@@ -528,17 +528,16 @@ class ProductionReadinessTest:
         
         # Test 2: Update configuration
         try:
-            config_update = {
-                "key": "platform_commission_rate",
-                "value": 0.05,
-                "description": "Platform commission rate (5%)",
-                "category": "financial"
+            params = {
+                "config_key": "platform_commission_rate",
+                "config_value": 0.05,
+                "description": "Platform commission rate (5%)"
             }
             
             start_time = time.time()
             response = self.session.post(
                 f"{API_BASE}/admin/config/update",
-                json=config_update,
+                params=params,
                 headers=headers,
                 timeout=10
             )
