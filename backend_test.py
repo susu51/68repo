@@ -665,7 +665,7 @@ class ProductionReadinessTest:
         critical_tests = [
             "Primary Health Check",
             "Legacy Health Check", 
-            "Public Menu Endpoint",
+            "Public Business Endpoint",
             "Admin Login",
             "Customer Login",
             "Business Login",
