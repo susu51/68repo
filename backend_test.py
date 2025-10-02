@@ -159,7 +159,7 @@ class ProductionReadinessTest:
                     response_time
                 )
         except Exception as e:
-            self.log_result("Public Menu System", False, f"Exception: {str(e)}")
+            self.log_result("Public Business System", False, f"Exception: {str(e)}")
     
     def test_kyc_file_upload(self):
         """Test KYC file upload functionality"""
