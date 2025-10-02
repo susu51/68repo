@@ -242,6 +242,13 @@ class Phase2ImprovementsTest:
                     f"Swagger UI loaded successfully at /docs",
                     response_time
                 )
+            elif response.status_code == 200 and "<!doctype html>" in response.text:
+                self.log_result(
+                    "FastAPI Swagger UI Accessible",
+                    False,
+                    f"Frontend routing intercepting /docs - API docs not accessible due to deployment configuration",
+                    response_time
+                )
             else:
                 self.log_result(
                     "FastAPI Swagger UI Accessible",
