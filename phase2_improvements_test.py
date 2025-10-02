@@ -336,36 +336,44 @@ class Phase2ImprovementsTest:
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                openapi_spec = response.json()
-                paths = openapi_spec.get("paths", {})
-                
-                tagged_endpoints = 0
-                described_endpoints = 0
-                total_endpoints = len(paths)
-                
-                for path, methods in paths.items():
-                    for method, details in methods.items():
-                        if isinstance(details, dict):
-                            if "tags" in details and details["tags"]:
-                                tagged_endpoints += 1
-                            if "description" in details or "summary" in details:
-                                described_endpoints += 1
-                
-                tag_percentage = (tagged_endpoints / max(total_endpoints, 1)) * 100
-                desc_percentage = (described_endpoints / max(total_endpoints, 1)) * 100
-                
-                if tag_percentage >= 70 and desc_percentage >= 70:
-                    self.log_result(
-                        "API Endpoints Have Tags and Descriptions",
-                        True,
-                        f"Tags: {tag_percentage:.1f}%, Descriptions: {desc_percentage:.1f}% of endpoints documented",
-                        response_time
-                    )
-                else:
+                try:
+                    openapi_spec = response.json()
+                    paths = openapi_spec.get("paths", {})
+                    
+                    tagged_endpoints = 0
+                    described_endpoints = 0
+                    total_endpoints = len(paths)
+                    
+                    for path, methods in paths.items():
+                        for method, details in methods.items():
+                            if isinstance(details, dict):
+                                if "tags" in details and details["tags"]:
+                                    tagged_endpoints += 1
+                                if "description" in details or "summary" in details:
+                                    described_endpoints += 1
+                    
+                    tag_percentage = (tagged_endpoints / max(total_endpoints, 1)) * 100
+                    desc_percentage = (described_endpoints / max(total_endpoints, 1)) * 100
+                    
+                    if tag_percentage >= 70 and desc_percentage >= 70:
+                        self.log_result(
+                            "API Endpoints Have Tags and Descriptions",
+                            True,
+                            f"Tags: {tag_percentage:.1f}%, Descriptions: {desc_percentage:.1f}% of endpoints documented",
+                            response_time
+                        )
+                    else:
+                        self.log_result(
+                            "API Endpoints Have Tags and Descriptions",
+                            False,
+                            f"Insufficient documentation - Tags: {tag_percentage:.1f}%, Descriptions: {desc_percentage:.1f}%",
+                            response_time
+                        )
+                except json.JSONDecodeError:
                     self.log_result(
                         "API Endpoints Have Tags and Descriptions",
                         False,
-                        f"Insufficient documentation - Tags: {tag_percentage:.1f}%, Descriptions: {desc_percentage:.1f}%",
+                        f"Frontend routing intercepting /openapi.json - Cannot verify endpoint documentation due to deployment configuration",
                         response_time
                     )
             else:
