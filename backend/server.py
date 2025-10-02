@@ -5043,8 +5043,11 @@ async def get_active_featured_businesses(current_user: dict = Depends(get_curren
 
 @api_router.post("/admin/login-simple")
 async def admin_simple_login():
-    """Simple admin login without email (password: 6851)"""
-    password = "6851"  # Fixed admin password
+    """DEPRECATED: Simple admin login - Use standard /auth/login instead"""
+    raise HTTPException(
+        status_code=status.HTTP_410_GONE,
+        detail="Simple admin login deprecated. Use /auth/login with admin credentials."
+    )
     
     # Generate admin token
     token_data = {
