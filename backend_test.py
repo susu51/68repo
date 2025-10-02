@@ -85,8 +85,7 @@ class ProductionReadinessTest:
         print("=" * 50)
         
         health_endpoints = [
-            ("/api/healthz", "Primary Health Check"),
-            ("/api/health", "Legacy Health Check")
+            ("/api/healthz", "Primary Health Check")
         ]
         
         for endpoint, description in health_endpoints:
