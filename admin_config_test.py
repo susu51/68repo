@@ -292,7 +292,7 @@ class AdminConfigTester:
         """Test that error messages are in Turkish"""
         try:
             # Test with invalid commission to get Turkish error message
-            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", json={
+            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", params={
                 "platform_commission": 0.30,  # Invalid rate
                 "courier_commission": 0.05
             })
