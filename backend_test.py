@@ -153,7 +153,7 @@ class ProductionReadinessTest:
                     )
             else:
                 self.log_result(
-                    "Public Menu Endpoint",
+                    "Public Business Endpoint",
                     False,
                     f"HTTP {response.status_code}: {response.text[:200]}",
                     response_time
