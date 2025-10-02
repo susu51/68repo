@@ -176,7 +176,7 @@ class AdminConfigTester:
         """Test POST /api/admin/config/commission with valid values"""
         try:
             # Test with valid commission rates (platform: 0.05, courier: 0.05)
-            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", json={
+            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", params={
                 "platform_commission": 0.05,
                 "courier_commission": 0.05
             })
