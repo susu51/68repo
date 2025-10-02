@@ -2541,7 +2541,7 @@ async def process_refund(
 
 # SYSTEM CONFIGURATION ENDPOINTS
 @api_router.get("/admin/config")
-async def get_system_configurations(current_user_id: str = Depends(get_admin_user)):
+async def get_system_configurations(current_user: dict = Depends(get_admin_user)):
     """Sistem konfigürasyonlarını getir"""
     configs = await db.system_configs.find().to_list(length=None)
     
