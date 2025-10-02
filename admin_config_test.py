@@ -207,7 +207,7 @@ class AdminConfigTester:
         """Test commission validation with invalid rates > 0.2"""
         try:
             # Test with invalid high platform commission (> 20%)
-            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", json={
+            response = self.session.post(f"{BACKEND_URL}/admin/config/commission", params={
                 "platform_commission": 0.25,  # 25% - should be rejected
                 "courier_commission": 0.05
             })
