@@ -25,36 +25,24 @@ TEST_CREDENTIALS = {
 }
 
 class ProductionReadinessTest:
-    def __init__(self, base_url="https://order-platform-1.preview.emergentagent.com"):
-        self.base_url = base_url
-        self.api_url = f"{base_url}/api"
-        self.access_token = None
-        self.admin_token = None
-        self.business_token = None
-        self.customer_token = None
-        self.courier_token = None
-        self.tests_run = 0
-        self.tests_passed = 0
+    def __init__(self):
+        self.session = requests.Session()
+        self.tokens = {}
         self.test_results = []
+        self.start_time = time.time()
         
-        # Test data
-        self.business_email = f"business_{uuid.uuid4().hex[:8]}@test.com"
-        self.customer_email = f"customer_{uuid.uuid4().hex[:8]}@test.com"
-        self.courier_email = f"courier_{uuid.uuid4().hex[:8]}@test.com"
-        self.test_password = "TestPass123!"
-        
-        # Store created entities for testing
-        self.created_products = []
-        self.created_orders = []
-        self.business_id = None
-        self.customer_id = None
-        self.courier_id = None
-
-    def log_test(self, name, success, details=""):
-        """Log test results"""
-        self.tests_run += 1
-        if success:
-            self.tests_passed += 1
+    def log_result(self, test_name, success, details="", response_time=0):
+        """Log test result"""
+        result = {
+            "test": test_name,
+            "success": success,
+            "details": details,
+            "response_time": f"{response_time:.2f}s",
+            "timestamp": datetime.now().isoformat()
+        }
+        self.test_results.append(result)
+        status = "✅" if success else "❌"
+        print(f"{status} {test_name}: {details}")
             print(f"✅ {name} - PASSED")
         else:
             print(f"❌ {name} - FAILED: {details}")
