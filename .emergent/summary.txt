@@ -1,84 +1,82 @@
 <analysis>
-The trajectory details an iterative development process for the Kuryecini delivery application, guided by frequent and specific user feedback. The AI engineer's work began by addressing user-reported issues concerning a missing map in the Courier Panel and a disorganized Customer Dashboard. Initial fixes involved correcting the tab structure and data handling in  and adding missing backend API endpoints in . The Customer Dashboard in  was reorganized for better UX.
+The trajectory documents the development of the Kuryecini application, a full-stack delivery platform. The process began with fixing initial UI bugs in the Courier and Customer dashboards and adding missing backend endpoints. Following user feedback, the project evolved into a major UI/UX overhaul, including a complete rewrite of the Business and Courier panels into professional, feature-rich dashboards with integrated maps and analytics.
 
-Subsequent user requests led to significant UI/UX refactoring. The Courier Panel was transformed from a top-tab to a side-tab layout, and the map was integrated directly into the orders view for a streamlined workflow. The Business Panel () was completely rewritten into a professional, multi-tab dashboard with comprehensive analytics and management tools. The customer-facing UI was also changed to a side-tab layout.
+A significant portion of the work involved intensive debugging of critical frontend runtime errors. These included fixing duplicate variable declarations, handling  calls on undefined stats objects by implementing safety checks and proper state initialization, resolving React object-rendering errors by creating a safe rendering utility, and fixing a recurring  DOM error by implementing  cleanup functions and an Error Boundary.
 
-The final phase involved extensive debugging of runtime errors, including fixing an undefined  function, resolving a critical authentication loop by correcting backend endpoint duplication and frontend state management, and adding safety checks to prevent crashes. The engineer is currently implementing a major overhaul of the customer's ordering flow, focusing on cart persistence, address management, and a redesigned restaurant menu interface, as per the user's latest detailed request.
+The focus then shifted to enhancing the customer order flow by implementing a persistent cart, an address management system, and an improved checkout modal. The final phase involved a major architectural refactor requested by the user: migrating all persistent state from  to a MongoDB backend, managed via a new set of REST APIs and secured with  cookies and CSRF protection to mitigate XSS risks. The last user request was to package the web application as an Android app.
 </analysis>
 
 <product_requirements>
-Kuryecini is a full-stack food and package delivery application for the Turkish market, designed to serve four distinct roles: Customer, Courier, Business, and Admin.
+Kuryecini is a full-stack food and package delivery application for the Turkish market, designed to serve four distinct user roles: Customer, Courier, Business, and Admin.
 
-The platform's core functionality includes user authentication (JWT-based, with email/password and OAuth options), real-time order tracking via Leaflet maps, and role-specific dashboards for managing operations.
+**Core Functionality:**
+The platform provides role-specific dashboards for managing operations. Customers can browse restaurants, manage a cart, and place orders. Couriers manage deliveries via an interactive map interface. Businesses manage their menu, orders, and view analytics. Admins oversee the entire platform, managing users and content.
 
-**Implemented Features:**
-- **Admin Panel**: User management, marketing tools, and KYC review capabilities.
-- **Courier Panel**: A multi-tab dashboard with side navigation, featuring an integrated map in the orders tab, real-time order management, earnings tracking, and profile settings.
-- **Business Panel**: A professional dashboard for restaurant owners to manage orders, menus (including adding products and changing prices), view detailed statistics, and control restaurant status (open/closed).
-- **Customer Frontend**: A user-friendly interface for browsing restaurants, viewing menus, and managing a profile.
-
-**Current Development Focus:**
-The immediate goal is to overhaul the customer's end-to-end ordering experience. This involves implementing robust cart functionality with state persistence, building an address management system for users to save and select delivery locations, and redesigning the restaurant menu UI to be more intuitive with categories, filtering, and a modern aesthetic.
+**Architectural Requirements & Evolution:**
+Initially, the application used standard JWT authentication with tokens stored in . However, due to security concerns, a major architectural shift was mandated. The current requirement is to eliminate all client-side storage (/) for sensitive or persistent data.
+- **State Management**: All user data, including shopping carts, addresses, and preferences, must be stored and managed on the server (MongoDB).
+- **Authentication**: JWTs must be delivered via ,  cookies with  and CSRF protection to prevent token theft via XSS attacks.
+- **Frontend**: The React frontend should be stateless regarding persistent data, fetching (hydrating) all necessary information from the backend upon loading.
+- **Mobile**: The web application should be packaged as a native Android application.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frameworks**: React.js (frontend), FastAPI (backend).
+- **Frameworks**: React.js (Create React App), FastAPI (Python).
 - **Database**: MongoDB.
-- **UI/UX**: Tailwind CSS, Shadcn UI components, Leaflet/OpenStreetMap for maps.
-- **Authentication**: JSON Web Tokens (JWT).
-- **State Management**: React hooks (, ), localStorage for cart persistence.
-- **API Communication**: Axios for frontend HTTP requests to the FastAPI backend.
+- **UI/UX**: Tailwind CSS, Radix UI components, Leaflet/OpenStreetMap for maps.
+- **Authentication**: Evolved from localStorage JWTs to a more secure  cookie-based session management with CSRF protection.
+- **State Management**: Migrated from client-side  for cart persistence to a server-side, database-driven state model.
+- **API Communication**: Axios for frontend HTTP requests.
+- **Mobile Deployment**: Progressive Web App (PWA) with Trusted Web Activity (TWA) for Android packaging.
 </key_technical_concepts>
 
 <code_architecture>
-The application follows a standard monolithic repository structure with separate directories for the frontend and backend services.
+The application uses a monorepo structure with distinct frontend and backend directories.
 
 
--   **/app/backend/server.py**
-    -   **Importance**: The core of the backend application. It defines all API endpoints using FastAPI, handles business logic, user authentication (JWT creation and validation), and interacts with the MongoDB database.
-    -   **Changes**: Numerous changes were made, including adding missing API endpoints for courier (, ) and business () panels. A critical fix involved removing a duplicate  endpoint that was causing authentication failures. The  function was modified to correctly validate in-memory test users.
--   **/app/frontend/src/App.js**
-    -   **Importance**: The main entry point for the React frontend. It manages routing, global state (like authentication and the shopping cart), and contains the implementation for the Customer Dashboard.
-    -   **Changes**: The customer dashboard UI was significantly refactored from a cluttered multi-button layout to a clean side-tab navigation system. The authentication logic was fixed to correctly map user data from the backend response.  was added to persist the shopping cart to .
--   **/app/frontend/src/CourierDashboard.js**
-    -   **Importance**: Provides the user interface for couriers.
-    -   **Changes**: This file underwent multiple major rewrites based on user feedback. It was changed from a top-tab to a side-tab layout. The separate Map tab was removed, and the Leaflet map was integrated directly into the Orders tab to create a unified workflow for managing deliveries.
--   **/app/frontend/src/BusinessDashboard_Enhanced.js**
-    -   **Importance**: The primary interface for business owners.
-    -   **Changes**: This file was completely rewritten from a basic panel to a professional, feature-rich dashboard with side-tab navigation, detailed analytics (daily performance, popular products), and comprehensive controls for managing orders, menus, and restaurant status. It was debugged to fix runtime errors caused by missing function definitions (, ).
--   **/app/frontend/src/FoodOrderSystem.js**
-    -   **Importance**: Manages the customer-facing restaurant browsing and menu interaction experience.
-    -   **Changes**: A critical runtime error, , was fixed by correctly defining the function within the  component. The file is currently being refactored to implement a new menu design with categories and filtering, and an enhanced checkout modal that incorporates address selection.
--   **/app/frontend/src/components/AddressSelector.js**
-    -   **Importance**: A new component created to handle address management.
-    -   **Changes**: Created to allow users to select, add, or edit saved addresses during the checkout process, as part of the current work on improving the customer order flow.
+
+-   **backend/server.py (and later backend/app/main.py)**
+    -   **Importance**: The core FastAPI application defining all API endpoints.
+    -   **Changes**: Initially held all logic. Later refactored for production deployment on services like Render. Endpoints were added for , a standardized , and crucially, new endpoints in  were created to manage server-side state for carts, addresses, and user preferences, replacing previous  reliance. Authentication logic was moved to  to handle secure  cookies and CSRF tokens.
+
+-   **frontend/src/App.js**
+    -   **Importance**: The main React component, managing routing and global state.
+    -   **Changes**: Modified to remove -based cart persistence. It now orchestrates API calls to fetch user data (cart, addresses) on load and passes this state down to child components like . The  is wrapped in the  here.
+
+-   **frontend/src/FoodOrderSystem.js**
+    -   **Importance**: The primary customer-facing component for browsing menus and ordering.
+    -   **Changes**: This file underwent extensive debugging to fix multiple runtime errors. It was heavily refactored to remove its own local cart state and instead receive and manipulate the global cart state via props passed from . The enhanced checkout modal, which uses the  component, was integrated here. All direct  access was removed as part of the architectural overhaul.
+
+-   **frontend/src/BusinessDashboard_Enhanced.js**
+    -   **Importance**: The main interface for business owners.
+    -   **Changes**: A critical runtime error () was fixed by adding safety checks (e.g., ) and ensuring the initial  state object was properly defined with all necessary properties.
+
+-   **frontend/src/utils/databaseState.js**
+    -   **Importance**: A new utility created to centralize all API interactions for fetching and updating user state that was previously in .
+    -   **Changes**: This file was created to abstract the logic for hydrating the application state from the new backend endpoints (e.g., fetching cart, addresses).
 </code_architecture>
 
 <pending_tasks>
-- Implement a comprehensive payment gateway integration (e.g., Iyzico).
-- Develop a commission reporting system for the platform.
-- Build out remaining Admin Panel features, such as user suspension and business menu approval.
-- Create a financial reporting and a customer complaint system.
-- Finalize the Business KYC (Know Your Customer) frontend approval flow.
+- Complete the migration from  to a fully server-side state management system with  cookies.
+- Implement the Progressive Web App (PWA) features (Service Worker, Manifest) and package the application into a native Android APK using Trusted Web Activity (TWA).
+- Integrate a real payment gateway (e.g., Iyzico).
+- Fully build out the remaining Admin Panel features, such as commission reporting and a customer complaint system.
 </pending_tasks>
 
 <current_work>
-The AI engineer is actively implementing a comprehensive overhaul of the customer's order flow, based on a detailed request from the user. This work spans three main areas:
+The engineer was in the middle of a critical architectural overhaul mandated by the user to enhance security and centralize state management. The primary goal is to completely eliminate the use of  and  in the frontend.
 
-1.  **Cart Functionality**: The immediate goal is to make the shopping cart fully functional and persistent.
-    -   In , the cart button UI has been updated to display the total price using a  function.
-    -   A  hook was added to  to save the cart's state to  on any change and to load it on initial render, ensuring the cart contents are not lost between page reloads or navigation.
-    -   The  function was confirmed to exist, but the Add to Cart button's functionality is still being fully integrated with the new menu UI.
+**Backend Work:**
+- A new file, , was created to refactor the authentication system to use  cookies for JWTs and implement CSRF protection.
+- The MongoDB schemas in  were being updated to include collections for , , and  to store data previously held on the client.
+- A new API module, , was created to define the CRUD endpoints (, , etc.) needed for the frontend to manage this server-side state.
 
-2.  **Customer Address Management**: A system for users to manage their delivery addresses is being built.
-    -   A new component has been created at . This component will house the UI for selecting an existing address or adding a new one.
-    -   This new address selector is being integrated into the checkout process within .
+**Frontend Work:**
+- A utility file, , was created to act as a service layer, centralizing all API calls that will replace direct  access. This service will be used to hydrate the React state with data from the database on initial page load.
 
-3.  **Restaurant Menu Redesign**: The restaurant menu interface is being modernized.
-    -   In , the UI is being refactored to support menu categories (e.g., Starters, Main Dishes, Drinks). State variables like  and  have been added to manage filtering and sorting.
-    -   The  function is being updated to trigger a new, more advanced modal that includes the  component, making the checkout process more robust and user-friendly. The engineer was in the process of adding this modal component to the file's render logic.
+This work was interrupted by the user's most recent request to package the web application for Android. The engineer had just proposed using a PWA + TWA strategy to achieve this.
 </current_work>
 
 <optional_next_step>
-Complete the implementation of the enhanced checkout modal within , ensuring it properly renders and utilizes the new  component to capture the user's delivery address before finalizing an order.
+Begin implementing the Progressive Web App (PWA) manifest and service worker to make the web application installable and offline-capable, as the first step toward creating the Android app via Trusted Web Activity (TWA).
 </optional_next_step>
