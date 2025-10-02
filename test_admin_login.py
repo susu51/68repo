@@ -12,7 +12,7 @@ async def test_admin_login():
     # Connect to MongoDB
     mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/kuryecini_database')
     client = AsyncIOMotorClient(mongo_url)
-    db = client.delivertr_database
+    db = client.kuryecini_database
     
     admin_email = "admin@kuryecini.com"
     admin_password = "KuryeciniAdmin2024!"
