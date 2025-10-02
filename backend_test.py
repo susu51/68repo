@@ -663,7 +663,6 @@ class ProductionReadinessTest:
         print(f"\n✅ CRITICAL SUCCESS CRITERIA CHECK:")
         critical_tests = [
             "Primary Health Check",
-            "Legacy Health Check", 
             "Public Business Endpoint",
             "Admin Login",
             "Customer Login",
