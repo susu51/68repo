@@ -99,6 +99,69 @@ async def get_menus():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Public menu endpoint with enhanced filtering
+@app.get("/menus/public")
+async def get_public_menus():
+    """Get public menus from active and approved restaurants"""
+    try:
+        # Get only approved and active businesses
+        businesses = await db.businesses.find({
+            "kyc_status": "approved",
+            "is_active": True
+        }).to_list(None)
+        
+        if not businesses:
+            return {
+                "restaurants": [],
+                "message": "Şu an aktif restoran bulunmamaktadır.",
+                "count": 0
+            }
+        
+        restaurants_with_menus = []
+        
+        for business in businesses:
+            # Get active products for this business
+            products = await db.products.find({
+                "business_id": business["id"],
+                "is_available": True
+            }).to_list(None)
+            
+            if products:  # Only include restaurants with available products
+                restaurant_data = {
+                    "id": business.get("id"),
+                    "name": business.get("business_name", ""),
+                    "description": business.get("description", ""),
+                    "address": business.get("address", ""),
+                    "city": business.get("city", ""),
+                    "rating": business.get("rating", 5.0),
+                    "delivery_time": business.get("delivery_time", "30-45 dk"),
+                    "min_order": business.get("min_order_amount", 50.0),
+                    "menu": []
+                }
+                
+                for product in products:
+                    menu_item = {
+                        "id": product.get("id", str(product.get("_id", ""))),
+                        "name": product.get("name", ""),
+                        "description": product.get("description", ""),
+                        "price": float(product.get("price", 0)),
+                        "image_url": product.get("image_url", ""),
+                        "category": product.get("category", "Ana Yemek"),
+                        "preparation_time": product.get("preparation_time_minutes", 15)
+                    }
+                    restaurant_data["menu"].append(menu_item)
+                
+                restaurants_with_menus.append(restaurant_data)
+        
+        return {
+            "restaurants": restaurants_with_menus,
+            "count": len(restaurants_with_menus),
+            "message": f"{len(restaurants_with_menus)} aktif restoran bulundu." if restaurants_with_menus else "Aktif restoran bulunamadı."
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Menü yüklenirken hata: {str(e)}")
+
 # Serve uploaded files
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
