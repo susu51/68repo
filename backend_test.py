@@ -277,7 +277,7 @@ class ProductionReadinessTest:
             
             if response.status_code == 200:
                 data = response.json()
-                test_address_id = data.get("id")
+                test_address_id = data.get("address_id") or data.get("id")
                 self.log_result(
                     "Create Address",
                     True,
