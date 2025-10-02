@@ -233,8 +233,11 @@ async def get_public_menus():
 # Serve uploaded files
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
+# Create a router with the /api prefix and comprehensive tagging
+api_router = APIRouter(
+    prefix="/api",
+    responses={404: {"description": "Not found"}},
+)
 
 # Security
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'delivertr-secret-key-2024')
