@@ -715,28 +715,14 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     
     return current_user
 
-# Admin Authentication
+# Legacy Admin Authentication (DEPRECATED - Use standard /auth/login)
 @api_router.post("/auth/admin")
 async def admin_login(admin_data: AdminLogin):
-    """Admin login with special password"""
-    if admin_data.password != "6851":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid admin password"
-        )
-    
-    # Create admin access token
-    access_token = create_access_token(data={"sub": "admin@delivertr.com", "role": "admin"})
-    
-    admin_user = {
-        "id": "admin",
-        "email": "admin@delivertr.com",
-        "role": "admin",
-        "first_name": "Admin",
-        "last_name": "User",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "is_active": True
-    }
+    """DEPRECATED: Admin login endpoint - Use standard /auth/login instead"""
+    raise HTTPException(
+        status_code=status.HTTP_410_GONE,
+        detail="Admin endpoint deprecated. Use /auth/login with admin credentials."
+    )
     
     return {
         "access_token": access_token,
