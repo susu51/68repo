@@ -1,23 +1,30 @@
 #!/usr/bin/env python3
 """
-DeliverTR Backend API Testing Suite - Core Business Flow
-Tests all API endpoints for the Turkish delivery platform MVP core business flow:
-- Product Management (Business creates products with photos)
-- Order Creation (Customer creates orders with multiple items)
-- Order Status Management (CREATED→ASSIGNED→ON_ROUTE→DELIVERED)
-- Admin Authentication (password "6851")
-- Admin Management (users, products, orders)
-- Commission Calculation (3%)
+Production Readiness Testing for Kuryecini Platform
+Testing newly implemented and updated endpoints (Madde 1-10)
 """
 
 import requests
-import sys
 import json
-from datetime import datetime
 import time
-import uuid
+import os
+from datetime import datetime
+from pathlib import Path
+import tempfile
 
-class DeliverTRAPITester:
+# Configuration
+BACKEND_URL = "https://order-platform-1.preview.emergentagent.com"
+API_BASE = f"{BACKEND_URL}/api"
+
+# Test credentials
+TEST_CREDENTIALS = {
+    "admin": {"email": "admin@test.com", "password": "6851"},
+    "customer": {"email": "testcustomer@example.com", "password": "test123"},
+    "business": {"email": "testbusiness@example.com", "password": "test123"},
+    "courier": {"email": "testkurye@example.com", "password": "test123"}
+}
+
+class ProductionReadinessTest:
     def __init__(self, base_url="https://order-platform-1.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
