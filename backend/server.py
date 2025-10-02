@@ -2713,6 +2713,66 @@ async def toggle_maintenance_mode(
     
     return {"success": True, "message": f"Bakım modu {'açıldı' if enabled else 'kapatıldı'}"}
 
+@api_router.post("/admin/config/commission")
+async def update_commission_settings(
+    platform_commission: float,
+    courier_commission: float,
+    request: Request,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update commission settings (Admin only)"""
+    # Validate commission rates
+    if not (0.0 <= platform_commission <= 0.2):
+        raise HTTPException(status_code=400, detail="Platform komisyonu 0% ile 20% arasında olmalıdır")
+    
+    if not (0.0 <= courier_commission <= 0.2):
+        raise HTTPException(status_code=400, detail="Kurye komisyonu 0% ile 20% arasında olmalıdır")
+    
+    # Calculate restaurant fee rate (remaining after platform and courier commissions)
+    restaurant_fee_rate = 1.0 - platform_commission - courier_commission
+    
+    if restaurant_fee_rate < 0.6:  # Ensure restaurant gets at least 60%
+        raise HTTPException(status_code=400, detail="Restoran payı minimum %60 olmalıdır")
+    
+    # Update configuration
+    user_id = current_user["id"]
+    await set_system_config("platform_commission_rate", platform_commission, user_id, "Platform komisyon oranı")
+    await set_system_config("courier_commission_rate", courier_commission, user_id, "Kurye komisyon oranı") 
+    await set_system_config("restaurant_fee_rate", restaurant_fee_rate, user_id, "Restoran gelir oranı")
+    
+    # Log the change
+    await log_action(
+        action_type="commission_update",
+        target_type="system_config", 
+        target_id="commission_rates",
+        user_id=user_id,
+        ip_address=request.client.host,
+        description=f"Komisyon oranları güncellendi: Platform {platform_commission*100:.1f}%, Kurye {courier_commission*100:.1f}%, Restoran {restaurant_fee_rate*100:.1f}%"
+    )
+    
+    return {
+        "message": "Komisyon oranları başarıyla güncellendi",
+        "platform_commission": f"{platform_commission*100:.1f}%",
+        "courier_commission": f"{courier_commission*100:.1f}%", 
+        "restaurant_fee": f"{restaurant_fee_rate*100:.1f}%"
+    }
+
+@api_router.get("/admin/config/commission")
+async def get_commission_settings(current_user: dict = Depends(get_admin_user)):
+    """Get current commission settings"""
+    platform_rate = await get_system_config("platform_commission_rate", 0.05)
+    courier_rate = await get_system_config("courier_commission_rate", 0.05)
+    restaurant_rate = await get_system_config("restaurant_fee_rate", 0.9)
+    
+    return {
+        "platform_commission_rate": platform_rate,
+        "courier_commission_rate": courier_rate,
+        "restaurant_fee_rate": restaurant_rate,
+        "platform_commission_percent": f"{platform_rate*100:.1f}%",
+        "courier_commission_percent": f"{courier_rate*100:.1f}%",
+        "restaurant_fee_percent": f"{restaurant_rate*100:.1f}%"
+    }
+
 # EXISTING ENDPOINTS (keeping all previous functionality)
 # ... (all previous registration, order, location endpoints remain the same)
 
