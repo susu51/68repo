@@ -271,39 +271,47 @@ class Phase2ImprovementsTest:
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                openapi_spec = response.json()
-                paths = openapi_spec.get("paths", {})
-                
-                # Check for key endpoints
-                key_endpoints = [
-                    "/api/auth/login",
-                    "/api/admin/users", 
-                    "/api/businesses",
-                    "/menus/public",
-                    "/healthz"
-                ]
-                
-                found_endpoints = []
-                missing_endpoints = []
-                
-                for endpoint in key_endpoints:
-                    if endpoint in paths:
-                        found_endpoints.append(endpoint)
+                try:
+                    openapi_spec = response.json()
+                    paths = openapi_spec.get("paths", {})
+                    
+                    # Check for key endpoints
+                    key_endpoints = [
+                        "/api/auth/login",
+                        "/api/admin/users", 
+                        "/api/businesses",
+                        "/menus/public",
+                        "/healthz"
+                    ]
+                    
+                    found_endpoints = []
+                    missing_endpoints = []
+                    
+                    for endpoint in key_endpoints:
+                        if endpoint in paths:
+                            found_endpoints.append(endpoint)
+                        else:
+                            missing_endpoints.append(endpoint)
+                    
+                    if len(found_endpoints) >= 4:  # Most endpoints should be documented
+                        self.log_result(
+                            "OpenAPI Schema Comprehensive",
+                            True,
+                            f"Found {len(found_endpoints)}/{len(key_endpoints)} key endpoints documented: {found_endpoints}",
+                            response_time
+                        )
                     else:
-                        missing_endpoints.append(endpoint)
-                
-                if len(found_endpoints) >= 4:  # Most endpoints should be documented
-                    self.log_result(
-                        "OpenAPI Schema Comprehensive",
-                        True,
-                        f"Found {len(found_endpoints)}/{len(key_endpoints)} key endpoints documented: {found_endpoints}",
-                        response_time
-                    )
-                else:
+                        self.log_result(
+                            "OpenAPI Schema Comprehensive",
+                            False,
+                            f"Only {len(found_endpoints)}/{len(key_endpoints)} endpoints documented. Missing: {missing_endpoints}",
+                            response_time
+                        )
+                except json.JSONDecodeError:
                     self.log_result(
                         "OpenAPI Schema Comprehensive",
                         False,
-                        f"Only {len(found_endpoints)}/{len(key_endpoints)} endpoints documented. Missing: {missing_endpoints}",
+                        f"Frontend routing intercepting /openapi.json - API schema not accessible due to deployment configuration",
                         response_time
                     )
             else:
