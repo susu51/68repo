@@ -465,28 +465,44 @@ class Phase2ImprovementsTest:
                 response_time = time.time() - start_time
                 
                 if response.status_code == 200:
-                    data = response.json()
-                    if expected_key and expected_key in data:
-                        self.log_result(
-                            f"Public Endpoint {endpoint}",
-                            True,
-                            f"Endpoint accessible, contains expected key '{expected_key}': {len(data.get(expected_key, []))} items",
-                            response_time
-                        )
-                    elif not expected_key and isinstance(data, list):
-                        self.log_result(
-                            f"Public Endpoint {endpoint}",
-                            True,
-                            f"Endpoint accessible, returned {len(data)} items",
-                            response_time
-                        )
-                    else:
-                        self.log_result(
-                            f"Public Endpoint {endpoint}",
-                            True,
-                            f"Endpoint accessible, data structure: {type(data).__name__}",
-                            response_time
-                        )
+                    try:
+                        data = response.json()
+                        if expected_key and expected_key in data:
+                            self.log_result(
+                                f"Public Endpoint {endpoint}",
+                                True,
+                                f"Endpoint accessible, contains expected key '{expected_key}': {len(data.get(expected_key, []))} items",
+                                response_time
+                            )
+                        elif not expected_key and isinstance(data, list):
+                            self.log_result(
+                                f"Public Endpoint {endpoint}",
+                                True,
+                                f"Endpoint accessible, returned {len(data)} items",
+                                response_time
+                            )
+                        else:
+                            self.log_result(
+                                f"Public Endpoint {endpoint}",
+                                True,
+                                f"Endpoint accessible, data structure: {type(data).__name__}",
+                                response_time
+                            )
+                    except json.JSONDecodeError:
+                        if "<!doctype html>" in response.text:
+                            self.log_result(
+                                f"Public Endpoint {endpoint}",
+                                False,
+                                f"Frontend routing intercepting {endpoint} - public endpoint not accessible due to deployment configuration",
+                                response_time
+                            )
+                        else:
+                            self.log_result(
+                                f"Public Endpoint {endpoint}",
+                                False,
+                                f"Endpoint returned non-JSON response: {response.text[:100]}",
+                                response_time
+                            )
                 else:
                     self.log_result(
                         f"Public Endpoint {endpoint}",
