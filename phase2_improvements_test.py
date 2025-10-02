@@ -71,12 +71,43 @@ class Phase2ImprovementsTest:
                 time.time() - start_time
             )
         
-        # Test 2: Test JWT role-based authentication for admin endpoints
+        # Test 2: Verify hardcoded password "6851" is no longer accepted via unified login
         start_time = time.time()
         try:
-            # Login with any email + password "6851" via new unified login
             response = self.session.post(f"{API_BASE}/auth/login",
                 json={"email": "admin@test.com", "password": "6851"},
+                timeout=10
+            )
+            response_time = time.time() - start_time
+            
+            if response.status_code == 400:
+                self.log_result(
+                    "Hardcoded Password 6851 No Longer Accepted",
+                    True,
+                    f"Hardcoded password '6851' correctly rejected: {response.json().get('detail', '')}",
+                    response_time
+                )
+            else:
+                self.log_result(
+                    "Hardcoded Password 6851 No Longer Accepted",
+                    False,
+                    f"Expected 400 Bad Request, got {response.status_code}: {response.text[:200]}",
+                    response_time
+                )
+        except Exception as e:
+            self.log_result(
+                "Hardcoded Password 6851 No Longer Accepted",
+                False,
+                f"Request failed: {str(e)}",
+                time.time() - start_time
+            )
+        
+        # Test 3: Test proper admin authentication with correct credentials
+        start_time = time.time()
+        try:
+            # Try with the proper admin credentials
+            response = self.session.post(f"{API_BASE}/auth/login",
+                json={"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
                 timeout=10
             )
             response_time = time.time() - start_time
@@ -86,28 +117,29 @@ class Phase2ImprovementsTest:
                 if "access_token" in data and data.get("user", {}).get("role") == "admin":
                     self.tokens["admin"] = data["access_token"]
                     self.log_result(
-                        "JWT Admin Authentication via Unified Login",
+                        "JWT Admin Authentication with Proper Credentials",
                         True,
                         f"Admin login successful, role: {data['user']['role']}, email: {data['user']['email']}",
                         response_time
                     )
                 else:
                     self.log_result(
-                        "JWT Admin Authentication via Unified Login",
+                        "JWT Admin Authentication with Proper Credentials",
                         False,
                         f"Login successful but missing token or wrong role: {data}",
                         response_time
                     )
             else:
+                # If proper credentials don't work, there might be a database field mismatch
                 self.log_result(
-                    "JWT Admin Authentication via Unified Login",
+                    "JWT Admin Authentication with Proper Credentials",
                     False,
-                    f"Login failed with status {response.status_code}: {response.text[:200]}",
+                    f"Admin login failed - possible database field mismatch (password vs password_hash): {response.text[:200]}",
                     response_time
                 )
         except Exception as e:
             self.log_result(
-                "JWT Admin Authentication via Unified Login",
+                "JWT Admin Authentication with Proper Credentials",
                 False,
                 f"Request failed: {str(e)}",
                 time.time() - start_time
