@@ -2018,7 +2018,7 @@ async def initialize_admin_user():
         admin_user = {
             "id": str(uuid.uuid4()),
             "email": admin_email,
-            "password": password_hash.decode('utf-8'),
+            "password_hash": password_hash.decode('utf-8'),  # Fixed: use password_hash instead of password
             "first_name": "Admin",
             "last_name": "Kuryecini",
             "role": "admin",
