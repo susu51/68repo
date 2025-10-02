@@ -1,0 +1,149 @@
+{
+  "name": "Kuryecini - Türkiye'nin En Hızlı Teslimat Platformu",
+  "short_name": "Kuryecini",
+  "description": "Yemek siparişi, kurye hizmeti ve teslimat uygulaması. 15 dakikada kapınızda!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ea580c",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "tr",
+  "dir": "ltr",
+  "categories": ["food", "business", "shopping"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ana sayfa görünümü"
+    },
+    {
+      "src": "/screenshots/mobile-2.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Restoran menüleri"
+    },
+    {
+      "src": "/screenshots/mobile-3.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Kurye haritası"
+    },
+    {
+      "src": "/screenshots/desktop-1.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Masaüstü ana sayfa"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Hızlı Sipariş",
+      "short_name": "Sipariş",
+      "description": "Hemen sipariş vermek için",
+      "url": "/customer?quick=true",
+      "icons": [
+        {
+          "src": "/icons/shortcut-order.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Kurye Paneli",
+      "short_name": "Kurye",
+      "description": "Kurye çalışma paneli",
+      "url": "/courier",
+      "icons": [
+        {
+          "src": "/icons/shortcut-courier.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "İşletme Paneli",
+      "short_name": "İşletme",
+      "description": "İşletme yönetim paneli",
+      "url": "/business",
+      "icons": [
+        {
+          "src": "/icons/shortcut-business.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "protocol_handlers": [
+    {
+      "protocol": "web+kuryecini",
+      "url": "/order?data=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

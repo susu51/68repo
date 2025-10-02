@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ea580c">
+  <title>Kuryecini - Çevrimdışı</title>
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    
+    .offline-container {
+      max-width: 400px;
+      width: 100%;
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .offline-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .offline-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .offline-subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ef4444;
+      margin-right: 8px;
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+    
+    .status-indicator.online {
+      background: #22c55e;
+      animation: none;
+    }
+    
+    .retry-button {
+      background: white;
+      color: #ea580c;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      margin-bottom: 1rem;
+    }
+    
+    .retry-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+    
+    .retry-button:active {
+      transform: translateY(0);
+    }
+    
+    .retry-button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .tips {
+      margin-top: 2rem;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .tips h3 {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .tips ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .tips li {
+      margin-bottom: 0.5rem;
+      padding-left: 1.5rem;
+      position: relative;
+      font-size: 0.9rem;
+    }
+    
+    .tips li::before {
+      content: '💡';
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    
+    .footer {
+      margin-top: 2rem;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 480px) {
+      .offline-title {
+        font-size: 2rem;
+      }
+      
+      .offline-subtitle {
+        font-size: 1rem;
+      }
+      
+      .tips {
+        margin-top: 1.5rem;
+        padding: 16px;
+      }
+    }
+    
+    /* Connection status styles */
+    .connection-status {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    
+    .connection-status.online {
+      background: rgba(34, 197, 94, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="connection-status" id="connectionStatus">
+    <span class="status-indicator" id="statusIndicator"></span>
+    <span id="statusText">Bağlantı Yok</span>
+  </div>
+
+  <div class="offline-container">
+    <div class="offline-icon">📱</div>
+    <h1 class="offline-title">Kuryecini</h1>
+    <p class="offline-subtitle">
+      İnternet bağlantınız kesildi.<br>
+      Bağlantı sağlandığında otomatik olarak yenilenecektir.
+    </p>
+    
+    <button class="retry-button" id="retryButton" onclick="handleRetry()">
+      🔄 Tekrar Dene
+    </button>
+    
+    <div class="tips">
+      <h3>💡 İpuçları</h3>
+      <ul>
+        <li>Wi-Fi bağlantınızı kontrol edin</li>
+        <li>Mobil veri açık olduğundan emin olun</li>
+        <li>Uçak modunu kapatıp açmayı deneyin</li>
+        <li>Cihazınızı yeniden başlatın</li>
+      </ul>
+    </div>
+    
+    <div class="footer">
+      Türkiye'nin En Hızlı Teslimat Platformu
+    </div>
+  </div>
+
+  <script>
+    let retryAttempts = 0;
+    const maxRetries = 3;
+    
+    // Connection status elements
+    const connectionStatus = document.getElementById('connectionStatus');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const retryButton = document.getElementById('retryButton');
+    
+    // Update connection status
+    function updateConnectionStatus(online) {
+      if (online) {
+        statusIndicator.classList.add('online');
+        statusText.textContent = 'Bağlantı Sağlandı';
+        connectionStatus.classList.add('online');
+      } else {
+        statusIndicator.classList.remove('online');
+        statusText.textContent = 'Bağlantı Yok';
+        connectionStatus.classList.remove('online');
+      }
+    }
+    
+    // Handle retry button click
+    function handleRetry() {
+      if (retryAttempts >= maxRetries) {
+        retryButton.textContent = '⏳ Lütfen bekleyin...';
+        retryButton.disabled = true;
+        
+        setTimeout(() => {
+          retryAttempts = 0;
+          retryButton.textContent = '🔄 Tekrar Dene';
+          retryButton.disabled = false;
+        }, 5000);
+        
+        return;
+      }
+      
+      retryAttempts++;
+      retryButton.textContent = `🔄 Deneniyor... (${retryAttempts}/${maxRetries})`;
+      retryButton.disabled = true;
+      
+      // Try to reload
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+    
+    // Auto-reload when online
+    window.addEventListener('online', () => {
+      console.log('📶 Connection restored');
+      updateConnectionStatus(true);
+      
+      statusText.textContent = 'Yeniden yükleniyor...';
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    });
+    
+    // Update status when offline
+    window.addEventListener('offline', () => {
+      console.log('📵 Connection lost');
+      updateConnectionStatus(false);
+    });
+    
+    // Initial status check
+    updateConnectionStatus(navigator.onLine);
+    
+    // Periodic connection check
+    setInterval(() => {
+      // Try to fetch a small resource to test connectivity
+      fetch('/favicon.ico', { 
+        method: 'HEAD',
+        cache: 'no-cache',
+        timeout: 5000
+      })
+      .then(() => {
+        if (!navigator.onLine) {
+          // Connection is back but browser hasn't detected it yet
+          updateConnectionStatus(true);
+          setTimeout(() => window.location.reload(), 500);
+        }
+      })
+      .catch(() => {
+        updateConnectionStatus(false);
+      });
+    }, 10000);
+    
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('✅ Service Worker registered');
+        })
+        .catch(error => {
+          console.error('❌ Service Worker registration failed:', error);
+        });
+    }
+  </script>
+</body>
+</html>
