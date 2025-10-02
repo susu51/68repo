@@ -125,47 +125,31 @@ class ProductionReadinessTest:
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                data = response.json()
-                restaurants = data.get("restaurants", [])
-                count = data.get("count", 0)
-                message = data.get("message", "")
+                businesses = response.json()
                 
                 self.log_result(
-                    "Public Menu Endpoint",
+                    "Public Business Endpoint",
                     True,
-                    f"Found {count} restaurants, Message: {message}",
+                    f"Found {len(businesses)} approved businesses",
                     response_time
                 )
                 
-                # Test restaurant structure
-                if restaurants:
-                    restaurant = restaurants[0]
-                    required_fields = ["id", "name", "address", "city", "rating", "delivery_time", "min_order", "menu"]
-                    missing_fields = [field for field in required_fields if field not in restaurant]
+                # Test business structure
+                if businesses:
+                    business = businesses[0]
+                    required_fields = ["id", "name", "category", "rating", "location"]
+                    missing_fields = [field for field in required_fields if field not in business]
                     
                     self.log_result(
-                        "Restaurant Data Structure",
+                        "Business Data Structure",
                         len(missing_fields) == 0,
                         f"Missing fields: {missing_fields}" if missing_fields else "All required fields present"
                     )
-                    
-                    # Test menu items structure
-                    menu = restaurant.get("menu", [])
-                    if menu:
-                        menu_item = menu[0]
-                        menu_fields = ["id", "name", "price", "category"]
-                        missing_menu_fields = [field for field in menu_fields if field not in menu_item]
-                        
-                        self.log_result(
-                            "Menu Item Structure",
-                            len(missing_menu_fields) == 0,
-                            f"Missing fields: {missing_menu_fields}" if missing_menu_fields else "All menu fields present"
-                        )
                 else:
                     self.log_result(
-                        "Restaurant Availability",
+                        "Business Availability",
                         False,
-                        "No approved restaurants found - may need to approve test restaurants"
+                        "No approved businesses found - may need to approve test businesses"
                     )
             else:
                 self.log_result(
