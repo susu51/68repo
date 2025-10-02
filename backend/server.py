@@ -2563,13 +2563,13 @@ async def update_system_configuration(
     config_value: Any,
     request: Request,
     description: Optional[str] = None,
-    current_user_id: str = Depends(get_admin_user)
+    current_user: dict = Depends(get_admin_user)
 ):
     """Sistem konfigürasyonu güncelle"""
     old_config = await db.system_configs.find_one({"key": config_key})
     old_value = old_config.get("value") if old_config else None
     
-    await set_system_config(config_key, config_value, current_user_id, description)
+    await set_system_config(config_key, config_value, current_user["id"], description)
     
     # Log configuration change
     await log_action(
