@@ -177,9 +177,55 @@ async def get_menus():
         raise HTTPException(status_code=500, detail=str(e))
 
 # Public menu endpoint with enhanced filtering
-@app.get("/menus/public")
+@app.get("/menus/public",
+    tags=["Public", "Restaurants"],
+    summary="Public Restaurant Menus", 
+    description="Get public menus from active and approved restaurants with full business information."
+)
 async def get_public_menus():
-    """Get public menus from active and approved restaurants"""
+    """
+    **Public Restaurant Menus**
+    
+    Returns detailed restaurant information with their complete menus.
+    Only shows approved and active restaurants with available products.
+    
+    **Response Structure:**
+    ```json
+    {
+        "restaurants": [
+            {
+                "id": "restaurant-uuid",
+                "name": "Restaurant Name",
+                "description": "Restaurant description", 
+                "address": "Full address",
+                "city": "Istanbul",
+                "rating": 4.8,
+                "delivery_time": "25-35 dk",
+                "min_order": 50.0,
+                "menu": [
+                    {
+                        "id": "product-uuid",
+                        "name": "Product Name",
+                        "description": "Product description",
+                        "price": 25.50,
+                        "image_url": "https://...",
+                        "category": "Ana Yemek",
+                        "preparation_time": 15
+                    }
+                ]
+            }
+        ],
+        "count": 5,
+        "message": "5 aktif restoran bulundu."
+    }
+    ```
+    
+    **Filtering:**
+    - Only `kyc_status: "approved"` businesses
+    - Only `is_active: true` businesses  
+    - Only `is_available: true` products
+    - Restaurants without available products are excluded
+    """
     try:
         # Get only approved and active businesses
         businesses = await db.businesses.find({
