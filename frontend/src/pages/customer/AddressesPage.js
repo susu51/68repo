@@ -262,7 +262,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                 </div>
                 
                 <Button 
-                  onClick={() => setShowAddForm(true)}
+                  onClick={() => {
+                    if (isMounted) {
+                      setShowAddForm(true);
+                    }
+                  }}
                   className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                 >
                   ➕ İlk Adresimi Ekle
