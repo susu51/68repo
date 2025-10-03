@@ -703,6 +703,15 @@ async def login(request: Request, login_data: LoginRequest):
     
     # Test users for demo purposes
     test_users = {
+        "admin@kuryecini.com": {
+            "id": "admin-001",
+            "email": "admin@kuryecini.com",
+            "first_name": "Admin",
+            "last_name": "Kuryecini",
+            "role": "admin",
+            "is_active": True,
+            "password": "KuryeciniAdmin2024!"
+        },
         "testcustomer@example.com": {
             "id": "customer-001",
             "email": "testcustomer@example.com", 
