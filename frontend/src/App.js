@@ -1236,7 +1236,11 @@ const AdminDashboard = ({ user }) => {
                               <p className="text-sm text-gray-600">
                                 {order.customer_name} → {order.business_name}
                               </p>
-                              <p className="text-xs text-gray-500">{order.delivery_address}</p>
+                              <p className="text-xs text-gray-500">
+                                {typeof order.delivery_address === 'object' ? 
+                                  order.delivery_address?.address || 'Adres bilgisi yok' : 
+                                  order.delivery_address}
+                              </p>
                               {order.courier_name && (
                                 <p className="text-xs text-gray-500">Kurye: {order.courier_name}</p>
                               )}
