@@ -2098,6 +2098,89 @@ async def get_nearby_restaurants(
                         "type": "Point",
                         "coordinates": [lng, lat]  # [longitude, latitude]
                     },
+# User Address Management Endpoints
+@api_router.get("/user/addresses")
+async def get_user_addresses(current_user: dict = Depends(get_current_user)):
+    """Get user's saved addresses"""
+    try:
+        user_id = current_user.get("id") or current_user.get("sub")
+        
+        addresses = await db.addresses.find({"userId": user_id}).to_list(length=None)
+        
+        # Transform addresses for frontend
+        address_list = []
+        for addr in addresses:
+            address_data = {
+                "id": addr.get("id", addr.get("_id", "")),
+                "label": addr.get("label", ""),
+                "city": addr.get("city_original", addr.get("city", "")),
+                "city_normalized": addr.get("city_normalized", ""),
+                "description": addr.get("description", ""),
+                "lat": addr.get("location", {}).get("coordinates", [None, None])[1],
+                "lng": addr.get("location", {}).get("coordinates", [None, None])[0]
+            }
+            address_list.append(address_data)
+        
+        return address_list
+        
+    except Exception as e:
+        logging.error(f"Error fetching user addresses: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching addresses")
+
+@api_router.post("/user/addresses")
+async def add_user_address(
+    address_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add a new address for user"""
+    from utils.city_normalize import normalize_city_name
+    
+    try:
+        user_id = current_user.get("id") or current_user.get("sub")
+        
+        # Normalize city
+        city_original = address_data.get("city", "")
+        city_normalized = normalize_city_name(city_original)
+        
+        # Create location object if lat/lng provided
+        location = None
+        lat = address_data.get("lat")
+        lng = address_data.get("lng")
+        
+        if lat is not None and lng is not None:
+            location = {
+                "type": "Point",
+                "coordinates": [lng, lat]  # [longitude, latitude]
+            }
+        
+        # Create address document
+        new_address = {
+            "id": str(uuid.uuid4()),
+            "userId": user_id,
+            "label": address_data.get("label", ""),
+            "city_original": city_original,
+            "city_normalized": city_normalized,
+            "description": address_data.get("description", ""),
+            "location": location,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        result = await db.addresses.insert_one(new_address)
+        
+        # Return created address
+        return {
+            "id": new_address["id"],
+            "label": new_address["label"],
+            "city": city_original,
+            "city_normalized": city_normalized,
+            "description": new_address["description"],
+            "lat": lat,
+            "lng": lng
+        }
+        
+    except Exception as e:
+        logging.error(f"Error adding user address: {e}")
+        raise HTTPException(status_code=500, detail="Error adding address")
                     "$maxDistance": radius
                 }
             }
