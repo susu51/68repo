@@ -40,6 +40,32 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
+// Handle React object rendering errors
+window.addEventListener('error', (event) => {
+  const error = event.error;
+  if (error && error.message) {
+    const message = error.message.toLowerCase();
+    
+    // Handle object rendering errors
+    if (message.includes('objects are not valid as a react child') || 
+        message.includes('object with keys')) {
+      
+      console.error('React Object Rendering Error Detected:', {
+        message: error.message,
+        stack: error.stack,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno
+      });
+      
+      // Show user-friendly message instead of crashing
+      console.warn('Attempting to render a complex object directly in React. Use proper string conversion.');
+      event.preventDefault();
+      return false;
+    }
+  }
+});
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
