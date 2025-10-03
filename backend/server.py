@@ -666,11 +666,13 @@ async def login(login_data: LoginRequest):
         test_user = test_users[login_data.email]
         if login_data.password == test_user["password"]:
             access_token = create_access_token(data={"sub": login_data.email, "role": test_user["role"]})
+            refresh_token = create_refresh_token(data={"sub": login_data.email, "role": test_user["role"]})
             user_data = test_user.copy()
             del user_data["password"]  # Remove password from response
             
             return {
                 "access_token": access_token,
+                "refresh_token": refresh_token,
                 "token_type": "bearer", 
                 "user": user_data
             }
