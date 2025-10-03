@@ -111,7 +111,7 @@ async def migrate_cities():
     for idx in indexes:
         print(f"   - {idx.get('name', 'unnamed')}: {idx.get('key', {})}")
     
-    await client.close()
+    client.close()
     print("\n🎉 Migration completed successfully!")
 
 if __name__ == "__main__":
