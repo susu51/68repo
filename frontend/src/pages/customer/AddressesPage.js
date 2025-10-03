@@ -599,6 +599,7 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
             </div>
           </DialogContent>
         </Dialog>
+        )}
       </div>
     </div>
   );
