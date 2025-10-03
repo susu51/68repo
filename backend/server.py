@@ -4218,7 +4218,7 @@ async def reset_password(request: Request, reset_data: ResetPasswordRequest):
         await db.users.update_one(
             {"id": reset_record["user_id"]},
             {"$set": {
-                "password": password_hash.decode('utf-8'),
+                "password_hash": password_hash.decode('utf-8'),
                 "updated_at": datetime.now(timezone.utc)
             }}
         )
