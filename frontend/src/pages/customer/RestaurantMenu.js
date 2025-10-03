@@ -210,7 +210,7 @@ const RestaurantMenu = ({ restaurant, onAddToCart, onBack, cartItems = [], cartT
                   ) : (
                     <div className="flex items-center justify-between bg-orange-50 rounded-xl p-3">
                       <Button 
-                        onClick={() => onAddToCart({...item, quantity: -1})}
+                        onClick={() => onAddToCart({...item, action: 'decrease'})}
                         className="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-0"
                       >
                         -
