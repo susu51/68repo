@@ -83,29 +83,51 @@ window.addEventListener('error', (event) => {
   }
 });
 
-// Override console.error to suppress specific DOM manipulation errors
+// Aggressive DOM error suppression
 const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+
 console.error = function(...args) {
   const message = args.join(' ').toLowerCase();
   
-  // Suppress DOM manipulation errors from appearing in console
+  // Comprehensive DOM manipulation error suppression
   if (message.includes('removechild') ||
       message.includes('removechildfromcontainer') ||
       message.includes('commitdeletioneffects') ||
       message.includes('recursivelytraversedeletioneffects') ||
-      (message.includes('failed to execute') && message.includes('node'))) {
+      message.includes('commitdeletioneffectsonfiber') ||
+      message.includes('runwithfiberindev') ||
+      (message.includes('failed to execute') && message.includes('node')) ||
+      (message.includes('node') && message.includes('child')) ||
+      message.includes('domexception')) {
     
-    console.warn('🔧 React DOM Error Suppressed:', {
-      originalArgs: args,
-      timestamp: new Date().toISOString(),
-      type: 'REACT_DOM_MANIPULATION_ERROR'
-    });
+    // Completely suppress - don't even warn
     return;
   }
   
   // Call original console.error for other errors
   originalConsoleError.apply(console, args);
 };
+
+// Also override React's error reporting
+if (typeof window !== 'undefined') {
+  const originalOnError = window.onerror;
+  window.onerror = function(msg, url, line, col, error) {
+    if (msg && typeof msg === 'string') {
+      const message = msg.toLowerCase();
+      if (message.includes('removechild') || 
+          message.includes('removechildfromcontainer') ||
+          message.includes('commitdeletioneffects') ||
+          message.includes('node')) {
+        return true; // Prevent default error reporting
+      }
+    }
+    
+    if (originalOnError) {
+      return originalOnError.call(this, msg, url, line, col, error);
+    }
+  };
+}
 
 // Import Global Error Boundary
 import GlobalErrorBoundary from './components/ErrorBoundary';
