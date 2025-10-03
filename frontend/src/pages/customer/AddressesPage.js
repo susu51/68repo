@@ -450,7 +450,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                         <Label className="text-sm font-semibold text-gray-700">Şehir *</Label>
                         <Select 
                           value={newAddress.city} 
-                          onValueChange={(value) => setNewAddress({...newAddress, city: value})}
+                          onValueChange={(value) => {
+                            if (isMounted) {
+                              setNewAddress({...newAddress, city: value});
+                            }
+                          }}
                         >
                           <SelectTrigger className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12">
                             <SelectValue />
