@@ -4110,7 +4110,7 @@ async def forgot_password(request: Request, forgot_data: ForgotPasswordRequest):
         # Always return success to prevent email enumeration
         email = forgot_data.email.lower().strip()
         
-        if not db:
+        if db is None:
             return {"message": "E-posta gönderildi (eğer hesap mevcutsa)", "success": True}
         
         # Check if user exists
