@@ -2158,9 +2158,11 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
                 return []
             user_id = user.get("id")
         addresses = await db.addresses.find({"userId": user_id}).to_list(length=None)
+        print(f"DEBUG: Found {len(addresses)} addresses for user_id: {user_id}")
         
         address_list = []
         for addr in addresses:
+            print(f"DEBUG: Processing address: {addr.get('label', 'NO LABEL')}")
             coords = addr.get("location", {}).get("coordinates", [None, None])
             address_data = {
                 "id": addr.get("id", addr.get("_id", "")),
