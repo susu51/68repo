@@ -734,7 +734,7 @@ async def refresh_access_token(request: RefreshTokenRequest):
     }
     ```
     """
-    payload = verify_refresh_token(refresh_token)
+    payload = verify_refresh_token(request.refresh_token)
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
