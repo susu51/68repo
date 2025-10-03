@@ -24,6 +24,11 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
+# Import logging configuration
+from logging_config import get_loggers, log_health_check
+import logging
+import time
+
 # Import phone validation function
 try:
     from models import validate_turkish_phone
