@@ -44,14 +44,20 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
   const loadAddresses = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      console.log('Loading addresses - Token debug:', token ? `Token exists (${token.length} chars)` : 'No token found');
+      
       const response = await axios.get(`${API}/user/addresses`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('kuryecini_access_token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
+      
+      console.log('Load addresses response:', response.data);
       setAddresses(response.data || []);
     } catch (error) {
       console.error('Error loading addresses:', error);
+      console.log('Error details:', error.response?.data);
       // If no addresses or error, show empty state
       setAddresses([]);
     } finally {
