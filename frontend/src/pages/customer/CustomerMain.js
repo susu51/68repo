@@ -38,6 +38,7 @@ export const CustomerMain = ({ user }) => {
 
   return (
     <AddressesPage
+      key="addresses-page"
       onSelectAddress={handleAddressSelect}
       onBack={null} // No back button on main page
     />
