@@ -477,27 +477,22 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
                       
                       <div>
                         <Label className="text-sm font-semibold text-gray-700">Şehir *</Label>
-                        <Select 
-                          value={newAddress.city} 
-                          onValueChange={(value) => {
-                            console.log('🏙️ City selected:', value);
+                        <select 
+                          className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12 w-full px-3 py-2 bg-white border-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          value={newAddress.city}
+                          onChange={(e) => {
+                            console.log('🏙️ Native select changed:', e.target.value);
                             if (isMounted) {
-                              setNewAddress({...newAddress, city: value});
-                              console.log('🏙️ City state updated:', value);
+                              setNewAddress({...newAddress, city: e.target.value});
+                              console.log('🏙️ City state updated to:', e.target.value);
                             }
                           }}
                         >
-                          <SelectTrigger className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12">
-                            <SelectValue placeholder="Şehir Seçin" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-xl z-[999]" position="popper" sideOffset={5}>
-                            {turkishCities.map(city => (
-                              <SelectItem key={city} value={city} className="rounded-lg" onSelect={() => {
-                                console.log('🏙️ SelectItem onSelect triggered for:', city);
-                              }}>{city}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          <option value="">Şehir Seçin</option>
+                          {turkishCities.map(city => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </CardContent>
