@@ -295,8 +295,11 @@ api_router = APIRouter(
 )
 
 # Security
-SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'delivertr-secret-key-2024')
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "kuryecini-super-secret-key-2024-turkey-delivery")
+JWT_REFRESH_SECRET_KEY = os.getenv("JWT_REFRESH_SECRET_KEY", f"{JWT_SECRET_KEY}_refresh")
 ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TTL_MIN", 15))  # Short-lived
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("JWT_REFRESH_TTL_DAY", 7))  # Long-lived
 security = HTTPBearer()
 
 # Configure CORS
