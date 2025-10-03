@@ -1037,7 +1037,9 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                               </p>
                               
                               <p className="text-sm text-gray-600 mb-3">
-                                📍 {order.delivery_address}
+                                📍 {typeof order.delivery_address === 'object' ? 
+                                    order.delivery_address?.address || 'Adres bilgisi yok' : 
+                                    order.delivery_address}
                               </p>
                               
                               <div className="space-y-1">
