@@ -125,10 +125,25 @@ class ErrorBoundary extends React.Component {
     // DOM manipulation errors (usually non-critical)
     if (errorMessage.includes('removechild') || 
         errorMessage.includes('appendchild') ||
-        errorMessage.includes('insertbefore')) {
-      toast.warning('Görsel güncelleme hatası oluştu, tekrar deniyor...', {
-        duration: 3000
-      });
+        errorMessage.includes('insertbefore') ||
+        errorMessage.includes('node') ||
+        errorMessage.includes('child')) {
+      
+      // Don't show toast for DOM errors as they're usually recovered automatically
+      console.warn('DOM manipulation error caught and handled:', error.message);
+      
+      // Try to self-recover after a short delay
+      setTimeout(() => {
+        try {
+          // Force a gentle re-render by updating a state
+          this.setState(prevState => ({ 
+            ...prevState,
+            retryCount: prevState.retryCount + 1 
+          }));
+        } catch (recoveryError) {
+          console.warn('Auto-recovery failed:', recoveryError);
+        }
+      }, 500);
       return;
     }
     
