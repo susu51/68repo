@@ -1083,7 +1083,7 @@ async def register_customer(request: Request, customer_data: CustomerRegistratio
     user_doc = {
         "id": str(uuid.uuid4()),
         "email": customer_data.email,
-        "password": hashed_password,
+        "password_hash": hashed_password,
         "role": "customer",
         "first_name": customer_data.first_name,
         "last_name": customer_data.last_name,
