@@ -2179,8 +2179,15 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
     
     try:
         user_email = current_user.get("sub")
+        logging.info(f"Add address - Looking for user email: {user_email}")
+        
         user = await db.users.find_one({"email": user_email})
+        logging.info(f"Add address - User found: {user is not None}")
+        
         if not user:
+            # Try to find any user for debugging
+            all_users_count = await db.users.count_documents({})
+            logging.info(f"Total users in database: {all_users_count}")
             raise HTTPException(status_code=404, detail="User not found")
         
         user_id = user.get("id")
