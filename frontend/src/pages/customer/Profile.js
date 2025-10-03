@@ -454,6 +454,226 @@ const Profile = ({ user, onBack, onLogout }) => {
       </div>
     </div>
   );
+
+  const renderCoupons = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">🎟️ Kuponlarım</h2>
+        <p className="text-gray-600">Aktif kuponlarınızı kullanarak tasarruf edin</p>
+      </div>
+
+      {coupons.length === 0 ? (
+        <Card className="text-center py-16 border-0 shadow-lg rounded-2xl">
+          <CardContent>
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">🎟️</span>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Henüz kuponunuz yok</h3>
+            <p className="text-gray-600">Kampanyalarımızı takip ederek avantajlı kuponlar kazanın</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {coupons.map(coupon => (
+            <Card key={coupon.id} className="border-0 shadow-lg rounded-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-4 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-2xl font-bold">{coupon.code}</div>
+                    <div className="text-green-100">
+                      {coupon.discountType === 'PERCENT' ? `%${coupon.discountValue}` : `₺${coupon.discountValue}`} İndirim
+                    </div>
+                  </div>
+                  <div className="text-3xl">🎟️</div>
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <p className="text-gray-700 mb-3">{coupon.description}</p>
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <span>Min. tutar: ₺{coupon.minAmount}</span>
+                  <span>Son tarih: {new Date(coupon.validUntil).toLocaleDateString('tr-TR')}</span>
+                </div>
+                <Button 
+                  onClick={() => {
+                    // Navigate to cart with coupon
+                    toast.success(`${coupon.code} kuponu sepete eklendi!`);
+                  }}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl"
+                >
+                  🛒 Kuponu Kullan
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderDiscounts = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">💸 İndirimlerim</h2>
+        <p className="text-gray-600">Size özel indirimlerinizi kullanın</p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {discounts.map(discount => (
+          <Card key={discount.id} className="border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <span className="text-2xl">💸</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-500">
+                    {discount.discountType === 'PERCENT' ? `%${discount.discountValue}` : `₺${discount.discountValue}`}
+                  </div>
+                  <div className="text-sm text-gray-500">İndirim</div>
+                </div>
+              </div>
+              
+              <h3 className="text-lg font-bold text-gray-800 mb-2">{discount.title}</h3>
+              <p className="text-gray-600 text-sm mb-4">{discount.description}</p>
+              
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>Geçerlilik: {new Date(discount.validUntil).toLocaleDateString('tr-TR')}</span>
+                <span className="text-green-600 font-medium">Aktif</span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderCampaigns = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">🎉 Kampanyalar</h2>
+        <p className="text-gray-600">Güncel kampanya ve fırsatları kaçırmayın</p>
+      </div>
+
+      <div className="grid gap-6">
+        {campaigns.map(campaign => (
+          <Card key={campaign.id} className="border-0 shadow-lg rounded-2xl overflow-hidden">
+            <div className="md:flex">
+              {campaign.imageUrl && (
+                <div className="md:w-1/3">
+                  <img 
+                    src={campaign.imageUrl} 
+                    alt={campaign.title}
+                    className="w-full h-48 md:h-full object-cover"
+                  />
+                </div>
+              )}
+              <CardContent className="p-6 md:w-2/3">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-gray-800">{campaign.title}</h3>
+                  {campaign.discountValue && (
+                    <div className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
+                      {campaign.discountType === 'PERCENT' ? `%${campaign.discountValue}` : `₺${campaign.discountValue}`} İndirim
+                    </div>
+                  )}
+                </div>
+                
+                <p className="text-gray-600 mb-4">{campaign.description}</p>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">
+                    Son tarih: {new Date(campaign.validUntil).toLocaleDateString('tr-TR')}
+                  </span>
+                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl">
+                    🛍️ Kampanyaya Git
+                  </Button>
+                </div>
+              </CardContent>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderPaymentMethods = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">💳 Ödeme Yöntemlerim</h2>
+          <p className="text-gray-600">Kayıtlı ödeme yöntemlerinizi yönetin</p>
+        </div>
+        
+        <Button 
+          onClick={() => {
+            toast.info('Yeni ödeme yöntemi ekleme özelliği yakında!');
+          }}
+          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl"
+        >
+          ➕ Yeni Yöntem Ekle
+        </Button>
+      </div>
+
+      {paymentMethods.length === 0 ? (
+        <Card className="text-center py-16 border-0 shadow-lg rounded-2xl">
+          <CardContent>
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">💳</span>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Henüz ödeme yönteminiz yok</h3>
+            <p className="text-gray-600 mb-6">Hızlı ödeme için kart bilgilerinizi güvenle kaydedin</p>
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
+              ➕ İlk Kartımı Ekle
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {paymentMethods.map(method => (
+            <Card key={method.id} className="border-0 shadow-lg rounded-2xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${
+                      method.brand === 'VISA' ? 'bg-blue-100' : 
+                      method.brand === 'MASTERCARD' ? 'bg-red-100' : 'bg-gray-100'
+                    }`}>
+                      <span className="text-2xl">
+                        {method.brand === 'VISA' ? '💳' : 
+                         method.brand === 'MASTERCARD' ? '💳' : '💳'}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-gray-800">{method.brand}</div>
+                      <div className="text-sm text-gray-500">**** **** **** {method.last4}</div>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => {
+                      if (window.confirm('Bu ödeme yöntemini silmek istediğinize emin misiniz?')) {
+                        setPaymentMethods(paymentMethods.filter(pm => pm.id !== method.id));
+                        toast.success('Ödeme yöntemi silindi');
+                      }
+                    }}
+                    className="bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-full p-0"
+                  >
+                    🗑️
+                  </Button>
+                </div>
+                
+                <div className="text-xs text-gray-500 mb-2">
+                  Sağlayıcı: {method.provider.charAt(0).toUpperCase() + method.provider.slice(1)}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Eklenme: {new Date(method.createdAt).toLocaleDateString('tr-TR')}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Profile;
