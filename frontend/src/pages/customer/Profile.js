@@ -456,35 +456,39 @@ const Profile = ({ user, onBack, onLogout }) => {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">💸 İndirimlerim</h2>
-        <p className="text-gray-600">Size özel indirimlerinizi kullanın</p>
+        <p className="text-gray-600">Size özel indirimler ve teklifler</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {discounts.map(discount => (
-          <Card key={discount.id} className="border-0 shadow-lg rounded-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl">💸</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-500">
-                    {discount.discountType === 'PERCENT' ? `%${discount.discountValue}` : `₺${discount.discountValue}`}
-                  </div>
-                  <div className="text-sm text-gray-500">İndirim</div>
-                </div>
-              </div>
-              
-              <h3 className="text-lg font-bold text-gray-800 mb-2">{discount.title}</h3>
-              <p className="text-gray-600 text-sm mb-4">{discount.description}</p>
-              
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>Geçerlilik: {new Date(discount.validUntil).toLocaleDateString('tr-TR')}</span>
-                <span className="text-green-600 font-medium">Aktif</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="border-0 shadow-lg rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50">
+          <CardContent className="p-6 text-center">
+            <div className="text-4xl mb-4">🌟</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">VIP Müşteri İndirimi</h3>
+            <p className="text-gray-600 mb-4">Tüm siparişlerinizde geçerli %15 indirim</p>
+            <div className="bg-white rounded-xl p-4 mb-4">
+              <div className="text-3xl font-bold text-blue-600">%15</div>
+              <div className="text-sm text-gray-500">Sürekli İndirim</div>
+            </div>
+            <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-xl">
+              🛒 Şimdi Kullan
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-lg rounded-2xl bg-gradient-to-br from-green-50 to-blue-50">
+          <CardContent className="p-6 text-center">
+            <div className="text-4xl mb-4">⚡</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Hızlı Teslimat İndirimi</h3>
+            <p className="text-gray-600 mb-4">30dk içi teslimat seçeneğinde %10 indirim</p>
+            <div className="bg-white rounded-xl p-4 mb-4">
+              <div className="text-3xl font-bold text-green-600">%10</div>
+              <div className="text-sm text-gray-500">Hızlı Teslimat</div>
+            </div>
+            <Button className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white rounded-xl">
+              ⚡ Şimdi Kullan
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
