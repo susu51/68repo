@@ -168,7 +168,7 @@ async def health_check():
         logging.error(f"Database health check failed: {e}")
     
     response_time = (time.time() - start_time) * 1000
-    status = "ok" if db_status == "ok" else "degraded"
+    status = "ok" if db_status in ["ok", "not_configured"] else "degraded"
     
     # Log health check
     log_health_check("/healthz", response_time, status)
