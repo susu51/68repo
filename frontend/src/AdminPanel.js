@@ -761,8 +761,13 @@ const AdminPanel = ({ user, onLogout }) => {
                     </Button>
                   </div>
                 </div>
-              ))}
-            </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    <p>Bekleyen istek bulunmuyor</p>
+                  </div>
+                )}
+              </div>
           </CardContent>
         </Card>
 
