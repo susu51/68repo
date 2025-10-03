@@ -31,7 +31,20 @@ import time
 
 # Import phone validation function
 try:
-    from models import validate_turkish_phone, ForgotPasswordRequest, ResetPasswordRequest
+    from models import ForgotPasswordRequest, ResetPasswordRequest
+except ImportError:
+    # Create fallback models if import fails
+    from pydantic import BaseModel, EmailStr, validator
+    
+    class ForgotPasswordRequest(BaseModel):
+        email: EmailStr
+        
+    class ResetPasswordRequest(BaseModel):
+        token: str
+        password: str
+
+try:
+    from models import validate_turkish_phone
 except ImportError:
     # Fallback phone validation function
     def validate_turkish_phone(phone: str) -> str:
