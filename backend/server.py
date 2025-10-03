@@ -890,7 +890,8 @@ async def register_business(business_data: BusinessRegister):
     description="Register a new customer account with email verification.",
     status_code=201
 )
-async def register_customer(customer_data: CustomerRegistration):
+@limiter.limit("3/minute")  # Prevent spam registrations
+async def register_customer(request: Request, customer_data: CustomerRegistration):
     """
     **Customer Registration**
     
