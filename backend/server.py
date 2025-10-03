@@ -2269,8 +2269,11 @@ async def initialize_admin_user():
 @app.on_event("startup")
 async def startup_event():
     """Initialize system on startup"""
-    await initialize_default_configs()
-    await initialize_admin_user()
+    if db is not None:
+        await initialize_default_configs()
+        await initialize_admin_user()
+    else:
+        print("⚠️ No database connection, skipping initialization")
 
 # EXISTING MODELS (keeping previous models)
 class Location(BaseModel):
