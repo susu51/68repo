@@ -688,6 +688,7 @@ async def login(login_data: LoginRequest):
         raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
     access_token = create_access_token(data={"sub": user["email"], "role": user.get("role", "customer")})
+    refresh_token = create_refresh_token(data={"sub": user["email"], "role": user.get("role", "customer")})
     
     user["id"] = str(user["_id"]) if "_id" in user else str(uuid.uuid4())
     if "_id" in user:
@@ -697,6 +698,7 @@ async def login(login_data: LoginRequest):
     
     return {
         "access_token": access_token,
+        "refresh_token": refresh_token,
         "token_type": "bearer",
         "user": user
     }
