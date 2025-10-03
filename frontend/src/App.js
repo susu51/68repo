@@ -4393,6 +4393,22 @@ const HomePage = ({ onAuthStart }) => {
 };
 
 const AuthPage = ({ onBack }) => {
+const ResetPasswordPage = () => {
+  const ResetPassword = React.lazy(() => import('./pages/Auth/ResetPassword'));
+  
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    }>
+      <ResetPassword onBackToLogin={() => window.location.href = '/'} />
+    </React.Suspense>
+  );
+};
   const { login } = useAuth();
   const [step, setStep] = useState('login'); // login, register, user_type_selection, registration_form
   const [userType, setUserType] = useState('');
