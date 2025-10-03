@@ -187,39 +187,81 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
               </Button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {addresses.map((address, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                          {address.label || 'Adres'}
-                        </h3>
-                        <div className="space-y-1 text-gray-600">
-                          <p className="flex items-center">
-                            <span className="mr-2">🏙️</span>
-                            <strong>{address.city || 'Şehir bilgisi yok'}</strong>
-                          </p>
-                          <p className="text-sm">
-                            {address.description || 'Açıklama yok'}
-                          </p>
-                          {address.lat && address.lng && (
-                            <p className="text-xs text-green-600 flex items-center">
-                              <span className="mr-1">📍</span>
-                              Konum bilgisi mevcut
+                <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white">
+                  <CardContent className="p-0">
+                    {/* Card Header with Icon */}
+                    <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 text-white">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-2xl">📍</span>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">
+                              {address.label || 'Adres'}
+                            </h3>
+                            <p className="text-orange-100 text-sm">
+                              Kayıtlı Adres
                             </p>
-                          )}
+                          </div>
                         </div>
                       </div>
                     </div>
                     
-                    <Button 
-                      onClick={() => handleSelectAddress(address)}
-                      className="w-full bg-orange-500 hover:bg-orange-600"
-                    >
-                      🍽️ Bu Adrese Göre Restoran Ara
-                    </Button>
+                    {/* Card Body */}
+                    <div className="p-6">
+                      <div className="space-y-4">
+                        {/* City */}
+                        <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                          <span className="mr-3 text-lg">🏙️</span>
+                          <div>
+                            <p className="text-sm text-gray-600">Şehir</p>
+                            <p className="font-semibold text-gray-800">
+                              {address.city || 'Şehir bilgisi yok'}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Address Description */}
+                        <div className="flex items-start p-3 bg-gray-50 rounded-lg">
+                          <span className="mr-3 text-lg mt-1">🏠</span>
+                          <div className="flex-1">
+                            <p className="text-sm text-gray-600">Adres Detayı</p>
+                            <p className="text-sm text-gray-800 leading-relaxed">
+                              {address.description || 'Açıklama yok'}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Location Info */}
+                        {address.lat && address.lng ? (
+                          <div className="flex items-center p-3 bg-green-50 rounded-lg border border-green-200">
+                            <span className="mr-3 text-lg">📍</span>
+                            <div>
+                              <p className="text-sm text-green-600 font-medium">Konum Bilgisi Mevcut</p>
+                              <p className="text-xs text-green-600">
+                                {address.lat.toFixed(4)}, {address.lng.toFixed(4)}
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <span className="mr-3 text-lg">⚠️</span>
+                            <p className="text-sm text-yellow-700">Konum bilgisi yok</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Action Button */}
+                      <Button 
+                        onClick={() => handleSelectAddress(address)}
+                        className="w-full mt-6 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300"
+                      >
+                        🍽️ Bu Adrese Göre Restoran Ara
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
