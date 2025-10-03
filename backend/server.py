@@ -66,12 +66,25 @@ db = None
 if mongo_uri:
     try:
         client = AsyncIOMotorClient(mongo_uri)
-        # Use database from connection string or default
-        db = client.get_default_database() or client.kuryecini_database
+        # Extract database name from URI or use default
+        if "/kuryecini_database" in mongo_uri or mongo_uri.endswith("/"):
+            db = client.kuryecini_database
+        else:
+            # Try to get database from connection string
+            try:
+                db_name = mongo_uri.split("/")[-1].split("?")[0]
+                if db_name:
+                    db = client[db_name]
+                else:
+                    db = client.kuryecini_database
+            except:
+                db = client.kuryecini_database
+        
         print(f"MongoDB connected: {mongo_uri.split('@')[1] if '@' in mongo_uri else 'localhost'}")
     except Exception as e:
         print(f"MongoDB connection error: {e}")
-        # App will continue without DB for now
+        client = None
+        db = None
 else:
     print("No MONGO_URI provided, running without database")
 
