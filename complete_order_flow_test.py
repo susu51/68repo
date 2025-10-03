@@ -528,8 +528,7 @@ class CompleteOrderFlowTest:
             try:
                 start_time = time.time()
                 response = self.session.patch(
-                    f"{API_BASE}/orders/{self.test_order_id}/status",
-                    json="delivered",
+                    f"{API_BASE}/orders/{self.test_order_id}/status?new_status=delivered",
                     headers=headers,
                     timeout=10
                 )
