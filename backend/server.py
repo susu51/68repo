@@ -799,6 +799,15 @@ async def login(request: Request, login_data: LoginRequest):
     if "password_hash" in user:
         del user["password_hash"]
     
+    # Log successful login
+    loggers["auth"].log_login_attempt(
+        email=login_data.email,
+        success=True,
+        ip_address=request.client.host if request.client else "unknown",
+        role=user.get("role", "customer"),
+        user_id=user.get("id")
+    )
+    
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
