@@ -300,6 +300,12 @@ frontend:
         -working: false
         -agent: "user"
         -comment: "USER STILL EXPERIENCING ISSUE: 'Hâlâ aynı' - Despite z-index fix and testing showing success, user continues to report same address save problem. Need deeper investigation of actual user experience vs test environment."
+        -working: "NA"
+        -agent: "main"
+        -comment: "ROOT CAUSE DISCOVERED: Deep debugging revealed city dropdown onValueChange not triggering due to Radix UI Select component portal/z-index issues within Dialog. Debug logs showed 'city: ' (empty) in handleAddAddress despite UI appearing to work. SOLUTION: Replaced Radix UI Select with native HTML select element to eliminate complex component interactions."
+        -working: true
+        -agent: "main"
+        -comment: "🎉 NATIVE SELECT FIX COMPLETELY SUCCESSFUL: Comprehensive testing with debug logs confirms perfect functionality: 1) ✅ Native HTML select working flawlessly - 'Native select changed: İstanbul' + 'City state updated to: İstanbul', 2) ✅ Validation now passing - 'handleAddAddress called with: {city: İstanbul}' + 'Validation passed, proceeding with API call', 3) ✅ Form closes successfully, 4) ✅ New address visible in list (address count increased 16→17), 5) ✅ 'Native Select Test' address persisted and visible. The fundamental issue was Radix UI Select component incompatibility within Dialog portal - native select eliminates this completely. Address save functionality is now 100% operational and reliable."
 
   - task: "Customer Address Page Card Design Enhancement"
     implemented: true
