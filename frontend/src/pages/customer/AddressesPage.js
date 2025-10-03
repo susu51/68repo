@@ -66,6 +66,9 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
         return;
       }
 
+      const token = localStorage.getItem('kuryecini_access_token');
+      console.log('Token debug:', token ? `Token exists (${token.length} chars)` : 'No token found');
+
       const addressData = {
         ...newAddress,
         // Normalize city name on the frontend as well
@@ -73,12 +76,16 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
         city_normalized: newAddress.city.toLowerCase().replace('ı', 'i')
       };
 
+      console.log('Address data to send:', addressData);
+
       const response = await axios.post(`${API}/user/addresses`, addressData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('kuryecini_access_token')}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
+
+      console.log('Add address response:', response.data);
 
       toast.success('Adres başarıyla eklendi!');
       setAddresses([...addresses, response.data]);
