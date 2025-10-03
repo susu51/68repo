@@ -488,7 +488,7 @@ class CustomerAddressRestaurantTest:
             ("Istanbul", "ıstanbul"),
             ("Gaziantap", "gaziantep"),
             ("ANKARA", "ankara"),
-            ("izmir", "izmir")
+            ("izmir", "ızmir")  # Correct Turkish spelling with dotless i
         ]
         
         for original, expected in test_cases:
