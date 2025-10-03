@@ -2038,3 +2038,178 @@ async def get_business_products(business_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching products: {str(e)}")
 
+# Restaurant Endpoints
+@api_router.get("/restaurants")
+async def get_restaurants(city: Optional[str] = None):
+    """Get restaurants by city"""
+    from utils.city_normalize import normalize_city_name
+    
+    try:
+        query_filter = {
+            "role": "business",
+            "kyc_status": "approved"
+        }
+        
+        if city:
+            normalized_city = normalize_city_name(city)
+            query_filter["city_normalized"] = normalized_city
+        
+        businesses = await db.users.find(query_filter).to_list(length=None)
+        
+        restaurant_list = []
+        for business in businesses:
+            restaurant_data = {
+                "id": business.get("id", business.get("_id", "")),
+                "name": business.get("business_name", ""),
+                "category": business.get("business_category", "Restoran"),
+                "description": business.get("description", ""),
+                "rating": 4.0 + (hash(str(business.get("id", ""))) % 10) / 10,
+                "delivery_time": "25-35 dk",
+                "min_order": 30 + (hash(str(business.get("id", ""))) % 50),
+                "is_open": True,
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "city_normalized": business.get("city_normalized", ""),
+                "location": business.get("location")
+            }
+            restaurant_list.append(restaurant_data)
+        
+        return restaurant_list
+        
+    except Exception as e:
+        logging.error(f"Error fetching restaurants: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching restaurants")
+
+@api_router.get("/restaurants/near")
+async def get_nearby_restaurants(
+    lat: float,
+    lng: float,
+    radius: Optional[int] = 50000
+):
+    """Get nearby restaurants using geospatial query"""
+    try:
+        query_filter = {
+            "role": "business",
+            "kyc_status": "approved",
+            "location": {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [lng, lat]
+                    },
+                    "$maxDistance": radius
+                }
+            }
+        }
+        
+        businesses = await db.users.find(query_filter).to_list(length=None)
+        
+        restaurant_list = []
+        for business in businesses:
+            # Calculate distance
+            business_location = business.get("location", {}).get("coordinates", [])
+            distance_km = None
+            
+            if len(business_location) == 2:
+                import math
+                dlat = lat - business_location[1]
+                dlng = lng - business_location[0]
+                distance_km = math.sqrt(dlat*dlat + dlng*dlng) * 111.0
+            
+            restaurant_data = {
+                "id": business.get("id", business.get("_id", "")),
+                "name": business.get("business_name", ""),
+                "category": business.get("business_category", "Restoran"),
+                "rating": 4.0 + (hash(str(business.get("id", ""))) % 10) / 10,
+                "delivery_time": "25-35 dk",
+                "min_order": 30 + (hash(str(business.get("id", ""))) % 50),
+                "is_open": True,
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "distance": round(distance_km, 1) if distance_km else None,
+                "location": business.get("location")
+            }
+            restaurant_list.append(restaurant_data)
+        
+        # Sort by distance
+        restaurant_list.sort(key=lambda x: x.get("distance") or float('inf'))
+        
+        return restaurant_list
+        
+    except Exception as e:
+        logging.error(f"Error fetching nearby restaurants: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching nearby restaurants")
+
+# Address Endpoints
+@api_router.get("/user/addresses")
+async def get_user_addresses(current_user: dict = Depends(get_current_user)):
+    """Get user's saved addresses"""
+    try:
+        user_id = current_user.get("id") or current_user.get("sub")
+        addresses = await db.addresses.find({"userId": user_id}).to_list(length=None)
+        
+        address_list = []
+        for addr in addresses:
+            coords = addr.get("location", {}).get("coordinates", [None, None])
+            address_data = {
+                "id": addr.get("id", addr.get("_id", "")),
+                "label": addr.get("label", ""),
+                "city": addr.get("city_original", addr.get("city", "")),
+                "description": addr.get("description", ""),
+                "lat": coords[1] if len(coords) > 1 else None,
+                "lng": coords[0] if len(coords) > 0 else None
+            }
+            address_list.append(address_data)
+        
+        return address_list
+        
+    except Exception as e:
+        logging.error(f"Error fetching addresses: {e}")
+        return []
+
+@api_router.post("/user/addresses")
+async def add_user_address(address_data: dict, current_user: dict = Depends(get_current_user)):
+    """Add a new address for user"""
+    from utils.city_normalize import normalize_city_name
+    
+    try:
+        user_id = current_user.get("id") or current_user.get("sub")
+        
+        city_original = address_data.get("city", "")
+        city_normalized = normalize_city_name(city_original)
+        
+        location = None
+        lat = address_data.get("lat")
+        lng = address_data.get("lng")
+        
+        if lat is not None and lng is not None:
+            location = {
+                "type": "Point",
+                "coordinates": [lng, lat]
+            }
+        
+        new_address = {
+            "id": str(uuid.uuid4()),
+            "userId": user_id,
+            "label": address_data.get("label", ""),
+            "city_original": city_original,
+            "city_normalized": city_normalized,
+            "description": address_data.get("description", ""),
+            "location": location,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.addresses.insert_one(new_address)
+        
+        return {
+            "id": new_address["id"],
+            "label": new_address["label"],
+            "city": city_original,
+            "description": new_address["description"],
+            "lat": lat,
+            "lng": lng
+        }
+        
+    except Exception as e:
+        logging.error(f"Error adding address: {e}")
+        raise HTTPException(status_code=500, detail="Error adding address")
