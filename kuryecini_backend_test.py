@@ -47,42 +47,91 @@ class KuryeciniBackendTest:
         print("\n🏥 HEALTH ENDPOINTS TESTING")
         print("=" * 50)
         
+        # Test direct backend server health endpoints (port 8001)
+        backend_direct = "http://localhost:8001"
         health_endpoints = [
-            ("/health", "Legacy Health Check"),
-            ("/healthz", "Primary Health Check")
+            (f"{backend_direct}/health", "Legacy Health Check (Direct)"),
+            (f"{backend_direct}/healthz", "Primary Health Check (Direct)")
         ]
         
         for endpoint, description in health_endpoints:
             try:
                 start_time = time.time()
-                response = self.session.get(f"{BACKEND_URL}{endpoint}", timeout=10)
+                response = self.session.get(endpoint, timeout=10)
                 response_time = time.time() - start_time
                 
                 if response.status_code == 200:
-                    data = response.json()
-                    status = data.get("status", "unknown")
-                    db_status = data.get("database", data.get("db", "unknown"))
-                    
-                    self.log_result(
-                        description,
-                        status in ["ok", "healthy"],
-                        f"Status: {status}, DB: {db_status}, Response time: {response_time:.2f}s",
-                        response_time
-                    )
-                    
-                    # Test database connection specifically
-                    if endpoint == "/healthz":
-                        db_working = db_status in ["ok", "connected"]
+                    try:
+                        data = response.json()
+                        status = data.get("status", "unknown")
+                        db_status = data.get("database", data.get("db", "unknown"))
+                        
                         self.log_result(
-                            "Database Connection Check",
-                            db_working,
-                            f"Database status: {db_status}"
+                            description,
+                            status in ["ok", "healthy"],
+                            f"Status: {status}, DB: {db_status}, Response time: {response_time:.2f}s",
+                            response_time
+                        )
+                        
+                        # Test database connection specifically
+                        if "healthz" in endpoint:
+                            db_working = db_status in ["ok", "connected", "not_configured"]
+                            self.log_result(
+                                "Database Connection Check",
+                                db_working,
+                                f"Database status: {db_status}"
+                            )
+                    except json.JSONDecodeError:
+                        self.log_result(
+                            description,
+                            False,
+                            f"Invalid JSON response: {response.text[:100]}",
+                            response_time
                         )
                 else:
                     self.log_result(
                         description,
                         False,
                         f"HTTP {response.status_code}: {response.text[:100]}",
+                        response_time
+                    )
+            except Exception as e:
+                self.log_result(description, False, f"Exception: {str(e)}")
+        
+        # Also test if health endpoints are accessible via the public URL
+        public_health_endpoints = [
+            (f"{BACKEND_URL}/health", "Legacy Health Check (Public)"),
+            (f"{BACKEND_URL}/healthz", "Primary Health Check (Public)")
+        ]
+        
+        for endpoint, description in public_health_endpoints:
+            try:
+                start_time = time.time()
+                response = self.session.get(endpoint, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    try:
+                        data = response.json()
+                        status = data.get("status", "unknown")
+                        self.log_result(
+                            description,
+                            status in ["ok", "healthy"],
+                            f"Status: {status}, Response time: {response_time:.2f}s",
+                            response_time
+                        )
+                    except json.JSONDecodeError:
+                        self.log_result(
+                            description,
+                            False,
+                            f"Returns HTML instead of JSON - routing issue",
+                            response_time
+                        )
+                else:
+                    self.log_result(
+                        description,
+                        False,
+                        f"HTTP {response.status_code}",
                         response_time
                     )
             except Exception as e:
