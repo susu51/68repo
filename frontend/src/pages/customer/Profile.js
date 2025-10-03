@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
 const Profile = ({ user, onBack, onLogout }) => {
+  const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'coupons' | 'discounts' | 'campaigns' | 'payment_methods'
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     first_name: user?.first_name || '',
@@ -17,6 +18,15 @@ const Profile = ({ user, onBack, onLogout }) => {
     gender: user?.gender || ''
   });
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // New state for enhanced features
+  const [coupons, setCoupons] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   const handleSaveProfile = async () => {
     setIsUpdating(true);
