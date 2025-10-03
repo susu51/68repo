@@ -408,8 +408,7 @@ class CompleteOrderFlowTest:
             try:
                 start_time = time.time()
                 response = self.session.patch(
-                    f"{API_BASE}/orders/{self.test_order_id}/status",
-                    json="on_route",  # Order is ready for pickup
+                    f"{API_BASE}/orders/{self.test_order_id}/status?new_status=on_route",
                     headers=headers,
                     timeout=10
                 )
