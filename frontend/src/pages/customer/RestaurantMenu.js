@@ -234,7 +234,7 @@ const RestaurantMenu = ({ restaurant, onAddToCart, onBack, cartItems = [], cartT
         {cartItems.length > 0 && (
           <div className="fixed bottom-6 right-6 z-50">
             <Button 
-              onClick={() => {/* Handle go to cart */}}
+              onClick={onGoToCart}
               className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 px-6 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105"
             >
               🛒 Sepete Git ({cartItems.length}) - ₺{cartTotal.toFixed(2)}
