@@ -4175,7 +4175,7 @@ async def reset_password(request: Request, reset_data: ResetPasswordRequest):
     from services.tokens import token_service
     
     try:
-        if not db:
+        if db is None:
             raise HTTPException(status_code=503, detail="Veritabanı bağlantısı yok")
         
         # Verify token format
