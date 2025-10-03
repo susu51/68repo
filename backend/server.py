@@ -2104,6 +2104,54 @@ async def get_nearby_restaurants(
                         "type": "Point",
                         "coordinates": [lng, lat]  # [longitude, latitude]
                     },
+                    "$maxDistance": radius
+                }
+            }
+        }
+        
+        businesses = await db.users.find(query_filter).to_list(length=None)
+        
+        restaurant_list = []
+        for business in businesses:
+            # Calculate distance (approximate)
+            business_location = business.get("location", {}).get("coordinates", [])
+            distance_km = None
+            
+            if len(business_location) == 2:
+                # Simple distance calculation (rough approximation)
+                import math
+                dlat = lat - business_location[1]
+                dlng = lng - business_location[0]
+                distance_km = math.sqrt(dlat*dlat + dlng*dlng) * 111.0  # Rough km conversion
+            
+            restaurant_data = {
+                "id": business.get("id", business.get("_id", "")),
+                "name": business.get("business_name", ""),
+                "category": business.get("business_category", "Restoran"),
+                "description": business.get("description", ""),
+                "rating": 4.0 + (hash(str(business.get("id", ""))) % 10) / 10,
+                "delivery_time": "25-35 dk",
+                "min_order": 30 + (hash(str(business.get("id", ""))) % 50),
+                "is_open": True,
+                "phone": business.get("phone"),
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "city_normalized": business.get("city_normalized", ""),
+                "location": business.get("location"),
+                "distance": round(distance_km, 1) if distance_km else None,
+                "image_url": f"/api/placeholder/restaurant-{hash(str(business.get('id', ''))) % 5 + 1}.jpg"
+            }
+            restaurant_list.append(restaurant_data)
+        
+        # Sort by distance
+        restaurant_list.sort(key=lambda x: x.get("distance") or float('inf'))
+        
+        return restaurant_list
+        
+    except Exception as e:
+        logging.error(f"Error fetching nearby restaurants: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching nearby restaurants")
+
 # User Address Management Endpoints
 @api_router.get("/user/addresses")
 async def get_user_addresses(current_user: dict = Depends(get_current_user)):
