@@ -802,6 +802,7 @@ const AdminPanel = ({ user, onLogout }) => {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     );
   };
