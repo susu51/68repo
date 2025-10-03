@@ -566,54 +566,38 @@ const Profile = ({ user, onBack, onLogout }) => {
 
   const renderPaymentMethods = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">💳 Ödeme Yöntemlerim</h2>
-          <p className="text-gray-600">Kayıtlı ödeme yöntemlerinizi yönetin</p>
-        </div>
-        
-        <Button 
-          onClick={() => {
-            toast.info('Yeni ödeme yöntemi ekleme özelliği yakında!');
-          }}
-          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl"
-        >
-          ➕ Yeni Yöntem Ekle
-        </Button>
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">💳 Ödeme Yöntemlerim</h2>
+        <p className="text-gray-600">Kayıtlı kartlarınızı yönetin ve yeni kart ekleyin</p>
       </div>
 
-      {paymentMethods.length === 0 ? (
-        <Card className="text-center py-16 border-0 shadow-lg rounded-2xl">
-          <CardContent>
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-4xl">💳</span>
+      <Card className="border-0 shadow-lg rounded-2xl">
+        <CardContent className="p-6">
+          <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl p-4 h-auto">
+            <div className="flex items-center justify-center">
+              <span className="text-2xl mr-3">➕</span>
+              <div>
+                <div className="font-semibold">Yeni Kart Ekle</div>
+                <div className="text-sm opacity-90">Kredi kartı veya banka kartı ekleyin</div>
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Henüz ödeme yönteminiz yok</h3>
-            <p className="text-gray-600 mb-6">Hızlı ödeme için kart bilgilerinizi güvenle kaydedin</p>
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
-              ➕ İlk Kartımı Ekle
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+          </Button>
+        </CardContent>
+      </Card>
+
+      {paymentMethods.length > 0 && (
+        <div className="space-y-4">
           {paymentMethods.map(method => (
             <Card key={method.id} className="border-0 shadow-lg rounded-2xl">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${
-                      method.brand === 'VISA' ? 'bg-blue-100' : 
-                      method.brand === 'MASTERCARD' ? 'bg-red-100' : 'bg-gray-100'
-                    }`}>
-                      <span className="text-2xl">
-                        {method.brand === 'VISA' ? '💳' : 
-                         method.brand === 'MASTERCARD' ? '💳' : '💳'}
-                      </span>
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-xl mr-4">
+                      💳
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-gray-800">{method.brand}</div>
-                      <div className="text-sm text-gray-500">**** **** **** {method.last4}</div>
+                      <h3 className="font-semibold text-gray-800">**** **** **** {method.lastFour}</h3>
+                      <p className="text-sm text-gray-600">{method.brand.toUpperCase()} • {method.expiryMonth}/{method.expiryYear}</p>
                     </div>
                   </div>
                   
