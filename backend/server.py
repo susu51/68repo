@@ -699,6 +699,71 @@ async def login(login_data: LoginRequest):
         "user": user
     }
 
+@api_router.post("/auth/refresh",
+    tags=["Authentication"],
+    summary="Refresh Access Token",
+    description="Generate a new access token using a valid refresh token.",
+    response_description="New JWT access token"
+)
+async def refresh_access_token(refresh_token: str):
+    """
+    **Refresh Access Token**
+    
+    Generate a new access token using a valid refresh token.
+    This allows users to stay logged in without re-entering credentials.
+    
+    **Usage:**
+    ```json
+    {
+        "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+    }
+    ```
+    
+    **Response:**
+    ```json
+    {
+        "access_token": "new_jwt_token_here",
+        "token_type": "bearer"
+    }
+    ```
+    """
+    payload = verify_refresh_token(refresh_token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+    
+    # Create new access token with same user data
+    new_access_token = create_access_token(
+        data={"sub": payload.get("sub"), "role": payload.get("role")}
+    )
+    
+    return {
+        "access_token": new_access_token,
+        "token_type": "bearer"
+    }
+
+@api_router.post("/auth/logout",
+    tags=["Authentication"],
+    summary="User Logout",
+    description="Logout user and invalidate tokens.",
+    response_description="Logout confirmation"
+)
+async def logout(current_user: dict = Depends(get_current_user)):
+    """
+    **User Logout**
+    
+    Logout the current user. In a production environment, this would
+    invalidate the refresh token in the database.
+    
+    **Note:** Currently returns success without token invalidation.
+    In production, implement token blacklisting or database cleanup.
+    """
+    return {
+        "message": "Successfully logged out",
+        "user_id": current_user.get("id")
+    }
 @api_router.post("/register/courier")
 async def register_courier(courier_data: CourierRegistration):
     """Register a new courier"""
