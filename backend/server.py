@@ -3789,7 +3789,7 @@ async def google_auth_session(session_data: dict):
                 "exp": datetime.now(timezone.utc) + timedelta(hours=24)
             }
             
-            access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+            access_token = jwt.encode(token_data, JWT_SECRET_KEY, algorithm=ALGORITHM)
             
             return {
                 "access_token": access_token,
