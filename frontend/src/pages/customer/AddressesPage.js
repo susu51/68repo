@@ -50,8 +50,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
   }, []);
 
   const loadAddresses = async () => {
+    // Async Operation Protection - prevent state updates after unmount
+    if (!isMounted) return;
+    
     try {
-      setLoading(true);
+      if (isMounted) setLoading(true);
       const token = localStorage.getItem('kuryecini_access_token');
       console.log('Loading addresses - Token debug:', token ? `Token exists (${token.length} chars)` : 'No token found');
       
@@ -62,14 +65,20 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
       });
       
       console.log('Load addresses response:', response.data);
-      setAddresses(response.data || []);
+      if (isMounted) {
+        setAddresses(response.data || []);
+      }
     } catch (error) {
       console.error('Error loading addresses:', error);
       console.log('Error details:', error.response?.data);
       // If no addresses or error, show empty state
-      setAddresses([]);
+      if (isMounted) {
+        setAddresses([]);
+      }
     } finally {
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     }
   };
 
