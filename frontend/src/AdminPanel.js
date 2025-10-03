@@ -733,9 +733,8 @@ const AdminPanel = ({ user, onLogout }) => {
     
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Öne Çıkarma Yönetimi</h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Featured Requests Panel */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Bekleyen İstekler</CardTitle>
