@@ -236,16 +236,29 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
           </Card>
         ) : (
           // Address list
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Adresleriniz ({addresses.length})</h2>
-              <Button 
-                onClick={() => setShowAddForm(true)}
-                className="bg-green-500 hover:bg-green-600"
-              >
-                ➕ Yeni Adres Ekle
-              </Button>
-            </div>
+          <div className="space-y-6">
+            {/* Address Count & Add Button Card */}
+            <Card className="border-0 shadow-lg rounded-2xl bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mr-4">
+                      <span className="text-white font-bold">{addresses.length}</span>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-800">Kayıtlı Adresleriniz</h2>
+                      <p className="text-sm text-gray-600">Toplam {addresses.length} adet adres</p>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={() => setShowAddForm(true)}
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    ➕ Yeni Adres Ekle
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {addresses.map((address, index) => (
