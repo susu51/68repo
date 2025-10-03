@@ -142,7 +142,28 @@ app = FastAPI(
 @app.get("/healthz")
 async def health_check():
     """Health check endpoint for deployment monitoring"""
-    return {"status": "ok"}
+    start_time = time.time()
+    
+    try:
+        # Check database connection
+        await db.command("ping")
+        db_status = "ok"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+        logging.error(f"Database health check failed: {e}")
+    
+    response_time = (time.time() - start_time) * 1000
+    status = "ok" if db_status == "ok" else "degraded"
+    
+    # Log health check
+    log_health_check("/healthz", response_time, status)
+    
+    return {
+        "status": status,
+        "database": db_status,
+        "response_time_ms": round(response_time, 2),
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 # Legacy health endpoint alias
 @app.get("/health")
