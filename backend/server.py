@@ -4192,7 +4192,12 @@ async def reset_password(request: Request, reset_data: ResetPasswordRequest):
             raise HTTPException(status_code=400, detail="Token bulunamadı veya zaten kullanılmış")
         
         # Check if token expired
-        if datetime.now(timezone.utc) > reset_record["expires_at"]:
+        expires_at = reset_record["expires_at"]
+        if not expires_at.tzinfo:
+            # If expires_at is naive, assume it's UTC
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        
+        if datetime.now(timezone.utc) > expires_at:
             # Mark as expired
             await db.password_resets.update_one(
                 {"token": reset_data.token},
