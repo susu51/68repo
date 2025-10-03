@@ -218,7 +218,7 @@ const Profile = ({ user, onBack, onLogout }) => {
   };
 
   const renderProfileInfo = () => (
-    <>
+    <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Profile Information */}
         <Card className="border-0 shadow-lg rounded-2xl">
