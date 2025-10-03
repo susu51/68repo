@@ -317,6 +317,38 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
+# Initialize loggers
+loggers = get_loggers()
+
+# Request logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    
+    # Extract user ID from token if available
+    user_id = None
+    try:
+        auth_header = request.headers.get("authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+            user_id = payload.get("sub")
+    except:
+        pass  # Token validation will happen in endpoints
+    
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    
+    # Log request
+    loggers["request"].log_request(
+        request=request,
+        response=response,
+        process_time=process_time,
+        user_id=user_id
+    )
+    
+    return response
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
