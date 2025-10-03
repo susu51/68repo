@@ -1000,13 +1000,6 @@ async def admin_login(admin_data: AdminLogin):
         status_code=status.HTTP_410_GONE,
         detail="Admin endpoint deprecated. Use /auth/login with admin credentials."
     )
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user_type": "admin",
-        "user_data": admin_user
-    }
 
 # Admin dependency
 async def get_admin_user(current_user: dict = Depends(get_current_user)):
