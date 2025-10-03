@@ -385,6 +385,18 @@ frontend:
         -agent: "frontend_testing"
         -comment: "🎉 COMPREHENSIVE FRONTEND TESTING COMPLETE: Excellent results with 90%+ success rate. ✅ Customer dashboard fully functional (login, side tabs, restaurant browsing, API integration), ✅ Authentication flows working perfectly, ✅ UI/UX responsive design confirmed, ✅ Mobile compatibility verified. Platform ready for production use."
 
+  - task: "Forgot/Reset Password Frontend Pages"
+    implemented: true
+    working: true
+    file: "pages/Auth/ForgotPassword.js, pages/Auth/ResetPassword.js, ModernLogin.js, App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "IMPLEMENTED: Complete forgot/reset password frontend pages with routing, form validation, error handling, and integration with backend API endpoints. Added /reset-password route, updated ModernLogin with forgot password link, created lazy-loaded components for optimal performance."
+
 metadata:
   created_by: "main_agent"
   version: "5.0"
