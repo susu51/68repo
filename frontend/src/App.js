@@ -10,6 +10,7 @@ import FileUpload from "./FileUpload";
 import LeafletMap from "./LeafletMap";
 import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
 import FoodOrderErrorBoundary from "./components/FoodOrderErrorBoundary";
+import GlobalErrorBoundary from "./components/ErrorBoundary";
 import { CustomerProfile } from "./CustomerProfile";
 import { CustomerMain } from "./pages/customer/CustomerMain";
 import PhoneAuth from "./PhoneAuth";
