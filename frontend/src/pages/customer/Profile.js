@@ -390,8 +390,8 @@ const Profile = ({ user, onBack, onLogout }) => {
             </div>
           </CardContent>
         </Card>
-      </>
-    )
+      </div>
+    </div>
   );
 
   const renderCoupons = () => (
