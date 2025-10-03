@@ -380,8 +380,7 @@ class CompleteOrderFlowTest:
             try:
                 start_time = time.time()
                 response = self.session.patch(
-                    f"{API_BASE}/orders/{self.test_order_id}/status",
-                    json="assigned",  # Business accepts the order
+                    f"{API_BASE}/orders/{self.test_order_id}/status?new_status=assigned",
                     headers=headers,
                     timeout=10
                 )
