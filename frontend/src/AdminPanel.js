@@ -128,7 +128,9 @@ const AdminPanel = ({ user, onLogout }) => {
   const fetchFeaturedRequests = async () => {
     try {
       const response = await axios.get(`${API}/admin/featured-requests`);
-      setFeaturedRequests(response.data);
+      // Ensure response.data is an array
+      const data = Array.isArray(response.data) ? response.data : [];
+      setFeaturedRequests(data);
     } catch (error) {
       console.error('Error fetching featured requests:', error);
       setFeaturedRequests([]);
@@ -138,7 +140,9 @@ const AdminPanel = ({ user, onLogout }) => {
   const fetchFeaturedBusinesses = async () => {
     try {
       const response = await axios.get(`${API}/admin/featured-businesses`);
-      setFeaturedBusinesses(response.data);
+      // Ensure response.data is an array
+      const data = Array.isArray(response.data) ? response.data : [];
+      setFeaturedBusinesses(data);
     } catch (error) {
       console.error('Error fetching featured businesses:', error);
       setFeaturedBusinesses([]);
