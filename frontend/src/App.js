@@ -4643,7 +4643,7 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
           user.role === 'admin' ? <AdminPanel user={user} onLogout={logout} /> :
           user.role === 'courier' ? <CourierDashboard user={user} onLogout={logout} /> :
           user.role === 'business' ? <EnhancedBusinessDashboard user={user} onLogout={logout} /> :
-          <CustomerDashboard user={user} />
+          <CustomerMain user={user} />
         } />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
