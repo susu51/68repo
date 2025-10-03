@@ -31,7 +31,7 @@ import time
 
 # Import phone validation function
 try:
-    from models import validate_turkish_phone
+    from models import validate_turkish_phone, ForgotPasswordRequest, ResetPasswordRequest
 except ImportError:
     # Fallback phone validation function
     def validate_turkish_phone(phone: str) -> str:
