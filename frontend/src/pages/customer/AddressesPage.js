@@ -403,9 +403,19 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
           </div>
         )}
 
-        {/* Add Address Dialog - Enhanced Card Design */}
-        <Dialog key="add-address-dialog" open={showAddForm} onOpenChange={setShowAddForm}>
-          <DialogContent key="dialog-content" className="sm:max-w-[700px] p-0 border-0 shadow-2xl rounded-3xl overflow-hidden">
+        {/* Add Address Dialog - Enhanced Card Design with Portal Safety */}
+        {showAddForm && (
+          <Dialog 
+            key="add-address-dialog" 
+            open={showAddForm} 
+            onOpenChange={(open) => {
+              if (isMounted) {
+                setShowAddForm(open);
+              }
+            }}
+            modal={true}
+          >
+            <DialogContent key="dialog-content" className="sm:max-w-[700px] p-0 border-0 shadow-2xl rounded-3xl overflow-hidden">
             {/* Header Card */}
             <div className="bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500 p-8 text-white relative overflow-hidden">
               {/* Background Pattern */}
