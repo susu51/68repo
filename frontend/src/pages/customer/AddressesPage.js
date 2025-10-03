@@ -202,20 +202,26 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {addresses.map((address, index) => (
-                <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white">
+                <Card key={index} className="group hover:shadow-2xl hover:scale-105 transition-all duration-500 border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
                   <CardContent className="p-0">
                     {/* Card Header with Icon */}
-                    <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 text-white">
-                      <div className="flex items-center justify-between">
+                    <div className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 p-6 text-white relative overflow-hidden">
+                      {/* Background Pattern */}
+                      <div className="absolute inset-0 bg-white/10 opacity-20">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/15 rounded-full -ml-12 -mb-12"></div>
+                      </div>
+                      
+                      <div className="relative flex items-center justify-between">
                         <div className="flex items-center">
-                          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                          <div className="w-14 h-14 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 shadow-lg">
                             <span className="text-2xl">📍</span>
                           </div>
                           <div>
-                            <h3 className="text-xl font-bold">
+                            <h3 className="text-xl font-bold mb-1">
                               {address.label || 'Adres'}
                             </h3>
-                            <p className="text-orange-100 text-sm">
+                            <p className="text-white/90 text-sm font-medium">
                               Kayıtlı Adres
                             </p>
                           </div>
@@ -227,22 +233,26 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                     <div className="p-6">
                       <div className="space-y-4">
                         {/* City */}
-                        <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                          <span className="mr-3 text-lg">🏙️</span>
+                        <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-100 shadow-sm">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-blue-600">🏙️</span>
+                          </div>
                           <div>
-                            <p className="text-sm text-gray-600">Şehir</p>
-                            <p className="font-semibold text-gray-800">
+                            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wider">Şehir</p>
+                            <p className="font-bold text-gray-800 text-lg">
                               {address.city || 'Şehir bilgisi yok'}
                             </p>
                           </div>
                         </div>
                         
                         {/* Address Description */}
-                        <div className="flex items-start p-3 bg-gray-50 rounded-lg">
-                          <span className="mr-3 text-lg mt-1">🏠</span>
+                        <div className="flex items-start p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100 shadow-sm">
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                            <span className="text-purple-600">🏠</span>
+                          </div>
                           <div className="flex-1">
-                            <p className="text-sm text-gray-600">Adres Detayı</p>
-                            <p className="text-sm text-gray-800 leading-relaxed">
+                            <p className="text-xs text-purple-600 font-semibold uppercase tracking-wider mb-1">Adres Detayı</p>
+                            <p className="text-sm text-gray-800 leading-relaxed font-medium">
                               {address.description || 'Açıklama yok'}
                             </p>
                           </div>
@@ -250,19 +260,26 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                         
                         {/* Location Info */}
                         {address.lat && address.lng ? (
-                          <div className="flex items-center p-3 bg-green-50 rounded-lg border border-green-200">
-                            <span className="mr-3 text-lg">📍</span>
+                          <div className="flex items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 shadow-sm">
+                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                              <span className="text-green-600">✅</span>
+                            </div>
                             <div>
-                              <p className="text-sm text-green-600 font-medium">Konum Bilgisi Mevcut</p>
-                              <p className="text-xs text-green-600">
+                              <p className="text-xs text-green-600 font-bold uppercase tracking-wider">Konum Mevcut</p>
+                              <p className="text-xs text-green-700 font-mono">
                                 {address.lat.toFixed(4)}, {address.lng.toFixed(4)}
                               </p>
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <span className="mr-3 text-lg">⚠️</span>
-                            <p className="text-sm text-yellow-700">Konum bilgisi yok</p>
+                          <div className="flex items-center p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-yellow-200 shadow-sm">
+                            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                              <span className="text-yellow-600">⚠️</span>
+                            </div>
+                            <div>
+                              <p className="text-xs text-yellow-600 font-bold uppercase tracking-wider">Konum Yok</p>
+                              <p className="text-xs text-yellow-700">Manuel adres</p>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -270,7 +287,7 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                       {/* Action Button */}
                       <Button 
                         onClick={() => handleSelectAddress(address)}
-                        className="w-full mt-6 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-lg shadow-lg group-hover:shadow-xl transition-all duration-300"
+                        className="w-full mt-6 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                       >
                         🍽️ Bu Adrese Göre Restoran Ara
                       </Button>
