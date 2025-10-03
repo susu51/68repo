@@ -134,29 +134,41 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
   };
 
   const handleSelectAddress = (address) => {
+    // Async Operation Protection
+    if (!isMounted) return;
+    
     if (onSelectAddress) {
       onSelectAddress(address);
     }
   };
 
   const getCurrentLocation = () => {
+    // Async Operation Protection
+    if (!isMounted) return;
+    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setNewAddress({
-            ...newAddress,
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-          toast.success('Konum başarıyla alındı!');
+          if (isMounted) {
+            setNewAddress({
+              ...newAddress,
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            });
+            toast.success('Konum başarıyla alındı!');
+          }
         },
         (error) => {
           console.error('Geolocation error:', error);
-          toast.error('Konum alınamadı. Lütfen el ile girin.');
+          if (isMounted) {
+            toast.error('Konum alınamadı. Lütfen el ile girin.');
+          }
         }
       );
     } else {
-      toast.error('Tarayıcınız konum servisini desteklemiyor.');
+      if (isMounted) {
+        toast.error('Tarayıcınız konum servisini desteklemiyor.');
+      }
     }
   };
 
