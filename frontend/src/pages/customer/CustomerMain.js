@@ -24,8 +24,53 @@ export const CustomerMain = ({ user }) => {
 
   const handleRestaurantSelect = (restaurant) => {
     console.log('Selected restaurant:', restaurant);
-    // Here you could navigate to restaurant detail page
-    // or open menu/cart functionality
+    setSelectedRestaurant(restaurant);
+    setCurrentView('restaurant_menu');
+  };
+
+  const handleAddToCart = (item) => {
+    console.log('Adding to cart:', item);
+    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
+    
+    if (existingItem) {
+      setCartItems(cartItems.map(cartItem => 
+        cartItem.id === item.id 
+          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          : cartItem
+      ));
+    } else {
+      setCartItems([...cartItems, { ...item, quantity: 1 }]);
+    }
+    
+    // Update total
+    const newTotal = orderTotal + item.price;
+    setOrderTotal(newTotal);
+  };
+
+  const handleRemoveFromCart = (itemId) => {
+    const item = cartItems.find(cartItem => cartItem.id === itemId);
+    if (item) {
+      if (item.quantity > 1) {
+        setCartItems(cartItems.map(cartItem => 
+          cartItem.id === itemId 
+            ? { ...cartItem, quantity: cartItem.quantity - 1 }
+            : cartItem
+        ));
+      } else {
+        setCartItems(cartItems.filter(cartItem => cartItem.id !== itemId));
+      }
+      
+      const newTotal = orderTotal - item.price;
+      setOrderTotal(newTotal);
+    }
+  };
+
+  const handleGoToCart = () => {
+    setCurrentView('cart');
+  };
+
+  const handleBackToMenu = () => {
+    setCurrentView('menu');
   };
 
   if (currentView === 'restaurants') {
