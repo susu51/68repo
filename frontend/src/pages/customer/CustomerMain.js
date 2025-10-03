@@ -3,8 +3,11 @@ import AddressesPage from './AddressesPage';
 import NearbyRestaurants from './NearbyRestaurants';
 
 export const CustomerMain = ({ user }) => {
-  const [currentView, setCurrentView] = useState('menu'); // 'menu' | 'addresses' | 'restaurants'
+  const [currentView, setCurrentView] = useState('menu'); // 'menu' | 'addresses' | 'restaurants' | 'restaurant_menu' | 'cart' | 'profile'
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const [orderTotal, setOrderTotal] = useState(0);
   
   console.log('🏠 CustomerMain rendered - currentView:', currentView, 'user:', user?.first_name);
 
