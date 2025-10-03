@@ -537,7 +537,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                           type="number"
                           step="any"
                           value={newAddress.lng || ''}
-                          onChange={(e) => setNewAddress({...newAddress, lng: parseFloat(e.target.value) || null})}
+                          onChange={(e) => {
+                            if (isMounted) {
+                              setNewAddress({...newAddress, lng: parseFloat e.target.value) || null});
+                            }
+                          }}
                         />
                       </div>
                     </div>
