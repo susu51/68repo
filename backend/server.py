@@ -157,9 +157,12 @@ async def health_check():
     start_time = time.time()
     
     try:
-        # Check database connection
-        await db.command("ping")
-        db_status = "ok"
+        # Check database connection if available
+        if db is not None:
+            await db.command("ping")
+            db_status = "ok"
+        else:
+            db_status = "not_configured"
     except Exception as e:
         db_status = f"error: {str(e)}"
         logging.error(f"Database health check failed: {e}")
