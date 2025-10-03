@@ -768,12 +768,26 @@ async def login(request: Request, login_data: LoginRequest):
             )
             raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
-    # Real user lookup (unchanged from original)
+    # Real user lookup
     user = await db.users.find_one({"email": login_data.email})
     if not user:
+        # Log failed login - user not found
+        loggers["auth"].log_login_attempt(
+            email=login_data.email,
+            success=False,
+            ip_address=request.client.host if request.client else "unknown",
+            failure_reason="user_not_found"
+        )
         raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
     if not verify_password(login_data.password, user.get("password_hash", "")):
+        # Log failed login - invalid password
+        loggers["auth"].log_login_attempt(
+            email=login_data.email,
+            success=False,
+            ip_address=request.client.host if request.client else "unknown",
+            failure_reason="invalid_password"
+        )
         raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
     access_token = create_access_token(data={"sub": user["email"], "role": user.get("role", "customer")})
