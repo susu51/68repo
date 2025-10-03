@@ -355,8 +355,9 @@ const Profile = ({ user, onBack, onLogout }) => {
             </CardContent>
           </Card>
         </div>
+      </div>
 
-        {/* Order History */}
+      {/* Order History */}
         <Card className="mt-6 border-0 shadow-lg rounded-2xl">
           <CardHeader>
             <h2 className="text-xl font-bold text-gray-800">📋 Sipariş Geçmişi</h2>
