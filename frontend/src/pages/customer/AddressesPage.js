@@ -29,6 +29,7 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isMounted, setIsMounted] = useState(true);
   const [newAddress, setNewAddress] = useState({
     label: '',
     city: 'İstanbul',
@@ -37,8 +38,15 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
     lng: null
   });
 
+  // Enhanced Component Lifecycle Management
   useEffect(() => {
+    setIsMounted(true);
     loadAddresses();
+    
+    // Cleanup function to prevent DOM manipulation errors
+    return () => {
+      setIsMounted(false);
+    };
   }, []);
 
   const loadAddresses = async () => {
