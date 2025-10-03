@@ -2032,6 +2032,12 @@ async def approve_user(user_id: str, current_user: dict = Depends(get_admin_user
 async def get_business_products(business_id: str):
     """Get products for a specific business"""
     try:
+        # This is a placeholder - in real implementation, 
+        # you'd fetch products from a products collection
+        return []
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching products: {str(e)}")
+
 # Restaurant Endpoints (alias for businesses)
 @api_router.get("/restaurants")
 async def get_restaurants(
