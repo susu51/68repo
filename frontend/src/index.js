@@ -107,7 +107,12 @@ console.error = function(...args) {
   originalConsoleError.apply(console, args);
 };
 
+// Import Global Error Boundary
+import GlobalErrorBoundary from './components/ErrorBoundary';
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <App />
+  <GlobalErrorBoundary>
+    <App />
+  </GlobalErrorBoundary>
 );
