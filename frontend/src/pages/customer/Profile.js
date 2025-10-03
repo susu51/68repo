@@ -625,24 +625,25 @@ const Profile = ({ user, onBack, onLogout }) => {
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/15 rounded-full -ml-16 -mb-16"></div>
             </div>
             
-            <div className="relative flex items-center justify-between">
+            <div className="relative z-10 flex items-center justify-between">
               <div className="flex items-center">
-                <div className="w-20 h-20 bg-white/25 backdrop-blur-sm rounded-full flex items-center justify-center mr-6 shadow-lg">
-                  <span className="text-4xl">👤</span>
-                </div>
+                <Button
+                  onClick={onBack}
+                  className="bg-white/20 hover:bg-white/30 text-white rounded-full w-12 h-12 p-0 mr-4 backdrop-blur-sm"
+                >
+                  ←
+                </Button>
+                
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">Profilim</h1>
-                  <p className="text-white/90 text-lg">Hesap bilgilerinizi ve avantajlarınızı yönetin</p>
+                  <h1 className="text-3xl font-bold">👤 Profil</h1>
+                  <p className="text-white/90 text-lg">Hesap ayarlarınızı yönetin</p>
                 </div>
               </div>
               
-              <Button 
-                variant="outline" 
-                onClick={onBack}
-                className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl backdrop-blur-sm"
-              >
-                ← Geri
-              </Button>
+              <div className="text-right">
+                <div className="text-2xl font-bold">{profileData.first_name} {profileData.last_name}</div>
+                <div className="text-white/80 text-sm">{profileData.email}</div>
+              </div>
             </div>
           </CardContent>
         </Card>
