@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import AddressSelector from './components/AddressSelector';
 import StickyCart from './components/StickyCart';
 import { renderLocation } from './utils/renderSafe';
+import { SafeRender, SafeAddress } from './components/SafeRender';
 
 const API = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001'}/api`;
 
