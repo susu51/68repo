@@ -35,19 +35,35 @@ export const CustomerMain = ({ user }) => {
     console.log('Adding to cart:', item);
     const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
     
-    if (existingItem) {
-      setCartItems(cartItems.map(cartItem => 
-        cartItem.id === item.id 
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
-          : cartItem
-      ));
+    if (item.action === 'decrease') {
+      // Decrease quantity
+      if (existingItem && existingItem.quantity > 1) {
+        setCartItems(cartItems.map(cartItem => 
+          cartItem.id === item.id 
+            ? { ...cartItem, quantity: cartItem.quantity - 1 }
+            : cartItem
+        ));
+        setOrderTotal(orderTotal - item.price);
+      } else if (existingItem && existingItem.quantity === 1) {
+        // Remove item completely
+        setCartItems(cartItems.filter(cartItem => cartItem.id !== item.id));
+        setOrderTotal(orderTotal - item.price);
+      }
     } else {
-      setCartItems([...cartItems, { ...item, quantity: 1 }]);
+      // Increase quantity or add new item
+      if (existingItem) {
+        setCartItems(cartItems.map(cartItem => 
+          cartItem.id === item.id 
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
+        ));
+      } else {
+        setCartItems([...cartItems, { ...item, quantity: 1 }]);
+      }
+      
+      // Update total
+      setOrderTotal(orderTotal + item.price);
     }
-    
-    // Update total
-    const newTotal = orderTotal + item.price;
-    setOrderTotal(newTotal);
   };
 
   const handleRemoveFromCart = (itemId) => {
