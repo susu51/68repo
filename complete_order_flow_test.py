@@ -22,7 +22,7 @@ API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials from the review request
 TEST_CREDENTIALS = {
-    "admin": {"email": "admin@kuryecini.com", "password": "6851"},
+    "admin": {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
     "customer": {"email": "testcustomer@example.com", "password": "test123"},
     "business": {"email": "testbusiness@example.com", "password": "test123"},
     "courier": {"email": "testkurye@example.com", "password": "test123"}
