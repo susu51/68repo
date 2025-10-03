@@ -46,7 +46,7 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
       setLoading(true);
       const response = await axios.get(`${API}/user/addresses`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('kuryecini_access_token')}`
         }
       });
       setAddresses(response.data || []);
@@ -75,7 +75,7 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
 
       const response = await axios.post(`${API}/user/addresses`, addressData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('kuryecini_access_token')}`,
           'Content-Type': 'application/json'
         }
       });
