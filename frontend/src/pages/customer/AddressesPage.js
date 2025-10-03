@@ -148,21 +148,42 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-gray-800">📍 Kayıtlı Adreslerim</h1>
-            {onBack && (
-              <Button variant="outline" onClick={onBack}>
-                ← Geri
-              </Button>
-            )}
-          </div>
-          <p className="text-gray-600">
-            Restoran araması için bir adres seçin. Adresinizdeki şehre göre restoranları listeleyeceğiz.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50 to-red-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header Card */}
+        <Card className="mb-8 border-0 shadow-xl rounded-3xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white overflow-hidden">
+          <CardContent className="p-8 relative">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-white/10 opacity-40">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/20 rounded-full -mr-24 -mt-24"></div>
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/15 rounded-full -ml-16 -mb-16"></div>
+            </div>
+            
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-16 h-16 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-6 shadow-lg">
+                  <span className="text-3xl">📍</span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">Kayıtlı Adreslerim</h1>
+                  <p className="text-white/90 text-lg">
+                    Restoran araması için bir adres seçin. Şehrinize göre en yakın restoranları bulacağız.
+                  </p>
+                </div>
+              </div>
+              
+              {onBack && (
+                <Button 
+                  variant="outline" 
+                  onClick={onBack}
+                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl backdrop-blur-sm"
+                >
+                  ← Geri
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {addresses.length === 0 ? (
           // Empty state - Enhanced Card Design
