@@ -13,7 +13,7 @@ from pathlib import Path
 import tempfile
 
 # Configuration
-BACKEND_URL = "https://kuryecini-delivery-1.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-platform.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
@@ -567,7 +567,7 @@ class ProductionReadinessTest:
         try:
             # Test preflight request
             headers = {
-                'Origin': 'https://kuryecini-delivery-1.preview.emergentagent.com',
+                'Origin': 'https://kuryecini-platform.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type,Authorization'
             }
