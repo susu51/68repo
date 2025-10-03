@@ -998,7 +998,9 @@ async def register_courier(courier_data: CourierRegistration):
 
 @api_router.post("/register/business")
 async def register_business(business_data: BusinessRegister):
-    """Register a new business"""
+    """Register a new business with city normalization"""
+    from utils.city_normalize import normalize_city_name
+    
     # Check if email already exists
     existing_user = await db.users.find_one({"email": business_data.email})
     if existing_user:
@@ -1006,6 +1008,10 @@ async def register_business(business_data: BusinessRegister):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
+    
+    # Normalize city name
+    city_original = business_data.city
+    city_normalized = normalize_city_name(city_original)
     
     # Create new business user with pending status for KYC approval
     hashed_password = hash_password(business_data.password)
@@ -1017,7 +1023,8 @@ async def register_business(business_data: BusinessRegister):
         "business_name": business_data.business_name,
         "tax_number": business_data.tax_number,
         "address": business_data.address,
-        "city": business_data.city,
+        "city": city_original,  # Keep original for reference
+        "city_normalized": city_normalized,  # Normalized for searching
         "business_category": business_data.business_category,
         "description": business_data.description,
         "is_active": True,
