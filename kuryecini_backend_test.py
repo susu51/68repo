@@ -487,22 +487,30 @@ class KuryeciniBackendTest:
         # Check if MongoDB connection is working (should work with local or Atlas)
         try:
             start_time = time.time()
-            response = self.session.get(f"{BACKEND_URL}/healthz", timeout=10)
+            response = self.session.get("http://localhost:8001/healthz", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                data = response.json()
-                db_status = data.get("database", "unknown")
-                
-                # Atlas readiness means DB connection is abstracted and working
-                atlas_ready = db_status in ["ok", "connected", "not_configured"]
-                
-                self.log_result(
-                    "Atlas Migration Readiness",
-                    atlas_ready,
-                    f"DB Status: {db_status}, Atlas Ready: {atlas_ready}",
-                    response_time
-                )
+                try:
+                    data = response.json()
+                    db_status = data.get("database", "unknown")
+                    
+                    # Atlas readiness means DB connection is abstracted and working
+                    atlas_ready = db_status in ["ok", "connected", "not_configured"]
+                    
+                    self.log_result(
+                        "Atlas Migration Readiness",
+                        atlas_ready,
+                        f"DB Status: {db_status}, Atlas Ready: {atlas_ready}",
+                        response_time
+                    )
+                except json.JSONDecodeError:
+                    self.log_result(
+                        "Atlas Migration Readiness",
+                        False,
+                        f"Invalid JSON response from health endpoint",
+                        response_time
+                    )
             else:
                 self.log_result(
                     "Atlas Migration Readiness",
