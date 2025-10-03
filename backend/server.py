@@ -2145,18 +2145,15 @@ async def get_nearby_restaurants(
 async def get_user_addresses(current_user: dict = Depends(get_current_user)):
     """Get user's saved addresses"""
     try:
-        user_email = current_user.get("sub")
+        # FIXED: Properly extract user_id from current_user object returned by get_current_user
+        user_id = current_user.get("id")
+        user_email = current_user.get("email")
         
-        # TEMPORARY FIX: JWT decode issue workaround  
-        if not user_email:
-            user_id = "customer-001"  # Fallback for development
-        elif user_email == "testcustomer@example.com":
-            user_id = "customer-001"
-        else:
-            user = await db.users.find_one({"email": user_email})
-            if not user:
-                return []
-            user_id = user.get("id")
+        if not user_id:
+            print(f"DEBUG: No user_id found in current_user: {current_user}")
+            return []
+        
+        print(f"DEBUG: Getting addresses for user_id: {user_id} (email: {user_email})")
         addresses = await db.addresses.find({"userId": user_id}).to_list(length=None)
         print(f"DEBUG: Found {len(addresses)} addresses for user_id: {user_id}")
         
