@@ -2179,7 +2179,8 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
     
     try:
         user_email = current_user.get("sub")
-        print(f"DEBUG: Add address - Looking for user email: {user_email}")
+        print(f"DEBUG: Add address - Looking for user email: '{user_email}'")
+        print(f"DEBUG: Current user data: {current_user}")
         
         user = await db.users.find_one({"email": user_email})
         print(f"DEBUG: Add address - User found: {user is not None}")
