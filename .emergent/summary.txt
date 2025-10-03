@@ -1,24 +1,23 @@
 <analysis>
-The Kuryecini project underwent significant development, starting from foundational UI/UX improvements and backend endpoint additions, and evolving into a feature-rich full-stack platform. The initial AI engineer focused on extensive frontend debugging, resolving issues like  on undefined values, React object-as-child errors, and  DOM manipulation problems. A major architectural shift migrated persistent state from  to MongoDB with secure  cookie-based authentication and CSRF protection. The current AI engineer continued this work, systematically addressing a new list of 26 detailed requirements in three phases. This involved standardizing deployment, environment variables, health checks, CORS, public menus, address management, courier KYC, Leaflet maps, and a commission system. Phase 2 focused on admin login security, CI/CD, OpenAPI documentation, and basic frontend error/loading states. Phase 3 introduced a professional  theme, accessibility, performance (lazy loading), enhanced error boundaries, JWT refresh, rate limiting, and comprehensive logging. Recent work successfully fixed a  type error in the AdminPanel and a persistent Objects are not valid as a React child error, which now appears resolved. The latest issue is a vercel display error coupled with a critical MongoDB authentication failure during deployment, indicating a backend connection problem on the target Atlas environment.
+The Kuryecini project has undergone substantial development, evolving from foundational UI/UX and backend endpoint additions into a feature-rich full-stack platform. Initially, the AI engineer resolved extensive frontend debugging issues like  on undefined values and React object-as-child errors. A major architectural shift migrated persistent state from  to MongoDB with secure  cookie-based JWT authentication and CSRF protection.
+
+Subsequent work focused on addressing 26 detailed requirements in phases, including standardizing deployment, environment variables, health checks, CORS, public menus, address management, courier KYC, Leaflet maps, and a commission system. The AI engineer successfully implemented a Forgot/Reset Password flow, city normalization for business registration, and initial customer address management with location-based restaurant listing.
+
+Recent efforts primarily involved debugging a persistent MongoDB authentication failure during deployment, which led to significant refactoring of backend environment variable usage and database connection logic. Further fixes addressed React rendering errors (Objects are not valid as a React child) in Business and Admin panels, and a  error. The most immediate challenge is a JWT token validation issue and user ID mismatch in the backend, preventing customer addresses from being fetched and displayed correctly on the frontend, necessitating temporary hardcoded fixes for debugging. The frontend consistently fails to log in after restarts, impacting further testing.
 </analysis>
 
 <product_requirements>
-Kuryecini is a full-stack food and package delivery platform designed for the Turkish market, supporting four distinct user roles: Customer, Courier, Business, and Admin. Its core functionality includes role-specific dashboards, customer order flow (menu browsing, cart management, order placement), courier delivery management via an interactive map, and business management with analytics.
-
-Architecturally, the application transitioned from client-side  for sensitive data to a secure, server-side state management system using MongoDB. Authentication leverages JWTs delivered via ,  cookies with CSRF protection, ensuring the React frontend remains stateless regarding persistent user data. A key future requirement is to package the web application as a native Android app, using a PWA (Progressive Web App) with Trusted Web Activity (TWA) strategy.
-
-Additional requirements span production readiness (deployment, environment variables, health endpoints, CORS), public menu features, address management, secure courier KYC with file uploads, Leaflet map integration, order commission system, secure JWT role-based admin login, CI/CD setup, comprehensive OpenAPI documentation, user-friendly frontend error/empty states, updated README, professional and responsive theming (Tailwind/shadcn/ui), accessibility (a11y), performance optimizations (code splitting, lazy loading), robust error handling (React Error Boundary, backend global handlers), enhanced security (JWT refresh, rate limiting), extensive logging, backend/frontend tests, basic analytics/SEO, and full PWA implementation.
+Kuryecini is a full-stack food and package delivery platform for the Turkish market, supporting Customer, Courier, Business, and Admin roles. Core features include role-specific dashboards, a customer order flow (menu browsing, cart, order placement), courier delivery via maps, and business management/analytics. The architecture transitioned from client-side  to server-side MongoDB state with JWT (,  cookies) and CSRF protection. Future plans include a native Android app using PWA/TWA. Requirements span production readiness (deployment, env vars, health checks, CORS), public menus, address management, secure courier KYC with uploads, Leaflet map integration, order commission system, secure JWT role-based admin login, CI/CD, OpenAPI docs, frontend error/empty states,  theming, accessibility, performance (lazy loading), robust error handling, JWT refresh, rate limiting, logging, and comprehensive tests. Recent additions include a Forgot Password flow, business city normalization, and customer address-based restaurant listing.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Frameworks**: React.js, FastAPI (Python).
--   **Database**: MongoDB (local and Atlas for deployment).
+-   **Database**: MongoDB (local and Atlas).
 -   **UI/UX**: Tailwind CSS, Radix UI (shadcn/ui), Leaflet/OpenStreetMap.
--   **Authentication**: JWTs via  cookies, CSRF protection, role-based access.
+-   **Authentication**: JWTs (httpOnly cookies), CSRF, role-based access.
 -   **State Management**: Server-side, database-driven.
--   **API Communication**: Axios, FastAPI ( prefix).
--   **Mobile Deployment**: PWA with Trusted Web Activity (TWA).
--   **Observability**:  for rate limiting, custom logging.
+-   **Mobile**: PWA with Trusted Web Activity (TWA).
+-   **Observability**:  (rate limiting), custom logging.
 -   **Deployment**: Vercel (frontend), Kubernetes (backend).
 </key_technical_concepts>
 
@@ -27,127 +26,57 @@ The application utilizes a monorepo structure with distinct  and  directories.
 
 
 
--   **backend/server.py**: The central FastAPI application handling all API endpoints and core business logic.
-    -   **Changes**: Added  alias, updated CORS, implemented , added , included  model and commission settings, refactored admin login to JWT role-based, integrated logging, and applied JWT refresh token logic with rate limiting.
--   **backend/models.py**: Defines Pydantic data models for the application's entities and data validation.
-    -   **Changes**: Extended to include schemas for , , , and the new  model, supporting server-side state.
--   **backend/auth_cookies.py**: Manages secure HTTP-only cookies for JWTs and CSRF protection.
-    -   **Changes**: Updated to support JWT refresh token mechanisms.
--   **backend/localstorage_api.py**: Provides CRUD API endpoints for user-specific data previously stored in .
-    -   **Importance**: Critical for the migration to server-side state management.
--   **backend/logging_config.py**: A newly created file to centralize and configure the application's logging strategy.
-    -   **Importance**: Enhances observability and debugging capabilities.
--   **backend/test_main.py**: A new file containing ============================= test session starts ==============================
-platform linux -- Python 3.11.13, pytest-8.4.2, pluggy-1.6.0
-rootdir: /app
-plugins: anyio-4.11.0
-collected 5 items / 1 error
-
-==================================== ERRORS ====================================
-____________________ ERROR collecting backend/test_main.py _____________________
-ImportError while importing test module '/app/backend/test_main.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/usr/local/lib/python3.11/importlib/__init__.py:126: in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-backend/test_main.py:7: in <module>
-    import pytest_asyncio
-E   ModuleNotFoundError: No module named 'pytest_asyncio'
-=========================== short test summary info ============================
-ERROR backend/test_main.py
-!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-=============================== 1 error in 1.60s =============================== tests to validate backend functionality.
-    -   **Importance**: Ensures the reliability of authentication, menus, and orders.
--   **frontend/src/App.js**: The root React component, managing overall routing and global application state.
-    -   **Changes**: Adapted to fetch user data (cart, addresses) from the backend, removed  dependencies, and integrated global error handling, including  and a new global object rendering error handler.
--   **frontend/src/FoodOrderSystem.js**: The primary customer-facing component for browsing menus and managing orders.
-    -   **Changes**: Refactored to operate with global cart state, integrated an enhanced checkout modal using , and received debugging attention to resolve object rendering issues by integrating .
--   **frontend/src/BusinessDashboard_Enhanced.js**: The dashboard for business owners to manage operations and view analytics.
-    -   **Changes**: Implemented safety checks for  calls and secure DOM manipulation for features like report exports.
--   **frontend/src/CourierDashboard.js**: The interface for couriers, featuring an interactive map for deliveries.
-    -   **Changes**: Similarly updated with safe DOM manipulation practices, especially for data export functionalities.
--   **frontend/src/AdminPanel.js**: The administrative control panel for platform oversight.
-    -   **Changes**: Fixed  errors with  checks, enhanced API response safety, and resolved several JSX syntax and structural rendering issues.
--   **frontend/src/index.js**: The main entry point for the React application into the DOM.
-    -   **Changes**: Incorporated a global  handler for unhandled DOM errors and a specific global error handler for Objects are not valid as a React child type errors.
--   **frontend/src/index.css**: Contains the global CSS styles and theming for the application.
-    -   **Changes**: Updated to implement a professional Kuryecini brand theme using CSS variables, including support for dark mode, and new utility classes following  principles.
--   **frontend/src/__tests__/App.test.js**: A newly created file for frontend tests using React Testing Library.
-    -   **Importance**: Facilitates unit and integration testing of React components.
--   **frontend/src/components/DynamicLeafletMap.js**: A new wrapper component to dynamically import Leaflet maps.
-    -   **Importance**: Optimizes performance by implementing lazy loading for map components.
--   **frontend/src/components/ErrorBoundary.jsx**: A new, more comprehensive React Error Boundary component.
-    -   **Importance**: Provides a robust mechanism for catching and gracefully handling runtime errors in the UI.
--   **frontend/src/components/SafeRender.jsx**: A new Higher-Order Component (HOC) designed for safe rendering.
-    -   **Importance**: Prevents React from attempting to render raw JavaScript objects, addressing Objects are not valid as a React child errors.
--   **frontend/src/components/PWAInstallPrompt.jsx**: A new component to manage and display the PWA installation prompt to users.
-    -   **Importance**: Enhances the Progressive Web App experience by guiding users to install the application.
--   **frontend/src/components/ui/*.js/jsx**: A set of new common UI components like , , , and .
-    -   **Importance**: Establishes a standardized, reusable library of UI elements for consistency and efficiency.
--   **frontend/src/hooks/useSafeEffect.js**: A new custom React hook for safer  cleanup.
-    -   **Importance**: Mitigates common issues related to DOM manipulation and event listeners in React components.
--   **frontend/src/lib/*.js**: A collection of new utility files for , , , and .
-    -   **Importance**: Centralizes helper functions and configurations for various cross-cutting concerns, ensuring consistent implementation.
--   **frontend/src/pages/index.js**: A new file created as a setup for route-level lazy loading.
-    -   **Importance**: Contributes to performance optimization by splitting code bundles and loading them only when needed.
--   **frontend/src/utils/domSafety.js**: A new utility file providing helper functions for safer DOM operations.
-    -   **Importance**: Further minimizes the risk of DOM-related runtime errors.
--   **frontend/public/index.html**: The main HTML file serving as the entry point for the frontend application.
-    -   **Changes**: Updated to include the Leaflet CSS link and enhanced meta tags for improved SEO and social sharing (Open Graph).
--   **frontend/public/sw.js**: The existing Service Worker script.
-    -   **Importance**: Provides offline capabilities and caching for the PWA features.
--   **frontend/public/manifest.json**: The existing PWA manifest file.
-    -   **Importance**: Defines the application's metadata for Add to Home Screen functionality.
--   **frontend/vercel.json**: The Vercel deployment configuration file for the frontend.
-    -   **Changes**: Confirmed as correctly configured for SPA 404 handling and Vercel's build process.
--   **.github/workflows/ci.yml**: The GitHub Actions CI workflow configuration.
-    -   **Changes**: Updated to support the monorepo structure with specific working directories for frontend (Node 18) and backend (Python 3.10), including  and ============================= test session starts ==============================
-platform linux -- Python 3.11.13, pytest-8.4.2, pluggy-1.6.0
-rootdir: /app
-plugins: anyio-4.11.0
-collected 5 items / 1 error
-
-==================================== ERRORS ====================================
-____________________ ERROR collecting backend/test_main.py _____________________
-ImportError while importing test module '/app/backend/test_main.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-/usr/local/lib/python3.11/importlib/__init__.py:126: in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-backend/test_main.py:7: in <module>
-    import pytest_asyncio
-E   ModuleNotFoundError: No module named 'pytest_asyncio'
-=========================== short test summary info ============================
-ERROR backend/test_main.py
-!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-=============================== 1 error in 0.34s =============================== steps.
--   **README.md**: The project's primary documentation file.
-    -   **Changes**: Updated with detailed production deployment steps, including guidelines for Render and Vercel.
--   **backend/.env.example & frontend/.env.example**: Example environment variable files for both frontend and backend.
-    -   **Importance**: Guides developers on the necessary environment variables for local and production setups.
--   **DEPLOYMENT_CHECKLIST.md**: A new markdown file outlining a comprehensive checklist for final deployment.
-    -   **Importance**: Ensures all critical steps are covered for a smooth transition to production.
+-   **backend/server.py**: Main FastAPI application.
+    -   **Summary of changes**: Integrated robust MongoDB connection (using  with graceful fallback), enhanced  endpoint for DB status, dynamic CORS configuration, full Forgot Password and Reset Password API endpoints, integrated  for business registration, extended  (now also serving as ) with geo-filtering and city filtering, and added  CRUD endpoints. Multiple fixes were applied for DB initialization, s, indentation, and user ID lookup logic within JWT processing.
+-   **backend/models.py**: Defines Pydantic data models.
+    -   **Summary of changes**: Extended with , , , and  models to support the new password reset functionality.
+-   **backend/services/email.py (New File)**: Centralizes email sending logic, configured to log emails to the console in development mode.
+-   **backend/services/tokens.py (New File)**: Manages the generation, validation, and expiration of secure password reset tokens.
+-   **backend/utils/city_normalize.py (New File)**: Implements Turkish city name standardization logic, critical for consistent data and accurate location-based searches.
+-   **backend/migrate_cities.py (New File)**: A utility script to perform one-off data migrations, specifically for adding  fields and creating  indexes on existing business data.
+-   **frontend/src/App.js**: The root React component.
+    -   **Summary of changes**: Refactored to manage authentication flows, dynamic routing for new auth and customer pages (e.g., , ,  using ). Also fixed instances of Objects are not valid as a React child errors by ensuring  objects were not rendered directly. Replaced  with .
+-   **frontend/src/ModernLogin.js**: The primary customer-facing login interface.
+    -   **Summary of changes**: Updated to include a Şifremi Unuttum? (Forgot Password?) navigation link.
+-   **frontend/src/BusinessDashboard_Enhanced.js**: The dashboard for business owners.
+    -   **Summary of changes**: Corrected direct object rendering issues and refactored the  reference to correctly point to the  function.
+-   **frontend/src/pages/Auth/ForgotPassword.js (New File)**: Frontend component providing the UI for users to request a password reset email.
+-   **frontend/src/pages/Auth/ResetPassword.js (New File)**: Frontend component offering the UI for users to set a new password using a provided reset token.
+-   **frontend/src/pages/customer/AddressesPage.js (New File)**: Displays a user's saved addresses in a card-like layout and manages the process of adding new addresses. It's designed to be the customer's initial view.
+-   **frontend/src/pages/customer/NearbyRestaurants.js (New File)**: Lists restaurants filtered by location or city, dynamically based on user input or browser geolocation.
+-   **frontend/src/pages/customer/CustomerMain.js (New File)**: A wrapper component that centralizes customer-specific routes, making  the default landing page for customers.
+-   **frontend/public/index.html**: The main HTML file.
+    -   **Summary of changes**: Updated to include Leaflet CSS and enhanced meta tags for improved SEO.
+-   **frontend/.env**: Frontend environment variables.
+    -   **Summary of changes**: Ensured  is correctly used.
+-   **backend/.env**: Backend environment variables.
+    -   **Summary of changes**: Updated for , , , , and .
+-   **vercel.json (Frontend)**: Vercel deployment configuration for the frontend.
+    -   **Summary of changes**: Confirmed to ensure correct SPA 404 handling and Vercel's build process.
 </code_architecture>
 
 <pending_tasks>
+-   Properly resolve the underlying JWT token validation and user ID mismatch in the backend, replacing temporary hardcoded fixes.
+-   Implement comprehensive frontend testing for customer address management and restaurant listing, including the add address functionality.
+-   Refine frontend UI/UX for addresses to ensure they are displayed correctly and interactively in a card-like format.
 -   Integrate a real payment gateway (e.g., Iyzico).
 -   Fully build out the remaining Admin Panel features, such as commission reporting and a customer complaint system.
--   User to conduct comprehensive frontend testing to confirm all UI/runtime errors are fully resolved.
--   Resolve the vercel display error, specifically the MongoDB authentication failure during deployment to Atlas.
 </pending_tasks>
 
 <current_work>
-The engineer has recently completed a critical phase of bug fixes and enhancements.
-1.  **Admin Login Fix**: The  user, despite being initialized, was not included in the backend's  dictionary, preventing login. This was rectified by adding the admin credentials () to the dictionary in .
-2.  ** DOM Error Resolution**: A persistent React DOM error () was addressed. Solutions included implementing safe DOM manipulation (e.g., using  for deferred cleanup and parent node checks) in  and . Additionally, a global  handler was added in , alongside new utilities like  and . The homepage is now reported to load without this specific console error.
-3.  ** Error Fix**: An error () occurring in  was due to  not always being an array. The fix involved adding  checks before  calls and ensuring API responses default to empty arrays. Multiple JSX syntax errors within  were also identified and corrected during this process, stabilizing the Admin panel's rendering.
-4.  **Objects are not valid as a React child Error Mitigation**: This significant React rendering error (e.g., an object like  being rendered directly) was the last major frontend bug tackled. The engineer implemented a global error handler for such issues in , created a  component, and added extensive debugging and safety checks (e.g., , ) within  and . Latest tests indicate this error is no longer reproducible, and the Admin panel is fully functional.
+The most recent work focused on implementing customer address management and location-based restaurant listing. This involved creating new frontend pages (, , ) and integrating them into . Backend API endpoints for  and  were added and refined, leveraging existing business listing logic and city normalization.
 
-Immediately following these successful fixes, the user reported a general vercel görüntüleme hatası (vercel display error). Upon analyzing deployment logs, the root cause appears to be a  failing with a  status and, more critically, a  error showing a  This clearly points to a **MongoDB authentication failure during the application's deployment to the target Atlas environment**, preventing the backend from starting correctly.
+However, several critical issues emerged during testing:
+1.  **Frontend Login Failures**: After restarts, the frontend often fails to retain login state, reverting to the homepage or login page, which hinders testing of authenticated routes like .
+2.  ** for Address API Calls**: Despite a successful login (when it works), API calls from the frontend to  consistently returned  errors.
+3.  **JWT Token Key Inconsistency**: Initially, the  was trying to retrieve a generic  from , while the actual token was stored under  by the main authentication system. This was rectified in .
+4.  **Backend User ID Mismatch**: The primary cause of the  errors for address operations was traced to a mismatch in user identification. The JWT  field contained the user's email, but the backend's  function (and subsequent database queries) expected a different format of user ID (e.g., ). This led to the system failing to find a valid user associated with the token.
+5.  **Temporary Hardcoded Fix**: To diagnose further, the AI introduced a temporary hardcoded  in  and  functions in . This allowed the backend API to successfully add and retrieve addresses for this specific ID.
+6.  ** Error in Address Processing**: An issue was found where  data could be  when processing addresses, causing a  object error during data transformation. This was fixed by adding safe checks.
+
+Currently, the backend successfully returns address data (with the temporary hardcoded user ID), but the frontend still shows Henüz kayıtlı adresiniz yok due to persistent frontend login issues after application restarts, preventing proper display and interaction.
 </current_work>
 
 <optional_next_step>
-Investigate and resolve the MongoDB authentication error by verifying the  environment variable and Atlas database user credentials in the deployment environment.
+Force a successful customer login on the frontend to verify if the addresses are now displayed correctly and if new addresses can be added without  errors.
 </optional_next_step>
