@@ -28,6 +28,123 @@ const Profile = ({ user, onBack, onLogout }) => {
 
   const API = process.env.REACT_APP_BACKEND_URL;
 
+  const tabs = [
+    { id: 'profile', name: 'Bilgilerim', icon: '👤' },
+    { id: 'coupons', name: 'Kuponlarım', icon: '🎟️' },
+    { id: 'discounts', name: 'İndirimlerim', icon: '💸' },
+    { id: 'campaigns', name: 'Kampanyalar', icon: '🎉' },
+    { id: 'payment_methods', name: 'Ödeme Yöntemlerim', icon: '💳' }
+  ];
+
+  // Load data for active tab
+  useEffect(() => {
+    loadTabData(activeTab);
+  }, [activeTab]);
+
+  const loadTabData = async (tab) => {
+    if (tab === 'profile') return; // Profile data already loaded
+    
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const headers = { 'Authorization': `Bearer ${token}` };
+      
+      switch (tab) {
+        case 'coupons':
+          // Mock data for now - will be replaced with real API
+          setCoupons([
+            {
+              id: 1,
+              code: 'YENI20',
+              description: '%20 İndirim - Yeni müşterilere özel',
+              discountType: 'PERCENT',
+              discountValue: 20,
+              validUntil: '2025-02-28',
+              minAmount: 50
+            },
+            {
+              id: 2,
+              code: 'SPRING15',
+              description: '₺15 İndirim - Bahar kampanyası',
+              discountType: 'AMOUNT',
+              discountValue: 15,
+              validUntil: '2025-03-31',
+              minAmount: 75
+            }
+          ]);
+          break;
+          
+        case 'discounts':
+          setDiscounts([
+            {
+              id: 1,
+              title: 'Sadık Müşteri İndirimi',
+              description: '10+ sipariş verenlere özel %15 indirim',
+              discountType: 'PERCENT',
+              discountValue: 15,
+              validUntil: '2025-06-30'
+            },
+            {
+              id: 2,
+              title: 'Hafta Sonu Özel',
+              description: 'Hafta sonları ₺10 ekstra indirim',
+              discountType: 'AMOUNT',
+              discountValue: 10,
+              validUntil: '2025-12-31'
+            }
+          ]);
+          break;
+          
+        case 'campaigns':
+          setCampaigns([
+            {
+              id: 1,
+              title: 'Yaz Kampanyası',
+              description: 'Tüm pizzalarda %25 indirim! Sıcak günlerde serin lezzetler.',
+              discountType: 'PERCENT',
+              discountValue: 25,
+              validUntil: '2025-08-31',
+              imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400'
+            },
+            {
+              id: 2,
+              title: 'Hızlı Teslimat Garantisi',
+              description: '30 dakikada kapınızda! Geç kalırsak ücretsiz.',
+              validUntil: '2025-12-31',
+              imageUrl: 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=400'
+            }
+          ]);
+          break;
+          
+        case 'payment_methods':
+          setPaymentMethods([
+            {
+              id: 1,
+              provider: 'iyzico',
+              brand: 'VISA',
+              last4: '4242',
+              token: 'pm_test_1234',
+              createdAt: '2025-01-01'
+            },
+            {
+              id: 2,
+              provider: 'stripe',
+              brand: 'MASTERCARD',
+              last4: '5678',
+              token: 'pm_test_5678',
+              createdAt: '2024-12-15'
+            }
+          ]);
+          break;
+      }
+    } catch (error) {
+      console.error(`Error loading ${tab}:`, error);
+      toast.error('Veri yüklenirken hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSaveProfile = async () => {
     setIsUpdating(true);
     
