@@ -15,8 +15,8 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-# Configuration - Use environment variable from frontend/.env
-BACKEND_URL = "https://deliverymap-1.preview.emergentagent.com"
+# Configuration - Use local backend for testing
+BACKEND_URL = "http://localhost:8001"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials from the review request
