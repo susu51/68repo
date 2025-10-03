@@ -1236,7 +1236,8 @@ async def delete_product(product_id: str, current_user: dict = Depends(get_busin
 
 # Order Management Endpoints
 @api_router.post("/orders")
-async def create_order(order_data: OrderCreate, current_user: dict = Depends(get_current_user)):
+@limiter.limit("10/minute")  # Prevent order spam
+async def create_order(request: Request, order_data: OrderCreate, current_user: dict = Depends(get_current_user)):
     """Create new order (Customer only)"""
     if current_user.get("role") != "customer":
         raise HTTPException(
