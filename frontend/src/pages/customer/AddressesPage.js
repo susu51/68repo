@@ -88,7 +88,12 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
     
     try {
       if (!newAddress.label || !newAddress.city || !newAddress.description) {
-        toast.error('Lütfen tüm zorunlu alanları doldurun');
+        let missingFields = [];
+        if (!newAddress.label) missingFields.push('Adres Adı');
+        if (!newAddress.city) missingFields.push('Şehir');
+        if (!newAddress.description) missingFields.push('Adres Açıklaması');
+        
+        toast.error(`Lütfen şu alanları doldurun: ${missingFields.join(', ')}`);
         return;
       }
 
