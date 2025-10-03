@@ -484,7 +484,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                       className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12"
                       placeholder="Mahalle, sokak, bina no, daire no vb."
                       value={newAddress.description}
-                      onChange={(e) => setNewAddress({...newAddress, description: e.target.value})}
+                      onChange={(e) => {
+                        if (isMounted) {
+                          setNewAddress({...newAddress, description: e.target.value});
+                        }
+                      }}
                     />
                   </CardContent>
                 </Card>
