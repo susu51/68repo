@@ -165,24 +165,50 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
         </div>
 
         {addresses.length === 0 ? (
-          // Empty state
-          <Card className="text-center py-12">
-            <CardContent>
-              <div className="mb-6">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-4xl">📍</span>
+          // Empty state - Enhanced Card Design
+          <Card className="text-center py-16 border-0 shadow-2xl rounded-3xl bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-200 rounded-full -mr-32 -mt-32"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-pink-200 rounded-full -ml-24 -mb-24"></div>
+              <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-red-200 rounded-full -ml-16 -mt-16"></div>
+            </div>
+            
+            <CardContent className="relative z-10">
+              <div className="mb-8">
+                {/* Animated Icon Container */}
+                <div className="w-32 h-32 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-pulse">
+                  <span className="text-6xl">📍</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">
                   Henüz kayıtlı adresiniz yok
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  Restoran araması yapmak için önce bir adres eklemelisiniz.
+                <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
+                  🍽️ Restoran araması yapmak ve sipariş verebilmek için önce bir adres eklemelisiniz.
                 </p>
+                
+                {/* Feature highlights */}
+                <div className="grid md:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
+                  <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg">
+                    <div className="text-2xl mb-2">🏠</div>
+                    <p className="text-sm font-medium text-gray-700">Ev, iş, okul adreslerinizi kaydedin</p>
+                  </div>
+                  <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg">
+                    <div className="text-2xl mb-2">📍</div>
+                    <p className="text-sm font-medium text-gray-700">Konum bazlı restoran önerisi</p>
+                  </div>
+                  <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg">
+                    <div className="text-2xl mb-2">⚡</div>
+                    <p className="text-sm font-medium text-gray-700">Hızlı teslimat süresi</p>
+                  </div>
+                </div>
+                
                 <Button 
                   onClick={() => setShowAddForm(true)}
-                  className="bg-orange-500 hover:bg-orange-600"
+                  className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                 >
-                  ➕ İlk Adresi Ekle
+                  ➕ İlk Adresimi Ekle
                 </Button>
               </div>
             </CardContent>
