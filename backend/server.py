@@ -712,7 +712,7 @@ async def login(login_data: LoginRequest):
     description="Generate a new access token using a valid refresh token.",
     response_description="New JWT access token"
 )
-async def refresh_access_token(refresh_token: str):
+async def refresh_access_token(request: RefreshTokenRequest):
     """
     **Refresh Access Token**
     
