@@ -57,8 +57,8 @@
 ##   test_priority: "high_first"  # or "sequential" or "stuck_first"
 ##
 ## agent_communication:
-##     -agent: "main"  # or "testing" or "user"
-##     -message: "Communication message between agents"
+##     -agent: "main"
+##     -message: "STARTING CUSTOMER AUTHENTICATION FIX: Identified root cause of JWT token/user ID mismatch issue. The get_current_user function returns user object with 'id' field, but address endpoints incorrectly try to extract 'sub' field. Will fix this by using current_user.get('id') directly instead of trying to extract from JWT payload."
 
 # Protocol Guidelines for Main agent
 #
