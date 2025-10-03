@@ -8,6 +8,39 @@ from typing import List, Optional, Dict, Any, Union
 from datetime import datetime, timezone
 from enum import Enum
 import uuid
+class ResetTokenStatus(str, Enum):
+    ACTIVE = "active"
+    USED = "used"
+    EXPIRED = "expired"
+
+class PasswordReset(BaseModel):
+    """Password reset token document"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    user_id: str
+    token: str
+    status: ResetTokenStatus = ResetTokenStatus.ACTIVE
+    expires_at: datetime
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    used_at: Optional[datetime] = None
+
+class ForgotPasswordRequest(BaseModel):
+    """Request model for forgot password"""
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    """Request model for password reset"""
+    token: str
+    password: str
+    
+    @validator('password')
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Parola en az 8 karakter olmalıdır')
+        if not any(c.isdigit() for c in v):
+            raise ValueError('Parola en az bir rakam içermelidir')
+        if not any(c.isalpha() for c in v):
+            raise ValueError('Parola en az bir harf içermelidir')
+        return v
 
 def generate_id() -> str:
     """Generate unique ID for documents"""
