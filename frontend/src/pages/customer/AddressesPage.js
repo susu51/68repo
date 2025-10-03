@@ -522,7 +522,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                           type="number"
                           step="any"
                           value={newAddress.lat || ''}
-                          onChange={(e) => setNewAddress({...newAddress, lat: parseFloat(e.target.value) || null})}
+                          onChange={(e) => {
+                            if (isMounted) {
+                              setNewAddress({...newAddress, lat: parseFloat(e.target.value) || null});
+                            }
+                          }}
                         />
                       </div>
                       <div>
