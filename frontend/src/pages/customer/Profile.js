@@ -497,46 +497,69 @@ const Profile = ({ user, onBack, onLogout }) => {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">🎉 Kampanyalar</h2>
-        <p className="text-gray-600">Güncel kampanya ve fırsatları kaçırmayın</p>
+        <p className="text-gray-600">Aktif kampanyalar ve özel teklifler</p>
       </div>
 
-      <div className="grid gap-6">
-        {campaigns.map(campaign => (
-          <Card key={campaign.id} className="border-0 shadow-lg rounded-2xl overflow-hidden">
-            <div className="md:flex">
-              {campaign.imageUrl && (
-                <div className="md:w-1/3">
-                  <img 
-                    src={campaign.imageUrl} 
-                    alt={campaign.title}
-                    className="w-full h-48 md:h-full object-cover"
-                  />
-                </div>
-              )}
-              <CardContent className="p-6 md:w-2/3">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-800">{campaign.title}</h3>
-                  {campaign.discountValue && (
-                    <div className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
-                      {campaign.discountType === 'PERCENT' ? `%${campaign.discountValue}` : `₺${campaign.discountValue}`} İndirim
-                    </div>
-                  )}
-                </div>
-                
-                <p className="text-gray-600 mb-4">{campaign.description}</p>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
-                    Son tarih: {new Date(campaign.validUntil).toLocaleDateString('tr-TR')}
-                  </span>
-                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl">
-                    🛍️ Kampanyaya Git
-                  </Button>
-                </div>
-              </CardContent>
+      <div className="space-y-6">
+        <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold mb-1">🍕 Pizza Festivali</h3>
+                <p className="opacity-90">Tüm pizzalarda %30 indirim!</p>
+              </div>
+              <div className="text-3xl">🍕</div>
             </div>
-          </Card>
-        ))}
+          </div>
+          <CardContent className="p-6">
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <div className="text-sm text-gray-500">Kampanya Süresi</div>
+                <div className="font-semibold">15 Eylül - 30 Eylül</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">Minimum Tutar</div>
+                <div className="font-semibold">₺50</div>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">
+              Pizzacı ortaklarımızdan sipariş verirken bu kampanyayı kullanarak %30 indirim kazanabilirsiniz. Kampanya tüm pizza çeşitleri için geçerlidir.
+            </p>
+            <Button className="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl">
+              🍕 Pizzacıları Gör
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold mb-1">🥗 Sağlıklı Yaşam</h3>
+                <p className="opacity-90">Salata siparişlerinizde %25 indirim</p>
+              </div>
+              <div className="text-3xl">🥗</div>
+            </div>
+          </div>
+          <CardContent className="p-6">
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <div className="text-sm text-gray-500">Kampanya Süresi</div>
+                <div className="font-semibold">1 Eylül - 31 Ekim</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">Minimum Tutar</div>
+                <div className="font-semibold">₺35</div>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">
+              Sağlıklı beslenme kampanyamız kapsamında tüm salata çeşitlerinde %25 indirim. Karbonhidrat azaltılmış menüler de kampanyaya dahil.
+            </p>
+            <Button className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white rounded-xl">
+              🥗 Sağlıklı Menüler
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
