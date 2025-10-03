@@ -226,6 +226,16 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
               >
                 🚀 Giriş Yap
               </Button>
+              
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => window.showForgotPassword && window.showForgotPassword()}
+                  className="text-sm text-orange-600 hover:text-orange-800 hover:underline transition-colors"
+                >
+                  Şifremi Unuttum?
+                </button>
+              </div>
             </form>
           )}
 
