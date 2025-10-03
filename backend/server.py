@@ -320,6 +320,9 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
 class CourierRegistration(BaseModel):
     email: EmailStr
     password: str
