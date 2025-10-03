@@ -25,7 +25,7 @@ const turkishCities = [
   'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
 ];
 
-export const AddressesPage = ({ onSelectAddress, onBack }) => {
+const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
