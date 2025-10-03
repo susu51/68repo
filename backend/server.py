@@ -742,6 +742,15 @@ async def login(request: Request, login_data: LoginRequest):
             user_data = test_user.copy()
             del user_data["password"]  # Remove password from response
             
+            # Log successful login
+            loggers["auth"].log_login_attempt(
+                email=login_data.email,
+                success=True,
+                ip_address=request.client.host if request.client else "unknown",
+                role=test_user["role"],
+                auth_method="test_user"
+            )
+            
             return {
                 "access_token": access_token,
                 "refresh_token": refresh_token,
@@ -749,6 +758,14 @@ async def login(request: Request, login_data: LoginRequest):
                 "user": user_data
             }
         else:
+            # Log failed login
+            loggers["auth"].log_login_attempt(
+                email=login_data.email,
+                success=False,
+                ip_address=request.client.host if request.client else "unknown",
+                auth_method="test_user",
+                failure_reason="invalid_password"
+            )
             raise HTTPException(status_code=400, detail="E-posta veya şifre yanlış")
     
     # Real user lookup (unchanged from original)
