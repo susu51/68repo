@@ -2145,7 +2145,12 @@ async def get_nearby_restaurants(
 async def get_user_addresses(current_user: dict = Depends(get_current_user)):
     """Get user's saved addresses"""
     try:
-        user_id = current_user.get("id") or current_user.get("sub")
+        user_email = current_user.get("sub")
+        user = await db.users.find_one({"email": user_email})
+        if not user:
+            return []
+        
+        user_id = user.get("id")
         addresses = await db.addresses.find({"userId": user_id}).to_list(length=None)
         
         address_list = []
