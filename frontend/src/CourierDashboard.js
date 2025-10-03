@@ -498,10 +498,27 @@ export const CourierDashboard = ({ user, onLogout }) => {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `kurye-rapor-${type}-${new Date().toISOString().slice(0, 7)}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      
+      // Safe DOM manipulation
+      try {
+        document.body.appendChild(link);
+        link.click();
+        
+        // Use setTimeout for safe cleanup
+        setTimeout(() => {
+          try {
+            if (link.parentNode) {
+              link.remove();
+            }
+            window.URL.revokeObjectURL(url);
+          } catch (removeError) {
+            console.warn('Safe cleanup: link already removed');
+          }
+        }, 100);
+      } catch (domError) {
+        console.warn('DOM manipulation failed:', domError);
+        window.URL.revokeObjectURL(url);
+      }
 
       toast.success('Rapor indirildi');
     } catch (error) {
