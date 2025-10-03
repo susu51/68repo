@@ -2867,7 +2867,11 @@ const BusinessDashboard = ({ user }) => {
                                 </p>
                                 <p className="flex items-center">
                                   <span className="mr-1">📍</span>
-                                  <span className="truncate">{order.delivery_address}</span>
+                                  <span className="truncate">
+                                    {typeof order.delivery_address === 'object' ? 
+                                      order.delivery_address?.address || 'Adres bilgisi yok' : 
+                                      order.delivery_address}
+                                  </span>
                                 </p>
                                 <p className="flex items-center">
                                   <span className="mr-1">🕐</span>
