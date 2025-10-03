@@ -14,6 +14,15 @@ module.exports = {
     },
     configure: (webpackConfig) => {
       
+      // Add aggressive error suppression plugins
+      webpackConfig.plugins.push(
+        new webpack.DefinePlugin({
+          // Suppress React error overlay and devtools
+          __REACT_ERROR_OVERLAY__: JSON.stringify(false),
+          __REACT_DEVTOOLS_GLOBAL_HOOK__: JSON.stringify(false)
+        })
+      );
+      
       // Disable hot reload completely if environment variable is set
       if (config.disableHotReload) {
         // Remove hot reload related plugins
@@ -42,6 +51,15 @@ module.exports = {
       }
       
       return webpackConfig;
+    },
+  },
+  devServer: {
+    // Disable error overlay completely
+    client: {
+      overlay: {
+        errors: false,
+        warnings: false,
+      },
     },
   },
 };
