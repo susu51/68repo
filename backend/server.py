@@ -2221,8 +2221,10 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
         }
         
     except Exception as e:
+        import traceback
         logging.error(f"Error adding address: {e}")
-        raise HTTPException(status_code=500, detail="Error adding address")
+        logging.error(f"Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Error adding address: {str(e)}")
 
 # Include the API router in the main app
 app.include_router(api_router)
