@@ -4421,6 +4421,30 @@ const ResetPasswordPage = () => {
 
   if (step === 'login') {
     if (showModernLogin) {
+      // Expose forgot password function
+      window.showForgotPassword = () => setShowForgotPassword(true);
+      
+      if (showForgotPassword) {
+        const ForgotPassword = React.lazy(() => import('./pages/Auth/ForgotPassword'));
+        return (
+          <React.Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">Yükleniyor...</p>
+              </div>
+            </div>
+          }>
+            <ForgotPassword 
+              onBackToLogin={() => {
+                setShowForgotPassword(false);
+                delete window.showForgotPassword;
+              }}
+            />
+          </React.Suspense>
+        );
+      }
+      
       return (
         <ModernLogin 
           onLogin={login}
