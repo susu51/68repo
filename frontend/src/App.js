@@ -4392,7 +4392,6 @@ const HomePage = ({ onAuthStart }) => {
   );
 };
 
-const AuthPage = ({ onBack }) => {
 const ResetPasswordPage = () => {
   const ResetPassword = React.lazy(() => import('./pages/Auth/ResetPassword'));
   
@@ -4409,6 +4408,8 @@ const ResetPasswordPage = () => {
     </React.Suspense>
   );
 };
+
+const AuthPage = ({ onBack }) => {
   const { login } = useAuth();
   const [step, setStep] = useState('login'); // login, register, user_type_selection, registration_form
   const [userType, setUserType] = useState('');
