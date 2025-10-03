@@ -119,7 +119,7 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
         setShowAddForm(false);
         setNewAddress({
           label: '',
-          city: 'İstanbul',
+          city: '',
           description: '',
           lat: null,
           lng: null
