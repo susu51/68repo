@@ -1278,7 +1278,7 @@ export const ProfessionalFoodOrderSystem = ({
                   📍 Teslimat Adresi
                 </h3>
                 <AddressSelector 
-                  onAddressSelect={setSelectedAddress}
+                  onAddressSelect={handleAddressSelect}
                   selectedAddress={selectedAddress}
                 />
               </div>
