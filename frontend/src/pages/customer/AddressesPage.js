@@ -32,7 +32,7 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
   const [isMounted, setIsMounted] = useState(true);
   const [newAddress, setNewAddress] = useState({
     label: '',
-    city: 'İstanbul',
+    city: '',
     description: '',
     lat: null,
     lng: null
