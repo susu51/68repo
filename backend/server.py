@@ -184,7 +184,13 @@ async def health_check():
 @app.get("/health")
 async def health_check_legacy():
     """Legacy health check endpoint alias"""
-    return {"status": "ok"}
+    try:
+        if db is not None:
+            await db.command("ping")
+            return {"status": "ok", "db": "connected"}
+        return {"status": "ok", "db": "not_configured"}
+    except Exception as e:
+        return {"status": "degraded", "db": f"error: {str(e)}"}
 
 # Add required menus endpoint
 @app.get("/menus", 
