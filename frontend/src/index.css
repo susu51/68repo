@@ -267,6 +267,8 @@ code {
     box-shadow: 0 10px 25px -3px rgba(249, 115, 22, 0.3);
   }
 }
+
+:root {
         --chart-1: 12 76% 61%;
         --chart-2: 173 58% 39%;
         --chart-3: 197 37% 24%;
