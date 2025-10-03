@@ -1167,10 +1167,16 @@ async def upload_file(file: UploadFile = File(...)):
 @api_router.get("/me")
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     """Get current user information"""
-    # Convert ObjectId to string
-    current_user["id"] = str(current_user["_id"])
-    del current_user["_id"]
-    del current_user["password"]  # Don't send password
+    # Convert ObjectId to string if present (for database users)
+    if "_id" in current_user:
+        current_user["id"] = str(current_user["_id"])
+        del current_user["_id"]
+    
+    # Remove password fields if present
+    if "password" in current_user:
+        del current_user["password"]
+    if "password_hash" in current_user:
+        del current_user["password_hash"]
     
     return current_user
 
