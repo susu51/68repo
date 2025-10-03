@@ -3,7 +3,7 @@ import AddressesPage from './AddressesPage';
 import NearbyRestaurants from './NearbyRestaurants';
 
 export const CustomerMain = ({ user }) => {
-  const [currentView, setCurrentView] = useState('addresses'); // 'addresses' | 'restaurants'
+  const [currentView, setCurrentView] = useState('menu'); // 'menu' | 'addresses' | 'restaurants'
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   const handleAddressSelect = (address) => {
