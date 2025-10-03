@@ -277,6 +277,18 @@ backend:
         -comment: "🎉 FRONTEND RESTAURANT VISIBILITY ISSUE COMPLETELY RESOLVED: Fixed API URL construction in FoodOrderSystem.js from 'process.env.REACT_APP_BACKEND_URL || http://localhost:8001/api' to '${process.env.REACT_APP_BACKEND_URL || http://localhost:8001}/api'. ✅ COMPREHENSIVE TESTING CONFIRMS: 1) Customer login working (testcustomer@example.com/test123). 2) Navigation to 'Keşfet' tab successful. 3) All 3 restaurants now displaying correctly: Test Restoranı, Pizza Palace İstanbul, Burger Deluxe. 4) Restaurant cards showing with proper ratings (5, 4.6, 4.9), delivery times (25-45dk, 26-41dk, 34-44dk), and minimum orders (₺95, ₺96, ₺94). 5) Restaurant menu functionality working - clicked Test Restoranı and menu loaded with products (Margherita Pizza ₺85, Chicken Burger ₺65, Coca Cola ₺15, Test Döner Kebap ₺35.5, Künefe ₺25). 6) Console shows 'Restaurants fetched: [Object, Object, Object]' confirming API calls working. 7) Location-based sorting showing '3 restoran' in status. 8) ProfessionalFoodOrderSystem component fully functional with restaurant discovery, menu browsing, and cart management. The user-reported issue 'Müşteri kısmında hiçbir restorant gözükmüyor' is completely resolved - customers can now see and interact with all restaurants in the customer dashboard."
 
 frontend:
+  - task: "Enhanced Customer Profile & Payment System"
+    implemented: false
+    working: false
+    file: "Profile.js, Cart.js, PaymentMethods.js, Reviews.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        -working: false
+        -agent: "user"
+        -comment: "USER REQUESTED COMPREHENSIVE ENHANCEMENT: 1) Profile tabs: Kuponlarım, İndirimlerim, Kampanyalar, Ödeme Yöntemlerim. 2) Payment system: Online/COD selection, tokenized payments (Iyzico/Stripe), payment methods management. 3) Review system: Post-delivery rating for courier & business (1-5 stars + comments). 4) Backend: New MongoDB collections (coupons, discounts, campaigns, payment_methods, reviews) with proper endpoints."
+
   - task: "Complete Customer Food Order System"
     implemented: true
     working: true
