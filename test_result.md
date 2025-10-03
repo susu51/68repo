@@ -107,11 +107,11 @@ user_problem_statement: "PHASE 1 DEBUG & STABILIZATION: Emergency debugging of w
 backend:
   - task: "Customer Authentication & Address Management Fix"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         -working: "NA"
         -agent: "main"
@@ -119,6 +119,9 @@ backend:
         -working: true
         -agent: "testing"
         -comment: "✅ CUSTOMER AUTHENTICATION & ADDRESS MANAGEMENT FIX TESTING COMPLETE: Perfect results (100% success rate, 7/7 tests passed). Customer login testcustomer@example.com/test123 working with valid JWT tokens (195 chars). GET /api/user/addresses retrieved 8 addresses for authenticated customer. POST /api/user/addresses successfully created address with sample data. JWT token validation working correctly - no 401 Unauthorized responses. Core fix confirmed - eliminated temporary hardcoded customer-001 dependency issues. Authentication system is robust and ready for production."
+        -working: false
+        -agent: "user"
+        -comment: "USER REPORTED: React removeChild DOM manipulation error in customer address page - 'Failed to execute removeChild on Node: The node to be removed is not a child of this node'. Same error that was previously fixed but now reoccurring, likely due to recent AddressesPage.js component changes."
 
   - task: "Business Registration with City Normalization"
     implemented: true
