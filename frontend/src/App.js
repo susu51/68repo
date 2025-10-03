@@ -4604,6 +4604,7 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
   return (
     <Routes>
       <Route path="/" element={<HomePage onAuthStart={() => setShowAuth(true)} />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
