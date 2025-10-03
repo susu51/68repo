@@ -854,6 +854,13 @@ export const ProfessionalFoodOrderSystem = ({
 
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  
+  // Debug address selection
+  const handleAddressSelect = (address) => {
+    console.log('FoodOrderSystem: Address selected:', address);
+    console.log('FoodOrderSystem: Address type:', typeof address);
+    setSelectedAddress(address);
+  };
   const [paymentMethod, setPaymentMethod] = useState('card');
 
   // Calculate cart total
