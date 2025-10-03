@@ -87,15 +87,20 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
     if (!isMounted) return;
     
     try {
+      console.log('🚀 handleAddAddress called with:', newAddress);
+      
       if (!newAddress.label || !newAddress.city || !newAddress.description) {
         let missingFields = [];
         if (!newAddress.label) missingFields.push('Adres Adı');
         if (!newAddress.city) missingFields.push('Şehir');
         if (!newAddress.description) missingFields.push('Adres Açıklaması');
         
+        console.log('❌ Validation failed. Missing fields:', missingFields);
         toast.error(`Lütfen şu alanları doldurun: ${missingFields.join(', ')}`);
         return;
       }
+      
+      console.log('✅ Validation passed, proceeding with API call...');
 
       const token = localStorage.getItem('kuryecini_access_token');
       console.log('Token debug:', token ? `Token exists (${token.length} chars)` : 'No token found');
