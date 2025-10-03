@@ -467,10 +467,26 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      
+      // Safe DOM manipulation with error handling
+      try {
+        document.body.appendChild(a);
+        a.click();
+        // Use setTimeout to ensure click completes before removal
+        setTimeout(() => {
+          try {
+            if (a.parentNode === document.body) {
+              document.body.removeChild(a);
+            }
+            URL.revokeObjectURL(url);
+          } catch (removeError) {
+            console.warn('Safe cleanup: element already removed');
+          }
+        }, 100);
+      } catch (domError) {
+        console.warn('DOM manipulation failed:', domError);
+        URL.revokeObjectURL(url);
+      }
 
       toast.success('Veri başarıyla dışa aktarıldı!');
     } catch (error) {
