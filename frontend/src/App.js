@@ -3868,7 +3868,11 @@ const CustomerDashboard = ({ user }) => {
                               <div>
                                 <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
                                 <p className="text-sm text-gray-600">{order.business_name}</p>
-                                <p className="text-xs text-gray-500">{order.delivery_address}</p>
+                                <p className="text-xs text-gray-500">
+                                  {typeof order.delivery_address === 'object' ? 
+                                    order.delivery_address?.address || 'Adres bilgisi yok' : 
+                                    order.delivery_address}
+                                </p>
                               </div>
                               <div className="text-right">
                                 <p className="font-bold text-lg">₺{order.total_amount}</p>
