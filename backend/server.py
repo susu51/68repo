@@ -2213,3 +2213,6 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
     except Exception as e:
         logging.error(f"Error adding address: {e}")
         raise HTTPException(status_code=500, detail="Error adding address")
+
+# Include the API router in the main app
+app.include_router(api_router)
