@@ -218,7 +218,10 @@ export const CustomerMain = ({ user }) => {
           </div>
 
           {/* Profil */}
-          <div className="group cursor-pointer">
+          <div 
+            className="group cursor-pointer"
+            onClick={() => setCurrentView('profile')}
+          >
             <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-transparent hover:border-purple-200">
               <div className="text-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
