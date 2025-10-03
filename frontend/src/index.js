@@ -3,20 +3,29 @@ import ReactDOM from "react-dom/client";
 import "@/index.css";
 import App from "@/App";
 
-// Global error handlers for DOM manipulation errors
+// Enhanced global error handlers for DOM manipulation errors
 window.addEventListener('error', (event) => {
   const error = event.error;
   if (error && error.message) {
     const message = error.message.toLowerCase();
     
-    // Handle DOM manipulation errors gracefully
+    // Handle DOM manipulation errors gracefully - comprehensive patterns
     if (message.includes('removechild') || 
         message.includes('appendchild') ||
         message.includes('insertbefore') ||
-        (message.includes('node') && message.includes('child'))) {
+        message.includes('removechildfromcontainer') ||
+        message.includes('commitdeletioneffects') ||
+        message.includes('recursivelytraversedeletioneffects') ||
+        (message.includes('node') && (message.includes('child') || message.includes('removed'))) ||
+        (message.includes('failed to execute') && message.includes('node'))) {
       
-      console.warn('Global DOM error caught and suppressed:', error.message);
+      console.warn('🔧 DOM Manipulation Error Suppressed:', {
+        message: error.message,
+        timestamp: new Date().toISOString(),
+        type: 'DOM_MANIPULATION_ERROR'
+      });
       event.preventDefault(); // Prevent default error reporting
+      event.stopPropagation(); // Stop propagation
       return false;
     }
   }
