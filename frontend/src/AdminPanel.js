@@ -789,7 +789,12 @@ const AdminPanel = ({ user, onLogout }) => {
                   </div>
                   <Badge className="bg-green-100 text-green-800">Aktif</Badge>
                 </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Aktif öne çıkan işletme bulunmuyor</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
