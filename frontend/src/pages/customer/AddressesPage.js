@@ -541,7 +541,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                 <div className="flex gap-4 pt-4">
                   <Button 
                     variant="outline" 
-                    onClick={() => setShowAddForm(false)}
+                    onClick={() => {
+                      if (isMounted) {
+                        setShowAddForm(false);
+                      }
+                    }}
                     className="flex-1 h-12 rounded-xl border-gray-300 hover:bg-gray-50"
                   >
                     ❌ İptal Et
