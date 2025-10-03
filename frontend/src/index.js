@@ -31,18 +31,26 @@ window.addEventListener('error', (event) => {
   }
 });
 
-// Handle unhandled promise rejections
+// Enhanced handler for unhandled promise rejections
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
   if (error && error.message) {
     const message = error.message.toLowerCase();
     
-    // Suppress DOM-related promise rejections
+    // Suppress DOM-related promise rejections - comprehensive patterns
     if (message.includes('removechild') || 
         message.includes('appendchild') ||
-        message.includes('node')) {
+        message.includes('insertbefore') ||
+        message.includes('removechildfromcontainer') ||
+        message.includes('commitdeletioneffects') ||
+        message.includes('node') ||
+        (message.includes('failed to execute') && message.includes('dom'))) {
       
-      console.warn('Global DOM promise rejection caught and suppressed:', error.message);
+      console.warn('🔧 DOM Promise Rejection Suppressed:', {
+        message: error.message,
+        timestamp: new Date().toISOString(),
+        type: 'DOM_PROMISE_REJECTION'
+      });
       event.preventDefault();
       return false;
     }
