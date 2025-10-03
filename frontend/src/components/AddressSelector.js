@@ -104,6 +104,7 @@ export const AddressSelector = ({
       setAddresses(updatedAddresses);
       
       // Select the new address
+      console.log('AddressSelector: Selecting new address:', addressToSave);
       onAddressSelect && onAddressSelect(addressToSave);
       onNewAddress && onNewAddress(addressToSave);
       
