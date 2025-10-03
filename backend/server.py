@@ -1934,13 +1934,42 @@ async def update_courier_kyc_status(
 
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
-async def get_public_businesses():
-    """Get all active businesses for customers"""
+async def get_public_businesses(
+    city: Optional[str] = None,
+    lat: Optional[float] = None,
+    lng: Optional[float] = None,
+    radius_km: Optional[float] = 50  # Default 50km radius
+):
+    """Get all active businesses for customers with city and location filtering"""
+    from utils.city_normalize import normalize_city_name
+    
     try:
-        businesses = await db.users.find({
+        # Build query filter
+        query_filter = {
             "role": "business",
             "kyc_status": "approved"  # Only show approved businesses
-        }).to_list(length=None)
+        }
+        
+        # Add city filter if provided
+        if city:
+            normalized_city = normalize_city_name(city)
+            query_filter["city_normalized"] = normalized_city
+        
+        # If lat/lng provided, use geo-spatial query
+        if lat is not None and lng is not None:
+            # MongoDB geospatial query for businesses within radius
+            radius_meters = radius_km * 1000  # Convert km to meters
+            query_filter["location"] = {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [lng, lat]  # [longitude, latitude]
+                    },
+                    "$maxDistance": radius_meters
+                }
+            }
+        
+        businesses = await db.users.find(query_filter).to_list(length=None)
         
         business_list = []
         for business in businesses:
