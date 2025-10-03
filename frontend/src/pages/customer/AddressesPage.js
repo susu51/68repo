@@ -419,6 +419,7 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
               }
             }}
             modal={true}
+            container={document.body}
           >
             <DialogContent key="dialog-content" className="sm:max-w-[700px] p-0 border-0 shadow-2xl rounded-3xl overflow-hidden">
             {/* Header Card */}
