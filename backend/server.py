@@ -509,7 +509,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(credentials.credentials, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -1915,7 +1915,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 async def get_current_user_v2(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(credentials.credentials, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Geçersiz token")
