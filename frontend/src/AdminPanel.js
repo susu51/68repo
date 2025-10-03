@@ -774,12 +774,12 @@ const AdminPanel = ({ user, onLogout }) => {
         <Card>
           <CardHeader>
             <CardTitle>Aktif Öne Çıkanlar</CardTitle>
-            <CardDescription>{Array.isArray(featuredBusinesses) ? featuredBusinesses.length : 0} işletme öne çıkarılmış</CardDescription>
+            <CardDescription>{safeBusinesses.length} işletme öne çıkarılmış</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Array.isArray(featuredBusinesses) && featuredBusinesses.length > 0 ? (
-                featuredBusinesses.slice(0, 5).map((business) => (
+              {safeBusinesses.length > 0 ? (
+                safeBusinesses.slice(0, 5).map((business) => (
                 <div key={business.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                   <div>
                     <p className="font-medium">{business.business_name}</p>
