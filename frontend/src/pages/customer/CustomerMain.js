@@ -103,6 +103,7 @@ export const CustomerMain = ({ user }) => {
         onBack={() => setCurrentView('restaurants')}
         cartItems={cartItems}
         cartTotal={orderTotal}
+        onGoToCart={() => setCurrentView('cart')}
       />
     );
   }
