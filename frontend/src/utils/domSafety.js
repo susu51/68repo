@@ -3,6 +3,8 @@
  * Prevents removeChild and appendChild errors
  */
 
+import { useEffect, useRef } from 'react';
+
 // Safe DOM element creation and cleanup
 export const createSafeDownloadLink = (blob, filename) => {
   return new Promise((resolve, reject) => {
