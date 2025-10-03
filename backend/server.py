@@ -984,7 +984,7 @@ async def register_courier(courier_data: CourierRegistration):
     access_token = create_access_token(data={"sub": courier_data.email})
     
     # Remove password from response and convert datetime to string
-    del user_doc["password"]
+    del user_doc["password_hash"]
     if "_id" in user_doc:
         del user_doc["_id"]
     user_doc["created_at"] = user_doc["created_at"].isoformat()
@@ -1032,7 +1032,7 @@ async def register_business(business_data: BusinessRegister):
     access_token = create_access_token(data={"sub": business_data.email})
     
     # Remove password from response and convert datetime to string
-    del user_doc["password"]
+    del user_doc["password_hash"]
     if "_id" in user_doc:
         del user_doc["_id"]
     user_doc["created_at"] = user_doc["created_at"].isoformat()
@@ -1098,7 +1098,7 @@ async def register_customer(request: Request, customer_data: CustomerRegistratio
     access_token = create_access_token(data={"sub": customer_data.email})
     
     # Remove password from response and convert datetime to string
-    del user_doc["password"]
+    del user_doc["password_hash"]
     if "_id" in user_doc:
         del user_doc["_id"]
     user_doc["created_at"] = user_doc["created_at"].isoformat()
