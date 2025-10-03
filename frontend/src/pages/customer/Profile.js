@@ -193,9 +193,33 @@ const Profile = ({ user, onBack, onLogout }) => {
     }
   ];
 
+  const renderTabContent = () => {
+    if (loading) {
+      return (
+        <div className="text-center py-16">
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Yükleniyor...</p>
+        </div>
+      );
+    }
+
+    switch (activeTab) {
+      case 'coupons':
+        return renderCoupons();
+      case 'discounts':
+        return renderDiscounts();
+      case 'campaigns':
+        return renderCampaigns();
+      case 'payment_methods':
+        return renderPaymentMethods();
+      default:
+        return renderProfileInfo();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <Card className="mb-6 border-0 shadow-xl rounded-3xl bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white overflow-hidden">
           <CardContent className="p-8 relative">
@@ -211,7 +235,7 @@ const Profile = ({ user, onBack, onLogout }) => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold mb-2">Profilim</h1>
-                  <p className="text-white/90 text-lg">Hesap bilgilerinizi yönetin</p>
+                  <p className="text-white/90 text-lg">Hesap bilgilerinizi ve avantajlarınızı yönetin</p>
                 </div>
               </div>
               
@@ -225,6 +249,30 @@ const Profile = ({ user, onBack, onLogout }) => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Tab Navigation */}
+        <Card className="mb-6 border-0 shadow-lg rounded-2xl">
+          <CardContent className="p-6">
+            <div className="flex gap-2 overflow-x-auto">
+              {tabs.map(tab => (
+                <Button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`min-w-fit rounded-xl px-6 py-3 font-semibold transition-all duration-300 ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {tab.icon} {tab.name}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tab Content */}
+        {renderTabContent()}
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Profile Information */}
