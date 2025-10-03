@@ -155,7 +155,10 @@ export const AddressSelector = ({
                   ? 'ring-2 ring-blue-500 bg-blue-50' 
                   : 'hover:bg-gray-50'
               }`}
-              onClick={() => onAddressSelect && onAddressSelect(address)}
+              onClick={() => {
+                console.log('AddressSelector: Selecting existing address:', address);
+                onAddressSelect && onAddressSelect(address);
+              }}
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
