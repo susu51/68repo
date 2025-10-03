@@ -1,5 +1,6 @@
 // Load configuration from environment or config file
 const path = require('path');
+const webpack = require('webpack');
 
 // Environment variable overrides
 const config = {
