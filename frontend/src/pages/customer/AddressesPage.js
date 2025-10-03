@@ -396,8 +396,8 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
         )}
 
         {/* Add Address Dialog - Enhanced Card Design */}
-        <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-          <DialogContent className="sm:max-w-[700px] p-0 border-0 shadow-2xl rounded-3xl overflow-hidden">
+        <Dialog key="add-address-dialog" open={showAddForm} onOpenChange={setShowAddForm}>
+          <DialogContent key="dialog-content" className="sm:max-w-[700px] p-0 border-0 shadow-2xl rounded-3xl overflow-hidden">
             {/* Header Card */}
             <div className="bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500 p-8 text-white relative overflow-hidden">
               {/* Background Pattern */}
