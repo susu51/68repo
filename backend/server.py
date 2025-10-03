@@ -2032,6 +2032,119 @@ async def approve_user(user_id: str, current_user: dict = Depends(get_admin_user
 async def get_business_products(business_id: str):
     """Get products for a specific business"""
     try:
+# Restaurant Endpoints (alias for businesses)
+@api_router.get("/restaurants")
+async def get_restaurants(
+    city: Optional[str] = None
+):
+    """Get restaurants by city (alias for businesses endpoint)"""
+    from utils.city_normalize import normalize_city_name
+    
+    try:
+        query_filter = {
+            "role": "business",
+            "kyc_status": "approved",
+            "business_category": {"$regex": "restoran|gida", "$options": "i"}  # Filter for restaurants
+        }
+        
+        if city:
+            normalized_city = normalize_city_name(city)
+            query_filter["city_normalized"] = normalized_city
+        
+        businesses = await db.users.find(query_filter).to_list(length=None)
+        
+        restaurant_list = []
+        for business in businesses:
+            # Transform to restaurant format
+            restaurant_data = {
+                "id": business.get("id", business.get("_id", "")),
+                "name": business.get("business_name", ""),
+                "category": business.get("business_category", "Restoran"),
+                "description": business.get("description", ""),
+                "rating": 4.0 + (hash(str(business.get("id", ""))) % 10) / 10,  # Demo rating
+                "delivery_time": "25-35 dk",
+                "min_order": 30 + (hash(str(business.get("id", ""))) % 50),  # Demo min order
+                "is_open": True,
+                "phone": business.get("phone"),
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "city_normalized": business.get("city_normalized", ""),
+                "location": business.get("location"),
+                "image_url": f"/api/placeholder/restaurant-{hash(str(business.get('id', ''))) % 5 + 1}.jpg"
+            }
+            restaurant_list.append(restaurant_data)
+        
+        return restaurant_list
+        
+    except Exception as e:
+        logging.error(f"Error fetching restaurants: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching restaurants")
+
+@api_router.get("/restaurants/near")
+async def get_nearby_restaurants(
+    lat: float,
+    lng: float,
+    radius: Optional[int] = 50000  # Default 50km in meters
+):
+    """Get nearby restaurants using geospatial query"""
+    try:
+        query_filter = {
+            "role": "business",
+            "kyc_status": "approved",
+            "business_category": {"$regex": "restoran|gida", "$options": "i"},
+            "location": {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [lng, lat]  # [longitude, latitude]
+                    },
+                    "$maxDistance": radius
+                }
+            }
+        }
+        
+        businesses = await db.users.find(query_filter).to_list(length=None)
+        
+        restaurant_list = []
+        for business in businesses:
+            # Calculate distance (approximate)
+            business_location = business.get("location", {}).get("coordinates", [])
+            distance_km = None
+            
+            if len(business_location) == 2:
+                # Simple distance calculation (rough approximation)
+                import math
+                dlat = lat - business_location[1]
+                dlng = lng - business_location[0]
+                distance_km = math.sqrt(dlat*dlat + dlng*dlng) * 111.0  # Rough km conversion
+            
+            restaurant_data = {
+                "id": business.get("id", business.get("_id", "")),
+                "name": business.get("business_name", ""),
+                "category": business.get("business_category", "Restoran"),
+                "description": business.get("description", ""),
+                "rating": 4.0 + (hash(str(business.get("id", ""))) % 10) / 10,
+                "delivery_time": "25-35 dk",
+                "min_order": 30 + (hash(str(business.get("id", ""))) % 50),
+                "is_open": True,
+                "phone": business.get("phone"),
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "city_normalized": business.get("city_normalized", ""),
+                "location": business.get("location"),
+                "distance": round(distance_km, 1) if distance_km else None,
+                "image_url": f"/api/placeholder/restaurant-{hash(str(business.get('id', ''))) % 5 + 1}.jpg"
+            }
+            restaurant_list.append(restaurant_data)
+        
+        # Sort by distance
+        restaurant_list.sort(key=lambda x: x.get("distance") or float('inf'))
+        
+        return restaurant_list
+        
+    except Exception as e:
+        logging.error(f"Error fetching nearby restaurants: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching nearby restaurants")
         products = await db.products.find({"business_id": business_id}).to_list(length=None)
         return [Product(**product).dict() for product in products]
     except Exception as e:
