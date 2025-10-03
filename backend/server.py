@@ -4068,6 +4068,164 @@ async def logout_user(current_user: dict = Depends(get_current_user)):
         logging.error(f"Logout error: {e}")
         return {"message": "Logout completed"}
 
+# PASSWORD RESET ENDPOINTS
+
+@api_router.post("/auth/forgot", 
+    tags=["Authentication"],
+    summary="Forgot Password",
+    description="Request password reset token via email"
+)
+@limiter.limit("5/minute")  # Rate limit to prevent abuse
+async def forgot_password(request: Request, forgot_data: ForgotPasswordRequest):
+    """
+    **Forgot Password Endpoint**
+    
+    Request a password reset token to be sent via email.
+    Always returns success (200) to prevent email enumeration attacks.
+    
+    **Example:**
+    ```json
+    {
+        "email": "user@example.com"
+    }
+    ```
+    """
+    from services.email import email_service
+    from services.tokens import token_service
+    
+    try:
+        # Always return success to prevent email enumeration
+        email = forgot_data.email.lower().strip()
+        
+        if not db:
+            return {"message": "E-posta gönderildi (eğer hesap mevcutsa)", "success": True}
+        
+        # Check if user exists
+        user = await db.users.find_one({"email": email})
+        
+        if user:
+            # Generate reset token
+            reset_token = token_service.generate_reset_token()
+            token_expiry = token_service.get_token_expiry()
+            
+            # Store reset token in database
+            reset_record = {
+                "id": str(uuid.uuid4()),
+                "user_id": user.get("id", user.get("_id")),
+                "token": reset_token,
+                "status": "active",
+                "expires_at": token_expiry,
+                "created_at": datetime.now(timezone.utc)
+            }
+            
+            await db.password_resets.insert_one(reset_record)
+            
+            # Send email (console in dev, SMTP in prod)
+            await email_service.send_password_reset_email(email, reset_token)
+            
+            logging.info(f"Password reset requested for {email}")
+        else:
+            logging.info(f"Password reset requested for non-existent email: {email}")
+        
+        return {
+            "message": "E-posta gönderildi (eğer hesap mevcutsa)", 
+            "success": True
+        }
+        
+    except Exception as e:
+        logging.error(f"Forgot password error: {e}")
+        return {
+            "message": "E-posta gönderildi (eğer hesap mevcutsa)", 
+            "success": True
+        }
+
+@api_router.post("/auth/reset", 
+    tags=["Authentication"],
+    summary="Reset Password",
+    description="Reset password using token from email"
+)
+@limiter.limit("10/minute")
+async def reset_password(request: Request, reset_data: ResetPasswordRequest):
+    """
+    **Reset Password Endpoint**
+    
+    Reset password using the token received via email.
+    
+    **Example:**
+    ```json
+    {
+        "token": "abc123-uuid-token",
+        "password": "newpassword123"
+    }
+    ```
+    """
+    from services.tokens import token_service
+    
+    try:
+        if not db:
+            raise HTTPException(status_code=503, detail="Veritabanı bağlantısı yok")
+        
+        # Verify token format
+        if not token_service.verify_token_format(reset_data.token):
+            raise HTTPException(status_code=400, detail="Geçersiz token formatı")
+        
+        # Find reset token record
+        reset_record = await db.password_resets.find_one({
+            "token": reset_data.token,
+            "status": "active"
+        })
+        
+        if not reset_record:
+            raise HTTPException(status_code=400, detail="Token bulunamadı veya zaten kullanılmış")
+        
+        # Check if token expired
+        if datetime.now(timezone.utc) > reset_record["expires_at"]:
+            # Mark as expired
+            await db.password_resets.update_one(
+                {"token": reset_data.token},
+                {"$set": {"status": "expired"}}
+            )
+            raise HTTPException(status_code=400, detail="Token süresi dolmuş")
+        
+        # Find user
+        user = await db.users.find_one({"id": reset_record["user_id"]})
+        if not user:
+            raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+        
+        # Hash new password
+        import bcrypt
+        password_hash = bcrypt.hashpw(reset_data.password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Update user password
+        await db.users.update_one(
+            {"id": reset_record["user_id"]},
+            {"$set": {
+                "password": password_hash.decode('utf-8'),
+                "updated_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        # Mark token as used
+        await db.password_resets.update_one(
+            {"token": reset_data.token},
+            {"$set": {
+                "status": "used",
+                "used_at": datetime.now(timezone.utc)
+            }}
+        )
+        
+        logging.info(f"Password reset completed for user {reset_record['user_id']}")
+        
+        return {
+            "message": "Parola başarıyla sıfırlandı",
+            "success": True
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Reset password error: {e}")
+        raise HTTPException(status_code=500, detail="Parola sıfırlama hatası")
 # PHONE AUTHENTICATION ENDPOINTS
 
 @api_router.post("/auth/phone/request-otp")
