@@ -83,6 +83,30 @@ window.addEventListener('error', (event) => {
   }
 });
 
+// Override console.error to suppress specific DOM manipulation errors
+const originalConsoleError = console.error;
+console.error = function(...args) {
+  const message = args.join(' ').toLowerCase();
+  
+  // Suppress DOM manipulation errors from appearing in console
+  if (message.includes('removechild') ||
+      message.includes('removechildfromcontainer') ||
+      message.includes('commitdeletioneffects') ||
+      message.includes('recursivelytraversedeletioneffects') ||
+      (message.includes('failed to execute') && message.includes('node'))) {
+    
+    console.warn('🔧 React DOM Error Suppressed:', {
+      originalArgs: args,
+      timestamp: new Date().toISOString(),
+      type: 'REACT_DOM_MANIPULATION_ERROR'
+    });
+    return;
+  }
+  
+  // Call original console.error for other errors
+  originalConsoleError.apply(console, args);
+};
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <App />
