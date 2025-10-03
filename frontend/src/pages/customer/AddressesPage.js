@@ -475,8 +475,10 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
                         <Select 
                           value={newAddress.city} 
                           onValueChange={(value) => {
+                            console.log('🏙️ City selected:', value);
                             if (isMounted) {
                               setNewAddress({...newAddress, city: value});
+                              console.log('🏙️ City state updated:', value);
                             }
                           }}
                         >
