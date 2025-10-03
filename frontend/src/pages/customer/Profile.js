@@ -398,49 +398,52 @@ const Profile = ({ user, onBack, onLogout }) => {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">🎟️ Kuponlarım</h2>
-        <p className="text-gray-600">Aktif kuponlarınızı kullanarak tasarruf edin</p>
+        <p className="text-gray-600">Mevcut kuponlarınızı görüntüleyin ve yönetin</p>
       </div>
-
+      
       {coupons.length === 0 ? (
         <Card className="text-center py-16 border-0 shadow-lg rounded-2xl">
           <CardContent>
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-4xl">🎟️</span>
-            </div>
+            <div className="text-6xl mb-4">🎟️</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">Henüz kuponunuz yok</h3>
-            <p className="text-gray-600">Kampanyalarımızı takip ederek avantajlı kuponlar kazanın</p>
+            <p className="text-gray-600 mb-6">Yemek siparişlerinizde kullanabileceğiniz kuponlar burada görünecek</p>
+            <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl px-8">
+              🎯 Kampanyaları İncele
+            </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {coupons.map(coupon => (
-            <Card key={coupon.id} className="border-0 shadow-lg rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-4 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-2xl font-bold">{coupon.code}</div>
-                    <div className="text-green-100">
-                      {coupon.discountType === 'PERCENT' ? `%${coupon.discountValue}` : `₺${coupon.discountValue}`} İndirim
-                    </div>
+            <Card key={coupon.id} className="border-0 shadow-lg rounded-2xl overflow-hidden bg-gradient-to-br from-orange-50 to-red-50">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <span className="text-3xl">{coupon.icon}</span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    coupon.status === 'active' ? 'bg-green-100 text-green-800' :
+                    coupon.status === 'used' ? 'bg-gray-100 text-gray-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {coupon.status === 'active' ? 'Aktif' : 
+                     coupon.status === 'used' ? 'Kullanıldı' : 'Süresi Doldu'}
+                  </span>
+                </div>
+                
+                <h3 className="font-bold text-lg text-gray-800 mb-2">{coupon.title}</h3>
+                <p className="text-gray-600 text-sm mb-4">{coupon.description}</p>
+                
+                <div className="bg-white rounded-xl p-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-600">%{coupon.discount}</div>
+                    <div className="text-sm text-gray-500">İndirim</div>
                   </div>
-                  <div className="text-3xl">🎟️</div>
                 </div>
-              </div>
-              <CardContent className="p-4">
-                <p className="text-gray-700 mb-3">{coupon.description}</p>
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <span>Min. tutar: ₺{coupon.minAmount}</span>
-                  <span>Son tarih: {new Date(coupon.validUntil).toLocaleDateString('tr-TR')}</span>
+                
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Minimum: ₺{coupon.minAmount}</div>
+                  <div>Geçerlilik: {coupon.expiryDate}</div>
+                  <div>Kod: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{coupon.code}</span></div>
                 </div>
-                <Button 
-                  onClick={() => {
-                    // Navigate to cart with coupon
-                    toast.success(`${coupon.code} kuponu sepete eklendi!`);
-                  }}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl"
-                >
-                  🛒 Kuponu Kullan
-                </Button>
               </CardContent>
             </Card>
           ))}
