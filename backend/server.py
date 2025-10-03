@@ -376,7 +376,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://*.vercel.app",
-        "https://order-platform-1.preview.emergentagent.com"  # Current deployment URL
+        "https://deliverymap-1.preview.emergentagent.com"  # Current deployment URL
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
