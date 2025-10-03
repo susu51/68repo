@@ -298,7 +298,7 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {addresses.map((address, index) => (
-                <Card key={index} className="group hover:shadow-2xl hover:scale-105 transition-all duration-500 border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
+                <Card key={`address-card-${address.id || index}`} className="group hover:shadow-2xl hover:scale-105 transition-all duration-500 border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
                   <CardContent className="p-0">
                     {/* Card Header with Icon */}
                     <div className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 p-6 text-white relative overflow-hidden">
