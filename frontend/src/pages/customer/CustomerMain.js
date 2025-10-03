@@ -5,6 +5,8 @@ import NearbyRestaurants from './NearbyRestaurants';
 export const CustomerMain = ({ user }) => {
   const [currentView, setCurrentView] = useState('menu'); // 'menu' | 'addresses' | 'restaurants'
   const [selectedAddress, setSelectedAddress] = useState(null);
+  
+  console.log('🏠 CustomerMain rendered - currentView:', currentView, 'user:', user?.first_name);
 
   const handleAddressSelect = (address) => {
     console.log('Selected address:', address);
