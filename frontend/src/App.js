@@ -31,7 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import { Textarea } from "./components/ui/textarea";
 import { Label } from "./components/ui/label";
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 const BACKEND_URL = process.env.VITE_API_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 const API = `${BACKEND_URL}/api`;
