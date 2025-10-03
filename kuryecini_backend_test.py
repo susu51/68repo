@@ -283,87 +283,138 @@ class KuryeciniBackendTest:
         print("\n🍽️ PUBLIC MENU ENDPOINT TESTING")
         print("=" * 50)
         
-        # Test /menus/public endpoint
+        # Test direct backend server endpoints
+        backend_direct = "http://localhost:8001"
+        
+        # Test /menus/public endpoint (direct)
+        try:
+            start_time = time.time()
+            response = self.session.get(f"{backend_direct}/menus/public", timeout=15)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    restaurants = data.get("restaurants", [])
+                    count = data.get("count", 0)
+                    
+                    self.log_result(
+                        "Public Menus Endpoint (Direct)",
+                        True,
+                        f"Found {count} restaurants with menus",
+                        response_time
+                    )
+                    
+                    # Test restaurant data structure
+                    if restaurants:
+                        restaurant = restaurants[0]
+                        required_fields = ["id", "name", "address", "city", "rating", "menu"]
+                        missing_fields = [field for field in required_fields if field not in restaurant]
+                        
+                        self.log_result(
+                            "Restaurant Data Structure",
+                            len(missing_fields) == 0,
+                            f"Missing fields: {missing_fields}" if missing_fields else "All required fields present"
+                        )
+                        
+                        # Test menu items structure
+                        menu = restaurant.get("menu", [])
+                        if menu:
+                            menu_item = menu[0]
+                            menu_fields = ["id", "name", "price", "category"]
+                            missing_menu_fields = [field for field in menu_fields if field not in menu_item]
+                            
+                            self.log_result(
+                                "Menu Item Structure",
+                                len(missing_menu_fields) == 0,
+                                f"Missing menu fields: {missing_menu_fields}" if missing_menu_fields else "All menu fields present"
+                            )
+                    else:
+                        self.log_result(
+                            "Restaurant Availability",
+                            False,
+                            "No restaurants found - may need approved businesses in database"
+                        )
+                except json.JSONDecodeError:
+                    self.log_result(
+                        "Public Menus Endpoint (Direct)",
+                        False,
+                        f"Invalid JSON response: {response.text[:100]}",
+                        response_time
+                    )
+            else:
+                self.log_result(
+                    "Public Menus Endpoint (Direct)",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:200]}",
+                    response_time
+                )
+        except Exception as e:
+            self.log_result("Public Menus Endpoint (Direct)", False, f"Exception: {str(e)}")
+        
+        # Test legacy /menus endpoint (direct)
+        try:
+            start_time = time.time()
+            response = self.session.get(f"{backend_direct}/menus", timeout=15)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                try:
+                    menu_items = response.json()
+                    self.log_result(
+                        "Legacy Menus Endpoint (Direct)",
+                        True,
+                        f"Found {len(menu_items)} menu items",
+                        response_time
+                    )
+                except json.JSONDecodeError:
+                    self.log_result(
+                        "Legacy Menus Endpoint (Direct)",
+                        False,
+                        f"Invalid JSON response: {response.text[:100]}",
+                        response_time
+                    )
+            else:
+                self.log_result(
+                    "Legacy Menus Endpoint (Direct)",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}",
+                    response_time
+                )
+        except Exception as e:
+            self.log_result("Legacy Menus Endpoint (Direct)", False, f"Exception: {str(e)}")
+        
+        # Test public URL routing (should work through proxy)
         try:
             start_time = time.time()
             response = self.session.get(f"{BACKEND_URL}/menus/public", timeout=15)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                data = response.json()
-                restaurants = data.get("restaurants", [])
-                count = data.get("count", 0)
-                
-                self.log_result(
-                    "Public Menus Endpoint",
-                    True,
-                    f"Found {count} restaurants with menus",
-                    response_time
-                )
-                
-                # Test restaurant data structure
-                if restaurants:
-                    restaurant = restaurants[0]
-                    required_fields = ["id", "name", "address", "city", "rating", "menu"]
-                    missing_fields = [field for field in required_fields if field not in restaurant]
-                    
+                try:
+                    data = response.json()
                     self.log_result(
-                        "Restaurant Data Structure",
-                        len(missing_fields) == 0,
-                        f"Missing fields: {missing_fields}" if missing_fields else "All required fields present"
+                        "Public Menus Endpoint (Public URL)",
+                        True,
+                        f"Public URL routing works",
+                        response_time
                     )
-                    
-                    # Test menu items structure
-                    menu = restaurant.get("menu", [])
-                    if menu:
-                        menu_item = menu[0]
-                        menu_fields = ["id", "name", "price", "category"]
-                        missing_menu_fields = [field for field in menu_fields if field not in menu_item]
-                        
-                        self.log_result(
-                            "Menu Item Structure",
-                            len(missing_menu_fields) == 0,
-                            f"Missing menu fields: {missing_menu_fields}" if missing_menu_fields else "All menu fields present"
-                        )
-                else:
+                except json.JSONDecodeError:
                     self.log_result(
-                        "Restaurant Availability",
+                        "Public Menus Endpoint (Public URL)",
                         False,
-                        "No restaurants found - may need approved businesses in database"
+                        f"Returns HTML - routing issue",
+                        response_time
                     )
             else:
                 self.log_result(
-                    "Public Menus Endpoint",
+                    "Public Menus Endpoint (Public URL)",
                     False,
-                    f"HTTP {response.status_code}: {response.text[:200]}",
+                    f"HTTP {response.status_code}",
                     response_time
                 )
         except Exception as e:
-            self.log_result("Public Menus Endpoint", False, f"Exception: {str(e)}")
-        
-        # Test legacy /menus endpoint
-        try:
-            start_time = time.time()
-            response = self.session.get(f"{BACKEND_URL}/menus", timeout=15)
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                menu_items = response.json()
-                self.log_result(
-                    "Legacy Menus Endpoint",
-                    True,
-                    f"Found {len(menu_items)} menu items",
-                    response_time
-                )
-            else:
-                self.log_result(
-                    "Legacy Menus Endpoint",
-                    False,
-                    f"HTTP {response.status_code}: {response.text[:100]}",
-                    response_time
-                )
-        except Exception as e:
-            self.log_result("Legacy Menus Endpoint", False, f"Exception: {str(e)}")
+            self.log_result("Public Menus Endpoint (Public URL)", False, f"Exception: {str(e)}")
     
     def test_error_handling(self):
         """Test endpoints gracefully handle database connection issues"""
