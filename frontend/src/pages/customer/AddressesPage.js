@@ -482,7 +482,7 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
                           <SelectTrigger className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12">
                             <SelectValue placeholder="Şehir Seçin" />
                           </SelectTrigger>
-                          <SelectContent className="rounded-xl">
+                          <SelectContent className="rounded-xl z-[60]">
                             {turkishCities.map(city => (
                               <SelectItem key={city} value={city} className="rounded-lg">{city}</SelectItem>
                             ))}
