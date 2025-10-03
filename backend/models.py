@@ -8,6 +8,11 @@ from typing import List, Optional, Dict, Any, Union
 from datetime import datetime, timezone
 from enum import Enum
 import uuid
+
+def generate_id() -> str:
+    """Generate unique ID for documents"""
+    return str(uuid.uuid4())
+
 class ResetTokenStatus(str, Enum):
     ACTIVE = "active"
     USED = "used"
