@@ -274,9 +274,14 @@ const Profile = ({ user, onBack, onLogout }) => {
         {/* Tab Content */}
         {renderTabContent()}
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Profile Information */}
-          <Card className="border-0 shadow-lg rounded-2xl">
+      </div>
+    </div>
+  );
+
+  const renderProfileInfo = () => (
+    <div className="grid gap-6 lg:grid-cols-2">
+      {/* Profile Information */}
+      <Card className="border-0 shadow-lg rounded-2xl">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-800">👤 Kişisel Bilgiler</h2>
