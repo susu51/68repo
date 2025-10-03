@@ -799,8 +799,8 @@ const AdminPanel = ({ user, onLogout }) => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderContent = () => {
     switch (currentView) {
