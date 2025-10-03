@@ -2163,14 +2163,16 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
         address_list = []
         for addr in addresses:
             print(f"DEBUG: Processing address: {addr.get('label', 'NO LABEL')}")
-            coords = addr.get("location", {}).get("coordinates", [None, None])
+            location = addr.get("location") or {}
+            coords = location.get("coordinates", [None, None]) or [None, None]
+            
             address_data = {
                 "id": addr.get("id", addr.get("_id", "")),
                 "label": addr.get("label", ""),
                 "city": addr.get("city_original", addr.get("city", "")),
                 "description": addr.get("description", ""),
-                "lat": coords[1] if len(coords) > 1 else None,
-                "lng": coords[0] if len(coords) > 0 else None
+                "lat": coords[1] if coords and len(coords) > 1 and coords[1] else None,
+                "lng": coords[0] if coords and len(coords) > 0 and coords[0] else None
             }
             address_list.append(address_data)
         
