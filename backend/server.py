@@ -58,10 +58,22 @@ except ImportError:
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client.kuryecini_database
+# MongoDB connection with error handling
+mongo_uri = os.getenv('MONGO_URI', '').strip()
+client = None
+db = None
+
+if mongo_uri:
+    try:
+        client = AsyncIOMotorClient(mongo_uri)
+        # Use database from connection string or default
+        db = client.get_default_database() or client.kuryecini_database
+        print(f"MongoDB connected: {mongo_uri.split('@')[1] if '@' in mongo_uri else 'localhost'}")
+    except Exception as e:
+        print(f"MongoDB connection error: {e}")
+        # App will continue without DB for now
+else:
+    print("No MONGO_URI provided, running without database")
 
 # Create uploads directory
 UPLOAD_DIR = Path("/app/backend/uploads")
