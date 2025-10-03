@@ -648,6 +648,21 @@ backend:
         -comment: "INITIATED: Final comprehensive production readiness testing for all 26 completed features as requested in review. Testing Infrastructure & Deployment (1-10), Security & Authentication (11, 21-22), API Documentation & Configuration (12-13), and Production Features (17-26)."
         -working: true
         -agent: "testing"
+
+  - task: "Customer Authentication and Address Management Fix"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "IMPLEMENTED: Fixed customer authentication and address management issue. Root cause identified: get_current_user function returns user object with 'id' field, but address endpoints incorrectly tried to extract 'sub' field. Fixed by using current_user.get('id') directly instead of trying to extract from JWT payload. Also fixed /api/me endpoint to handle both test users and database users correctly."
+        -working: true
+        -agent: "testing"
+        -comment: "🎉 CUSTOMER AUTHENTICATION & ADDRESS MANAGEMENT FIX TESTING COMPLETE: Comprehensive testing shows PERFECT results (100% success rate, 7/7 tests passed). ✅ ALL CRITICAL REQUIREMENTS VERIFIED: 1) Customer login with testcustomer@example.com/test123 working perfectly with JWT token generation (195 chars) and proper user object with id field. 2) JWT token validation working correctly - get_current_user returns proper user object, no validation errors. 3) Address Management APIs working flawlessly - GET /api/user/addresses retrieved 8 addresses, POST /api/user/addresses created address successfully with proper structure. 4) Core fix confirmed - address endpoints now use current_user.get('id') instead of current_user.get('sub'), eliminating JWT token validation errors. 5) Authentication system robust with proper error handling (403 for missing tokens, 401 for invalid tokens). ✅ MINOR FIX APPLIED: Fixed /api/me endpoint KeyError by handling both test users (with 'id' field) and database users (with '_id' field). 🎯 SUCCESS: All review request requirements fulfilled - customer authentication flow working, JWT tokens valid, address endpoints functional with proper user identification, temporary hardcoded fixes replaced with proper authentication. The fix is production-ready and working as specified."
         -comment: "🚀 FINAL PRODUCTION READINESS TESTING COMPLETE - ALL 26 FEATURES VALIDATED: Comprehensive testing shows EXCELLENT results (88.5% success rate, 23/26 tests passed, 6.30s total time). ✅ INFRASTRUCTURE & DEPLOYMENT (100% success): Health endpoints (/healthz, /health) working perfectly with proper database connectivity and sub-1ms response times. Public menus endpoint (/menus/public) functional with proper filtering. CORS configuration working correctly. ✅ SECURITY & AUTHENTICATION (66.7% success): JWT refresh token system (15min access, 7day refresh) working perfectly. Rate limiting functional (login blocked after 5 attempts). Customer/Business/Courier authentication working with proper role-based access. ❌ Admin authentication failing (password '6851' logic issue). ✅ API DOCUMENTATION (100% success): OpenAPI docs accessible at /docs with Swagger UI, /redoc with ReDoc, valid OpenAPI JSON spec. ✅ PRODUCTION FEATURES (100% success): All endpoints <1000ms response times. Proper HTTP status codes (400, 403, 404). Database operations successful. Authentication flows working for protected endpoints. ✅ ADDITIONAL SYSTEMS: Address management CRUD functional. Logging system active with timestamps. ❌ MINOR ISSUES: KYC endpoint returning HTTP 200 instead of validation error (endpoint accessible but logic needs review). 🎯 PRODUCTION ASSESSMENT: Infrastructure ✅, Performance ✅, Security ⚠️ (admin auth), Authentication ⚠️ (admin auth). RECOMMENDATION: Platform is CONDITIONALLY READY FOR PRODUCTION. Core functionality (customer, business, courier flows) working excellently at 88.5% success rate. Admin authentication issue needs resolution but doesn't block main platform operations. All critical user-facing features functional and ready for deployment."
 
   - task: "Kuryecini Backend API Review Testing"
