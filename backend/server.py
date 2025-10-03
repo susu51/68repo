@@ -2185,22 +2185,15 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
     from utils.city_normalize import normalize_city_name
     
     try:
-        user_email = current_user.get("sub")
+        # FIXED: Properly extract user_id from current_user object returned by get_current_user
+        user_id = current_user.get("id")
+        user_email = current_user.get("email")
         
-        # TEMPORARY FIX: JWT decode issue workaround
-        if not user_email:
-            print(f"DEBUG: current_user data: {current_user}")
-            # Default to testcustomer for development
-            user_id = "customer-001"
-            print(f"DEBUG: Using fallback user_id: {user_id}")
-        elif user_email == "testcustomer@example.com":
-            user_id = "customer-001"
-            print(f"DEBUG: Using hardcoded user_id for testcustomer: {user_id}")
-        else:
-            user = await db.users.find_one({"email": user_email})
-            if not user:
-                raise HTTPException(status_code=404, detail=f"User not found for email: {user_email}")
-            user_id = user.get("id")
+        if not user_id:
+            print(f"DEBUG: No user_id found in current_user: {current_user}")
+            raise HTTPException(status_code=401, detail="User identification failed")
+        
+        print(f"DEBUG: Adding address for user_id: {user_id} (email: {user_email})")
         
         city_original = address_data.get("city", "")
         city_normalized = normalize_city_name(city_original)
