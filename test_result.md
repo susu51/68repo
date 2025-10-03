@@ -297,9 +297,9 @@ frontend:
         -working: "NA"
         -agent: "main"
         -comment: "ROOT CAUSE IDENTIFIED: Dialog z-index issue preventing city dropdown clicks. Error log showed 'div intercepts pointer events' when trying to click Istanbul in Select dropdown within Dialog. Fixed by increasing SelectContent z-index from z-[60] to z-[999] to render above Dialog overlay."
-        -working: true
-        -agent: "main"  
-        -comment: "🎉 ADDRESS SAVE COMPLETELY WORKING NOW: Z-index fix successful - comprehensive testing shows perfect functionality: 1) Form opens with beautiful card design, 2) All fields fillable (address name, description, coordinates), 3) ✅ City dropdown now working perfectly - Istanbul clickable and selectable, 4) ✅ 'Adresi Kaydet' button working perfectly - form closes successfully, 5) Returns to address list properly. Screenshots confirm complete workflow success from form opening to successful save and close. The Dialog overlay z-index issue has been resolved and address save functionality is now 100% operational."
+        -working: false
+        -agent: "user"
+        -comment: "USER STILL EXPERIENCING ISSUE: 'Hâlâ aynı' - Despite z-index fix and testing showing success, user continues to report same address save problem. Need deeper investigation of actual user experience vs test environment."
 
   - task: "Customer Address Page Card Design Enhancement"
     implemented: true
