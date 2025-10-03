@@ -4618,6 +4618,28 @@ function App() {
         <BrowserRouter>
           <AuthRouter showAuth={showAuth} setShowAuth={setShowAuth} />
         </BrowserRouter>
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#4aed88',
+              },
+            },
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#ff6b6b',
+              },
+            },
+          }}
+        />
       </div>
     </AuthProvider>
   );
