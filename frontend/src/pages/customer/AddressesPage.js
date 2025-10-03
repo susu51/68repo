@@ -83,6 +83,9 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
   };
 
   const handleAddAddress = async () => {
+    // Async Operation Protection - prevent state updates after unmount
+    if (!isMounted) return;
+    
     try {
       if (!newAddress.label || !newAddress.city || !newAddress.description) {
         toast.error('Lütfen tüm zorunlu alanları doldurun');
@@ -110,19 +113,23 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
 
       console.log('Add address response:', response.data);
 
-      toast.success('Adres başarıyla eklendi!');
-      setAddresses([...addresses, response.data]);
-      setShowAddForm(false);
-      setNewAddress({
-        label: '',
-        city: 'İstanbul',
-        description: '',
-        lat: null,
-        lng: null
-      });
+      if (isMounted) {
+        toast.success('Adres başarıyla eklendi!');
+        setAddresses([...addresses, response.data]);
+        setShowAddForm(false);
+        setNewAddress({
+          label: '',
+          city: 'İstanbul',
+          description: '',
+          lat: null,
+          lng: null
+        });
+      }
     } catch (error) {
       console.error('Error adding address:', error);
-      toast.error('Adres eklenirken hata oluştu');
+      if (isMounted) {
+        toast.error('Adres eklenirken hata oluştu');
+      }
     }
   };
 
