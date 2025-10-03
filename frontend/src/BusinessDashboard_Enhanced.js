@@ -1465,7 +1465,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                     >
                       İptal
                     </Button>
-                    <Button onClick={saveProduct}>
+                    <Button onClick={addProduct}>
                       {editingProduct ? '💾 Güncelle' : '➕ Ekle'}
                     </Button>
                   </div>
