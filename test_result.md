@@ -274,6 +274,26 @@ backend:
         -comment: "🎉 FRONTEND RESTAURANT VISIBILITY ISSUE COMPLETELY RESOLVED: Fixed API URL construction in FoodOrderSystem.js from 'process.env.REACT_APP_BACKEND_URL || http://localhost:8001/api' to '${process.env.REACT_APP_BACKEND_URL || http://localhost:8001}/api'. ✅ COMPREHENSIVE TESTING CONFIRMS: 1) Customer login working (testcustomer@example.com/test123). 2) Navigation to 'Keşfet' tab successful. 3) All 3 restaurants now displaying correctly: Test Restoranı, Pizza Palace İstanbul, Burger Deluxe. 4) Restaurant cards showing with proper ratings (5, 4.6, 4.9), delivery times (25-45dk, 26-41dk, 34-44dk), and minimum orders (₺95, ₺96, ₺94). 5) Restaurant menu functionality working - clicked Test Restoranı and menu loaded with products (Margherita Pizza ₺85, Chicken Burger ₺65, Coca Cola ₺15, Test Döner Kebap ₺35.5, Künefe ₺25). 6) Console shows 'Restaurants fetched: [Object, Object, Object]' confirming API calls working. 7) Location-based sorting showing '3 restoran' in status. 8) ProfessionalFoodOrderSystem component fully functional with restaurant discovery, menu browsing, and cart management. The user-reported issue 'Müşteri kısmında hiçbir restorant gözükmüyor' is completely resolved - customers can now see and interact with all restaurants in the customer dashboard."
 
 frontend:
+  - task: "Customer Address Save & Restaurant Navigation Issue"
+    implemented: false
+    working: false
+    file: "AddressesPage.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        -working: false
+        -agent: "user"
+        -comment: "USER REPORTED: Address save button not working - clicking 'Adresi Kaydet' does nothing, restaurants are not being listed, customer section not opening properly."
+
+  - task: "Customer Address Page Card Design Enhancement"
+    implemented: true
+    working: true
+    file: "AddressesPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+
   - task: "CustomerDashboard JSX Fix"
     implemented: true
     working: true
