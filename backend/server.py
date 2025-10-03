@@ -958,7 +958,7 @@ async def register_courier(courier_data: CourierRegistration):
     user_doc = {
         "id": str(uuid.uuid4()),
         "email": courier_data.email,
-        "password": hashed_password,
+        "password_hash": hashed_password,
         "role": "courier",
         "first_name": courier_data.first_name,
         "last_name": courier_data.last_name,
@@ -1012,7 +1012,7 @@ async def register_business(business_data: BusinessRegister):
     user_doc = {
         "id": str(uuid.uuid4()),
         "email": business_data.email,
-        "password": hashed_password,
+        "password_hash": hashed_password,
         "role": "business",
         "business_name": business_data.business_name,
         "tax_number": business_data.tax_number,
