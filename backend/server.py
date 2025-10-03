@@ -602,7 +602,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     description="Authenticate user with email and password. Returns JWT token for API access.",
     response_description="JWT access token and user information"
 )
-async def login(login_data: LoginRequest):
+@limiter.limit("5/minute")  # Prevent brute force attacks
+async def login(request: Request, login_data: LoginRequest):
     """
     **User Authentication Endpoint**
     
