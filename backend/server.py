@@ -2178,7 +2178,12 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
     from utils.city_normalize import normalize_city_name
     
     try:
-        user_id = current_user.get("id") or current_user.get("sub")
+        user_email = current_user.get("sub")
+        user = await db.users.find_one({"email": user_email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user_id = user.get("id")
         
         city_original = address_data.get("city", "")
         city_normalized = normalize_city_name(city_original)
