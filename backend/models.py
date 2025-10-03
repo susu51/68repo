@@ -47,10 +47,6 @@ class ResetPasswordRequest(BaseModel):
             raise ValueError('Parola en az bir harf içermelidir')
         return v
 
-def generate_id() -> str:
-    """Generate unique ID for documents"""
-    return str(uuid.uuid4())
-
 class UserRole(str, Enum):
     CUSTOMER = "customer"
     COURIER = "courier"
