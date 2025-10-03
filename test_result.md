@@ -291,9 +291,9 @@ frontend:
         -working: "NA"
         -agent: "main"
         -comment: "DEBUGGING COMPLETED: Identified issue was with city dropdown not showing selected value properly. Fixed by: 1) Added placeholder='Şehir Seçin' to SelectValue component. 2) Changed initial city state from 'İstanbul' to '' (empty) to force user selection. 3) Enhanced form validation with specific missing field messages. 4) Confirmed backend API working perfectly via curl test - address save endpoint returning proper JSON response."
-        -working: true
-        -agent: "main"
-        -comment: "✅ ADDRESS SAVE FUNCTIONALITY COMPLETELY FIXED: Comprehensive testing confirms perfect functionality - form opens correctly with beautiful card design, all fields fillable (address name, city dropdown, description, coordinates), Istanbul properly selectable from dropdown, save button working perfectly and form closes successfully. Backend API tested via curl and works flawlessly. Customer address management system is now fully operational. User can successfully: 1) Open address form via 'Yeni Adres Ekle', 2) Fill all required fields including city selection, 3) Save address successfully with 'Adresi Kaydet' button, 4) Form closes and returns to address list. The customer section opens properly and address save/restaurant navigation issue is completely resolved."
+        -working: false
+        -agent: "user"
+        -comment: "USER REPORTED AGAIN: Address save still not working - 'Adres kaydet kısmı çalışmıyor' - Despite previous testing showing success, user still experiencing issues with address save functionality."
 
   - task: "Customer Address Page Card Design Enhancement"
     implemented: true
