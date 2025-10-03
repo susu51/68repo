@@ -723,8 +723,9 @@ const AdminPanel = ({ user, onLogout }) => {
   );
 
   const renderFeatured = () => {
-    // Ensure featuredRequests is always an array
+    // Ensure arrays are always arrays to prevent .slice() errors
     const safeRequests = Array.isArray(featuredRequests) ? featuredRequests : [];
+    const safeBusinesses = Array.isArray(featuredBusinesses) ? featuredBusinesses : [];
     
     return (
       <div className="space-y-6">
