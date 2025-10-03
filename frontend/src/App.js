@@ -11,6 +11,7 @@ import LeafletMap from "./LeafletMap";
 import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
 import FoodOrderErrorBoundary from "./components/FoodOrderErrorBoundary";
 import { CustomerProfile } from "./CustomerProfile";
+import { CustomerMain } from "./pages/customer/CustomerMain";
 import PhoneAuth from "./PhoneAuth";
 import { ModernLogin } from "./ModernLogin";
 import { KuryeciniTextLogo } from "./components/KuryeciniLogo";
