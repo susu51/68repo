@@ -76,6 +76,64 @@ export const CustomerMain = ({ user }) => {
     setCurrentView('menu');
   };
 
+  const handleLogout = () => {
+    // Clear user data and redirect to login
+    console.log('User logging out...');
+    // This would be handled by parent component
+  };
+
+  const handleUpdateCart = (itemId, newQuantity) => {
+    setCartItems(cartItems.map(item => 
+      item.id === itemId ? { ...item, quantity: newQuantity } : item
+    ));
+    
+    // Recalculate total
+    const newTotal = cartItems.reduce((total, item) => 
+      total + (item.id === itemId ? item.price * newQuantity : item.price * item.quantity), 0
+    );
+    setOrderTotal(newTotal);
+  };
+
+  // Restaurant Menu View
+  if (currentView === 'restaurant_menu') {
+    return (
+      <RestaurantMenu
+        restaurant={selectedRestaurant}
+        onAddToCart={handleAddToCart}
+        onBack={() => setCurrentView('restaurants')}
+        cartItems={cartItems}
+        cartTotal={orderTotal}
+      />
+    );
+  }
+
+  // Cart View
+  if (currentView === 'cart') {
+    return (
+      <Cart
+        cartItems={cartItems}
+        onUpdateCart={handleUpdateCart}
+        onRemoveFromCart={handleRemoveFromCart}
+        onBack={() => setCurrentView('restaurant_menu')}
+        selectedAddress={selectedAddress}
+        selectedRestaurant={selectedRestaurant}
+        user={user}
+      />
+    );
+  }
+
+  // Profile View
+  if (currentView === 'profile') {
+    return (
+      <Profile
+        user={user}
+        onBack={() => setCurrentView('menu')}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  // Restaurants View
   if (currentView === 'restaurants') {
     return (
       <NearbyRestaurants
