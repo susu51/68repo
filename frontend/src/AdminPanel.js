@@ -722,19 +722,24 @@ const AdminPanel = ({ user, onLogout }) => {
     </div>
   );
 
-  const renderFeatured = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Öne Çıkarma Yönetimi</h2>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Bekleyen İstekler</CardTitle>
-            <CardDescription>{featuredRequests.length} istek bekliyor</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {featuredRequests.slice(0, 5).map((request) => (
+  const renderFeatured = () => {
+    // Ensure featuredRequests is always an array
+    const safeRequests = Array.isArray(featuredRequests) ? featuredRequests : [];
+    
+    return (
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold">Öne Çıkarma Yönetimi</h2>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Bekleyen İstekler</CardTitle>
+              <CardDescription>{safeRequests.length} istek bekliyor</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {safeRequests.length > 0 ? (
+                  safeRequests.slice(0, 5).map((request) => (
                 <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <p className="font-medium">{request.business_name}</p>
