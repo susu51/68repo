@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import AddressesPage from './AddressesPage';
 import NearbyRestaurants from './NearbyRestaurants';
+import RestaurantMenu from './RestaurantMenu';
+import Cart from './Cart';
+import Profile from './Profile';
 
 export const CustomerMain = ({ user }) => {
   const [currentView, setCurrentView] = useState('menu'); // 'menu' | 'addresses' | 'restaurants' | 'restaurant_menu' | 'cart' | 'profile'
