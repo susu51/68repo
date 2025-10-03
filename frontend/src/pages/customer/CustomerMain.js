@@ -36,12 +36,96 @@ export const CustomerMain = ({ user }) => {
     );
   }
 
+  if (currentView === 'addresses') {
+    return (
+      <AddressesPage
+        key="addresses-page"
+        onSelectAddress={handleAddressSelect}
+        onBack={() => setCurrentView('menu')}
+      />
+    );
+  }
+
+  // Default menu view
   return (
-    <AddressesPage
-      key="addresses-page"
-      onSelectAddress={handleAddressSelect}
-      onBack={null} // No back button on main page
-    />
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Welcome Header */}
+        <div className="text-center mb-8">
+          <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-xl">
+            <span className="text-4xl text-white">👤</span>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Hoş Geldiniz, {user?.first_name}!
+          </h1>
+          <p className="text-lg text-gray-600">
+            Kuryecini ile sipariş vermeye hazır mısınız?
+          </p>
+        </div>
+
+        {/* Menu Options */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-3xl mx-auto">
+          
+          {/* Kayıtlı Adreslerim */}
+          <div 
+            className="group cursor-pointer"
+            onClick={() => setCurrentView('addresses')}
+          >
+            <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-transparent hover:border-orange-200">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl text-white">📍</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  Kayıtlı Adreslerim
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Adreslerinizi yönetin ve yeni adres ekleyin
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Restoran Keşfet */}
+          <div 
+            className="group cursor-pointer"
+            onClick={() => setCurrentView('addresses')}
+          >
+            <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-transparent hover:border-green-200">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl text-white">🍽️</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  Restoran Keşfet
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Çevrendeki restoranları keşfet ve sipariş ver
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Profil */}
+          <div className="group cursor-pointer">
+            <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-transparent hover:border-purple-200">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl text-white">⚙️</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  Profil Ayarları
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Hesap bilgilerinizi düzenleyin
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   );
 };
 
