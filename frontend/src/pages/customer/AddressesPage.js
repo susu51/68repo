@@ -438,7 +438,11 @@ export const AddressesPage = ({ onSelectAddress, onBack }) => {
                           className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12"
                           placeholder="Ev, İş, Okul vb."
                           value={newAddress.label}
-                          onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
+                          onChange={(e) => {
+                            if (isMounted) {
+                              setNewAddress({...newAddress, label: e.target.value});
+                            }
+                          }}
                         />
                       </div>
                       
