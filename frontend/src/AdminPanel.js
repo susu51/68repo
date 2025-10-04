@@ -153,6 +153,19 @@ const AdminPanel = ({ user, onLogout }) => {
     }
   };
 
+  const fetchAllBusinesses = async () => {
+    try {
+      const response = await axios.get(`${API}/businesses`);
+      const businesses = Array.isArray(response.data) ? response.data : [];
+      setAllBusinesses(businesses);
+      setFilteredBusinesses(businesses);
+    } catch (error) {
+      console.error('Error fetching all businesses:', error);
+      setAllBusinesses([]);
+      setFilteredBusinesses([]);
+    }
+  };
+
   // Courier KYC Management
   const handleApprove = async (courierId, notes = '') => {
     try {
