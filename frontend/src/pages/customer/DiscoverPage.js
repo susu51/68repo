@@ -14,6 +14,8 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [restaurantProducts, setRestaurantProducts] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
 
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
