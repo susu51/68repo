@@ -785,7 +785,10 @@ const ProfilePage = ({ user, onLogout }) => {
       {/* Add Payment Method Button */}
       <Card className="border-dashed border-2">
         <CardContent className="p-6 text-center">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+          <Button 
+            onClick={() => setShowPaymentModal(true)}
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+          >
             ➕ Yeni Ödeme Yöntemi Ekle
           </Button>
           <p className="text-sm text-gray-600 mt-2">
