@@ -104,7 +104,7 @@ class AdminPanelBackendTester:
                 })
                 
                 self.log_test(
-                    "Admin Authentication (password: 6851)",
+                    "Admin Authentication (admin@kuryecini.com)",
                     True,
                     f"Admin login successful. Role: {user_data.get('role')}, Token length: {len(self.admin_token) if self.admin_token else 0} chars",
                     {"user_id": user_data.get("id"), "email": user_data.get("email"), "role": user_data.get("role")}
