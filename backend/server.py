@@ -2686,19 +2686,60 @@ async def get_payment_methods(current_user: dict = Depends(get_current_user)):
 
 @api_router.post("/payment-methods")
 async def add_payment_method(method_data: dict, current_user: dict = Depends(get_current_user)):
-    """Add new payment method (tokenized)"""
+    """Add new payment method (tokenized with mock provider support)"""
     try:
-        # In production, this would handle payment provider token
+        provider = method_data.get("provider", "stripe")
+        card_number = method_data.get("card_number", "")
+        expiry_month = method_data.get("expiry_month", "")
+        expiry_year = method_data.get("expiry_year", "")
+        cvv = method_data.get("cvv", "")
+        cardholder_name = method_data.get("cardholder_name", "")
+        
+        # Validate required fields
+        if not all([card_number, expiry_month, expiry_year, cvv, cardholder_name]):
+            raise HTTPException(status_code=400, detail="All card fields are required")
+        
+        # Mock card validation
+        if len(card_number.replace(" ", "")) != 16:
+            raise HTTPException(status_code=400, detail="Card number must be 16 digits")
+        
+        if len(cvv) not in [3, 4]:
+            raise HTTPException(status_code=400, detail="CVV must be 3 or 4 digits")
+        
+        # Determine card brand from card number
+        card_first_digit = card_number.replace(" ", "")[0]
+        if card_first_digit == "4":
+            brand = "VISA"
+        elif card_first_digit == "5":
+            brand = "MASTERCARD"
+        elif card_first_digit == "3":
+            brand = "AMEX"
+        else:
+            brand = "UNKNOWN"
+        
+        # Generate mock token based on provider
+        if provider.lower() == "stripe":
+            mock_token = f"pm_stripe_{str(uuid.uuid4()).replace('-', '')[:16]}"
+        elif provider.lower() == "iyzico":
+            mock_token = f"iyz_token_{str(uuid.uuid4()).replace('-', '')[:12]}"
+        else:
+            mock_token = f"token_{str(uuid.uuid4()).replace('-', '')[:16]}"
+        
+        # Get last 4 digits
+        last_four = card_number.replace(" ", "")[-4:]
+        
         payment_method = {
             "id": str(uuid.uuid4()),
             "user_id": current_user["id"],
-            "provider": method_data.get("provider", "stripe"),
-            "token": method_data.get("token", ""),
-            "brand": method_data.get("brand", "VISA"),
-            "last_four": method_data.get("last_four", "4242"),
-            "expiry_month": method_data.get("expiry_month", "12"),
-            "expiry_year": method_data.get("expiry_year", "26"),
-            "created_at": datetime.now(timezone.utc).isoformat()
+            "provider": provider,
+            "token": mock_token,
+            "brand": brand,
+            "last_four": last_four,
+            "expiry_month": expiry_month,
+            "expiry_year": expiry_year,
+            "cardholder_name": cardholder_name,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "is_active": True
         }
         
         await db.payment_methods.insert_one(payment_method)
@@ -2706,7 +2747,20 @@ async def add_payment_method(method_data: dict, current_user: dict = Depends(get
         if "_id" in payment_method:
             del payment_method["_id"]
         
-        return payment_method
+        # Don't return sensitive info in response
+        response_data = {
+            "id": payment_method["id"],
+            "provider": payment_method["provider"],
+            "brand": payment_method["brand"],
+            "last_four": payment_method["last_four"],
+            "expiry_month": payment_method["expiry_month"],
+            "expiry_year": payment_method["expiry_year"],
+            "cardholder_name": payment_method["cardholder_name"],
+            "created_at": payment_method["created_at"],
+            "is_active": payment_method["is_active"]
+        }
+        
+        return response_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
