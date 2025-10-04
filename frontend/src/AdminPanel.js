@@ -102,7 +102,8 @@ const AdminPanel = ({ user, onLogout }) => {
         fetchUsers(),
         fetchAds(),
         fetchFeaturedRequests(),
-        fetchFeaturedBusinesses()
+        fetchFeaturedBusinesses(),
+        fetchAllBusinesses()
       ]);
     } catch (error) {
       console.error('Error fetching initial data:', error);
