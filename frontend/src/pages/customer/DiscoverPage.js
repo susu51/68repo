@@ -266,14 +266,17 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
         <div className="p-4">
           {/* Location/Address Bar */}
           <div className="flex items-center mb-4">
-            <div className="flex-1 bg-gray-100 rounded-xl p-3 mr-3">
+            <div 
+              className="flex-1 bg-gray-100 rounded-xl p-3 mr-3 cursor-pointer hover:bg-gray-200 transition-colors"
+              onClick={() => setShowAddressSelector(true)}
+            >
               <div className="flex items-center">
                 <span className="text-orange-500 mr-2">📍</span>
                 <div className="flex-1">
                   {selectedAddress ? (
                     <div>
                       <div className="text-sm font-medium text-gray-800">
-                        {selectedAddress.label || 'Adresim'}
+                        {selectedAddress.label || 'Adresim'} • {selectedAddress.city}
                       </div>
                       <div className="text-xs text-gray-600">
                         {selectedAddress.description}
@@ -285,6 +288,7 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
                     </div>
                   )}
                 </div>
+                <span className="text-gray-400 ml-2">▼</span>
               </div>
             </div>
             <Button
