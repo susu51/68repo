@@ -600,6 +600,58 @@ class Order(BaseModel):
 class AdminLogin(BaseModel):
     password: str
 
+# Profile System Models
+class Coupon(BaseModel):
+    id: str
+    code: str
+    title: str
+    description: str
+    discount_type: str  # PERCENT | AMOUNT
+    discount_value: float
+    min_amount: float
+    valid_until: str
+    assigned_user_ids: List[str]
+    status: str = "active"
+
+class Discount(BaseModel):
+    id: str
+    user_id: str
+    title: str
+    description: str
+    discount_type: str  # PERCENT | AMOUNT
+    discount_value: float
+    valid_until: str
+
+class Campaign(BaseModel):
+    id: str
+    title: str
+    description: str
+    discount_type: str  # PERCENT | AMOUNT
+    discount_value: float
+    valid_until: str
+    image_url: Optional[str] = None
+
+class PaymentMethod(BaseModel):
+    id: str
+    user_id: str
+    provider: str  # iyzico | stripe
+    token: str
+    brand: str  # VISA | MASTERCARD
+    last_four: str
+    expiry_month: str
+    expiry_year: str
+    created_at: str
+
+class Review(BaseModel):
+    id: str
+    order_id: str
+    target_type: str  # business | courier
+    target_id: str
+    user_id: str
+    rating: int  # 1-5
+    comment: Optional[str] = None
+    created_at: str
+
 # Enums and Constants
 class UserStatus(str, Enum):
     ACTIVE = "active"
