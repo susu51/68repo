@@ -2000,6 +2000,7 @@ async def get_public_businesses(
 ):
     """Get all active businesses for customers with city and location filtering"""
     from utils.city_normalize import normalize_city_name
+    import re
     
     try:
         # Build query filter
