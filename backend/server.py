@@ -1828,6 +1828,176 @@ async def get_all_products(current_user: dict = Depends(get_admin_user)):
     
     return products
 
+# Admin Menu/Product Management Endpoints
+@api_router.get("/admin/products/{product_id}")
+async def get_product_by_id_admin(product_id: str, current_user: dict = Depends(get_admin_user)):
+    """Get specific product by ID (Admin only)"""
+    try:
+        from bson import ObjectId
+        
+        # Try ObjectId first, then string ID
+        try:
+            product = await db.products.find_one({"_id": ObjectId(product_id)})
+        except:
+            product = await db.products.find_one({"id": product_id})
+        
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        # Convert ObjectId to string
+        product["id"] = str(product["_id"])
+        del product["_id"]
+        
+        # Handle datetime conversion safely
+        if product.get("created_at") and not isinstance(product["created_at"], str):
+            product["created_at"] = product["created_at"].isoformat()
+        
+        return product
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving product: {str(e)}")
+
+@api_router.patch("/admin/products/{product_id}")
+async def update_product_admin(
+    product_id: str,
+    product_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update product (Admin only)"""
+    try:
+        # Validate input data
+        allowed_fields = [
+            "name", "description", "price", "category", "is_available", 
+            "preparation_time_minutes", "image_url", "ingredients", "allergens"
+        ]
+        
+        update_data = {}
+        for field, value in product_data.items():
+            if field in allowed_fields:
+                if field == "price" and value is not None:
+                    try:
+                        update_data[field] = float(value)
+                    except (ValueError, TypeError):
+                        raise HTTPException(status_code=422, detail="Price must be a valid number")
+                elif field == "preparation_time_minutes" and value is not None:
+                    try:
+                        update_data[field] = int(value)
+                    except (ValueError, TypeError):
+                        raise HTTPException(status_code=422, detail="Preparation time must be a valid integer")
+                elif field == "is_available" and value is not None:
+                    update_data[field] = bool(value)
+                else:
+                    update_data[field] = value
+        
+        if not update_data:
+            raise HTTPException(status_code=422, detail="No valid fields provided for update")
+        
+        update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        # Update product
+        from bson import ObjectId
+        try:
+            result = await db.products.update_one(
+                {"_id": ObjectId(product_id)},
+                {"$set": update_data}
+            )
+        except:
+            result = await db.products.update_one(
+                {"id": product_id},
+                {"$set": update_data}
+            )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="No changes made")
+        
+        return {
+            "message": "Product updated successfully",
+            "product_id": product_id,
+            "updates": update_data
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating product: {str(e)}")
+
+@api_router.delete("/admin/products/{product_id}")
+async def delete_product_admin(product_id: str, current_user: dict = Depends(get_admin_user)):
+    """Delete product (Admin only)"""
+    try:
+        from bson import ObjectId
+        
+        # Delete product
+        try:
+            result = await db.products.delete_one({"_id": ObjectId(product_id)})
+        except:
+            result = await db.products.delete_one({"id": product_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        return {
+            "message": "Product deleted successfully",
+            "product_id": product_id
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting product: {str(e)}")
+
+@api_router.get("/admin/products/stats")
+async def get_product_statistics(current_user: dict = Depends(get_admin_user)):
+    """Get product statistics for admin dashboard"""
+    try:
+        # Total products
+        total_products = await db.products.count_documents({})
+        
+        # Available products
+        available_products = await db.products.count_documents({"is_available": True})
+        
+        # Products by category
+        category_pipeline = [
+            {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        category_counts = {}
+        async for result in db.products.aggregate(category_pipeline):
+            category_counts[result["_id"] or "Other"] = result["count"]
+        
+        # Average price by category
+        avg_price_pipeline = [
+            {"$group": {"_id": "$category", "avg_price": {"$avg": "$price"}}},
+            {"$sort": {"avg_price": -1}}
+        ]
+        avg_prices = {}
+        async for result in db.products.aggregate(avg_price_pipeline):
+            avg_prices[result["_id"] or "Other"] = round(result["avg_price"], 2)
+        
+        # New products this week
+        week_start = datetime.now(timezone.utc) - timedelta(days=7)
+        new_products = await db.products.count_documents({
+            "created_at": {"$gte": week_start}
+        })
+        
+        return {
+            "total_products": total_products,
+            "available_products": available_products,
+            "category_counts": category_counts,
+            "average_prices_by_category": avg_prices,
+            "new_products_this_week": new_products,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving product statistics: {str(e)}")
+
 @api_router.get("/admin/orders")
 async def get_all_orders(current_user: dict = Depends(get_admin_user)):
     """Get all orders (Admin only)"""
