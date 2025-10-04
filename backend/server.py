@@ -2313,6 +2313,7 @@ async def discover_restaurants():
     try:
         # Get featured/popular businesses
         businesses = await db.users.find({
+            "role": "business",
             "kyc_status": "approved",
             "is_active": True
         }).limit(20).to_list(None)
