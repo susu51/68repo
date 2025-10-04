@@ -1408,7 +1408,7 @@ class AdminPanelBackendTester:
         # Critical Success Criteria Check
         print("🎯 CRITICAL SUCCESS CRITERIA CHECK:")
         critical_tests = [
-            "Admin Authentication (password: 6851)",
+            "Admin Authentication (admin@kuryecini.com)",
             "RBAC - Admin Orders List (403 Forbidden for non-admin)",
             "GET /admin/orders (list all orders)",
             "GET /admin/businesses (list all businesses)",
