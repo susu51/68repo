@@ -146,13 +146,6 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
   };
 
   const filteredRestaurants = restaurants.filter(restaurant => {
-    // Debug individual restaurant
-    if (restaurants.length > 0 && filteredRestaurants.length === 0) {
-      console.log('Restaurant object:', restaurant);
-      console.log('Business name:', restaurant.business_name);
-      console.log('Name:', restaurant.name);
-    }
-    
     const searchLower = searchQuery.toLowerCase();
     return (
       !searchQuery || // If no search query, show all
@@ -162,6 +155,11 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
       restaurant.category?.toLowerCase().includes(searchLower)
     );
   });
+  
+  // Debug individual restaurant (after filteredRestaurants is defined)
+  if (restaurants.length > 0 && filteredRestaurants.length === 0 && !searchQuery) {
+    console.log('Restaurant object sample:', restaurants[0]);
+  }
   
   // Debug logging
   console.log('Restaurants count:', restaurants.length);
