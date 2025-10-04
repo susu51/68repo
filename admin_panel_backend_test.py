@@ -131,7 +131,7 @@ class AdminPanelBackendTester:
                 return True
             else:
                 self.log_test(
-                    "Admin Authentication (password: 6851)",
+                    "Admin Authentication (admin@kuryecini.com)",
                     False,
                     f"Admin login failed. Status: {response.status_code}",
                     response.text
