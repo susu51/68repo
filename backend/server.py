@@ -2116,6 +2116,51 @@ async def approve_user(user_id: str, current_user: dict = Depends(get_admin_user
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error approving user: {str(e)}")
 
+@api_router.patch("/admin/users/{user_id}/reject")
+async def reject_user(user_id: str, request: dict, current_user: dict = Depends(get_admin_user)):
+    """Reject a user (business/courier) application"""
+    try:
+        notes = request.get("notes", "")
+        
+        # Update user with rejected status
+        update_data = {
+            "kyc_status": "rejected",
+            "is_active": False,
+            "kyc_reviewed_at": datetime.now(timezone.utc).isoformat(),
+            "kyc_reviewed_by": current_user.get("id"),
+            "rejection_notes": notes
+        }
+        
+        # Try UUID format first
+        result = await db.users.update_one(
+            {"id": user_id},
+            {"$set": update_data}
+        )
+        
+        # If no document found with UUID, try ObjectId format
+        if result.matched_count == 0:
+            try:
+                from bson import ObjectId
+                result = await db.users.update_one(
+                    {"_id": ObjectId(user_id)},
+                    {"$set": update_data}
+                )
+            except:
+                pass
+        
+        if result.matched_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+            
+        return {"success": True, "message": f"User {user_id} rejected successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error rejecting user: {str(e)}")
+
 # Removed duplicate placeholder implementation - actual implementation is below at line 2539
 
 # Restaurant Endpoints
