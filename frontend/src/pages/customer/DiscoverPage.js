@@ -422,6 +422,88 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
           </>
         )}
       </div>
+
+      {/* Address Selector Modal */}
+      {showAddressSelector && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-96 overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-gray-800">Teslimat Adresi Seç</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAddressSelector(false)}
+                  className="p-1"
+                >
+                  ✕
+                </Button>
+              </div>
+              
+              <div className="space-y-3">
+                {userAddresses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <span className="text-4xl">📍</span>
+                    <p className="text-gray-600 mt-2">Henüz kayıtlı adresiniz yok</p>
+                    <Button
+                      onClick={() => {
+                        onTabChange('profile');
+                        setShowAddressSelector(false);
+                      }}
+                      className="mt-4 bg-orange-500 hover:bg-orange-600"
+                    >
+                      Adres Ekle
+                    </Button>
+                  </div>
+                ) : (
+                  userAddresses.map((address) => (
+                    <Card 
+                      key={address.id} 
+                      className={`cursor-pointer hover:shadow-md transition-shadow ${
+                        selectedAddress?.id === address.id ? 'ring-2 ring-orange-500' : ''
+                      }`}
+                      onClick={() => {
+                        setSelectedAddress(address);
+                        setShowAddressSelector(false);
+                        toast.success(`Adres değiştirildi: ${address.label}`);
+                      }}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            📍
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <p className="font-semibold text-gray-800">
+                                {address.label}
+                              </p>
+                              <span className="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                                {address.city}
+                              </span>
+                              {address.is_default && (
+                                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                  Varsayılan
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {address.description}
+                            </p>
+                          </div>
+                          {selectedAddress?.id === address.id && (
+                            <span className="text-orange-500">✓</span>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
