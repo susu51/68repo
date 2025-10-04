@@ -2870,6 +2870,445 @@ async def get_courier_statistics(current_user: dict = Depends(get_admin_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving courier statistics: {str(e)}")
 
+# Admin Promotion Management Endpoints
+@api_router.get("/admin/promotions")
+async def get_all_promotions(current_user: dict = Depends(get_admin_user)):
+    """Get all promotions (Admin only)"""
+    try:
+        promotions = await db.promotions.find({}).to_list(length=None)
+        
+        # Convert ObjectId to string and handle datetime
+        for promotion in promotions:
+            promotion["id"] = str(promotion["_id"])
+            del promotion["_id"]
+            
+            # Handle datetime fields
+            for field in ["created_at", "start_date", "end_date", "updated_at"]:
+                if promotion.get(field) and not isinstance(promotion[field], str):
+                    promotion[field] = promotion[field].isoformat()
+        
+        return promotions
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving promotions: {str(e)}")
+
+@api_router.post("/admin/promotions")
+async def create_promotion(
+    promotion_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Create new promotion (Admin only)"""
+    try:
+        # Validate required fields
+        required_fields = ["title", "description", "type", "value"]
+        for field in required_fields:
+            if field not in promotion_data:
+                raise HTTPException(status_code=422, detail=f"Field '{field}' is required")
+        
+        # Validate promotion type and value
+        valid_types = ["percentage", "fixed_amount", "free_delivery", "buy_x_get_y"]
+        if promotion_data["type"] not in valid_types:
+            raise HTTPException(status_code=422, detail=f"Invalid type. Must be one of: {valid_types}")
+        
+        # Add metadata
+        promotion_data["id"] = str(uuid.uuid4())
+        promotion_data["created_at"] = datetime.now(timezone.utc)
+        promotion_data["created_by"] = current_user["id"]
+        promotion_data["is_active"] = promotion_data.get("is_active", True)
+        promotion_data["usage_count"] = 0
+        
+        # Handle datetime fields
+        if "start_date" in promotion_data and isinstance(promotion_data["start_date"], str):
+            promotion_data["start_date"] = datetime.fromisoformat(promotion_data["start_date"].replace('Z', '+00:00'))
+        
+        if "end_date" in promotion_data and isinstance(promotion_data["end_date"], str):
+            promotion_data["end_date"] = datetime.fromisoformat(promotion_data["end_date"].replace('Z', '+00:00'))
+        
+        # Insert promotion
+        result = await db.promotions.insert_one(promotion_data)
+        
+        return {
+            "message": "Promotion created successfully",
+            "promotion_id": promotion_data["id"]
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating promotion: {str(e)}")
+
+@api_router.get("/admin/promotions/{promotion_id}")
+async def get_promotion_by_id(promotion_id: str, current_user: dict = Depends(get_admin_user)):
+    """Get specific promotion by ID (Admin only)"""
+    try:
+        from bson import ObjectId
+        
+        # Try ObjectId first, then string ID
+        try:
+            promotion = await db.promotions.find_one({"_id": ObjectId(promotion_id)})
+        except:
+            promotion = await db.promotions.find_one({"id": promotion_id})
+        
+        if not promotion:
+            raise HTTPException(status_code=404, detail="Promotion not found")
+        
+        # Convert ObjectId to string and handle datetime
+        promotion["id"] = str(promotion["_id"])
+        del promotion["_id"]
+        
+        for field in ["created_at", "start_date", "end_date", "updated_at"]:
+            if promotion.get(field) and not isinstance(promotion[field], str):
+                promotion[field] = promotion[field].isoformat()
+        
+        return promotion
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving promotion: {str(e)}")
+
+@api_router.patch("/admin/promotions/{promotion_id}")
+async def update_promotion(
+    promotion_id: str,
+    promotion_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update promotion (Admin only)"""
+    try:
+        # Add metadata
+        promotion_data["updated_at"] = datetime.now(timezone.utc)
+        promotion_data["updated_by"] = current_user["id"]
+        
+        # Handle datetime fields
+        for field in ["start_date", "end_date"]:
+            if field in promotion_data and isinstance(promotion_data[field], str):
+                promotion_data[field] = datetime.fromisoformat(promotion_data[field].replace('Z', '+00:00'))
+        
+        # Update promotion
+        from bson import ObjectId
+        try:
+            result = await db.promotions.update_one(
+                {"_id": ObjectId(promotion_id)},
+                {"$set": promotion_data}
+            )
+        except:
+            result = await db.promotions.update_one(
+                {"id": promotion_id},
+                {"$set": promotion_data}
+            )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Promotion not found")
+        
+        return {
+            "message": "Promotion updated successfully",
+            "promotion_id": promotion_id
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating promotion: {str(e)}")
+
+@api_router.delete("/admin/promotions/{promotion_id}")
+async def delete_promotion(promotion_id: str, current_user: dict = Depends(get_admin_user)):
+    """Delete promotion (Admin only)"""
+    try:
+        from bson import ObjectId
+        
+        # Delete promotion
+        try:
+            result = await db.promotions.delete_one({"_id": ObjectId(promotion_id)})
+        except:
+            result = await db.promotions.delete_one({"id": promotion_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Promotion not found")
+        
+        return {
+            "message": "Promotion deleted successfully",
+            "promotion_id": promotion_id
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting promotion: {str(e)}")
+
+@api_router.patch("/admin/promotions/{promotion_id}/toggle")
+async def toggle_promotion_status(promotion_id: str, current_user: dict = Depends(get_admin_user)):
+    """Toggle promotion active status (Admin only)"""
+    try:
+        from bson import ObjectId
+        
+        # Find promotion
+        try:
+            promotion = await db.promotions.find_one({"_id": ObjectId(promotion_id)})
+            filter_query = {"_id": ObjectId(promotion_id)}
+        except:
+            promotion = await db.promotions.find_one({"id": promotion_id})
+            filter_query = {"id": promotion_id}
+        
+        if not promotion:
+            raise HTTPException(status_code=404, detail="Promotion not found")
+        
+        # Toggle status
+        new_status = not promotion.get("is_active", False)
+        
+        result = await db.promotions.update_one(
+            filter_query,
+            {
+                "$set": {
+                    "is_active": new_status,
+                    "updated_at": datetime.now(timezone.utc),
+                    "updated_by": current_user["id"]
+                }
+            }
+        )
+        
+        return {
+            "message": f"Promotion {'activated' if new_status else 'deactivated'} successfully",
+            "promotion_id": promotion_id,
+            "is_active": new_status
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error toggling promotion status: {str(e)}")
+
+@api_router.get("/admin/promotions/stats")
+async def get_promotion_statistics(current_user: dict = Depends(get_admin_user)):
+    """Get promotion statistics for admin dashboard"""
+    try:
+        # Total promotions
+        total_promotions = await db.promotions.count_documents({})
+        
+        # Active promotions
+        active_promotions = await db.promotions.count_documents({"is_active": True})
+        
+        # Current active promotions (not expired)
+        current_time = datetime.now(timezone.utc)
+        current_active = await db.promotions.count_documents({
+            "is_active": True,
+            "$or": [
+                {"end_date": {"$gte": current_time}},
+                {"end_date": {"$exists": False}}
+            ]
+        })
+        
+        # Promotions by type
+        type_pipeline = [
+            {"$group": {"_id": "$type", "count": {"$sum": 1}}}
+        ]
+        type_counts = {}
+        async for result in db.promotions.aggregate(type_pipeline):
+            type_counts[result["_id"] or "Other"] = result["count"]
+        
+        # Most used promotions (top 5)
+        popular_pipeline = [
+            {"$sort": {"usage_count": -1}},
+            {"$limit": 5},
+            {"$project": {"title": 1, "usage_count": 1}}
+        ]
+        popular_promotions = []
+        async for result in db.promotions.aggregate(popular_pipeline):
+            popular_promotions.append({
+                "title": result.get("title", "Unknown"),
+                "usage_count": result.get("usage_count", 0)
+            })
+        
+        return {
+            "total_promotions": total_promotions,
+            "active_promotions": active_promotions,
+            "current_active_promotions": current_active,
+            "type_counts": type_counts,
+            "popular_promotions": popular_promotions,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving promotion statistics: {str(e)}")
+
+# Admin Reports Management Endpoints
+@api_router.get("/admin/reports/dashboard")
+async def get_dashboard_reports(current_user: dict = Depends(get_admin_user)):
+    """Get comprehensive dashboard reports (Admin only)"""
+    try:
+        # Time ranges
+        now = datetime.now(timezone.utc)
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        week_start = today_start - timedelta(days=7)
+        month_start = today_start - timedelta(days=30)
+        
+        # Order statistics
+        total_orders = await db.orders.count_documents({})
+        today_orders = await db.orders.count_documents({"created_at": {"$gte": today_start}})
+        week_orders = await db.orders.count_documents({"created_at": {"$gte": week_start}})
+        
+        # Revenue statistics
+        revenue_pipeline = [
+            {"$match": {"status": {"$in": ["delivered", "completed"]}}},
+            {"$group": {
+                "_id": None,
+                "total_revenue": {"$sum": "$total_amount"},
+                "avg_order_value": {"$avg": "$total_amount"}
+            }}
+        ]
+        revenue_data = {"total_revenue": 0, "avg_order_value": 0}
+        async for result in db.orders.aggregate(revenue_pipeline):
+            revenue_data = {
+                "total_revenue": result.get("total_revenue", 0),
+                "avg_order_value": round(result.get("avg_order_value", 0), 2)
+            }
+        
+        # Weekly revenue
+        weekly_revenue_pipeline = [
+            {"$match": {
+                "created_at": {"$gte": week_start},
+                "status": {"$in": ["delivered", "completed"]}
+            }},
+            {"$group": {"_id": None, "total": {"$sum": "$total_amount"}}}
+        ]
+        weekly_revenue = 0
+        async for result in db.orders.aggregate(weekly_revenue_pipeline):
+            weekly_revenue = result.get("total", 0)
+        
+        # User statistics
+        total_customers = await db.users.count_documents({"role": "customer"})
+        total_businesses = await db.businesses.count_documents({})
+        total_couriers = await db.users.count_documents({"role": "courier"})
+        
+        # Active entities
+        active_businesses = await db.businesses.count_documents({"is_active": True, "kyc_status": "approved"})
+        active_couriers = await db.users.count_documents({"role": "courier", "is_active": True, "kyc_status": "approved"})
+        
+        # Order status distribution
+        status_pipeline = [
+            {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+        ]
+        order_status_counts = {}
+        async for result in db.orders.aggregate(status_pipeline):
+            order_status_counts[result["_id"]] = result["count"]
+        
+        # Top cities by orders
+        city_pipeline = [
+            {"$lookup": {
+                "from": "users",
+                "localField": "customer_id",
+                "foreignField": "id",
+                "as": "customer"
+            }},
+            {"$unwind": "$customer"},
+            {"$group": {"_id": "$customer.city", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        city_counts = {}
+        async for result in db.orders.aggregate(city_pipeline):
+            city_counts[result["_id"] or "Unknown"] = result["count"]
+        
+        return {
+            "orders": {
+                "total": total_orders,
+                "today": today_orders,
+                "this_week": week_orders,
+                "status_distribution": order_status_counts
+            },
+            "revenue": {
+                "total": revenue_data["total_revenue"],
+                "weekly": weekly_revenue,
+                "average_order_value": revenue_data["avg_order_value"]
+            },
+            "users": {
+                "total_customers": total_customers,
+                "total_businesses": total_businesses,
+                "total_couriers": total_couriers,
+                "active_businesses": active_businesses,
+                "active_couriers": active_couriers
+            },
+            "top_cities": city_counts,
+            "generated_at": now.isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating dashboard report: {str(e)}")
+
+@api_router.get("/admin/reports/financial")
+async def get_financial_reports(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Get financial reports (Admin only)"""
+    try:
+        # Parse dates
+        if start_date:
+            start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        else:
+            start = datetime.now(timezone.utc) - timedelta(days=30)
+        
+        if end_date:
+            end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        else:
+            end = datetime.now(timezone.utc)
+        
+        # Revenue by date
+        daily_revenue_pipeline = [
+            {"$match": {
+                "created_at": {"$gte": start, "$lte": end},
+                "status": {"$in": ["delivered", "completed"]}
+            }},
+            {"$group": {
+                "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$created_at"}},
+                "revenue": {"$sum": "$total_amount"},
+                "orders": {"$sum": 1}
+            }},
+            {"$sort": {"_id": 1}}
+        ]
+        daily_revenue = []
+        async for result in db.orders.aggregate(daily_revenue_pipeline):
+            daily_revenue.append({
+                "date": result["_id"],
+                "revenue": result["revenue"],
+                "orders": result["orders"]
+            })
+        
+        # Commission breakdown
+        commission_pipeline = [
+            {"$match": {
+                "created_at": {"$gte": start, "$lte": end},
+                "status": {"$in": ["delivered", "completed"]}
+            }},
+            {"$group": {
+                "_id": None,
+                "total_orders": {"$sum": 1},
+                "total_revenue": {"$sum": "$total_amount"},
+                "total_commission": {"$sum": "$commission_amount"}
+            }}
+        ]
+        commission_data = {}
+        async for result in db.orders.aggregate(commission_pipeline):
+            commission_data = {
+                "total_orders": result.get("total_orders", 0),
+                "total_revenue": result.get("total_revenue", 0),
+                "total_commission": result.get("total_commission", 0),
+                "commission_rate": round((result.get("total_commission", 0) / result.get("total_revenue", 1)) * 100, 2) if result.get("total_revenue", 0) > 0 else 0
+            }
+        
+        return {
+            "period": {
+                "start_date": start.isoformat(),
+                "end_date": end.isoformat()
+            },
+            "summary": commission_data,
+            "daily_revenue": daily_revenue,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating financial report: {str(e)}")
+
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
 async def get_public_businesses(
