@@ -2008,10 +2008,14 @@ async def get_public_businesses(
             "kyc_status": "approved"  # Only show approved businesses
         }
         
-        # Add city filter if provided
+        # Add city filter if provided - case-insensitive
         if city:
             normalized_city = normalize_city_name(city)
-            query_filter["city_normalized"] = normalized_city
+            query_filter["$or"] = [
+                {"city_normalized": normalized_city},
+                {"city": {"$regex": f"^{re.escape(city)}$", "$options": "i"}},
+                {"address": {"$regex": f".*{re.escape(city)}.*", "$options": "i"}}
+            ]
         
         # If lat/lng provided, use geo-spatial query
         if lat is not None and lng is not None:
