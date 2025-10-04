@@ -98,22 +98,96 @@ const AdminPanel = ({ user, onLogout }) => {
       {/* Content */}
       <main className="max-w-7xl mx-auto py-6 px-6">
         {currentView === 'dashboard' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Toplam Kullanıcılar</h3>
-              <p className="text-3xl font-bold text-blue-600">150</p>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Toplam Siparişler</h3>
+                <p className="text-3xl font-bold text-blue-600">1,234</p>
+                <p className="text-sm text-green-600 mt-1">↗️ +12% bu hafta</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Aktif İşletmeler</h3>
+                <p className="text-3xl font-bold text-green-600">89</p>
+                <p className="text-sm text-blue-600 mt-1">📈 +5 yeni onay</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Aktif Kuryeler</h3>
+                <p className="text-3xl font-bold text-yellow-600">156</p>
+                <p className="text-sm text-gray-600 mt-1">🚴 Çevrimiçi: 23</p>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Günlük Gelir</h3>
+                <p className="text-3xl font-bold text-purple-600">₺15,430</p>
+                <p className="text-sm text-green-600 mt-1">💰 +8% dün</p>
+              </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Aktif İşletmeler</h3>
-              <p className="text-3xl font-bold text-green-600">45</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Bekleyen KYC</h3>
-              <p className="text-3xl font-bold text-yellow-600">12</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Günlük Siparişler</h3>
-              <p className="text-3xl font-bold text-purple-600">89</p>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Son Siparişler</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <div>
+                      <p className="font-medium">#ORD-001</p>
+                      <p className="text-sm text-gray-600">Pizza Palace - ₺125</p>
+                    </div>
+                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      Teslim Edildi
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <div>
+                      <p className="font-medium">#ORD-002</p>
+                      <p className="text-sm text-gray-600">Burger Deluxe - ₺89</p>
+                    </div>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      Yolda
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <div>
+                      <p className="font-medium">#ORD-003</p>
+                      <p className="text-sm text-gray-600">Döner Evi - ₺65</p>
+                    </div>
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      Hazırlanıyor
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Bekleyen Onaylar</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <div>
+                      <p className="font-medium">İşletme KYC</p>
+                      <p className="text-sm text-gray-600">3 bekleyen başvuru</p>
+                    </div>
+                    <button className="text-blue-600 hover:text-blue-800">
+                      Görüntüle →
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <div>
+                      <p className="font-medium">Kurye KYC</p>
+                      <p className="text-sm text-gray-600">7 bekleyen başvuru</p>
+                    </div>
+                    <button className="text-blue-600 hover:text-blue-800">
+                      Görüntüle →
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <div>
+                      <p className="font-medium">Promosyonlar</p>
+                      <p className="text-sm text-gray-600">2 aktif kampanya</p>
+                    </div>
+                    <button className="text-blue-600 hover:text-blue-800">
+                      Yönet →
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
