@@ -2244,6 +2244,198 @@ async def delete_order_admin(order_id: str, current_user: dict = Depends(get_adm
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting order: {str(e)}")
 
+# Mock Payment Endpoints for FAZ 2
+class PaymentMethod(str, Enum):
+    ONLINE = "online"
+    CASH_ON_DELIVERY = "cash_on_delivery"
+    POS_ON_DELIVERY = "pos_on_delivery"
+
+class MockPaymentRequest(BaseModel):
+    order_id: str
+    payment_method: PaymentMethod
+    amount: float
+    card_details: Optional[dict] = None  # For online payment simulation
+
+class MockPaymentResponse(BaseModel):
+    payment_id: str
+    status: str  # success, failed, pending
+    message: str
+    transaction_id: Optional[str] = None
+
+@api_router.post("/payments/mock", response_model=MockPaymentResponse)
+async def process_mock_payment(
+    payment_request: MockPaymentRequest,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Mock payment processing for FAZ 2 - simulates payment gateway"""
+    try:
+        payment_id = str(uuid.uuid4())
+        
+        # Simulate payment processing based on method
+        if payment_request.payment_method == PaymentMethod.ONLINE:
+            # Mock online payment - simulate success/failure randomly
+            import random
+            success_rate = 0.9  # 90% success rate
+            
+            if random.random() < success_rate:
+                status = "success"
+                message = "Online ödeme başarıyla tamamlandı"
+                transaction_id = f"TXN-{uuid.uuid4().hex[:12].upper()}"
+                
+                # Update order status to confirmed for successful payment
+                await db.orders.update_one(
+                    {"id": payment_request.order_id},
+                    {"$set": {
+                        "payment_status": "paid",
+                        "payment_method": "online",
+                        "payment_id": payment_id,
+                        "transaction_id": transaction_id,
+                        "status": "confirmed",
+                        "confirmed_at": datetime.now(timezone.utc)
+                    }}
+                )
+            else:
+                status = "failed"
+                message = "Online ödeme başarısız oldu. Lütfen tekrar deneyin."
+                transaction_id = None
+        
+        elif payment_request.payment_method == PaymentMethod.CASH_ON_DELIVERY:
+            status = "success"
+            message = "Kapıda nakit ödeme seçildi. Sipariş onaylandı."
+            transaction_id = f"COD-{uuid.uuid4().hex[:8].upper()}"
+            
+            # Update order status to confirmed
+            await db.orders.update_one(
+                {"id": payment_request.order_id},
+                {"$set": {
+                    "payment_status": "pending",
+                    "payment_method": "cash_on_delivery",
+                    "payment_id": payment_id,
+                    "transaction_id": transaction_id,
+                    "status": "confirmed",
+                    "confirmed_at": datetime.now(timezone.utc)
+                }}
+            )
+        
+        elif payment_request.payment_method == PaymentMethod.POS_ON_DELIVERY:
+            status = "success"
+            message = "Kapıda POS ile ödeme seçildi. Sipariş onaylandı."
+            transaction_id = f"POS-{uuid.uuid4().hex[:8].upper()}"
+            
+            # Update order status to confirmed
+            await db.orders.update_one(
+                {"id": payment_request.order_id},
+                {"$set": {
+                    "payment_status": "pending",
+                    "payment_method": "pos_on_delivery",
+                    "payment_id": payment_id,
+                    "transaction_id": transaction_id,
+                    "status": "confirmed",
+                    "confirmed_at": datetime.now(timezone.utc)
+                }}
+            )
+        
+        # Store payment record
+        payment_record = {
+            "id": payment_id,
+            "order_id": payment_request.order_id,
+            "customer_id": current_user["id"],
+            "amount": payment_request.amount,
+            "payment_method": payment_request.payment_method,
+            "status": status,
+            "transaction_id": transaction_id,
+            "created_at": datetime.now(timezone.utc),
+            "card_details": payment_request.card_details if payment_request.payment_method == PaymentMethod.ONLINE else None
+        }
+        
+        await db.payments.insert_one(payment_record)
+        
+        return MockPaymentResponse(
+            payment_id=payment_id,
+            status=status,
+            message=message,
+            transaction_id=transaction_id
+        )
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Payment processing error: {str(e)}")
+
+@api_router.get("/orders/my")
+async def get_my_orders(current_user: dict = Depends(get_customer_user)):
+    """Get customer's orders for tracking"""
+    try:
+        orders = await db.orders.find({"customer_id": current_user["id"]}).to_list(length=None)
+        
+        # Convert datetime and ObjectId
+        for order in orders:
+            order["id"] = str(order.get("_id", order.get("id", "")))
+            if "_id" in order:
+                del order["_id"]
+            
+            # Handle datetime conversion safely
+            datetime_fields = ["created_at", "confirmed_at", "preparing_at", "picked_up_at", "delivering_at", "delivered_at", "cancelled_at"]
+            for field in datetime_fields:
+                if order.get(field) and not isinstance(order[field], str):
+                    order[field] = order[field].isoformat()
+        
+        # Sort by creation date (newest first)
+        orders.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        
+        return orders
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving orders: {str(e)}")
+
+@api_router.get("/orders/{order_id}/track")
+async def track_order(order_id: str, current_user: dict = Depends(get_customer_user)):
+    """Track specific order status and location"""
+    try:
+        # Find order
+        from bson import ObjectId
+        try:
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Check if order belongs to current user
+        if order["customer_id"] != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Convert ObjectId and datetime
+        order["id"] = str(order.get("_id", order.get("id", "")))
+        if "_id" in order:
+            del order["_id"]
+        
+        datetime_fields = ["created_at", "confirmed_at", "preparing_at", "picked_up_at", "delivering_at", "delivered_at", "cancelled_at"]
+        for field in datetime_fields:
+            if order.get(field) and not isinstance(order[field], str):
+                order[field] = order[field].isoformat()
+        
+        # Add estimated delivery time based on status
+        current_time = datetime.now(timezone.utc)
+        if order["status"] in ["confirmed", "preparing"]:
+            order["estimated_delivery"] = (current_time + timedelta(minutes=45)).isoformat()
+        elif order["status"] in ["picked_up", "delivering"]:
+            order["estimated_delivery"] = (current_time + timedelta(minutes=15)).isoformat()
+        
+        # Get courier location if available (mock data for now)
+        if order.get("courier_id") and order["status"] in ["picked_up", "delivering"]:
+            order["courier_location"] = {
+                "lat": 41.0082,  # Istanbul center mock
+                "lng": 28.9784,
+                "last_updated": current_time.isoformat()
+            }
+        
+        return order
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error tracking order: {str(e)}")
+
 @api_router.get("/admin/orders/stats")
 async def get_order_statistics(current_user: dict = Depends(get_admin_user)):
     """Get order statistics for admin dashboard"""
