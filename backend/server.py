@@ -2317,7 +2317,7 @@ async def process_mock_payment(
                 }}
             )
         
-        elif payment_request.payment_method == PaymentMethod.POS_ON_DELIVERY:
+        elif payment_request.payment_method == MockPaymentMethod.POS_ON_DELIVERY:
             status = "success"
             message = "Kapıda POS ile ödeme seçildi. Sipariş onaylandı."
             transaction_id = f"POS-{uuid.uuid4().hex[:8].upper()}"
