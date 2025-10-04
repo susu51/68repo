@@ -405,44 +405,385 @@ const AdminPanel = ({ user, onLogout }) => {
           </div>
         )}
 
-        {currentView === 'featured' && (
+        {currentView === 'promotions' && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">⭐ Öne Çıkarılanlar</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">🎯 Promosyon Yönetimi</h2>
+              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                + Yeni Promosyon
+              </button>
+            </div>
             
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Öne Çıkan İşletmeler</h3>
-                <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                  İşletme Ekle
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="border rounded-lg p-4">
-                  <h4 className="font-semibold">Pizza Palace</h4>
-                  <p className="text-sm text-gray-600">İstanbul • ⭐ Öne Çıkan</p>
-                  <div className="mt-2 space-x-2">
-                    <button className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                      Kaldır
-                    </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">%20 İndirim Kampanyası</h3>
+                    <p className="text-sm text-gray-600">Yeni kullanıcılar için</p>
                   </div>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    Aktif
+                  </span>
                 </div>
                 
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                  <p className="text-gray-500">Yeni işletme ekle</p>
-                  <button className="mt-2 text-blue-500 hover:text-blue-600">
-                    + Ekle
+                <div className="text-sm text-gray-600 space-y-1 mb-4">
+                  <p>🎯 Tip: Yüzde İndirimi</p>
+                  <p>💰 %20 indirim</p>
+                  <p>📅 01.01.2024 - 31.01.2024</p>
+                  <p>🔢 Kullanım: 234/1000</p>
+                  <p>💳 Min. Tutar: ₺50</p>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600">
+                    Düzenle
+                  </button>
+                  <button className="flex-1 bg-gray-500 text-white px-3 py-2 rounded text-sm hover:bg-gray-600">
+                    Duraklat
+                  </button>
+                  <button className="bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600">
+                    🗑️
                   </button>
                 </div>
+              </div>
+              
+              <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Ücretsiz Teslimat</h3>
+                    <p className="text-sm text-gray-600">150₺ üzeri siparişler</p>
+                  </div>
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                    Beklemede
+                  </span>
+                </div>
+                
+                <div className="text-sm text-gray-600 space-y-1 mb-4">
+                  <p>🎯 Tip: Ücretsiz Teslimat</p>
+                  <p>💰 Teslimat ücreti ₺0</p>
+                  <p>📅 15.02.2024 - 15.03.2024</p>
+                  <p>🔢 Kullanım: 0/500</p>
+                  <p>💳 Min. Tutar: ₺150</p>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600">
+                    Başlat
+                  </button>
+                  <button className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600">
+                    Düzenle
+                  </button>
+                </div>
+              </div>
+              
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                <div className="text-gray-400 mb-2">
+                  <svg className="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 font-medium">Yeni Promosyon</p>
+                <button className="mt-2 text-blue-500 hover:text-blue-600 text-sm">
+                  + Kampanya Oluştur
+                </button>
               </div>
             </div>
           </div>
         )}
 
-        {currentView === 'users' && (
+        {currentView === 'settings' && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">👥 Kullanıcı Yönetimi</h2>
-            <p className="text-gray-600">Kullanıcı listesi burada görünecek.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">⚙️ Platform Ayarları</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-4">Genel Ayarlar</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Bakım Modu</label>
+                      <input type="checkbox" className="rounded" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Yeni Kayıtlar</label>
+                      <input type="checkbox" defaultChecked className="rounded" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Teslimat Yarıçapı (km)</label>
+                      <input type="number" defaultValue="50" className="w-full border rounded px-3 py-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Platform Komisyonu (%)</label>
+                      <input type="number" defaultValue="5" className="w-full border rounded px-3 py-2" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-4">Ödeme Ayarları</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Kapıda Ödeme</label>
+                      <input type="checkbox" defaultChecked className="rounded" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Online Ödeme</label>
+                      <input type="checkbox" defaultChecked className="rounded" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">POS Ödeme</label>
+                      <input type="checkbox" className="rounded" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Min. Sipariş Tutarı (₺)</label>
+                      <input type="number" defaultValue="25" className="w-full border rounded px-3 py-2" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-4">Bildirim Ayarları</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Email Bildirimleri</label>
+                      <input type="checkbox" defaultChecked className="rounded" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">SMS Bildirimleri</label>
+                      <input type="checkbox" className="rounded" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Push Bildirimleri</label>
+                      <input type="checkbox" defaultChecked className="rounded" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-4">KYC Ayarları</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">İşletme Otomatik Onay</label>
+                      <input type="checkbox" className="rounded" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Kurye Otomatik Onay</label>
+                      <input type="checkbox" className="rounded" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium text-gray-700">Belge Doğrulama Gerekli</label>
+                      <input type="checkbox" defaultChecked className="rounded" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-4">Teslimat Bölgeleri</h3>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex justify-between items-center py-2 border-b">
+                      <span className="text-sm">İstanbul - Avrupa Yakası</span>
+                      <span className="text-xs text-gray-500">₺5 teslimat</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b">
+                      <span className="text-sm">İstanbul - Anadolu Yakası</span>
+                      <span className="text-xs text-gray-500">₺5 teslimat</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm">Ankara - Çankaya</span>
+                      <span className="text-xs text-gray-500">₺7 teslimat</span>
+                    </div>
+                  </div>
+                  <button className="w-full bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600">
+                    Bölge Ekle
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-6 border-t flex justify-end space-x-3">
+              <button className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
+                İptal Et
+              </button>
+              <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Ayarları Kaydet
+              </button>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'reports' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">📈 Raporlar & Analytics</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Bu Ayın Geliri</h3>
+                <p className="text-2xl font-bold">₺125,430</p>
+                <p className="text-sm opacity-90">+12% geçen aya göre</p>
+              </div>
+              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Toplam Siparişler</h3>
+                <p className="text-2xl font-bold">2,847</p>
+                <p className="text-sm opacity-90">+18% geçen aya göre</p>
+              </div>
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Ortalama Sipariş</h3>
+                <p className="text-2xl font-bold">₺87.50</p>
+                <p className="text-sm opacity-90">+5% geçen aya göre</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-4">Sipariş Durumu Dağılımı</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Teslim Edildi</span>
+                    <div className="flex items-center">
+                      <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                        <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                      </div>
+                      <span className="text-sm font-medium">85%</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Yolda</span>
+                    <div className="flex items-center">
+                      <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{width: '8%'}}></div>
+                      </div>
+                      <span className="text-sm font-medium">8%</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Hazırlanıyor</span>
+                    <div className="flex items-center">
+                      <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                        <div className="bg-yellow-500 h-2 rounded-full" style={{width: '5%'}}></div>
+                      </div>
+                      <span className="text-sm font-medium">5%</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">İptal Edildi</span>
+                    <div className="flex items-center">
+                      <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                        <div className="bg-red-500 h-2 rounded-full" style={{width: '2%'}}></div>
+                      </div>
+                      <span className="text-sm font-medium">2%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-4">Top Kategoriler</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">🍕 Pizza</span>
+                    <span className="font-medium">₺45,230</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">🍔 Burger</span>
+                    <span className="font-medium">₺38,920</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">🌯 Döner</span>
+                    <span className="font-medium">₺25,640</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">🍖 Et Yemekleri</span>
+                    <span className="font-medium">₺18,340</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">🥗 Salata</span>
+                    <span className="font-medium">₺12,890</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-4">Şehir Bazlı Performans</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">İstanbul</span>
+                    <div className="text-right">
+                      <div className="font-medium">1,456 sipariş</div>
+                      <div className="text-xs text-gray-500">₺89,340</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Ankara</span>
+                    <div className="text-right">
+                      <div className="font-medium">654 sipariş</div>
+                      <div className="text-xs text-gray-500">₺42,180</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">İzmir</span>
+                    <div className="text-right">
+                      <div className="font-medium">387 sipariş</div>
+                      <div className="text-xs text-gray-500">₺28,670</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-4">En İyi Performans Gösteren İşletmeler</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <span className="text-lg mr-2">🥇</span>
+                      <span className="text-sm text-gray-600">Pizza Palace İstanbul</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">234 sipariş</div>
+                      <div className="text-xs text-gray-500">⭐ 4.8</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <span className="text-lg mr-2">🥈</span>
+                      <span className="text-sm text-gray-600">Burger Deluxe</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">189 sipariş</div>
+                      <div className="text-xs text-gray-500">⭐ 4.7</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <span className="text-lg mr-2">🥉</span>
+                      <span className="text-sm text-gray-600">Döner Evi</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">156 sipariş</div>
+                      <div className="text-xs text-gray-500">⭐ 4.6</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-6 border-t">
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-gray-900">Detaylı Raporlar</h3>
+                <div className="flex space-x-2">
+                  <button className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                    📊 Finansal Rapor İndir
+                  </button>
+                  <button className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                    📈 Sipariş Raporu İndir
+                  </button>
+                  <button className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                    👥 Kullanıcı Raporu İndir
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
