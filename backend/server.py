@@ -2238,7 +2238,8 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
                 "city": addr.get("city_original", addr.get("city", "")),
                 "description": addr.get("description", ""),
                 "lat": coords[1] if coords and len(coords) > 1 and coords[1] else None,
-                "lng": coords[0] if coords and len(coords) > 0 and coords[0] else None
+                "lng": coords[0] if coords and len(coords) > 0 and coords[0] else None,
+                "is_default": addr.get("is_default", False)
             }
             address_list.append(address_data)
         
