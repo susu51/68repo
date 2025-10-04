@@ -60,9 +60,21 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
         });
         setRestaurants(response.data || []);
       } else {
-        // City-wide listing
-        const response = await axios.get(`${API}/api/businesses`);
+        // City-wide listing - filter by selected address city if available
+        let endpoint = `${API}/api/businesses`;
+        let params = {};
+        
+        if (selectedAddress && selectedAddress.city) {
+          params.city = selectedAddress.city;
+          console.log(`Filtering restaurants by city: ${selectedAddress.city}`);
+        }
+        
+        const response = await axios.get(endpoint, { params });
         setRestaurants(response.data || []);
+        
+        if (selectedAddress && selectedAddress.city) {
+          console.log(`Found ${response.data?.length || 0} restaurants in ${selectedAddress.city}`);
+        }
       }
       
     } catch (error) {
