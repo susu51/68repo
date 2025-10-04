@@ -2245,14 +2245,14 @@ async def delete_order_admin(order_id: str, current_user: dict = Depends(get_adm
         raise HTTPException(status_code=500, detail=f"Error deleting order: {str(e)}")
 
 # Mock Payment Endpoints for FAZ 2
-class PaymentMethod(str, Enum):
+class MockPaymentMethod(str, Enum):
     ONLINE = "online"
     CASH_ON_DELIVERY = "cash_on_delivery"
     POS_ON_DELIVERY = "pos_on_delivery"
 
 class MockPaymentRequest(BaseModel):
     order_id: str
-    payment_method: PaymentMethod
+    payment_method: MockPaymentMethod
     amount: float
     card_details: Optional[dict] = None  # For online payment simulation
 
