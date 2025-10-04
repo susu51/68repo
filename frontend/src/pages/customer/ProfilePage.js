@@ -448,13 +448,25 @@ const ProfilePage = ({ user, onLogout }) => {
           <h3 className="text-lg font-semibold">⚙️ Hesap Ayarları</h3>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Button variant="outline" className="w-full justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            onClick={() => setShowPasswordModal(true)}
+          >
             🔒 Şifre Değiştir
           </Button>
-          <Button variant="outline" className="w-full justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            onClick={() => setActiveTab('notifications')}
+          >
             🔔 Bildirim Ayarları
           </Button>
-          <Button variant="outline" className="w-full justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            onClick={() => setActiveTab('addresses')}
+          >
             📍 Adres Yönetimi
           </Button>
           
