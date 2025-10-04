@@ -308,53 +308,52 @@ const Profile = ({ user, onBack, onLogout }) => {
             </CardContent>
           </Card>
 
-          {/* Account Actions */}
-          <Card className="border-0 shadow-lg rounded-2xl">
-            <CardHeader>
-              <h2 className="text-xl font-bold text-gray-800">⚙️ Hesap Ayarları</h2>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl p-4 h-auto">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-4">🔒</span>
-                  <div className="text-left">
-                    <div className="font-semibold">Şifre Değiştir</div>
-                    <div className="text-sm opacity-70">Hesabınızın güvenliği için şifrenizi güncelleyin</div>
-                  </div>
+        {/* Account Actions */}
+        <Card className="border-0 shadow-lg rounded-2xl">
+          <CardHeader>
+            <h2 className="text-xl font-bold text-gray-800">⚙️ Hesap Ayarları</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl p-4 h-auto">
+              <div className="flex items-center">
+                <span className="text-2xl mr-4">🔒</span>
+                <div className="text-left">
+                  <div className="font-semibold">Şifre Değiştir</div>
+                  <div className="text-sm opacity-70">Hesabınızın güvenliği için şifrenizi güncelleyin</div>
                 </div>
-              </Button>
+              </div>
+            </Button>
 
-              <Button className="w-full justify-start bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl p-4 h-auto">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-4">🔔</span>
-                  <div className="text-left">
-                    <div className="font-semibold">Bildirim Ayarları</div>
-                    <div className="text-sm opacity-70">Sipariş durumu ve promosyon bildirimlerini yönetin</div>
-                  </div>
+            <Button className="w-full justify-start bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl p-4 h-auto">
+              <div className="flex items-center">
+                <span className="text-2xl mr-4">🔔</span>
+                <div className="text-left">
+                  <div className="font-semibold">Bildirim Ayarları</div>
+                  <div className="text-sm opacity-70">Sipariş durumu ve promosyon bildirimlerini yönetin</div>
                 </div>
-              </Button>
+              </div>
+            </Button>
 
-              <Button className="w-full justify-start bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl p-4 h-auto">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-4">💳</span>
-                  <div className="text-left">
-                    <div className="font-semibold">Ödeme Yöntemleri</div>
-                    <div className="text-sm opacity-70">Kredi kartı ve diğer ödeme seçeneklerini yönetin</div>
-                  </div>
+            <Button className="w-full justify-start bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl p-4 h-auto">
+              <div className="flex items-center">
+                <span className="text-2xl mr-4">💳</span>
+                <div className="text-left">
+                  <div className="font-semibold">Ödeme Yöntemleri</div>
+                  <div className="text-sm opacity-70">Kredi kartı ve diğer ödeme seçeneklerini yönetin</div>
                 </div>
-              </Button>
+              </div>
+            </Button>
 
-              <hr className="my-4" />
+            <hr className="my-4" />
 
-              <Button 
-                onClick={onLogout}
-                className="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl p-4 font-semibold"
-              >
-                🚪 Çıkış Yap
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+            <Button 
+              onClick={onLogout}
+              className="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl p-4 font-semibold"
+            >
+              🚪 Çıkış Yap
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Order History */}
