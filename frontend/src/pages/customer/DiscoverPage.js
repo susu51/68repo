@@ -113,10 +113,10 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
     );
   };
 
-  // Reload restaurants when sort mode changes
+  // Reload restaurants when sort mode changes or selected address changes
   useEffect(() => {
     loadRestaurants();
-  }, [sortMode, userLocation]);
+  }, [sortMode, userLocation, selectedAddress]);
 
   const handleRestaurantClick = async (restaurant) => {
     try {
