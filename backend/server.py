@@ -2534,11 +2534,18 @@ async def get_business_products(business_id: str):
     try:
         print(f"🔍 DEBUG: Looking for products with business_id: {business_id}")
         
+        # Check if any products exist at all
+        total_products = await db.products.count_documents({})
+        print(f"🔍 DEBUG: Total products in collection: {total_products}")
+        
         # Check if any products exist for this business_id
         all_products_for_business = await db.products.find({
             "business_id": business_id
         }).to_list(None)
         print(f"🔍 DEBUG: Found {len(all_products_for_business)} products (including unavailable)")
+        
+        if len(all_products_for_business) > 0:
+            print(f"🔍 DEBUG: First product: {all_products_for_business[0]}")
         
         products = await db.products.find({
             "business_id": business_id,
