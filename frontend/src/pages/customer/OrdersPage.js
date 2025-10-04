@@ -47,8 +47,13 @@ const OrdersPage = ({ user }) => {
       setOrders(ordersData);
     } catch (error) {
       console.error('Error loading orders:', error);
-      // Fallback to mock data
-      setOrders(mockOrders);
+      // Fallback to mock data with safe properties
+      const safeOrders = mockOrders.map(order => ({
+        ...order,
+        total: order.total || 0,
+        items: order.items || []
+      }));
+      setOrders(safeOrders);
     } finally {
       setLoading(false);
     }
