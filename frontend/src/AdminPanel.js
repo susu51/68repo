@@ -538,44 +538,7 @@ const AdminPanel = ({ user, onLogout }) => {
         </div>
       )}
 
-      {/* Reject Modal */}
-      {showRejectModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Kurye Başvurusunu Reddet</h3>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="reject-notes">Ret Sebebi</Label>
-                <Textarea
-                  id="reject-notes"
-                  value={rejectNotes}
-                  onChange={(e) => setRejectNotes(e.target.value)}
-                  placeholder="Neden reddedildiğini açıklayın..."
-                  rows={4}
-                />
-              </div>
-              <div className="flex justify-end space-x-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setShowRejectModal(false);
-                    setRejectNotes('');
-                    setSelectedCourier(null);
-                  }}
-                >
-                  İptal
-                </Button>
-                <Button 
-                  variant="destructive"
-                  onClick={() => handleReject(selectedCourier, rejectNotes)}
-                >
-                  Reddet
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Business KYC system uses inline notes - no modal needed */}
     </div>
   );
 
