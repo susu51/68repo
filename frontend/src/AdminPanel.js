@@ -222,8 +222,6 @@ const AdminPanel = ({ user, onLogout }) => {
     }
   };
 
-  // Business KYC Management function exists above at line ~195
-
   // Legacy courier KYC (keep for backward compatibility)
   const handleApprove = async (courierId, notes = '') => {
     try {
@@ -354,7 +352,7 @@ const AdminPanel = ({ user, onLogout }) => {
   // Navigation items
   const navigationItems = [
     { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
-    { id: 'kyc', label: '🏪 İşletme Onay', icon: '🏪' },
+    { id: 'kyc', label: '✅ KYC Onay', icon: '✅' },
     { id: 'users', label: '👥 Kullanıcılar', icon: '👥' },
     { id: 'businesses', label: '🏪 İşletmeler', icon: '🏪' },
     { id: 'messages', label: '💬 Mesajlaşma', icon: '💬' },
@@ -517,7 +515,7 @@ const AdminPanel = ({ user, onLogout }) => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">İşletme Onay Bekleyenler</h2>
-          <Badge variant="secondary">{allBusinesses.filter(b => !b.kyc_status || b.kyc_status === 'pending').length} bekleyen</Badge>
+          <Badge variant="secondary">{pendingBusinesses.length} bekleyen</Badge>
         </div>
 
         {pendingBusinesses.length === 0 ? (
@@ -529,30 +527,13 @@ const AdminPanel = ({ user, onLogout }) => {
           </Card>
       ) : (
         <div className="grid gap-6">
-          {allBusinesses.filter(b => !b.kyc_status || b.kyc_status === 'pending').map((business) => (
-            <Card key={business.id} className="shadow-lg">
-              <CardHeader>
-                <CardTitle>{business.business_name || business.name}</CardTitle>
-                <CardDescription>{business.email} • {business.city}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <Badge variant="outline">
-                      {business.kyc_status || 'Onay Bekliyor'}
-                    </Badge>
-                  </div>
-                  <div className="space-x-2">
-                    <Button 
-                      onClick={() => handleBusinessApprove ? handleBusinessApprove(business.id) : console.log('approve', business.id)}
-                      className="bg-green-600"
-                    >
-                      ✅ Onayla
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {pendingBusinesses.map((business) => (
+            <BusinessKYCCard
+              key={business.id}
+              business={business}
+              onApprove={(businessId, notes) => handleBusinessApprove(businessId, notes)}
+              onReject={(businessId, notes) => handleBusinessReject(businessId, notes)}
+            />
           ))}
         </div>
       )}
