@@ -804,12 +804,34 @@ const ProfilePage = ({ user, onLogout }) => {
               </div>
               
               <div className="flex space-x-2">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleEditAddress(address)}
+                  disabled={loading}
+                >
                   ✏️
                 </Button>
-                <Button variant="outline" size="sm" className="text-red-500">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-red-500"
+                  onClick={() => handleDeleteAddress(address.id)}
+                  disabled={loading}
+                >
                   🗑️
                 </Button>
+                {!address.is_default && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-green-600 border-green-300"
+                    onClick={() => handleSetDefaultAddress(address.id)}
+                    disabled={loading}
+                  >
+                    📌 Varsayılan Yap
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
