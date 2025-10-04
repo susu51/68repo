@@ -69,6 +69,30 @@ const AdminPanel = ({ user, onLogout }) => {
     fetchInitialData();
   }, []);
 
+  // Filter businesses based on city and search query
+  useEffect(() => {
+    let filtered = allBusinesses;
+    
+    // City filter
+    if (cityFilter) {
+      filtered = filtered.filter(business => 
+        business.city?.toLowerCase().includes(cityFilter.toLowerCase()) ||
+        business.address?.toLowerCase().includes(cityFilter.toLowerCase())
+      );
+    }
+    
+    // Search query filter
+    if (searchQuery) {
+      filtered = filtered.filter(business =>
+        business.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        business.business_category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        business.email?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    setFilteredBusinesses(filtered);
+  }, [allBusinesses, cityFilter, searchQuery]);
+
   const fetchInitialData = async () => {
     setLoading(true);
     try {
