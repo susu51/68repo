@@ -2417,4 +2417,236 @@ def calculate_distance(lat1, lng1, lat2, lng2):
     r = 6371  # Radius of earth in kilometers
     return c * r
 
+# Profile & Customer App Endpoints
+@api_router.get("/profile/coupons")
+async def get_user_coupons(current_user: dict = Depends(get_current_user)):
+    """Get user's available coupons"""
+    try:
+        # Get coupons assigned to user
+        coupons = await db.coupons.find({
+            "assigned_user_ids": current_user["id"],
+            "status": "active"
+        }).to_list(None)
+        
+        # Mock data for demo
+        if not coupons:
+            mock_coupons = [
+                {
+                    "id": "coupon-1",
+                    "code": "WELCOME20",
+                    "title": "Hoş Geldin İndirimi", 
+                    "description": "İlk siparişinizde %20 indirim",
+                    "discount_type": "PERCENT",
+                    "discount_value": 20,
+                    "min_amount": 50,
+                    "valid_until": "2024-12-31",
+                    "status": "active"
+                }
+            ]
+            return mock_coupons
+        
+        # Convert ObjectId
+        for coupon in coupons:
+            if "_id" in coupon:
+                coupon["id"] = str(coupon["_id"])
+                del coupon["_id"]
+        
+        return coupons
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/profile/discounts")
+async def get_user_discounts(current_user: dict = Depends(get_current_user)):
+    """Get user's personal discounts"""
+    try:
+        discounts = await db.discounts.find({
+            "user_id": current_user["id"]
+        }).to_list(None)
+        
+        # Mock data for demo
+        if not discounts:
+            mock_discounts = [
+                {
+                    "id": "discount-1",
+                    "title": "VIP Müşteri İndirimi",
+                    "description": "Tüm siparişlerinizde geçerli",
+                    "discount_type": "PERCENT",
+                    "discount_value": 15,
+                    "valid_until": "2024-12-31"
+                }
+            ]
+            return mock_discounts
+        
+        # Convert ObjectId
+        for discount in discounts:
+            if "_id" in discount:
+                discount["id"] = str(discount["_id"])
+                del discount["_id"]
+        
+        return discounts
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/campaigns")
+async def get_active_campaigns():
+    """Get active campaigns"""
+    try:
+        campaigns = await db.campaigns.find({
+            "valid_until": {"$gte": datetime.now(timezone.utc).isoformat()}
+        }).to_list(None)
+        
+        # Mock data for demo
+        if not campaigns:
+            mock_campaigns = [
+                {
+                    "id": "campaign-1",
+                    "title": "Pizza Festivali",
+                    "description": "Tüm pizzalarda %30 indirim",
+                    "discount_type": "PERCENT",
+                    "discount_value": 30,
+                    "valid_until": "2024-12-31",
+                    "image_url": None
+                },
+                {
+                    "id": "campaign-2", 
+                    "title": "Sağlıklı Yaşam",
+                    "description": "Salata siparişlerinde %25 indirim",
+                    "discount_type": "PERCENT",
+                    "discount_value": 25,
+                    "valid_until": "2024-12-31",
+                    "image_url": None
+                }
+            ]
+            return mock_campaigns
+        
+        # Convert ObjectId
+        for campaign in campaigns:
+            if "_id" in campaign:
+                campaign["id"] = str(campaign["_id"])
+                del campaign["_id"]
+        
+        return campaigns
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/payment-methods")
+async def get_payment_methods(current_user: dict = Depends(get_current_user)):
+    """Get user's saved payment methods"""
+    try:
+        methods = await db.payment_methods.find({
+            "user_id": current_user["id"]
+        }).to_list(None)
+        
+        # Convert ObjectId
+        for method in methods:
+            if "_id" in method:
+                method["id"] = str(method["_id"])
+                del method["_id"]
+        
+        return methods
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/payment-methods")
+async def add_payment_method(method_data: dict, current_user: dict = Depends(get_current_user)):
+    """Add new payment method (tokenized)"""
+    try:
+        # In production, this would handle payment provider token
+        payment_method = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user["id"],
+            "provider": method_data.get("provider", "stripe"),
+            "token": method_data.get("token", ""),
+            "brand": method_data.get("brand", "VISA"),
+            "last_four": method_data.get("last_four", "4242"),
+            "expiry_month": method_data.get("expiry_month", "12"),
+            "expiry_year": method_data.get("expiry_year", "26"),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.payment_methods.insert_one(payment_method)
+        
+        if "_id" in payment_method:
+            del payment_method["_id"]
+        
+        return payment_method
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/payment-methods/{method_id}")
+async def delete_payment_method(method_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete payment method"""
+    try:
+        result = await db.payment_methods.delete_one({
+            "id": method_id,
+            "user_id": current_user["id"]
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Payment method not found")
+        
+        return {"success": True, "message": "Payment method deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/reviews")
+async def submit_review(review_data: dict, current_user: dict = Depends(get_current_user)):
+    """Submit review for delivered order"""
+    try:
+        # Check if order is delivered
+        order = await db.orders.find_one({"id": review_data.get("order_id")})
+        if not order or order.get("status") != "delivered":
+            raise HTTPException(status_code=400, detail="Can only review delivered orders")
+        
+        # Check if already reviewed
+        existing_review = await db.reviews.find_one({
+            "order_id": review_data.get("order_id"),
+            "target_type": review_data.get("target_type"),
+            "user_id": current_user["id"]
+        })
+        
+        if existing_review:
+            raise HTTPException(status_code=409, detail="Already reviewed this target for this order")
+        
+        review = {
+            "id": str(uuid.uuid4()),
+            "order_id": review_data.get("order_id"),
+            "target_type": review_data.get("target_type"),  # business | courier
+            "target_id": review_data.get("target_id"),
+            "user_id": current_user["id"],
+            "rating": review_data.get("rating", 5),
+            "comment": review_data.get("comment", ""),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.reviews.insert_one(review)
+        
+        if "_id" in review:
+            del review["_id"]
+        
+        return review
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/orders/my")
+async def get_my_orders(current_user: dict = Depends(get_current_user)):
+    """Get current user's orders"""
+    try:
+        orders = await db.orders.find({
+            "customer_id": current_user["id"]
+        }).sort("created_at", -1).to_list(None)
+        
+        # Convert ObjectId and datetime
+        for order in orders:
+            if "_id" in order:
+                order["id"] = str(order["_id"])
+                del order["_id"]
+            
+            if "created_at" in order and hasattr(order["created_at"], 'isoformat'):
+                order["created_at"] = order["created_at"].isoformat()
+        
+        return orders
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
