@@ -401,10 +401,10 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
                       
                       <div className="flex-1">
                         <h3 className="font-bold text-gray-800 mb-1">
-                          {restaurant.business_name}
+                          {restaurant.business_name || restaurant.name || 'İsimsiz Restoran'}
                         </h3>
                         <p className="text-sm text-gray-600 mb-2">
-                          {restaurant.business_category}
+                          {restaurant.business_category || restaurant.category || 'Restoran'}
                         </p>
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
                           <span>⭐ 4.8</span>
