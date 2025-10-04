@@ -352,7 +352,7 @@ const AdminPanel = ({ user, onLogout }) => {
   // Navigation items
   const navigationItems = [
     { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
-    { id: 'kyc', label: '✅ KYC Onay', icon: '✅' },
+    { id: 'kyc', label: '🏪 İşletme KYC', icon: '🏪' },
     { id: 'users', label: '👥 Kullanıcılar', icon: '👥' },
     { id: 'businesses', label: '🏪 İşletmeler', icon: '🏪' },
     { id: 'messages', label: '💬 Mesajlaşma', icon: '💬' },
