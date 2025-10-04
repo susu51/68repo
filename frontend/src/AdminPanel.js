@@ -850,13 +850,14 @@ const AdminPanel = ({ user, onLogout }) => {
     );
   };
 
+  // Load businesses when businesses view is accessed
+  useEffect(() => {
+    if (currentView === 'businesses') {
+      fetchAllBusinesses();
+    }
+  }, [currentView]);
+
   const renderBusinesses = () => {
-    // Load businesses when this view is accessed
-    useEffect(() => {
-      if (currentView === 'businesses') {
-        fetchAllBusinesses();
-      }
-    }, [currentView]);
 
     return (
       <div className="space-y-6">
