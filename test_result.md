@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "FAZ 1 - ADMIN PANEL TAM İMPLEMENTASYON: Complete implementation of all admin panel modules with RBAC system. Priority: Siparişler > İşletmeler > Menüler > Kuryeler > Ayarlar > Promosyon/Raporlar. All admin CRUD operations, role-based access control, real-time data reflection, and E2E validation (Onay → Görünürlük → Sipariş) must be working perfectly."
+user_problem_statement: "FAZ 2 - MÜŞTERİ SEPET & ÖDEME AKIŞİ: Complete customer cart and payment flow implementation. Customer journey: Keşfet→Ürün→Sepet→Adres→Ödeme(mock)→Sipariş→Takip. Mock payment options: Online / Kapıda Nakit / Kapıda POS. Order creation, status tracking, and business/admin visibility required. Order status flow: created→confirmed→preparing→picked_up→delivering→delivered|cancelled."
 
 backend:
   - task: "FAZ 1 - Admin Order Management API"
