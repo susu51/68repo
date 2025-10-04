@@ -877,6 +877,163 @@ const ProfilePage = ({ user, onLogout }) => {
       <div className="p-4">
         {renderTabContent()}
       </div>
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md">
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">🔒 Şifre Değiştir</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label>Mevcut Şifre</Label>
+                  <Input
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                    placeholder="Mevcut şifrenizi girin"
+                  />
+                </div>
+                
+                <div>
+                  <Label>Yeni Şifre</Label>
+                  <Input
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                    placeholder="Yeni şifrenizi girin"
+                  />
+                </div>
+                
+                <div>
+                  <Label>Yeni Şifre (Tekrar)</Label>
+                  <Input
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                    placeholder="Yeni şifrenizi tekrar girin"
+                  />
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
+                <Button
+                  onClick={() => setShowPasswordModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  İptal
+                </Button>
+                <Button
+                  onClick={handlePasswordChange}
+                  disabled={loading}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                >
+                  {loading ? 'Değiştiriliyor...' : 'Şifreyi Değiştir'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Method Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md">
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">💳 Ödeme Yöntemi Ekle</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label>Sağlayıcı</Label>
+                  <select
+                    value={newPaymentMethod.provider}
+                    onChange={(e) => setNewPaymentMethod({...newPaymentMethod, provider: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg p-2"
+                  >
+                    <option value="stripe">Stripe</option>
+                    <option value="iyzico">İyzico</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <Label>Kart Numarası</Label>
+                  <Input
+                    type="text"
+                    value={newPaymentMethod.card_number}
+                    onChange={(e) => setNewPaymentMethod({...newPaymentMethod, card_number: e.target.value})}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={19}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Ay</Label>
+                    <Input
+                      type="text"
+                      value={newPaymentMethod.expiry_month}
+                      onChange={(e) => setNewPaymentMethod({...newPaymentMethod, expiry_month: e.target.value})}
+                      placeholder="MM"
+                      maxLength={2}
+                    />
+                  </div>
+                  <div>
+                    <Label>Yıl</Label>
+                    <Input
+                      type="text"
+                      value={newPaymentMethod.expiry_year}
+                      onChange={(e) => setNewPaymentMethod({...newPaymentMethod, expiry_year: e.target.value})}
+                      placeholder="YY"
+                      maxLength={2}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label>CVV</Label>
+                  <Input
+                    type="text"
+                    value={newPaymentMethod.cvv}
+                    onChange={(e) => setNewPaymentMethod({...newPaymentMethod, cvv: e.target.value})}
+                    placeholder="123"
+                    maxLength={4}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Kart Sahibi Adı</Label>
+                  <Input
+                    type="text"
+                    value={newPaymentMethod.cardholder_name}
+                    onChange={(e) => setNewPaymentMethod({...newPaymentMethod, cardholder_name: e.target.value})}
+                    placeholder="Ad Soyad"
+                  />
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
+                <Button
+                  onClick={() => setShowPaymentModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  İptal
+                </Button>
+                <Button
+                  onClick={handleAddPaymentMethod}
+                  disabled={loading}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                >
+                  {loading ? 'Ekleniyor...' : 'Kartı Ekle'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
