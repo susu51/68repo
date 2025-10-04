@@ -515,7 +515,7 @@ const AdminPanel = ({ user, onLogout }) => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">İşletme Onay Bekleyenler</h2>
-          <Badge variant="secondary">{pendingBusinesses.length} bekleyen</Badge>
+          <Badge variant="secondary">{allBusinesses.filter(b => !b.kyc_status || b.kyc_status === 'pending').length} bekleyen</Badge>
         </div>
 
         {pendingBusinesses.length === 0 ? (
