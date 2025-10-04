@@ -147,12 +147,13 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
 
   const filteredRestaurants = restaurants.filter(restaurant => {
     const searchLower = searchQuery.toLowerCase();
+    const name = restaurant.business_name || restaurant.name || '';
+    const category = restaurant.business_category || restaurant.category || '';
+    
     return (
       !searchQuery || // If no search query, show all
-      restaurant.business_name?.toLowerCase().includes(searchLower) ||
-      restaurant.name?.toLowerCase().includes(searchLower) ||
-      restaurant.business_category?.toLowerCase().includes(searchLower) ||
-      restaurant.category?.toLowerCase().includes(searchLower)
+      name.toLowerCase().includes(searchLower) ||
+      category.toLowerCase().includes(searchLower)
     );
   });
   
