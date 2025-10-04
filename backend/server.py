@@ -2074,21 +2074,41 @@ async def get_public_businesses(
 
 @api_router.patch("/admin/users/{user_id}/approve")
 async def approve_user(user_id: str, current_user: dict = Depends(get_admin_user)):
-    """Approve any user (business, courier) for KYC"""
+    """Approve any user (business, courier) for KYC - Supports both UUID and ObjectId formats"""
     try:
-        # Update user with approved status
+        # Try to find and update user by both formats
+        result = None
+        
+        # First try as ObjectId (for older users)
+        try:
+            from bson import ObjectId
+            object_id = ObjectId(user_id)
+            result = await db.users.update_one(
+                {"_id": object_id},
+                {"$set": {"kyc_status": "approved"}}
+            )
+            if result.modified_count > 0:
+                return {"success": True, "message": f"User {user_id} approved successfully", "format": "ObjectId"}
+        except:
+            pass
+        
+        # Then try as UUID string (for newer users created via registration)
         result = await db.users.update_one(
             {"id": user_id},
             {"$set": {"kyc_status": "approved"}}
         )
         
-        if result.modified_count == 0:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
-            )
+        if result.modified_count > 0:
+            return {"success": True, "message": f"User {user_id} approved successfully", "format": "UUID"}
         
-        return {"success": True, "message": f"User {user_id} approved successfully"}
+        # If not found by either method
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+        
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error approving user: {str(e)}")
 
