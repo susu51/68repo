@@ -1344,6 +1344,7 @@ class AdminPanelBackendTester:
         print("🚀 STARTING FAZ 1 - ADMIN PANEL BACKEND COMPREHENSIVE TESTING")
         print("=" * 80)
         print(f"Backend URL: {BACKEND_URL}")
+        print(f"Admin Email: {ADMIN_EMAIL}")
         print(f"Admin Password: {ADMIN_PASSWORD}")
         print(f"Test Time: {datetime.now().isoformat()}")
         print("=" * 80)
