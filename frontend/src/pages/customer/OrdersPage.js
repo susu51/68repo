@@ -42,12 +42,15 @@ const OrdersPage = ({ user }) => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      // Ensure all required properties exist
+      // Ensure all required properties exist and handle item objects
       const ordersData = (response.data || []).map(order => ({
         ...order,
         total: order.total || 0,
-        items: order.items || [],
-        status: order.status || 'unknown'
+        items: (order.items || []).map(item => 
+          typeof item === 'string' ? item : (item.product_name || item.name || 'Ürün')
+        ),
+        status: order.status || 'unknown',
+        paymentMethod: order.paymentMethod || order.payment_method || 'unknown'
       }));
       setOrders(ordersData);
     } catch (error) {
