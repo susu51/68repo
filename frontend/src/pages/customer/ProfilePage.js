@@ -348,6 +348,8 @@ const ProfilePage = ({ user, onLogout }) => {
     }
 
     switch (activeTab) {
+      case 'addresses':
+        return renderAddresses();
       case 'coupons':
         return renderCoupons();
       case 'discounts':
@@ -356,6 +358,8 @@ const ProfilePage = ({ user, onLogout }) => {
         return renderCampaigns();
       case 'payment_methods':
         return renderPaymentMethods();
+      case 'notifications':
+        return renderNotifications();
       default:
         return renderProfileInfo();
     }
