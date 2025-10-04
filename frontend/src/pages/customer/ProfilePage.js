@@ -311,6 +311,113 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   };
 
+  const handleEditAddress = (address) => {
+    setEditingAddress(address);
+    setNewAddress({
+      label: address.label || '',
+      description: address.description || '',
+      city: address.city || '',
+      district: address.district || '',
+      lat: address.lat || 0,
+      lng: address.lng || 0
+    });
+    setShowAddressModal(true);
+  };
+
+  const handleUpdateAddress = async () => {
+    try {
+      if (!newAddress.label || !newAddress.description || !newAddress.city) {
+        toast.error('Lütfen tüm zorunlu alanları doldurun');
+        return;
+      }
+
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      await axios.put(`${API}/api/user/addresses/${editingAddress.id}`, newAddress, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      toast.success('Adres başarıyla güncellendi!');
+      setShowAddressModal(false);
+      setEditingAddress(null);
+      setNewAddress({
+        label: '',
+        description: '',
+        city: '',
+        district: '',
+        lat: 0,
+        lng: 0
+      });
+      
+      // Refresh addresses
+      loadTabData('addresses');
+    } catch (error) {
+      console.error('Error updating address:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Adres güncellenirken hata oluştu');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!window.confirm('Bu adresi silmek istediğinize emin misiniz?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      await axios.delete(`${API}/api/user/addresses/${addressId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      toast.success('Adres başarıyla silindi!');
+      
+      // Refresh addresses
+      loadTabData('addresses');
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Adres silinirken hata oluştu');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetDefaultAddress = async (addressId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      await axios.post(`${API}/api/user/addresses/${addressId}/set-default`, {}, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      toast.success('Varsayılan adres başarıyla güncellendi!');
+      
+      // Refresh addresses
+      loadTabData('addresses');
+    } catch (error) {
+      console.error('Error setting default address:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Varsayılan adres ayarlanırken hata oluştu');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Mock data
   const mockCoupons = [
     {
