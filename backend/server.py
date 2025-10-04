@@ -2243,4 +2243,126 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
         raise HTTPException(status_code=500, detail=f"Error adding address: {str(e)}")
 
 # Include the API router in the main app
+# Restaurant Discovery Endpoints (New Customer App)
+@api_router.get("/restaurants/discover")
+async def discover_restaurants():
+    """Get featured/sponsored restaurants for discovery page"""
+    try:
+        # Get featured/popular businesses
+        businesses = await db.businesses.find({
+            "kyc_status": "approved",
+            "is_active": True
+        }).limit(20).to_list(None)
+        
+        restaurants = []
+        for business in businesses:
+            restaurant = {
+                "id": business.get("id", str(business.get("_id", ""))),
+                "business_name": business.get("business_name", ""),
+                "business_category": business.get("business_category", ""),
+                "description": business.get("description", ""),
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "logo_url": business.get("logo_url", ""),
+                "rating": business.get("rating", 4.5),
+                "delivery_time": "25-35 dk",
+                "min_order": 50.0,
+                "location": business.get("location", {})
+            }
+            restaurants.append(restaurant)
+        
+        return restaurants
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/restaurants/near")
+async def get_nearby_restaurants(lat: float, lng: float, radius: int = 50000):
+    """Get restaurants within specified radius (default 50km)"""
+    try:
+        # Use 2dsphere index for geolocation queries
+        businesses = await db.businesses.find({
+            "kyc_status": "approved",
+            "is_active": True,
+            "location": {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [lng, lat]  # Note: MongoDB uses [lng, lat] order
+                    },
+                    "$maxDistance": radius
+                }
+            }
+        }).to_list(None)
+        
+        restaurants = []
+        for business in businesses:
+            # Calculate distance for display
+            business_location = business.get("location", {})
+            if "coordinates" in business_location:
+                business_lng, business_lat = business_location["coordinates"]
+                distance = calculate_distance(lat, lng, business_lat, business_lng)
+            else:
+                distance = 0
+            
+            restaurant = {
+                "id": business.get("id", str(business.get("_id", ""))),
+                "business_name": business.get("business_name", ""),
+                "business_category": business.get("business_category", ""),
+                "description": business.get("description", ""),
+                "address": business.get("address", ""),
+                "city": business.get("city", ""),
+                "logo_url": business.get("logo_url", ""),
+                "rating": business.get("rating", 4.5),
+                "delivery_time": "25-35 dk",
+                "min_order": 50.0,
+                "distance": round(distance, 1),
+                "location": business_location
+            }
+            restaurants.append(restaurant)
+        
+        # Sort by distance
+        restaurants.sort(key=lambda x: x.get("distance", 0))
+        
+        return restaurants
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/businesses/{business_id}/products")
+async def get_business_products(business_id: str):
+    """Get products for a specific business"""
+    try:
+        products = await db.products.find({
+            "business_id": business_id,
+            "is_available": True
+        }).to_list(None)
+        
+        # Convert ObjectId to string
+        for product in products:
+            if "_id" in product:
+                product["id"] = str(product["_id"])
+                del product["_id"]
+            
+            # Handle datetime conversion
+            if "created_at" in product and hasattr(product["created_at"], 'isoformat'):
+                product["created_at"] = product["created_at"].isoformat()
+        
+        return products
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+def calculate_distance(lat1, lng1, lat2, lng2):
+    """Calculate distance between two coordinates using Haversine formula"""
+    from math import radians, cos, sin, asin, sqrt
+    
+    # Convert decimal degrees to radians
+    lat1, lng1, lat2, lng2 = map(radians, [lat1, lng1, lat2, lng2])
+    
+    # Haversine formula
+    dlng = lng2 - lng1
+    dlat = lat2 - lat1
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlng/2)**2
+    c = 2 * asin(sqrt(a))
+    r = 6371  # Radius of earth in kilometers
+    return c * r
+
 app.include_router(api_router)
