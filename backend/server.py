@@ -2641,6 +2641,98 @@ async def submit_review(review_data: dict, current_user: dict = Depends(get_curr
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Password Change Endpoint
+@api_router.post("/auth/change-password")
+async def change_password(
+    password_data: dict, 
+    current_user: dict = Depends(get_current_user)
+):
+    """Change user password"""
+    try:
+        current_password = password_data.get("current_password", "")
+        new_password = password_data.get("new_password", "")
+        
+        if not current_password or not new_password:
+            raise HTTPException(status_code=400, detail="Current and new password required")
+        
+        if len(new_password) < 6:
+            raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+        
+        # For demo users, just validate current password
+        user_id = current_user["id"]
+        
+        if user_id == "testcustomer-001":
+            # Test customer - validate current password is "test123"
+            if current_password != "test123":
+                raise HTTPException(status_code=400, detail="Current password is incorrect")
+        else:
+            # For real users, check from database
+            user = await db.users.find_one({"id": user_id})
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found")
+            
+            # In production, use proper password hashing (bcrypt)
+            if user.get("password") != hash_password(current_password):
+                raise HTTPException(status_code=400, detail="Current password is incorrect")
+        
+        # Update password in database
+        if user_id == "testcustomer-001":
+            # For demo user, just return success
+            return {"success": True, "message": "Password changed successfully"}
+        else:
+            # Update password in database
+            new_password_hash = hash_password(new_password)
+            await db.users.update_one(
+                {"id": user_id},
+                {"$set": {"password": new_password_hash, "updated_at": datetime.now(timezone.utc).isoformat()}}
+            )
+        
+        return {"success": True, "message": "Password changed successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Notification Settings Endpoint
+@api_router.patch("/user/notification-settings")
+async def update_notification_settings(
+    settings_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user notification preferences"""
+    try:
+        user_id = current_user["id"]
+        
+        # Extract notification settings
+        push_notifications = settings_data.get("push_notifications", True)
+        email_notifications = settings_data.get("email_notifications", True)
+        order_updates = settings_data.get("order_updates", True)
+        promotions = settings_data.get("promotions", False)
+        
+        notification_settings = {
+            "push_notifications": push_notifications,
+            "email_notifications": email_notifications,
+            "order_updates": order_updates,
+            "promotions": promotions,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # For demo user, just return success
+        if user_id == "testcustomer-001":
+            return {"success": True, "settings": notification_settings}
+        
+        # Update in database
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"notification_settings": notification_settings}}
+        )
+        
+        return {"success": True, "settings": notification_settings}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/orders/my")
 async def get_my_orders(current_user: dict = Depends(get_current_user)):
     """Get current user's orders"""
