@@ -71,12 +71,13 @@ const AdminPanel = ({ user, onLogout }) => {
           <div className="flex space-x-8">
             {[
               { id: 'dashboard', label: '📊 Dashboard' },
-              { id: 'courier-kyc', label: '🚴 Kurye KYC' },
-              { id: 'business-kyc', label: '🏪 İşletme KYC' },
-              { id: 'users', label: '👥 Kullanıcılar' },
+              { id: 'orders', label: '📦 Siparişler' },
               { id: 'businesses', label: '🏪 İşletmeler' },
-              { id: 'ads', label: '📢 Reklamlar' },
-              { id: 'featured', label: '⭐ Öne Çıkar' }
+              { id: 'menus', label: '📋 Menü Yönetimi' },
+              { id: 'couriers', label: '🚴 Kuryeler' },
+              { id: 'promotions', label: '🎯 Promosyonlar' },
+              { id: 'settings', label: '⚙️ Ayarlar' },
+              { id: 'reports', label: '📈 Raporlar' }
             ].map((tab) => (
               <button
                 key={tab.id}
