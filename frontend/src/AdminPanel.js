@@ -853,7 +853,8 @@ const AdminPanel = ({ user, onLogout }) => {
   // Load businesses when businesses view is accessed
   useEffect(() => {
     if (currentView === 'businesses') {
-      fetchAllBusinesses();
+      console.log('Loading businesses for admin panel...');
+      fetchAllBusinesses(cityFilter, searchQuery);
     }
   }, [currentView]);
 
