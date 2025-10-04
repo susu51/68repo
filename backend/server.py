@@ -1262,6 +1262,39 @@ async def get_business_user(current_user: dict = Depends(get_current_user)):
         )
     return current_user
 
+# Courier dependency
+async def get_courier_user(current_user: dict = Depends(get_current_user)):
+    """Require courier role"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Courier access required"
+        )
+    return current_user
+
+# Customer dependency
+async def get_customer_user(current_user: dict = Depends(get_current_user)):
+    """Require customer role"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Customer access required"
+        )
+    return current_user
+
+# Multi-role dependency factory
+def get_multi_role_user(*allowed_roles):
+    """Create dependency that allows multiple roles"""
+    async def check_role(current_user: dict = Depends(get_current_user)):
+        if current_user.get("role") not in allowed_roles:
+            roles_str = ", ".join(allowed_roles)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. Allowed roles: {roles_str}"
+            )
+        return current_user
+    return check_role
+
 # BUSINESS MANAGEMENT ENDPOINTS
 
 @api_router.put("/business/status")
