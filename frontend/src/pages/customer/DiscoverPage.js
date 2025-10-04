@@ -149,6 +149,11 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
     restaurant.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     restaurant.business_category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  // Debug logging
+  console.log('Restaurants count:', restaurants.length);
+  console.log('Filtered restaurants count:', filteredRestaurants.length);
+  console.log('Search query:', searchQuery);
 
   // Restaurant Menu View
   if (selectedRestaurant) {
