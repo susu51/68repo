@@ -1405,10 +1405,14 @@ async def get_my_products(current_user: dict = Depends(get_business_user)):
     """Get products for current business"""
     products = await db.products.find({"business_id": current_user["id"]}).to_list(length=None)
     
-    # Convert datetime and ObjectId
+    # Convert datetime and ObjectId - preserve existing UUID id if present
     for product in products:
-        product["id"] = str(product["_id"])
-        del product["_id"]
+        # Only use MongoDB _id if no UUID id exists (backward compatibility)
+        if "id" not in product or not product["id"]:
+            product["id"] = str(product["_id"])
+        # Always remove MongoDB _id from response
+        if "_id" in product:
+            del product["_id"]
         
         # Handle datetime conversion safely
         if "created_at" in product:
