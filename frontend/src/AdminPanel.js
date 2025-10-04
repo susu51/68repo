@@ -192,6 +192,122 @@ const AdminPanel = ({ user, onLogout }) => {
           </div>
         )}
 
+        {currentView === 'orders' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">📦 Sipariş Yönetimi</h2>
+              <div className="flex space-x-2">
+                <select className="border rounded px-3 py-2">
+                  <option>Tüm Durumlar</option>
+                  <option>Bekleyen</option>
+                  <option>Onaylandı</option>
+                  <option>Hazırlanıyor</option>
+                  <option>Yolda</option>
+                  <option>Teslim Edildi</option>
+                  <option>İptal Edildi</option>
+                </select>
+                <input type="text" placeholder="Sipariş ara..." className="border rounded px-3 py-2" />
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sipariş No
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Müşteri
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      İşletme
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Kurye
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tutar
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Durum
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      İşlemler
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      #ORD-001
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Ahmet Yılmaz
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Pizza Palace
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Mehmet K.
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      ₺125.00
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Teslim Edildi
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button className="text-blue-600 hover:text-blue-900 mr-2">Görüntüle</button>
+                      <button className="text-red-600 hover:text-red-900">İptal Et</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      #ORD-002
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Fatma Demir
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Burger Deluxe
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Ali S.
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      ₺89.50
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        Yolda
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button className="text-blue-600 hover:text-blue-900 mr-2">Görüntüle</button>
+                      <button className="text-yellow-600 hover:text-yellow-900">Kurye Değiştir</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="mt-6 flex justify-between items-center">
+              <p className="text-sm text-gray-700">
+                Toplam 1,234 sipariş içinden 1-10 arası gösteriliyor
+              </p>
+              <div className="flex space-x-1">
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Önceki</button>
+                <button className="px-3 py-1 bg-blue-500 text-white rounded">1</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Sonraki</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {currentView === 'courier-kyc' && (
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">🚴 Kurye KYC Onayları</h2>
