@@ -514,7 +514,7 @@ const AdminPanel = ({ user, onLogout }) => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">İşletme Onay Bekleyenler</h2>
+          <h2 className="text-xl font-semibold">İşletme Onayları (KYC)</h2>
           <Badge variant="secondary">{pendingBusinesses.length} bekleyen</Badge>
         </div>
 
