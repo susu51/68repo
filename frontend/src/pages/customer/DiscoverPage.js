@@ -38,6 +38,7 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
+      setUserAddresses(response.data || []);
       if (response.data && response.data.length > 0) {
         // Use first address as default
         setSelectedAddress(response.data[0]);
