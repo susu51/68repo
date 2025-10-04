@@ -2299,7 +2299,7 @@ async def process_mock_payment(
                 message = "Online ödeme başarısız oldu. Lütfen tekrar deneyin."
                 transaction_id = None
         
-        elif payment_request.payment_method == PaymentMethod.CASH_ON_DELIVERY:
+        elif payment_request.payment_method == MockPaymentMethod.CASH_ON_DELIVERY:
             status = "success"
             message = "Kapıda nakit ödeme seçildi. Sipariş onaylandı."
             transaction_id = f"COD-{uuid.uuid4().hex[:8].upper()}"
