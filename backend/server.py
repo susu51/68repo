@@ -305,7 +305,8 @@ async def get_public_menus():
     """
     try:
         # Get only approved and active businesses
-        businesses = await db.businesses.find({
+        businesses = await db.users.find({
+            "role": "business",
             "kyc_status": "approved",
             "is_active": True
         }).to_list(None)
