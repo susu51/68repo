@@ -74,12 +74,52 @@ const RestaurantMenu = ({ restaurant, onAddToCart, onBack, cartItems = [], cartT
   ];
 
   useEffect(() => {
-    // Mock loading delay
-    setTimeout(() => {
-      setMenuItems(mockMenuItems);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const loadMenuItems = async () => {
+      if (!restaurant?.id) {
+        console.error('No restaurant ID provided');
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        const API = process.env.REACT_APP_BACKEND_URL || import.meta.env.VITE_REACT_APP_BACKEND_URL;
+        
+        const response = await fetch(`${API}/api/businesses/${restaurant.id}/products`);
+        
+        if (response.ok) {
+          const products = await response.json();
+          console.log(`Loaded ${products.length} products for restaurant:`, restaurant.name);
+          
+          // Convert API format to component format
+          const convertedItems = products.map(product => ({
+            id: product.id,
+            name: product.name,
+            description: product.description || 'Lezzetli seçenek',
+            price: product.price || 0,
+            category: product.category?.toLowerCase().replace(/[^a-z]/g, '') || 'main',
+            image: product.image_url || `https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=300`,
+            availability: product.is_available !== false,
+            preparation_time: product.preparation_time_minutes || 15
+          }));
+          
+          setMenuItems(convertedItems);
+        } else {
+          console.error('Failed to load products:', response.status);
+          // Fallback to mock items if API fails
+          setMenuItems(mockMenuItems);
+        }
+      } catch (error) {
+        console.error('Error loading menu items:', error);
+        // Fallback to mock items if API fails
+        setMenuItems(mockMenuItems);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadMenuItems();
+  }, [restaurant?.id]);
 
   const filteredItems = selectedCategory === 'all' 
     ? menuItems 
