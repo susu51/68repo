@@ -222,6 +222,20 @@ const AdminPanel = ({ user, onLogout }) => {
     }
   };
 
+  // Business KYC Management (simple version)
+  const handleBusinessApprove = async (businessId) => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      await axios.patch(`${API}/admin/users/${businessId}/approve`, {}, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      toast.success('İşletme onaylandı!');
+      fetchAllBusinesses(); // Refresh
+    } catch (error) {
+      toast.error('Onaylama başarısız');
+    }
+  };
+
   // Legacy courier KYC (keep for backward compatibility)
   const handleApprove = async (courierId, notes = '') => {
     try {
