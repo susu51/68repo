@@ -825,6 +825,80 @@ const AdminPanel = ({ user, onLogout }) => {
     );
   };
 
+  const renderBusinesses = () => {
+    // Load businesses when this view is accessed
+    useEffect(() => {
+      if (currentView === 'businesses') {
+        fetchAllBusinesses();
+      }
+    }, [currentView]);
+
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">İşletme Yönetimi</h2>
+          <Badge variant="secondary">{filteredBusinesses.length} işletme</Badge>
+        </div>
+
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="city-filter">Şehir Filtresi</Label>
+            <Input
+              id="city-filter"
+              value={cityFilter}
+              onChange={(e) => setCityFilter(e.target.value)}
+              placeholder="Şehir ara..."
+            />
+          </div>
+          <div>
+            <Label htmlFor="search-query">İşletme Ara</Label>
+            <Input
+              id="search-query"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="İşletme adı, kategori veya email ara..."
+            />
+          </div>
+        </div>
+
+        {/* Business List */}
+        <div className="grid gap-4">
+          {filteredBusinesses.length > 0 ? (
+            filteredBusinesses.map((business) => (
+              <Card key={business.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{business.business_name}</p>
+                      <p className="text-sm text-gray-600">
+                        {business.business_category} • {business.city}
+                      </p>
+                      <p className="text-sm text-gray-500">{business.email}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant={business.is_active ? 'default' : 'secondary'}>
+                        {business.is_active ? 'Aktif' : 'Pasif'}
+                      </Badge>
+                      <Button variant="outline" size="sm">Düzenle</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Card>
+              <CardContent className="text-center py-12">
+                <p className="text-gray-500 text-lg mb-4">İşletme bulunamadı</p>
+                <p className="text-sm text-gray-400">Filtrelerinizi kontrol edin</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard': return renderDashboard();
