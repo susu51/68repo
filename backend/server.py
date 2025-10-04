@@ -2114,8 +2114,13 @@ async def get_restaurants(city: Optional[str] = None):
         }
         
         if city:
+            import re
             normalized_city = normalize_city_name(city)
-            query_filter["city_normalized"] = normalized_city
+            query_filter["$or"] = [
+                {"city_normalized": normalized_city},
+                {"city": {"$regex": f"^{re.escape(city)}$", "$options": "i"}},
+                {"address": {"$regex": f".*{re.escape(city)}.*", "$options": "i"}}
+            ]
         
         businesses = await db.businesses.find(query_filter).to_list(length=None)
         
