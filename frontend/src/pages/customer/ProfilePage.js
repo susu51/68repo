@@ -771,7 +771,18 @@ const ProfilePage = ({ user, onLogout }) => {
       <Card className="border-dashed border-2">
         <CardContent className="p-6 text-center">
           <Button 
-            onClick={() => setShowAddressModal(true)}
+            onClick={() => {
+              setEditingAddress(null);
+              setNewAddress({
+                label: '',
+                description: '',
+                city: '',
+                district: '',
+                lat: 0,
+                lng: 0
+              });
+              setShowAddressModal(true);
+            }}
             className="bg-orange-500 hover:bg-orange-600 text-white"
           >
             ➕ Yeni Adres Ekle
