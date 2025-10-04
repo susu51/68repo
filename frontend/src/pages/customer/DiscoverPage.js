@@ -73,6 +73,7 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
         }
         
         const response = await axios.get(endpoint, { params });
+        console.log('API Response:', response.data);
         setRestaurants(response.data || []);
         
         if (selectedAddress && selectedAddress.city) {
