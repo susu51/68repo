@@ -1145,4 +1145,6 @@ const BusinessKYCCard = ({ business, onApprove, onReject }) => {
   );
 };
 
+}; // AdminPanel function closing brace
+
 export default AdminPanel;
