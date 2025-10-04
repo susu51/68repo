@@ -139,7 +139,7 @@ const CartPage = ({ cartItems, orderTotal, onUpdateCart, onRemoveFromCart, onTab
                 </div>
                 
                 <div className="text-right">
-                  <p className="font-bold">₺{(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-bold">₺{((item.price || 0) * (item.quantity || 0)).toFixed(2)}</p>
                   <Button
                     variant="ghost"
                     size="sm"
