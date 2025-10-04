@@ -2532,10 +2532,19 @@ async def get_nearby_restaurants(lat: float, lng: float, radius: int = 50000):
 async def get_business_products(business_id: str):
     """Get products for a specific business"""
     try:
+        print(f"🔍 DEBUG: Looking for products with business_id: {business_id}")
+        
+        # Check if any products exist for this business_id
+        all_products_for_business = await db.products.find({
+            "business_id": business_id
+        }).to_list(None)
+        print(f"🔍 DEBUG: Found {len(all_products_for_business)} products (including unavailable)")
+        
         products = await db.products.find({
             "business_id": business_id,
             "is_available": True
         }).to_list(None)
+        print(f"🔍 DEBUG: Found {len(products)} available products")
         
         # Convert ObjectId to string
         for product in products:
