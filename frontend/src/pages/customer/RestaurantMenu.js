@@ -213,8 +213,21 @@ const RestaurantMenu = ({ restaurant, onAddToCart, onBack, cartItems = [], cartT
         </Card>
 
         {/* Menu Items */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredItems.map(item => {
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-16">
+            <span className="text-6xl mb-4 block">🍽️</span>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              {menuItems.length === 0 ? 'Henüz menü eklenmemiş' : 'Bu kategoride ürün bulunamadı'}
+            </h3>
+            <p className="text-gray-600">
+              {menuItems.length === 0 
+                ? 'Bu işletme henüz menü ürünlerini yüklememiş. Lütfen daha sonra tekrar deneyin.' 
+                : 'Farklı bir kategori seçmeyi deneyin.'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredItems.map(item => {
             const quantityInCart = getItemQuantityInCart(item.id);
             
             return (
