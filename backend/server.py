@@ -4478,26 +4478,7 @@ async def update_notification_settings(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/orders/my")
-async def get_my_orders(current_user: dict = Depends(get_current_user)):
-    """Get current user's orders"""
-    try:
-        orders = await db.orders.find({
-            "customer_id": current_user["id"]
-        }).sort("created_at", -1).to_list(None)
-        
-        # Convert ObjectId and datetime
-        for order in orders:
-            if "_id" in order:
-                order["id"] = str(order["_id"])
-                del order["_id"]
-            
-            if "created_at" in order and hasattr(order["created_at"], 'isoformat'):
-                order["created_at"] = order["created_at"].isoformat()
-        
-        return orders
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# Duplicate function removed - using the enhanced version above
 
 # Admin Business Management Endpoint
 @api_router.get("/admin/businesses")
