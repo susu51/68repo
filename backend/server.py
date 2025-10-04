@@ -2272,7 +2272,7 @@ async def process_mock_payment(
         payment_id = str(uuid.uuid4())
         
         # Simulate payment processing based on method
-        if payment_request.payment_method == PaymentMethod.ONLINE:
+        if payment_request.payment_method == MockPaymentMethod.ONLINE:
             # Mock online payment - simulate success/failure randomly
             import random
             success_rate = 0.9  # 90% success rate
