@@ -178,7 +178,7 @@ const AdminPanel = ({ user, onLogout }) => {
     }
   };
 
-  const fetchAllBusinesses = async () => {
+  const fetchAllBusinesses = async (city = '', search = '') => {
     try {
       const token = localStorage.getItem('kuryecini_access_token');
       if (!token) {
@@ -186,7 +186,12 @@ const AdminPanel = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await axios.get(`${API}/admin/businesses`, {
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (city) params.append('city', city);
+      if (search) params.append('search', search);
+      
+      const response = await axios.get(`${API}/admin/businesses?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const businesses = Array.isArray(response.data) ? response.data : [];
