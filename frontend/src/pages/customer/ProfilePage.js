@@ -47,6 +47,7 @@ const ProfilePage = ({ user, onLogout }) => {
   
   // Address management states
   const [userAddresses, setUserAddresses] = useState([]);
+  const [editingAddress, setEditingAddress] = useState(null);
   const [newAddress, setNewAddress] = useState({
     label: '',
     description: '',
