@@ -68,10 +68,12 @@ const ProfilePage = ({ user, onLogout }) => {
 
   const tabs = [
     { id: 'profile', name: 'Bilgilerim', icon: '👤' },
+    { id: 'addresses', name: 'Adreslerim', icon: '📍' },
     { id: 'coupons', name: 'Kuponlarım', icon: '🎟️' },
     { id: 'discounts', name: 'İndirimlerim', icon: '💸' },
     { id: 'campaigns', name: 'Kampanyalar', icon: '🎉' },
-    { id: 'payment_methods', name: 'Ödeme Yöntemlerim', icon: '💳' }
+    { id: 'payment_methods', name: 'Ödeme Yöntemlerim', icon: '💳' },
+    { id: 'notifications', name: 'Bildirimler', icon: '🔔' }
   ];
 
   useEffect(() => {
