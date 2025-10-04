@@ -37,7 +37,14 @@ const OrdersPage = ({ user }) => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      setOrders(response.data || []);
+      // Ensure all required properties exist
+      const ordersData = (response.data || []).map(order => ({
+        ...order,
+        total: order.total || 0,
+        items: order.items || [],
+        status: order.status || 'unknown'
+      }));
+      setOrders(ordersData);
     } catch (error) {
       console.error('Error loading orders:', error);
       // Fallback to mock data
