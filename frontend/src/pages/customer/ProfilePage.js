@@ -239,6 +239,45 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   };
 
+  const handleAddAddress = async () => {
+    try {
+      if (!newAddress.label || !newAddress.description || !newAddress.city) {
+        toast.error('Lütfen tüm zorunlu alanları doldurun');
+        return;
+      }
+
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      await axios.post(`${API}/api/user/addresses`, newAddress, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      toast.success('Adres başarıyla eklendi!');
+      setShowAddressModal(false);
+      setNewAddress({
+        label: '',
+        description: '',
+        city: '',
+        district: '',
+        lat: 0,
+        lng: 0
+      });
+      
+      // Refresh addresses
+      loadTabData('addresses');
+    } catch (error) {
+      console.error('Error adding address:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Adres eklerken hata oluştu');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleUpdateNotificationSettings = async (newSettings) => {
     try {
       const token = localStorage.getItem('kuryecini_access_token');
