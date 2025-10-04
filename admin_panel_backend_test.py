@@ -85,9 +85,9 @@ class AdminPanelBackendTester:
         print("=" * 50)
         
         try:
-            # Test admin login with password 6851
+            # Test admin login with correct credentials
             login_data = {
-                "email": "admin@kuryecini.com",
+                "email": ADMIN_EMAIL,
                 "password": ADMIN_PASSWORD
             }
             
