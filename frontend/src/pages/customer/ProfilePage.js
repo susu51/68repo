@@ -96,6 +96,10 @@ const ProfilePage = ({ user, onLogout }) => {
       const headers = { 'Authorization': `Bearer ${token}` };
 
       switch (tab) {
+        case 'addresses':
+          const addressesRes = await axios.get(`${API}/api/user/addresses`, { headers });
+          setUserAddresses(addressesRes.data || []);
+          break;
         case 'coupons':
           const couponsRes = await axios.get(`${API}/api/profile/coupons`, { headers });
           setCoupons(couponsRes.data || []);
