@@ -2845,4 +2845,176 @@ async def get_all_businesses_admin(
         print(f"Admin businesses fetch error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Address Management Endpoints
+@api_router.get("/user/addresses")
+async def get_user_addresses(current_user: dict = Depends(get_current_user)):
+    """Get user's saved addresses"""
+    try:
+        user_id = current_user["id"]
+        
+        addresses = await db.user_addresses.find({
+            "user_id": user_id
+        }).to_list(None)
+        
+        # Convert ObjectId to string
+        for address in addresses:
+            if "_id" in address:
+                address["id"] = str(address["_id"])
+                del address["_id"]
+        
+        return addresses
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/user/addresses")
+async def add_user_address(
+    address_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add new user address"""
+    try:
+        user_id = current_user["id"]
+        
+        # Validate required fields
+        required_fields = ["label", "description", "city"]
+        for field in required_fields:
+            if not address_data.get(field):
+                raise HTTPException(status_code=400, detail=f"{field} is required")
+        
+        address = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "label": address_data.get("label", ""),
+            "description": address_data.get("description", ""),
+            "city": address_data.get("city", ""),
+            "district": address_data.get("district", ""),
+            "lat": address_data.get("lat", 0.0),
+            "lng": address_data.get("lng", 0.0),
+            "is_default": address_data.get("is_default", False),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # If this is set as default, remove default from other addresses
+        if address["is_default"]:
+            await db.user_addresses.update_many(
+                {"user_id": user_id},
+                {"$set": {"is_default": False}}
+            )
+        
+        await db.user_addresses.insert_one(address)
+        
+        if "_id" in address:
+            del address["_id"]
+        
+        return address
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/user/addresses/{address_id}")
+async def update_user_address(
+    address_id: str,
+    address_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user address"""
+    try:
+        user_id = current_user["id"]
+        
+        # Check if address belongs to user
+        existing_address = await db.user_addresses.find_one({
+            "id": address_id,
+            "user_id": user_id
+        })
+        
+        if not existing_address:
+            raise HTTPException(status_code=404, detail="Address not found")
+        
+        # Update fields
+        update_data = {
+            "label": address_data.get("label", existing_address["label"]),
+            "description": address_data.get("description", existing_address["description"]),
+            "city": address_data.get("city", existing_address["city"]),
+            "district": address_data.get("district", existing_address.get("district", "")),
+            "lat": address_data.get("lat", existing_address.get("lat", 0.0)),
+            "lng": address_data.get("lng", existing_address.get("lng", 0.0)),
+            "is_default": address_data.get("is_default", existing_address.get("is_default", False)),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # If setting as default, remove default from other addresses
+        if update_data["is_default"]:
+            await db.user_addresses.update_many(
+                {"user_id": user_id, "id": {"$ne": address_id}},
+                {"$set": {"is_default": False}}
+            )
+        
+        await db.user_addresses.update_one(
+            {"id": address_id, "user_id": user_id},
+            {"$set": update_data}
+        )
+        
+        return {"success": True, "message": "Address updated successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/user/addresses/{address_id}")
+async def delete_user_address(
+    address_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete user address"""
+    try:
+        user_id = current_user["id"]
+        
+        result = await db.user_addresses.delete_one({
+            "id": address_id,
+            "user_id": user_id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Address not found")
+        
+        return {"success": True, "message": "Address deleted successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/user/addresses/{address_id}/set-default")
+async def set_default_address(
+    address_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Set address as default"""
+    try:
+        user_id = current_user["id"]
+        
+        # Check if address exists and belongs to user
+        existing_address = await db.user_addresses.find_one({
+            "id": address_id,
+            "user_id": user_id
+        })
+        
+        if not existing_address:
+            raise HTTPException(status_code=404, detail="Address not found")
+        
+        # Remove default from all addresses
+        await db.user_addresses.update_many(
+            {"user_id": user_id},
+            {"$set": {"is_default": False}}
+        )
+        
+        # Set this address as default
+        await db.user_addresses.update_one(
+            {"id": address_id, "user_id": user_id},
+            {"$set": {"is_default": True}}
+        )
+        
+        return {"success": True, "message": "Default address updated"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
