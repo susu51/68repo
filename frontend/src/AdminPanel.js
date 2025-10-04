@@ -191,7 +191,38 @@ const AdminPanel = ({ user, onLogout }) => {
     }
   };
 
-  // Courier KYC Management
+  // Business KYC Management
+  const handleBusinessApprove = async (businessId, notes = '') => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      await axios.patch(`${API}/admin/users/${businessId}/approve`, {}, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      toast.success('İşletme başvurusu onaylandı');
+      fetchAllBusinesses(); // Refresh business list
+    } catch (error) {
+      console.error('Business approval error:', error);
+      toast.error('İşletme onaylama başarısız');
+    }
+  };
+
+  const handleBusinessReject = async (businessId, notes = '') => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      await axios.patch(`${API}/admin/users/${businessId}/reject`, {
+        notes: notes
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      toast.success('İşletme başvurusu reddedildi');
+      fetchAllBusinesses(); // Refresh business list
+    } catch (error) {
+      console.error('Business rejection error:', error);
+      toast.error('İşletme reddetme başarısız');
+    }
+  };
+
+  // Legacy courier KYC (keep for backward compatibility)
   const handleApprove = async (courierId, notes = '') => {
     try {
       await axios.patch(`${API}/admin/couriers/${courierId}/kyc`, {
