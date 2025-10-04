@@ -1,0 +1,568 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { toast } from 'react-hot-toast';
+import axios from 'axios';
+
+const ProfilePage = ({ user, onLogout }) => {
+  const [activeTab, setActiveTab] = useState('profile');
+  const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({
+    first_name: user?.first_name || '',
+    last_name: user?.last_name || '',
+    email: user?.email || '',
+    phone: user?.phone || ''
+  });
+
+  // Profile tab data
+  const [coupons, setCoupons] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+
+  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+
+  const tabs = [
+    { id: 'profile', name: 'Bilgilerim', icon: '👤' },
+    { id: 'coupons', name: 'Kuponlarım', icon: '🎟️' },
+    { id: 'discounts', name: 'İndirimlerim', icon: '💸' },
+    { id: 'campaigns', name: 'Kampanyalar', icon: '🎉' },
+    { id: 'payment_methods', name: 'Ödeme Yöntemlerim', icon: '💳' }
+  ];
+
+  useEffect(() => {
+    if (activeTab !== 'profile') {
+      loadTabData(activeTab);
+    }
+  }, [activeTab]);
+
+  const loadTabData = async (tab) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      if (!token) {
+        // Load mock data if no token
+        loadMockData(tab);
+        return;
+      }
+
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      switch (tab) {
+        case 'coupons':
+          const couponsRes = await axios.get(`${API}/api/profile/coupons`, { headers });
+          setCoupons(couponsRes.data || []);
+          break;
+        case 'discounts':
+          const discountsRes = await axios.get(`${API}/api/profile/discounts`, { headers });
+          setDiscounts(discountsRes.data || []);
+          break;
+        case 'campaigns':
+          const campaignsRes = await axios.get(`${API}/api/campaigns`);
+          setCampaigns(campaignsRes.data || []);
+          break;
+        case 'payment_methods':
+          const paymentRes = await axios.get(`${API}/api/payment-methods`, { headers });
+          setPaymentMethods(paymentRes.data || []);
+          break;
+      }
+    } catch (error) {
+      console.error(`Error loading ${tab}:`, error);
+      loadMockData(tab);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMockData = (tab) => {
+    switch (tab) {
+      case 'coupons':
+        setCoupons(mockCoupons);
+        break;
+      case 'discounts':
+        setDiscounts(mockDiscounts);
+        break;
+      case 'campaigns':
+        setCampaigns(mockCampaigns);
+        break;
+      case 'payment_methods':
+        setPaymentMethods(mockPaymentMethods);
+        break;
+    }
+    setLoading(false);
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      if (!token) {
+        toast.success('Profil bilgileri kaydedildi!');
+        setIsEditing(false);
+        return;
+      }
+
+      await axios.put(`${API}/api/profile`, profileData, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      toast.success('Profil bilgileri güncellendi!');
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Güncelleme sırasında hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUseCoupon = (coupon) => {
+    toast.success(`${coupon.code} kuponu sepete eklendi!`);
+    // Navigate to cart or discover page
+  };
+
+  const handleDeletePaymentMethod = (methodId) => {
+    if (window.confirm('Bu ödeme yöntemini silmek istediğinize emin misiniz?')) {
+      setPaymentMethods(paymentMethods.filter(pm => pm.id !== methodId));
+      toast.success('Ödeme yöntemi silindi');
+    }
+  };
+
+  // Mock data
+  const mockCoupons = [
+    {
+      id: 'coupon-1',
+      code: 'WELCOME20',
+      title: 'Hoş Geldin İndirimi',
+      description: 'İlk siparişinizde %20 indirim',
+      discount: 20,
+      discountType: 'PERCENT',
+      minAmount: 50,
+      expiryDate: '31 Ocak 2024',
+      status: 'active'
+    },
+    {
+      id: 'coupon-2',
+      code: 'PIZZA15',
+      title: 'Pizza İndirimi',
+      description: 'Pizza siparişlerinde ₺15 indirim',
+      discount: 15,
+      discountType: 'AMOUNT',
+      minAmount: 75,
+      expiryDate: '15 Şubat 2024',
+      status: 'active'
+    }
+  ];
+
+  const mockDiscounts = [
+    {
+      id: 'discount-1',
+      title: 'VIP Müşteri İndirimi',
+      description: 'Tüm siparişlerinizde geçerli',
+      discount: 15,
+      type: 'PERCENT',
+      validUntil: '31 Aralık 2024'
+    }
+  ];
+
+  const mockCampaigns = [
+    {
+      id: 'campaign-1',
+      title: 'Pizza Festivali',
+      description: 'Tüm pizzalarda %30 indirim',
+      discount: 30,
+      discountType: 'PERCENT',
+      validUntil: '28 Şubat 2024',
+      imageUrl: null
+    },
+    {
+      id: 'campaign-2',
+      title: 'Sağlıklı Yaşam',
+      description: 'Salata siparişlerinde %25 indirim',
+      discount: 25,
+      discountType: 'PERCENT',
+      validUntil: '31 Mart 2024',
+      imageUrl: null
+    }
+  ];
+
+  const mockPaymentMethods = [
+    {
+      id: 'pm-1',
+      brand: 'VISA',
+      lastFour: '4242',
+      expiryMonth: '12',
+      expiryYear: '26',
+      provider: 'stripe',
+      createdAt: '2024-01-01T00:00:00Z'
+    }
+  ];
+
+  const renderTabContent = () => {
+    if (loading) {
+      return (
+        <div className="text-center py-16">
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      );
+    }
+
+    switch (activeTab) {
+      case 'coupons':
+        return renderCoupons();
+      case 'discounts':
+        return renderDiscounts();
+      case 'campaigns':
+        return renderCampaigns();
+      case 'payment_methods':
+        return renderPaymentMethods();
+      default:
+        return renderProfileInfo();
+    }
+  };
+
+  const renderProfileInfo = () => (
+    <div className="space-y-6">
+      {/* Profile Information Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">👤 Kişisel Bilgiler</h3>
+            <Button
+              onClick={() => setIsEditing(!isEditing)}
+              variant={isEditing ? "outline" : "default"}
+            >
+              {isEditing ? '❌ İptal' : '✏️ Düzenle'}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Ad</Label>
+              {isEditing ? (
+                <Input
+                  value={profileData.first_name}
+                  onChange={(e) => setProfileData({...profileData, first_name: e.target.value})}
+                />
+              ) : (
+                <p className="p-2 bg-gray-50 rounded">{profileData.first_name}</p>
+              )}
+            </div>
+            
+            <div>
+              <Label>Soyad</Label>
+              {isEditing ? (
+                <Input
+                  value={profileData.last_name}
+                  onChange={(e) => setProfileData({...profileData, last_name: e.target.value})}
+                />
+              ) : (
+                <p className="p-2 bg-gray-50 rounded">{profileData.last_name}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <Label>E-posta</Label>
+            <p className="p-2 bg-gray-50 rounded text-gray-500">
+              {profileData.email} (Değiştirilemez)
+            </p>
+          </div>
+
+          <div>
+            <Label>Telefon</Label>
+            {isEditing ? (
+              <Input
+                value={profileData.phone}
+                onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                placeholder="0555 123 4567"
+              />
+            ) : (
+              <p className="p-2 bg-gray-50 rounded">{profileData.phone || 'Belirtilmemiş'}</p>
+            )}
+          </div>
+
+          {isEditing && (
+            <div className="flex gap-3 pt-4">
+              <Button
+                onClick={() => setIsEditing(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                İptal
+              </Button>
+              <Button
+                onClick={handleSaveProfile}
+                disabled={loading}
+                className="flex-1"
+              >
+                {loading ? 'Kaydediliyor...' : '✅ Kaydet'}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Account Actions */}
+      <Card>
+        <CardHeader>
+          <h3 className="text-lg font-semibold">⚙️ Hesap Ayarları</h3>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button variant="outline" className="w-full justify-start">
+            🔒 Şifre Değiştir
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            🔔 Bildirim Ayarları
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            📍 Adres Yönetimi
+          </Button>
+          
+          <hr className="my-4" />
+          
+          <Button 
+            onClick={onLogout}
+            className="w-full bg-red-500 hover:bg-red-600 text-white"
+          >
+            🚪 Çıkış Yap
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderCoupons = () => (
+    <div className="space-y-4">
+      {coupons.length === 0 ? (
+        <div className="text-center py-16">
+          <span className="text-6xl mb-4 block">🎟️</span>
+          <h3 className="text-xl font-bold mb-2">Henüz kuponunuz yok</h3>
+          <p className="text-gray-600">Kampanyaları takip ederek kupon kazanın</p>
+        </div>
+      ) : (
+        coupons.map(coupon => (
+          <Card key={coupon.id} className="border-l-4 border-l-orange-500">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-2xl">🎟️</span>
+                    <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm font-bold">
+                      {coupon.code}
+                    </span>
+                  </div>
+                  <h4 className="font-semibold text-gray-800">{coupon.title}</h4>
+                  <p className="text-sm text-gray-600">{coupon.description}</p>
+                  <div className="text-xs text-gray-500 mt-2 space-y-1">
+                    <div>Minimum: ₺{coupon.minAmount}</div>
+                    <div>Son tarih: {coupon.expiryDate}</div>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-orange-600 mb-2">
+                    {coupon.discountType === 'PERCENT' ? `%${coupon.discount}` : `₺${coupon.discount}`}
+                  </div>
+                  <Button
+                    onClick={() => handleUseCoupon(coupon)}
+                    size="sm"
+                    className="bg-orange-500 hover:bg-orange-600"
+                  >
+                    Kullan
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      )}
+    </div>
+  );
+
+  const renderDiscounts = () => (
+    <div className="space-y-4">
+      {discounts.length === 0 ? (
+        <div className="text-center py-16">
+          <span className="text-6xl mb-4 block">💸</span>
+          <h3 className="text-xl font-bold mb-2">Henüz özel indiriminiz yok</h3>
+          <p className="text-gray-600">VIP müşteri olarak özel indirimler kazanın</p>
+        </div>
+      ) : (
+        discounts.map(discount => (
+          <Card key={discount.id} className="border-l-4 border-l-green-500">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-2xl">💸</span>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">
+                      Özel İndirim
+                    </span>
+                  </div>
+                  <h4 className="font-semibold text-gray-800">{discount.title}</h4>
+                  <p className="text-sm text-gray-600">{discount.description}</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Geçerli: {discount.validUntil}
+                  </p>
+                </div>
+                
+                <div className="text-2xl font-bold text-green-600">
+                  {discount.type === 'PERCENT' ? `%${discount.discount}` : `₺${discount.discount}`}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      )}
+    </div>
+  );
+
+  const renderCampaigns = () => (
+    <div className="space-y-4">
+      {campaigns.map(campaign => (
+        <Card key={campaign.id} className="overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-lg">{campaign.title}</h4>
+                <p className="opacity-90">{campaign.description}</p>
+              </div>
+              <div className="text-3xl">🎉</div>
+            </div>
+          </div>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Son tarih: {campaign.validUntil}</p>
+                <p className="text-lg font-bold text-purple-600">
+                  %{campaign.discount} İndirim
+                </p>
+              </div>
+              <Button className="bg-purple-500 hover:bg-purple-600">
+                Kampanyayı Gör
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {campaigns.length === 0 && (
+        <div className="text-center py-16">
+          <span className="text-6xl mb-4 block">🎉</span>
+          <h3 className="text-xl font-bold mb-2">Aktif kampanya yok</h3>
+          <p className="text-gray-600">Yeni kampanyalar için takipte kalın</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderPaymentMethods = () => (
+    <div className="space-y-4">
+      {/* Add Payment Method Button */}
+      <Card className="border-dashed border-2">
+        <CardContent className="p-6 text-center">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+            ➕ Yeni Ödeme Yöntemi Ekle
+          </Button>
+          <p className="text-sm text-gray-600 mt-2">
+            Kredi kartı veya banka kartı ekleyin
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Existing Payment Methods */}
+      {paymentMethods.map(method => (
+        <Card key={method.id}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  💳
+                </div>
+                <div>
+                  <p className="font-semibold">**** **** **** {method.lastFour}</p>
+                  <p className="text-sm text-gray-600">
+                    {method.brand.toUpperCase()} • {method.expiryMonth}/{method.expiryYear}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Eklenme: {new Date(method.createdAt).toLocaleDateString('tr-TR')}
+                  </p>
+                </div>
+              </div>
+              
+              <Button
+                onClick={() => handleDeletePaymentMethod(method.id)}
+                variant="outline"
+                size="sm"
+                className="text-red-500 hover:text-red-700"
+              >
+                🗑️
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {paymentMethods.length === 0 && (
+        <div className="text-center py-16">
+          <span className="text-6xl mb-4 block">💳</span>
+          <h3 className="text-xl font-bold mb-2">Kayıtlı ödeme yönteminiz yok</h3>
+          <p className="text-gray-600">Hızlı ödeme için kart ekleyin</p>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm sticky top-0 z-40">
+        <div className="p-4">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+              <span className="text-xl">👤</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">
+                {profileData.first_name} {profileData.last_name}
+              </h1>
+              <p className="text-sm text-gray-600">{profileData.email}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="px-4 pb-4">
+          <div className="flex space-x-2 overflow-x-auto">
+            {tabs.map(tab => (
+              <Button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                variant={activeTab === tab.id ? "default" : "outline"}
+                size="sm"
+                className="min-w-fit"
+              >
+                {tab.icon} {tab.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="p-4">
+        {renderTabContent()}
+      </div>
+    </div>
+  );
+};
+
+export default ProfilePage;
