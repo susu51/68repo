@@ -496,15 +496,12 @@ const AdminPanel = ({ user, onLogout }) => {
           </Card>
       ) : (
         <div className="grid gap-6">
-          {pendingCouriers.map((courier) => (
-            <CourierCard
-              key={courier.id}
-              courier={courier}
-              onApprove={handleApprove}
-              onReject={(id) => {
-                setSelectedCourier(id);
-                setShowRejectModal(true);
-              }}
+          {pendingBusinesses.map((business) => (
+            <BusinessKYCCard
+              key={business.id}
+              business={business}
+              onApprove={(businessId, notes) => handleBusinessApprove(businessId, notes)}
+              onReject={(businessId, notes) => handleBusinessReject(businessId, notes)}
             />
           ))}
         </div>
