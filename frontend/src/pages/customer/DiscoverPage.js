@@ -145,10 +145,23 @@ const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
     setRestaurantProducts([]);
   };
 
-  const filteredRestaurants = restaurants.filter(restaurant =>
-    restaurant.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    restaurant.business_category?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredRestaurants = restaurants.filter(restaurant => {
+    // Debug individual restaurant
+    if (restaurants.length > 0 && filteredRestaurants.length === 0) {
+      console.log('Restaurant object:', restaurant);
+      console.log('Business name:', restaurant.business_name);
+      console.log('Name:', restaurant.name);
+    }
+    
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      !searchQuery || // If no search query, show all
+      restaurant.business_name?.toLowerCase().includes(searchLower) ||
+      restaurant.name?.toLowerCase().includes(searchLower) ||
+      restaurant.business_category?.toLowerCase().includes(searchLower) ||
+      restaurant.category?.toLowerCase().includes(searchLower)
+    );
+  });
   
   // Debug logging
   console.log('Restaurants count:', restaurants.length);
