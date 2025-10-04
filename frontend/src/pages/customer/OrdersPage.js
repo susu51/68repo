@@ -250,7 +250,9 @@ const OrdersPage = ({ user }) => {
                           <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs mr-3">
                             {index + 1}
                           </span>
-                          <span className="text-gray-700">{item}</span>
+                          <span className="text-gray-700">
+                            {typeof item === 'string' ? item : (item.product_name || item.name || 'Ürün')}
+                          </span>
                         </div>
                       ))}
                     </div>
