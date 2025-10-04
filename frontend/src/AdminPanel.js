@@ -281,6 +281,7 @@ const AdminPanel = ({ user, onLogout }) => {
     { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
     { id: 'kyc', label: '✅ KYC Onay', icon: '✅' },
     { id: 'users', label: '👥 Kullanıcılar', icon: '👥' },
+    { id: 'businesses', label: '🏪 İşletmeler', icon: '🏪' },
     { id: 'messages', label: '💬 Mesajlaşma', icon: '💬' },
     { id: 'ads', label: '📢 Reklamlar', icon: '📢' },
     { id: 'featured', label: '⭐ Öne Çıkar', icon: '⭐' }
