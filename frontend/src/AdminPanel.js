@@ -527,13 +527,30 @@ const AdminPanel = ({ user, onLogout }) => {
           </Card>
       ) : (
         <div className="grid gap-6">
-          {pendingBusinesses.map((business) => (
-            <BusinessKYCCard
-              key={business.id}
-              business={business}
-              onApprove={(businessId, notes) => handleBusinessApprove(businessId, notes)}
-              onReject={(businessId, notes) => handleBusinessReject(businessId, notes)}
-            />
+          {allBusinesses.filter(b => !b.kyc_status || b.kyc_status === 'pending').map((business) => (
+            <Card key={business.id} className="shadow-lg">
+              <CardHeader>
+                <CardTitle>{business.business_name || business.name}</CardTitle>
+                <CardDescription>{business.email} • {business.city}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <Badge variant="outline">
+                      {business.kyc_status || 'Onay Bekliyor'}
+                    </Badge>
+                  </div>
+                  <div className="space-x-2">
+                    <Button 
+                      onClick={() => handleBusinessApprove ? handleBusinessApprove(business.id) : console.log('approve', business.id)}
+                      className="bg-green-600"
+                    >
+                      ✅ Onayla
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
