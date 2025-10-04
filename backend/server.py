@@ -2345,7 +2345,7 @@ async def process_mock_payment(
             "status": status,
             "transaction_id": transaction_id,
             "created_at": datetime.now(timezone.utc),
-            "card_details": payment_request.card_details if payment_request.payment_method == PaymentMethod.ONLINE else None
+            "card_details": payment_request.card_details if payment_request.payment_method == MockPaymentMethod.ONLINE else None
         }
         
         await db.payments.insert_one(payment_record)
