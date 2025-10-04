@@ -1146,5 +1146,3 @@ const BusinessKYCCard = ({ business, onApprove, onReject }) => {
     </Card>
   );
 };
-
-export default AdminPanel;
