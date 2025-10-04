@@ -793,6 +793,21 @@ backend:
         -agent: "testing"
         -comment: "✅ CITY NORMALIZATION FUNCTION TESTING COMPLETE: Perfect results (11/11, 100% success rate). All test cases from review request working correctly - 'Aksary' → 'aksaray', 'Istanbul' → 'ıstanbul', 'Gaziantap' → 'gaziantep'. Edge cases handled properly: empty strings, special characters, case variations. Function ready for production use."
 
+  - task: "Aksaray City Filtering Fix - Business Endpoints"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "main"
+        -comment: "FIXED: Corrected business endpoints to query users collection instead of non-existent businesses collection. Changed db.businesses.find() to db.users.find() with proper role='business' filter. Added case-insensitive city filtering with regex patterns and import re statement for regex operations."
+        -working: true
+        -agent: "testing"
+        -comment: "🎉 AKSARAY CITY FILTERING FIX TESTING COMPLETE: Comprehensive testing shows PERFECT results (100% success rate, 18/18 tests passed). ✅ CRITICAL FIXES VERIFIED: 1) Collection Query Fix - Successfully changed from db.businesses.find() to db.users.find() with role='business' filter. Confirmed businesses are correctly retrieved from users collection, not non-existent businesses collection. Response structure shows proper business fields (name, category, description, rating, delivery_time, min_order). 2) Case-Insensitive City Filtering - All case variations working perfectly: 'Aksaray' (1 business), 'aksaray' (1 business), 'AKSARAY' (1 business), 'AkSaRaY' (1 business), 'aksARAY' (1 business). Consistent results across all case variations confirming regex pattern implementation. 3) Import re Statement - Regex operations working correctly for case-insensitive matching with proper escape handling. ✅ ALL ENDPOINTS WORKING WITHOUT 500 ERRORS: Tested 7 endpoints (/businesses, /businesses?city=Aksaray, /businesses?city=aksaray, /businesses?city=AKSARAY, /restaurants, /restaurants?city=Aksaray, /restaurants?city=aksaray) - all returning HTTP 200 with proper JSON responses. ✅ RESTAURANT ENDPOINTS ENHANCED: Both /api/restaurants and /api/businesses endpoints working with improved case-insensitive filtering. Restaurant responses include city and city_normalized fields confirming normalization working. ✅ ADDRESS SEARCH FUNCTIONALITY: Address field search working correctly, businesses found through city filtering, proper integration with existing address search logic. ✅ MONGODB COLLECTION VERIFICATION: Confirmed correct querying of users collection with role='business' filter instead of non-existent businesses collection. Data structure validates proper business data retrieval. All fixes from review request successfully implemented and verified: db.users.find() instead of db.businesses.find() ✓, case-insensitive city filtering with regex patterns ✓, import re statement for regex operations ✓, all endpoints returning JSON without 500 errors ✓, Aksaray city filtering working for all case variations ✓."
+
   - task: "Database Indexes for Geospatial Queries"
     implemented: true
     working: true
