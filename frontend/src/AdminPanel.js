@@ -352,7 +352,7 @@ const AdminPanel = ({ user, onLogout }) => {
   // Navigation items
   const navigationItems = [
     { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
-    { id: 'kyc', label: '🏪 İşletme KYC', icon: '🏪' },
+    { id: 'kyc', label: '✅ KYC Onay', icon: '✅' },
     { id: 'users', label: '👥 Kullanıcılar', icon: '👥' },
     { id: 'businesses', label: '🏪 İşletmeler', icon: '🏪' },
     { id: 'messages', label: '💬 Mesajlaşma', icon: '💬' },
@@ -514,7 +514,7 @@ const AdminPanel = ({ user, onLogout }) => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">İşletme Onayları (KYC)</h2>
+          <h2 className="text-xl font-semibold">İşletme Onay Bekleyenler</h2>
           <Badge variant="secondary">{pendingBusinesses.length} bekleyen</Badge>
         </div>
 
@@ -947,42 +947,12 @@ const AdminPanel = ({ user, onLogout }) => {
     );
   }
 
-  // Debug: Simple return to test component loading
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-center text-red-600 mb-8">
-        🔧 ADMIN PANEL DEBUG MODE
-      </h1>
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Admin Panel Test</h2>
-        <p className="text-gray-600 mb-4">User: {user?.email || 'No user'}</p>
-        <p className="text-gray-600 mb-4">Role: {user?.role || 'No role'}</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button 
-            onClick={() => setCurrentView('dashboard')}
-            className="bg-blue-500 text-white p-4 rounded hover:bg-blue-600"
-          >
-            📊 Dashboard
-          </button>
-          <button 
-            onClick={() => setCurrentView('kyc')}
-            className="bg-green-500 text-white p-4 rounded hover:bg-green-600"
-          >
-            🏪 İşletme KYC
-          </button>
-          <button 
-            onClick={onLogout}
-            className="bg-red-500 text-white p-4 rounded hover:bg-red-600"
-          >
-            🚪 Çıkış Yap
-          </button>
-        </div>
-        <div className="mt-6 p-4 bg-gray-50 rounded">
-          <h3 className="font-semibold mb-2">Current View: {currentView}</h3>
-          <p className="text-sm text-gray-600">
-            Debug mode active - simplified admin panel for testing
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-100">
+      {renderHeader()}
+      {renderNavbar()}
+      <div className="max-w-7xl mx-auto p-6">
+        {renderContent()}
       </div>
     </div>
   );
@@ -1174,7 +1144,5 @@ const BusinessKYCCard = ({ business, onApprove, onReject }) => {
     </Card>
   );
 };
-
-}; // AdminPanel function closing brace
 
 export default AdminPanel;
