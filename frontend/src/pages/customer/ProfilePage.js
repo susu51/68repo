@@ -614,6 +614,172 @@ const ProfilePage = ({ user, onLogout }) => {
     </div>
   );
 
+  const renderAddresses = () => (
+    <div className="space-y-4">
+      {/* Add Address Button */}
+      <Card className="border-dashed border-2">
+        <CardContent className="p-6 text-center">
+          <Button 
+            onClick={() => setShowAddressModal(true)}
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            ➕ Yeni Adres Ekle
+          </Button>
+          <p className="text-sm text-gray-600 mt-2">
+            Teslimat adresinizi ekleyin
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Existing Addresses */}
+      {userAddresses.map(address => (
+        <Card key={address.id}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  📍
+                </div>
+                <div>
+                  <p className="font-semibold">{address.label}</p>
+                  <p className="text-sm text-gray-600">{address.description}</p>
+                  <p className="text-xs text-gray-500">{address.city}</p>
+                  {address.is_default && (
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      Varsayılan
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm">
+                  ✏️
+                </Button>
+                <Button variant="outline" size="sm" className="text-red-500">
+                  🗑️
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {userAddresses.length === 0 && (
+        <div className="text-center py-16">
+          <span className="text-6xl mb-4 block">📍</span>
+          <h3 className="text-xl font-bold mb-2">Henüz adresiniz yok</h3>
+          <p className="text-gray-600">İlk adresinizi ekleyin</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderNotifications = () => (
+    <div className="space-y-4">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">🔔 Bildirim Ayarları</h2>
+        <p className="text-gray-600">Hangi bildirimleri almak istediğinizi seçin</p>
+      </div>
+
+      {/* Push Notifications */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-semibold">📱 Push Bildirimleri</h4>
+              <p className="text-sm text-gray-600">Mobil cihazınıza anında bildirim gönderir</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={notificationSettings.push_notifications}
+                onChange={(e) => handleUpdateNotificationSettings({
+                  ...notificationSettings,
+                  push_notifications: e.target.checked
+                })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+            </label>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Email Notifications */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-semibold">📧 E-posta Bildirimleri</h4>
+              <p className="text-sm text-gray-600">E-posta adresinize bildirim gönderir</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={notificationSettings.email_notifications}
+                onChange={(e) => handleUpdateNotificationSettings({
+                  ...notificationSettings,
+                  email_notifications: e.target.checked
+                })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+            </label>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Order Updates */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-semibold">📦 Sipariş Güncellemeleri</h4>
+              <p className="text-sm text-gray-600">Sipariş durumu değişikliklerinde bildirim alın</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={notificationSettings.order_updates}
+                onChange={(e) => handleUpdateNotificationSettings({
+                  ...notificationSettings,
+                  order_updates: e.target.checked
+                })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+            </label>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Promotions */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-semibold">🎉 Promosyon Bildirimleri</h4>
+              <p className="text-sm text-gray-600">Kampanya ve indirimler hakkında bilgi alın</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={notificationSettings.promotions}
+                onChange={(e) => handleUpdateNotificationSettings({
+                  ...notificationSettings,
+                  promotions: e.target.checked
+                })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+            </label>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   const renderPaymentMethods = () => (
     <div className="space-y-4">
       {/* Add Payment Method Button */}
