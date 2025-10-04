@@ -2112,15 +2112,7 @@ async def approve_user(user_id: str, current_user: dict = Depends(get_admin_user
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error approving user: {str(e)}")
 
-@api_router.get("/businesses/{business_id}/products")
-async def get_business_products(business_id: str):
-    """Get products for a specific business"""
-    try:
-        # This is a placeholder - in real implementation, 
-        # you'd fetch products from a products collection
-        return []
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching products: {str(e)}")
+# Removed duplicate placeholder implementation - actual implementation is below at line 2539
 
 # Restaurant Endpoints
 @api_router.get("/restaurants")
