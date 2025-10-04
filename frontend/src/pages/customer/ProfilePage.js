@@ -22,6 +22,47 @@ const ProfilePage = ({ user, onLogout }) => {
   const [discounts, setDiscounts] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
+  
+  // Modal states
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  
+  // Password change states
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  
+  // Payment method states
+  const [newPaymentMethod, setNewPaymentMethod] = useState({
+    provider: 'stripe',
+    card_number: '',
+    expiry_month: '',
+    expiry_year: '',
+    cvv: '',
+    cardholder_name: ''
+  });
+  
+  // Address management states
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [newAddress, setNewAddress] = useState({
+    label: '',
+    description: '',
+    city: '',
+    district: '',
+    lat: 0,
+    lng: 0
+  });
+  
+  // Notification settings states
+  const [notificationSettings, setNotificationSettings] = useState({
+    push_notifications: true,
+    email_notifications: true,
+    order_updates: true,
+    promotions: false
+  });
 
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
