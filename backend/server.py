@@ -233,7 +233,7 @@ async def get_menus():
     """
     try:
         # Get all products from all businesses
-        businesses = await db.businesses.find({"kyc_status": "approved"}).to_list(None)
+        businesses = await db.users.find({"role": "business", "kyc_status": "approved"}).to_list(None)
         all_menu_items = []
         
         for business in businesses:
