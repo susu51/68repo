@@ -2625,6 +2625,192 @@ async def delete_courier_admin(courier_id: str, current_user: dict = Depends(get
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting courier: {str(e)}")
 
+# Admin Settings Management Endpoints
+@api_router.get("/admin/settings")
+async def get_platform_settings(current_user: dict = Depends(get_admin_user)):
+    """Get platform settings (Admin only)"""
+    try:
+        # Get settings from database, return default if not found
+        settings = await db.settings.find_one({"type": "platform"})
+        
+        if not settings:
+            # Return default settings
+            default_settings = {
+                "platform": {
+                    "app_name": "Kuryecini",
+                    "app_version": "1.0.0",
+                    "maintenance_mode": False,
+                    "new_registrations_enabled": True,
+                    "max_delivery_radius_km": 50,
+                    "default_delivery_fee": 0,
+                    "platform_commission_rate": 5,
+                    "courier_commission_rate": 5
+                },
+                "notifications": {
+                    "email_enabled": True,
+                    "sms_enabled": False,
+                    "push_enabled": True
+                },
+                "payment": {
+                    "cash_on_delivery": True,
+                    "online_payment": True,
+                    "pos_payment": True,
+                    "minimum_order_amount": 0
+                },
+                "business": {
+                    "auto_approve_businesses": False,
+                    "require_business_documents": True,
+                    "business_verification_required": True
+                },
+                "courier": {
+                    "auto_approve_couriers": False,
+                    "require_vehicle_documents": True,
+                    "courier_background_check": True
+                }
+            }
+            return default_settings
+        
+        # Remove MongoDB fields
+        if "_id" in settings:
+            del settings["_id"]
+        
+        return settings
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving settings: {str(e)}")
+
+@api_router.patch("/admin/settings")
+async def update_platform_settings(
+    settings_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update platform settings (Admin only)"""
+    try:
+        # Add metadata
+        settings_data["updated_at"] = datetime.now(timezone.utc)
+        settings_data["updated_by"] = current_user["id"]
+        settings_data["type"] = "platform"
+        
+        # Upsert settings
+        result = await db.settings.update_one(
+            {"type": "platform"},
+            {"$set": settings_data},
+            upsert=True
+        )
+        
+        return {
+            "message": "Settings updated successfully",
+            "updated": result.modified_count > 0 or result.upserted_id is not None
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating settings: {str(e)}")
+
+@api_router.get("/admin/settings/delivery-zones")
+async def get_delivery_zones(current_user: dict = Depends(get_admin_user)):
+    """Get delivery zones configuration"""
+    try:
+        zones = await db.delivery_zones.find({}).to_list(length=None)
+        
+        # Convert ObjectId to string
+        for zone in zones:
+            zone["id"] = str(zone["_id"])
+            del zone["_id"]
+        
+        return zones
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving delivery zones: {str(e)}")
+
+@api_router.post("/admin/settings/delivery-zones")
+async def create_delivery_zone(
+    zone_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Create delivery zone"""
+    try:
+        # Validate required fields
+        required_fields = ["name", "city", "coordinates", "delivery_fee"]
+        for field in required_fields:
+            if field not in zone_data:
+                raise HTTPException(status_code=422, detail=f"Field '{field}' is required")
+        
+        # Add metadata
+        zone_data["id"] = str(uuid.uuid4())
+        zone_data["created_at"] = datetime.now(timezone.utc)
+        zone_data["created_by"] = current_user["id"]
+        zone_data["is_active"] = zone_data.get("is_active", True)
+        
+        # Insert zone
+        result = await db.delivery_zones.insert_one(zone_data)
+        
+        return {
+            "message": "Delivery zone created successfully",
+            "zone_id": zone_data["id"]
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating delivery zone: {str(e)}")
+
+@api_router.patch("/admin/settings/delivery-zones/{zone_id}")
+async def update_delivery_zone(
+    zone_id: str,
+    zone_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update delivery zone"""
+    try:
+        # Add metadata
+        zone_data["updated_at"] = datetime.now(timezone.utc)
+        zone_data["updated_by"] = current_user["id"]
+        
+        # Update zone
+        from bson import ObjectId
+        try:
+            result = await db.delivery_zones.update_one(
+                {"_id": ObjectId(zone_id)},
+                {"$set": zone_data}
+            )
+        except:
+            result = await db.delivery_zones.update_one(
+                {"id": zone_id},
+                {"$set": zone_data}
+            )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Delivery zone not found")
+        
+        return {"message": "Delivery zone updated successfully"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating delivery zone: {str(e)}")
+
+@api_router.delete("/admin/settings/delivery-zones/{zone_id}")
+async def delete_delivery_zone(zone_id: str, current_user: dict = Depends(get_admin_user)):
+    """Delete delivery zone"""
+    try:
+        from bson import ObjectId
+        
+        # Delete zone
+        try:
+            result = await db.delivery_zones.delete_one({"_id": ObjectId(zone_id)})
+        except:
+            result = await db.delivery_zones.delete_one({"id": zone_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Delivery zone not found")
+        
+        return {"message": "Delivery zone deleted successfully"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting delivery zone: {str(e)}")
+
 @api_router.get("/admin/couriers/stats")
 async def get_courier_statistics(current_user: dict = Depends(get_admin_user)):
     """Get courier statistics for admin dashboard"""
