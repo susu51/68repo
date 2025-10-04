@@ -2345,6 +2345,7 @@ async def get_nearby_restaurants(lat: float, lng: float, radius: int = 50000):
     try:
         # Use 2dsphere index for geolocation queries
         businesses = await db.users.find({
+            "role": "business",
             "kyc_status": "approved",
             "is_active": True,
             "location": {
