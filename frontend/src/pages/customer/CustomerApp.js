@@ -151,7 +151,7 @@ export const CustomerApp = ({ user, onLogout }) => {
               }`}>
                 {tab.label}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
