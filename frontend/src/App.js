@@ -12,7 +12,7 @@ import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
 import FoodOrderErrorBoundary from "./components/FoodOrderErrorBoundary";
 import GlobalErrorBoundary from "./components/ErrorBoundary";
 import { CustomerProfile } from "./CustomerProfile";
-import { CustomerMain } from "./pages/customer/CustomerMain";
+import { CustomerApp } from "./pages/customer/CustomerApp";
 import PhoneAuth from "./PhoneAuth";
 import { ModernLogin } from "./ModernLogin";
 import { KuryeciniTextLogo } from "./components/KuryeciniLogo";
