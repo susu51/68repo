@@ -2662,4 +2662,95 @@ async def get_my_orders(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Admin Business Management Endpoint
+@api_router.get("/admin/businesses")
+async def get_all_businesses_admin(
+    city: Optional[str] = None, 
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all businesses for admin management with filtering"""
+    try:
+        # Check admin permissions
+        if current_user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Build query filter
+        query_filter = {}
+        
+        # City filter - case-insensitive
+        if city:
+            import re
+            normalized_city = normalize_city_name(city)
+            query_filter["$or"] = [
+                {"city_normalized": normalized_city},
+                {"city": {"$regex": f"^{re.escape(city)}$", "$options": "i"}},
+                {"address": {"$regex": f".*{re.escape(city)}.*", "$options": "i"}}
+            ]
+        
+        # Search filter - business name, category, email
+        if search:
+            import re
+            search_regex = {"$regex": f".*{re.escape(search)}.*", "$options": "i"}
+            if "$or" in query_filter:
+                # Combine with existing OR condition
+                query_filter = {
+                    "$and": [
+                        query_filter,
+                        {
+                            "$or": [
+                                {"business_name": search_regex},
+                                {"business_category": search_regex}, 
+                                {"email": search_regex}
+                            ]
+                        }
+                    ]
+                }
+            else:
+                query_filter["$or"] = [
+                    {"business_name": search_regex},
+                    {"business_category": search_regex},
+                    {"email": search_regex}
+                ]
+        
+        # Status filter
+        if status:
+            if status == "active":
+                query_filter["is_active"] = True
+            elif status == "inactive":
+                query_filter["is_active"] = False
+            elif status == "pending":
+                query_filter["kyc_status"] = "pending"
+            elif status == "approved":
+                query_filter["kyc_status"] = "approved"
+        
+        # Fetch businesses
+        businesses = await db.businesses.find(query_filter).to_list(length=None)
+        
+        # Convert ObjectId to string and prepare response
+        result = []
+        for business in businesses:
+            business_data = {
+                "id": str(business.get("_id", "")),
+                "business_name": business.get("business_name", ""),
+                "business_category": business.get("business_category", ""),
+                "email": business.get("email", ""),
+                "phone": business.get("phone", ""),
+                "city": business.get("city", ""),
+                "address": business.get("address", ""),
+                "kyc_status": business.get("kyc_status", "pending"),
+                "is_active": business.get("is_active", False),
+                "created_at": business.get("created_at", ""),
+                "description": business.get("description", ""),
+                "city_normalized": business.get("city_normalized", "")
+            }
+            result.append(business_data)
+        
+        return result
+        
+    except Exception as e:
+        print(f"Admin businesses fetch error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
