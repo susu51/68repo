@@ -830,6 +830,7 @@ const AdminPanel = ({ user, onLogout }) => {
       case 'dashboard': return renderDashboard();
       case 'kyc': return renderKYC();
       case 'users': return renderUsers();
+      case 'businesses': return renderBusinesses();
       case 'messages': return renderMessages();
       case 'ads': return renderAds();
       case 'featured': return renderFeatured();
