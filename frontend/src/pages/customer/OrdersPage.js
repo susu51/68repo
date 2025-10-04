@@ -219,7 +219,7 @@ const OrdersPage = ({ user }) => {
                           {getStatusText(order.status)}
                         </div>
                         <p className="text-lg font-bold text-gray-800 mt-1">
-                          ₺{order.total.toFixed(2)}
+                          ₺{(order.total || 0).toFixed(2)}
                         </p>
                       </div>
                     </div>
