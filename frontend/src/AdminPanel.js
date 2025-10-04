@@ -180,7 +180,15 @@ const AdminPanel = ({ user, onLogout }) => {
 
   const fetchAllBusinesses = async () => {
     try {
-      const response = await axios.get(`${API}/businesses`);
+      const token = localStorage.getItem('kuryecini_access_token');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+      
+      const response = await axios.get(`${API}/admin/businesses`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const businesses = Array.isArray(response.data) ? response.data : [];
       setAllBusinesses(businesses);
       setFilteredBusinesses(businesses);
