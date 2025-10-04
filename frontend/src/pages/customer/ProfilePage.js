@@ -162,6 +162,97 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   };
 
+  const handlePasswordChange = async () => {
+    try {
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        toast.error('Yeni şifreler eşleşmiyor');
+        return;
+      }
+
+      if (passwordData.newPassword.length < 6) {
+        toast.error('Yeni şifre en az 6 karakter olmalıdır');
+        return;
+      }
+
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      await axios.post(`${API}/api/auth/change-password`, {
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      toast.success('Şifre başarıyla değiştirildi!');
+      setShowPasswordModal(false);
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Şifre değiştirirken hata oluştu');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddPaymentMethod = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      await axios.post(`${API}/api/payment-methods`, newPaymentMethod, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      toast.success('Ödeme yöntemi başarıyla eklendi!');
+      setShowPaymentModal(false);
+      setNewPaymentMethod({
+        provider: 'stripe',
+        card_number: '',
+        expiry_month: '',
+        expiry_year: '',
+        cvv: '',
+        cardholder_name: ''
+      });
+      
+      // Refresh payment methods
+      loadTabData('payment_methods');
+    } catch (error) {
+      console.error('Error adding payment method:', error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Ödeme yöntemi eklerken hata oluştu');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateNotificationSettings = async (newSettings) => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      await axios.patch(`${API}/api/user/notification-settings`, newSettings, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      setNotificationSettings(newSettings);
+      toast.success('Bildirim ayarları güncellendi!');
+    } catch (error) {
+      console.error('Error updating notification settings:', error);
+      toast.error('Ayarlar güncellenirken hata oluştu');
+    }
+  };
+
   const handleUseCoupon = (coupon) => {
     toast.success(`${coupon.code} kuponu sepete eklendi!`);
     // Navigate to cart or discover page
