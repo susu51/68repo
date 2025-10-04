@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 const AdminPanel = ({ user, onLogout }) => {
   const [currentView, setCurrentView] = useState('dashboard');
+  const [pendingBusinesses, setPendingBusinesses] = useState([]);
+  const [pendingCouriers, setPendingCouriers] = useState([]);
+  const [loading, setLoading] = useState(false);
   
   if (!user) {
     return (
