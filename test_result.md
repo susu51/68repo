@@ -315,15 +315,18 @@ backend:
 frontend:
   - task: "Trendyol Go-style Customer App Implementation"
     implemented: true
-    working: "NA"
+    working: false
     file: "pages/customer/CustomerApp.js, DiscoverPage.js, CartPage.js, OrdersPage.js, ProfilePage.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         -working: "NA"
         -agent: "testing"
         -comment: "TESTING INITIATED: New Trendyol Go-style Customer App frontend implementation with bottom tab navigation (Keşfet | Sepet | Siparişler | Profil). Components include: CustomerApp.js (main component with tabs), DiscoverPage.js (restaurant discovery with location-based search), CartPage.js (shopping cart functionality), OrdersPage.js (orders list and review system), ProfilePage.js (profile tabs: Bilgilerim, Kuponlar, İndirimler, Kampanyalar, Ödeme). Testing scenarios: customer login flow, tab navigation, restaurant listings, profile tabs functionality, mock data display, console error checking. Focus on verifying recent bug fix for undefined total values and overall Customer App functionality."
+        -working: false
+        -agent: "testing"
+        -comment: "🎯 TRENDYOL GO-STYLE CUSTOMER APP TESTING COMPLETE: Comprehensive testing shows MIXED results with critical React object rendering errors. ✅ SUCCESSFUL COMPONENTS: 1) Homepage loads correctly with main app container found. 2) Customer login flow working - 'Hemen Sipariş Ver' button found and functional, login form accepts testcustomer@example.com/test123 credentials successfully. 3) Bottom tab navigation FULLY FUNCTIONAL - all 4 tabs found and working: Keşfet ✅, Sepet ✅, Siparişler ✅, Profil ✅ (4/4 tabs working). 4) Keşfet page loads with location-based search functionality, restaurant discovery interface working, 'En Yakın Konum' and 'Şehir Geneli' buttons present. 5) Sepet page displays empty cart state correctly with 'Sepetiniz boş' message and 'Restoranları Keşfet' button. 6) Siparişler page accessible with proper navigation. ❌ CRITICAL ISSUES FOUND: 1) REACT OBJECT RENDERING ERRORS - Multiple 'Objects are not valid as a React child' errors detected with object keys {product_id, product_name, product_price, quantity, subtotal}. Error occurs in OrdersPage component when trying to render order item objects directly in JSX instead of extracting specific properties. 2) Error Boundary catching repeated React rendering errors in order items display. 3) DOM manipulation issues causing element detachment during tab navigation. ⚠️ CONSOLE ERRORS: React DevTools version warning, 404 errors for /api/ads endpoints (non-critical), multiple React object rendering errors. 🔍 ROOT CAUSE: OrdersPage.js is attempting to render order item objects directly in JSX instead of accessing individual properties like item.product_name, item.product_price, etc. This violates React's rendering rules. 📊 OVERALL ASSESSMENT: Customer App structure and navigation working perfectly (100% tab functionality), but critical React rendering errors in OrdersPage prevent full functionality. The 'toFixed' error mentioned in review request appears to be resolved, but new object rendering errors have emerged."
 
   - task: "Enhanced Customer Profile & Payment System"
     implemented: false
