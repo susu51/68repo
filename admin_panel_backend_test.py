@@ -30,7 +30,8 @@ import uuid
 
 # Configuration
 BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com/api"
-ADMIN_PASSWORD = "6851"  # As specified in review request
+ADMIN_EMAIL = "admin@kuryecini.com"
+ADMIN_PASSWORD = "KuryeciniAdmin2024!"  # Actual admin password from backend
 
 class AdminPanelBackendTester:
     def __init__(self):
