@@ -3307,4 +3307,185 @@ async def get_all_businesses_admin(
         print(f"Admin businesses fetch error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Admin Business Management Endpoints
+@api_router.get("/admin/businesses/{business_id}")
+async def get_business_by_id_admin(business_id: str, current_user: dict = Depends(get_admin_user)):
+    """Get specific business by ID (Admin only)"""
+    try:
+        from bson import ObjectId
+        
+        # Try ObjectId first, then string ID
+        try:
+            business = await db.businesses.find_one({"_id": ObjectId(business_id)})
+        except:
+            business = await db.businesses.find_one({"id": business_id})
+        
+        if not business:
+            raise HTTPException(status_code=404, detail="Business not found")
+        
+        # Convert ObjectId to string and prepare response
+        business_data = {
+            "id": str(business.get("_id", "")),
+            "business_name": business.get("business_name", ""),
+            "business_category": business.get("business_category", ""),
+            "email": business.get("email", ""),
+            "phone": business.get("phone", ""),
+            "city": business.get("city", ""),
+            "address": business.get("address", ""),
+            "kyc_status": business.get("kyc_status", "pending"),
+            "is_active": business.get("is_active", False),
+            "created_at": business.get("created_at", ""),
+            "description": business.get("description", ""),
+            "city_normalized": business.get("city_normalized", ""),
+            "tax_number": business.get("tax_number", ""),
+            "owner_name": business.get("owner_name", ""),
+            "documents": business.get("documents", {}),
+            "ratings": business.get("ratings", {}),
+            "total_orders": business.get("total_orders", 0)
+        }
+        
+        return business_data
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving business: {str(e)}")
+
+@api_router.patch("/admin/businesses/{business_id}/status")
+async def update_business_status_admin(
+    business_id: str,
+    status_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update business status (Admin only)"""
+    try:
+        is_active = status_data.get("is_active")
+        kyc_status = status_data.get("kyc_status")
+        
+        if is_active is None and kyc_status is None:
+            raise HTTPException(status_code=422, detail="Either is_active or kyc_status is required")
+        
+        # Build update data
+        update_data = {}
+        if is_active is not None:
+            update_data["is_active"] = bool(is_active)
+        
+        if kyc_status is not None:
+            valid_kyc_statuses = ["pending", "approved", "rejected"]
+            if kyc_status not in valid_kyc_statuses:
+                raise HTTPException(status_code=422, detail=f"Invalid KYC status. Must be one of: {valid_kyc_statuses}")
+            update_data["kyc_status"] = kyc_status
+            update_data["kyc_updated_at"] = datetime.now(timezone.utc)
+            
+            if kyc_status == "rejected":
+                update_data["rejection_reason"] = status_data.get("rejection_reason", "No reason provided")
+        
+        # Update business
+        from bson import ObjectId
+        try:
+            result = await db.businesses.update_one(
+                {"_id": ObjectId(business_id)},
+                {"$set": update_data}
+            )
+        except:
+            result = await db.businesses.update_one(
+                {"id": business_id},
+                {"$set": update_data}
+            )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Business not found")
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="No changes made")
+        
+        return {
+            "message": "Business status updated successfully",
+            "business_id": business_id,
+            "updates": update_data
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating business status: {str(e)}")
+
+@api_router.delete("/admin/businesses/{business_id}")
+async def delete_business_admin(business_id: str, current_user: dict = Depends(get_admin_user)):
+    """Delete business (Admin only) - Use with caution"""
+    try:
+        from bson import ObjectId
+        
+        # Also delete business's products and orders
+        try:
+            # Delete products first
+            await db.products.delete_many({"business_id": business_id})
+            
+            # Delete business
+            result = await db.businesses.delete_one({"_id": ObjectId(business_id)})
+            if result.deleted_count == 0:
+                result = await db.businesses.delete_one({"id": business_id})
+        except:
+            await db.products.delete_many({"business_id": business_id})
+            result = await db.businesses.delete_one({"id": business_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Business not found")
+        
+        return {
+            "message": "Business and related data deleted successfully",
+            "business_id": business_id
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting business: {str(e)}")
+
+@api_router.get("/admin/businesses/stats")
+async def get_business_statistics(current_user: dict = Depends(get_admin_user)):
+    """Get business statistics for admin dashboard"""
+    try:
+        # Total businesses
+        total_businesses = await db.businesses.count_documents({})
+        
+        # Active businesses
+        active_businesses = await db.businesses.count_documents({"is_active": True})
+        
+        # Businesses by KYC status
+        kyc_pipeline = [
+            {"$group": {"_id": "$kyc_status", "count": {"$sum": 1}}}
+        ]
+        kyc_counts = {}
+        async for result in db.businesses.aggregate(kyc_pipeline):
+            kyc_counts[result["_id"] or "unknown"] = result["count"]
+        
+        # Businesses by category
+        category_pipeline = [
+            {"$group": {"_id": "$business_category", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        category_counts = {}
+        async for result in db.businesses.aggregate(category_pipeline):
+            category_counts[result["_id"] or "Other"] = result["count"]
+        
+        # New businesses this week
+        week_start = datetime.now(timezone.utc) - timedelta(days=7)
+        new_businesses = await db.businesses.count_documents({
+            "created_at": {"$gte": week_start}
+        })
+        
+        return {
+            "total_businesses": total_businesses,
+            "active_businesses": active_businesses,
+            "kyc_status_counts": kyc_counts,
+            "category_counts": category_counts,
+            "new_businesses_this_week": new_businesses,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving business statistics: {str(e)}")
+
 app.include_router(api_router)
