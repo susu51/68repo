@@ -120,10 +120,11 @@ export const CustomerApp = ({ user, onLogout }) => {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
         <div className="flex items-center justify-around px-2 py-2">
           {tabs.map(tab => (
-            <button
+            <Button
               key={tab.id}
+              variant="ghost"
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center justify-center py-3 px-2 relative rounded-lg transition-all duration-200 cursor-pointer ${
+              className={`flex-1 flex flex-col items-center justify-center py-3 px-2 relative rounded-lg transition-all duration-200 ${
                 activeTab === tab.id
                   ? 'text-orange-600 bg-orange-50'
                   : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
