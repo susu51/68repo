@@ -16,7 +16,7 @@ from typing import Dict, List, Any
 sys.path.append('/app/backend')
 
 # Test configuration
-BACKEND_URL = "https://kuryecini-platform.preview.emergentagent.com/api"
+BACKEND_URL = "https://express-order-2.preview.emergentagent.com/api"
 TEST_EMAIL = "aksary_test@example.com"
 TEST_PASSWORD = "test123"
 
