@@ -2388,6 +2388,269 @@ async def update_courier_kyc_status(
     
     return {"success": True, "message": f"KYC status updated to {kyc_status}"}
 
+# Admin Courier Management Endpoints
+@api_router.get("/admin/couriers")
+async def get_all_couriers_admin(
+    status: Optional[str] = None,
+    city: Optional[str] = None,
+    search: Optional[str] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Get all couriers for admin management with filtering"""
+    try:
+        # Build query filter
+        query_filter = {"role": "courier"}
+        
+        # Status filter
+        if status:
+            if status == "active":
+                query_filter["is_active"] = True
+            elif status == "inactive":
+                query_filter["is_active"] = False
+            elif status == "pending":
+                query_filter["kyc_status"] = "pending"
+            elif status == "approved":
+                query_filter["kyc_status"] = "approved"
+            elif status == "rejected":
+                query_filter["kyc_status"] = "rejected"
+        
+        # City filter
+        if city:
+            import re
+            query_filter["city"] = {"$regex": f".*{re.escape(city)}.*", "$options": "i"}
+        
+        # Search filter
+        if search:
+            import re
+            search_regex = {"$regex": f".*{re.escape(search)}.*", "$options": "i"}
+            query_filter["$or"] = [
+                {"first_name": search_regex},
+                {"last_name": search_regex},
+                {"email": search_regex},
+                {"phone": search_regex}
+            ]
+        
+        # Fetch couriers
+        couriers = await db.users.find(query_filter).to_list(length=None)
+        
+        # Clean up data and prepare response
+        result = []
+        for courier in couriers:
+            courier_data = {
+                "id": courier.get("id", str(courier.get("_id", ""))),
+                "first_name": courier.get("first_name", ""),
+                "last_name": courier.get("last_name", ""),
+                "email": courier.get("email", ""),
+                "phone": courier.get("phone", ""),
+                "city": courier.get("city", ""),
+                "kyc_status": courier.get("kyc_status", "pending"),
+                "is_active": courier.get("is_active", False),
+                "created_at": courier.get("created_at", ""),
+                "vehicle_type": courier.get("vehicle_type", ""),
+                "license_number": courier.get("license_number", ""),
+                "total_orders": courier.get("total_orders", 0),
+                "average_rating": courier.get("average_rating", 0),
+                "earnings_this_month": courier.get("earnings_this_month", 0),
+                "kyc_documents": courier.get("kyc_documents", {}),
+                "kyc_notes": courier.get("kyc_notes", "")
+            }
+            result.append(courier_data)
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving couriers: {str(e)}")
+
+@api_router.get("/admin/couriers/{courier_id}")
+async def get_courier_by_id_admin(courier_id: str, current_user: dict = Depends(get_admin_user)):
+    """Get specific courier by ID (Admin only)"""
+    try:
+        from bson import ObjectId
+        
+        # Try string ID first, then ObjectId
+        courier = await db.users.find_one({"id": courier_id, "role": "courier"})
+        if not courier:
+            try:
+                courier = await db.users.find_one({"_id": ObjectId(courier_id), "role": "courier"})
+            except:
+                pass
+        
+        if not courier:
+            raise HTTPException(status_code=404, detail="Courier not found")
+        
+        # Remove sensitive data
+        if "password" in courier:
+            del courier["password"]
+        
+        # Prepare response data
+        courier_data = {
+            "id": courier.get("id", str(courier.get("_id", ""))),
+            "first_name": courier.get("first_name", ""),
+            "last_name": courier.get("last_name", ""),
+            "email": courier.get("email", ""),
+            "phone": courier.get("phone", ""),
+            "city": courier.get("city", ""),
+            "address": courier.get("address", ""),
+            "kyc_status": courier.get("kyc_status", "pending"),
+            "is_active": courier.get("is_active", False),
+            "created_at": courier.get("created_at", ""),
+            "vehicle_type": courier.get("vehicle_type", ""),
+            "license_number": courier.get("license_number", ""),
+            "total_orders": courier.get("total_orders", 0),
+            "average_rating": courier.get("average_rating", 0),
+            "earnings_this_month": courier.get("earnings_this_month", 0),
+            "kyc_documents": courier.get("kyc_documents", {}),
+            "kyc_notes": courier.get("kyc_notes", ""),
+            "working_hours": courier.get("working_hours", {}),
+            "location": courier.get("location", {})
+        }
+        
+        return courier_data
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving courier: {str(e)}")
+
+@api_router.patch("/admin/couriers/{courier_id}/status")
+async def update_courier_status_admin(
+    courier_id: str,
+    status_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update courier status (Admin only)"""
+    try:
+        is_active = status_data.get("is_active")
+        kyc_status = status_data.get("kyc_status")
+        
+        if is_active is None and kyc_status is None:
+            raise HTTPException(status_code=422, detail="Either is_active or kyc_status is required")
+        
+        # Build update data
+        update_data = {}
+        if is_active is not None:
+            update_data["is_active"] = bool(is_active)
+        
+        if kyc_status is not None:
+            valid_kyc_statuses = ["pending", "approved", "rejected"]
+            if kyc_status not in valid_kyc_statuses:
+                raise HTTPException(status_code=422, detail=f"Invalid KYC status. Must be one of: {valid_kyc_statuses}")
+            update_data["kyc_status"] = kyc_status
+            update_data["kyc_updated_at"] = datetime.now(timezone.utc)
+            
+            if kyc_status == "rejected":
+                update_data["rejection_reason"] = status_data.get("rejection_reason", "No reason provided")
+        
+        update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        # Update courier
+        result = await db.users.update_one(
+            {"id": courier_id, "role": "courier"},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Courier not found")
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="No changes made")
+        
+        return {
+            "message": "Courier status updated successfully",
+            "courier_id": courier_id,
+            "updates": update_data
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating courier status: {str(e)}")
+
+@api_router.delete("/admin/couriers/{courier_id}")
+async def delete_courier_admin(courier_id: str, current_user: dict = Depends(get_admin_user)):
+    """Delete courier (Admin only) - Use with caution"""
+    try:
+        # Update orders to remove courier assignment first
+        await db.orders.update_many(
+            {"courier_id": courier_id},
+            {"$unset": {"courier_id": "", "courier_name": ""}}
+        )
+        
+        # Delete courier
+        result = await db.users.delete_one({"id": courier_id, "role": "courier"})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Courier not found")
+        
+        return {
+            "message": "Courier deleted successfully",
+            "courier_id": courier_id
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting courier: {str(e)}")
+
+@api_router.get("/admin/couriers/stats")
+async def get_courier_statistics(current_user: dict = Depends(get_admin_user)):
+    """Get courier statistics for admin dashboard"""
+    try:
+        # Total couriers
+        total_couriers = await db.users.count_documents({"role": "courier"})
+        
+        # Active couriers
+        active_couriers = await db.users.count_documents({"role": "courier", "is_active": True})
+        
+        # Couriers by KYC status
+        kyc_pipeline = [
+            {"$match": {"role": "courier"}},
+            {"$group": {"_id": "$kyc_status", "count": {"$sum": 1}}}
+        ]
+        kyc_counts = {}
+        async for result in db.users.aggregate(kyc_pipeline):
+            kyc_counts[result["_id"] or "unknown"] = result["count"]
+        
+        # Couriers by city (top 10)
+        city_pipeline = [
+            {"$match": {"role": "courier"}},
+            {"$group": {"_id": "$city", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        city_counts = {}
+        async for result in db.users.aggregate(city_pipeline):
+            city_counts[result["_id"] or "Other"] = result["count"]
+        
+        # New couriers this week
+        week_start = datetime.now(timezone.utc) - timedelta(days=7)
+        new_couriers = await db.users.count_documents({
+            "role": "courier",
+            "created_at": {"$gte": week_start}
+        })
+        
+        # Average rating
+        avg_rating_pipeline = [
+            {"$match": {"role": "courier", "average_rating": {"$gt": 0}}},
+            {"$group": {"_id": None, "avg_rating": {"$avg": "$average_rating"}}}
+        ]
+        avg_rating = 0
+        async for result in db.users.aggregate(avg_rating_pipeline):
+            avg_rating = round(result["avg_rating"], 2)
+        
+        return {
+            "total_couriers": total_couriers,
+            "active_couriers": active_couriers,
+            "kyc_status_counts": kyc_counts,
+            "city_counts": city_counts,
+            "new_couriers_this_week": new_couriers,
+            "average_rating": avg_rating,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving courier statistics: {str(e)}")
+
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
 async def get_public_businesses(
