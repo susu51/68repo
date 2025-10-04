@@ -956,7 +956,7 @@ const AdminPanel = ({ user, onLogout }) => {
       </div>
     </div>
   );
-};
+}; // Main AdminPanel function closing brace
 
 export default AdminPanel;
 
