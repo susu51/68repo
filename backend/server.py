@@ -1863,6 +1863,229 @@ async def get_all_orders(current_user: dict = Depends(get_admin_user)):
     
     return orders
 
+# Admin Order Management Endpoints
+@api_router.get("/admin/orders/{order_id}")
+async def get_order_by_id(order_id: str, current_user: dict = Depends(get_admin_user)):
+    """Get specific order by ID (Admin only)"""
+    try:
+        # Try ObjectId first, then string ID
+        from bson import ObjectId
+        try:
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Convert ObjectId to string
+        order["id"] = str(order["_id"])
+        del order["_id"]
+        
+        # Handle datetime conversion safely
+        for field in ["created_at", "assigned_at", "picked_up_at", "delivered_at"]:
+            if order.get(field) and not isinstance(order[field], str):
+                order[field] = order[field].isoformat()
+        
+        return order
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving order: {str(e)}")
+
+@api_router.patch("/admin/orders/{order_id}/status")
+async def update_order_status_admin(
+    order_id: str, 
+    status_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update order status (Admin only)"""
+    try:
+        new_status = status_data.get("status")
+        if not new_status:
+            raise HTTPException(status_code=422, detail="Status is required")
+        
+        # Validate status
+        valid_statuses = ["created", "confirmed", "preparing", "picked_up", "delivering", "delivered", "cancelled"]
+        if new_status not in valid_statuses:
+            raise HTTPException(status_code=422, detail=f"Invalid status. Must be one of: {valid_statuses}")
+        
+        # Find order
+        from bson import ObjectId
+        try:
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Update order with timestamp
+        update_data = {"status": new_status}
+        current_time = datetime.now(timezone.utc)
+        
+        if new_status == "confirmed":
+            update_data["confirmed_at"] = current_time
+        elif new_status == "preparing":
+            update_data["preparing_at"] = current_time
+        elif new_status == "picked_up":
+            update_data["picked_up_at"] = current_time
+        elif new_status == "delivering":
+            update_data["delivering_at"] = current_time
+        elif new_status == "delivered":
+            update_data["delivered_at"] = current_time
+        elif new_status == "cancelled":
+            update_data["cancelled_at"] = current_time
+            update_data["cancel_reason"] = status_data.get("cancel_reason", "Admin cancelled")
+        
+        # Update order
+        try:
+            result = await db.orders.update_one(
+                {"_id": ObjectId(order_id)},
+                {"$set": update_data}
+            )
+        except:
+            result = await db.orders.update_one(
+                {"id": order_id},
+                {"$set": update_data}
+            )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found or no changes made")
+        
+        return {"message": f"Order status updated to {new_status}", "order_id": order_id, "new_status": new_status}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating order status: {str(e)}")
+
+@api_router.patch("/admin/orders/{order_id}/assign-courier")
+async def assign_courier_to_order(
+    order_id: str,
+    courier_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Assign courier to order (Admin only)"""
+    try:
+        courier_id = courier_data.get("courier_id")
+        if not courier_id:
+            raise HTTPException(status_code=422, detail="Courier ID is required")
+        
+        # Verify courier exists and is approved
+        courier = await db.users.find_one({
+            "$or": [{"id": courier_id}, {"_id": courier_id}],
+            "role": "courier",
+            "kyc_status": "approved"
+        })
+        
+        if not courier:
+            raise HTTPException(status_code=404, detail="Approved courier not found")
+        
+        # Find and update order
+        from bson import ObjectId
+        try:
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+            order_filter = {"_id": ObjectId(order_id)}
+        except:
+            order = await db.orders.find_one({"id": order_id})
+            order_filter = {"id": order_id}
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Update order with courier assignment
+        update_data = {
+            "courier_id": courier.get("id", str(courier["_id"])),
+            "courier_name": f"{courier.get('first_name', '')} {courier.get('last_name', '')}".strip(),
+            "assigned_at": datetime.now(timezone.utc),
+            "status": "assigned" if order["status"] == "created" else order["status"]
+        }
+        
+        result = await db.orders.update_one(order_filter, {"$set": update_data})
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found or no changes made")
+        
+        return {
+            "message": "Courier assigned successfully",
+            "order_id": order_id,
+            "courier_id": courier_id,
+            "courier_name": update_data["courier_name"]
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error assigning courier: {str(e)}")
+
+@api_router.delete("/admin/orders/{order_id}")
+async def delete_order_admin(order_id: str, current_user: dict = Depends(get_admin_user)):
+    """Delete order (Admin only) - Use with caution"""
+    try:
+        from bson import ObjectId
+        
+        # Try to delete by ObjectId first, then by string ID
+        try:
+            result = await db.orders.delete_one({"_id": ObjectId(order_id)})
+        except:
+            result = await db.orders.delete_one({"id": order_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        return {"message": "Order deleted successfully", "order_id": order_id}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting order: {str(e)}")
+
+@api_router.get("/admin/orders/stats")
+async def get_order_statistics(current_user: dict = Depends(get_admin_user)):
+    """Get order statistics for admin dashboard"""
+    try:
+        # Get various order counts
+        total_orders = await db.orders.count_documents({})
+        
+        # Orders by status
+        pipeline = [
+            {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+        ]
+        status_counts = {}
+        async for result in db.orders.aggregate(pipeline):
+            status_counts[result["_id"]] = result["count"]
+        
+        # Today's orders
+        today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        today_orders = await db.orders.count_documents({
+            "created_at": {"$gte": today_start}
+        })
+        
+        # Revenue calculation (this week)
+        week_start = today_start - timedelta(days=7)
+        weekly_revenue_pipeline = [
+            {"$match": {
+                "created_at": {"$gte": week_start},
+                "status": {"$in": ["delivered", "completed"]}
+            }},
+            {"$group": {"_id": None, "total": {"$sum": "$total_amount"}}}
+        ]
+        weekly_revenue = 0
+        async for result in db.orders.aggregate(weekly_revenue_pipeline):
+            weekly_revenue = result["total"]
+        
+        return {
+            "total_orders": total_orders,
+            "today_orders": today_orders,
+            "status_counts": status_counts,
+            "weekly_revenue": weekly_revenue,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving order statistics: {str(e)}")
+
 # KYC Management Endpoints
 @api_router.post("/couriers/kyc")
 async def upload_kyc_documents(
