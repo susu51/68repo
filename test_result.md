@@ -313,6 +313,18 @@ backend:
         -comment: "🎉 FRONTEND RESTAURANT VISIBILITY ISSUE COMPLETELY RESOLVED: Fixed API URL construction in FoodOrderSystem.js from 'process.env.REACT_APP_BACKEND_URL || http://localhost:8001/api' to '${process.env.REACT_APP_BACKEND_URL || http://localhost:8001}/api'. ✅ COMPREHENSIVE TESTING CONFIRMS: 1) Customer login working (testcustomer@example.com/test123). 2) Navigation to 'Keşfet' tab successful. 3) All 3 restaurants now displaying correctly: Test Restoranı, Pizza Palace İstanbul, Burger Deluxe. 4) Restaurant cards showing with proper ratings (5, 4.6, 4.9), delivery times (25-45dk, 26-41dk, 34-44dk), and minimum orders (₺95, ₺96, ₺94). 5) Restaurant menu functionality working - clicked Test Restoranı and menu loaded with products (Margherita Pizza ₺85, Chicken Burger ₺65, Coca Cola ₺15, Test Döner Kebap ₺35.5, Künefe ₺25). 6) Console shows 'Restaurants fetched: [Object, Object, Object]' confirming API calls working. 7) Location-based sorting showing '3 restoran' in status. 8) ProfessionalFoodOrderSystem component fully functional with restaurant discovery, menu browsing, and cart management. The user-reported issue 'Müşteri kısmında hiçbir restorant gözükmüyor' is completely resolved - customers can now see and interact with all restaurants in the customer dashboard."
 
 frontend:
+  - task: "Trendyol Go-style Customer App Implementation"
+    implemented: true
+    working: "NA"
+    file: "pages/customer/CustomerApp.js, DiscoverPage.js, CartPage.js, OrdersPage.js, ProfilePage.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "TESTING INITIATED: New Trendyol Go-style Customer App frontend implementation with bottom tab navigation (Keşfet | Sepet | Siparişler | Profil). Components include: CustomerApp.js (main component with tabs), DiscoverPage.js (restaurant discovery with location-based search), CartPage.js (shopping cart functionality), OrdersPage.js (orders list and review system), ProfilePage.js (profile tabs: Bilgilerim, Kuponlar, İndirimler, Kampanyalar, Ödeme). Testing scenarios: customer login flow, tab navigation, restaurant listings, profile tabs functionality, mock data display, console error checking. Focus on verifying recent bug fix for undefined total values and overall Customer App functionality."
+
   - task: "Enhanced Customer Profile & Payment System"
     implemented: false
     working: false
