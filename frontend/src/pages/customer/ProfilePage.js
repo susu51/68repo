@@ -1181,18 +1181,30 @@ const ProfilePage = ({ user, onLogout }) => {
 
               <div className="flex space-x-3 mt-6">
                 <Button
-                  onClick={() => setShowAddressModal(false)}
+                  onClick={() => {
+                    setShowAddressModal(false);
+                    setEditingAddress(null);
+                    setNewAddress({
+                      label: '',
+                      description: '',
+                      city: '',
+                      district: '',
+                      lat: 0,
+                      lng: 0
+                    });
+                  }}
                   variant="outline"
                   className="flex-1"
                 >
                   İptal
                 </Button>
                 <Button
-                  onClick={handleAddAddress}
+                  onClick={editingAddress ? handleUpdateAddress : handleAddAddress}
                   disabled={loading}
                   className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
                 >
-                  {loading ? 'Ekleniyor...' : 'Adresi Ekle'}
+                  {loading ? (editingAddress ? 'Güncelleniyor...' : 'Ekleniyor...') : 
+                           (editingAddress ? 'Adresi Güncelle' : 'Adresi Ekle')}
                 </Button>
               </div>
             </div>
