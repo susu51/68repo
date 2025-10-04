@@ -27,8 +27,13 @@ const OrdersPage = ({ user }) => {
       const token = localStorage.getItem('kuryecini_access_token');
       
       if (!token) {
-        // Show mock data if not authenticated
-        setOrders(mockOrders);
+        // Show mock data if not authenticated with safe properties
+        const safeOrders = mockOrders.map(order => ({
+          ...order,
+          total: order.total || 0,
+          items: order.items || []
+        }));
+        setOrders(safeOrders);
         setLoading(false);
         return;
       }
