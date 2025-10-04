@@ -5,6 +5,34 @@ const AdminPanel = ({ user, onLogout }) => {
   const [pendingBusinesses, setPendingBusinesses] = useState([]);
   const [pendingCouriers, setPendingCouriers] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Business approval handler
+  const handleBusinessApprove = async (businessId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      
+      const response = await fetch(`/api/admin/users/${businessId}/approve`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        alert('İşletme başarıyla onaylandı!');
+        // Refresh data in real implementation
+      } else {
+        alert('Onaylama başarısız!');
+      }
+    } catch (error) {
+      console.error('Approval error:', error);
+      alert('Hata oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   if (!user) {
     return (
