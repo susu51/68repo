@@ -89,18 +89,18 @@ const AdminPanel = ({ user, onLogout }) => {
           </div>
         )}
 
-        {currentView === 'kyc' && (
+        {currentView === 'courier-kyc' && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">🏪 İşletme KYC Onayları</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">🚴 Kurye KYC Onayları</h2>
             
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="font-semibold text-gray-900">Test İşletmesi</h3>
-                    <p className="text-sm text-gray-600">test@example.com • Aksaray</p>
+                    <h3 className="font-semibold text-gray-900">Test Kurye</h3>
+                    <p className="text-sm text-gray-600">courier@example.com • İstanbul</p>
                     <span className="inline-block mt-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                      Onay Bekliyor
+                      KYC Bekliyor
                     </span>
                   </div>
                   <div className="space-x-2">
@@ -115,10 +115,106 @@ const AdminPanel = ({ user, onLogout }) => {
               </div>
               
               <div className="text-center py-8">
-                <p className="text-gray-500">Bu basit KYC sistemi çalışıyor!</p>
+                <p className="text-gray-500">Kurye KYC sistemi aktif</p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Backend endpoints: /admin/users/ID/approve
+                  Backend: /admin/couriers/ID/kyc
                 </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'business-kyc' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">🏪 İşletme KYC Onayları</h2>
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">başer Restaurant</h3>
+                    <p className="text-sm text-gray-600">baser@example.com • Aksaray</p>
+                    <span className="inline-block mt-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      Onay Bekliyor
+                    </span>
+                  </div>
+                  <div className="space-x-2">
+                    <button 
+                      onClick={() => handleBusinessApprove('test-business-id')}
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    >
+                      ✅ Onayla
+                    </button>
+                    <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                      ❌ Reddet
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-center py-8">
+                <p className="text-gray-500">İşletme KYC sistemi aktif</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Backend: /admin/users/ID/approve
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'ads' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">📢 Reklam Yönetimi</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Banner Reklamları</h3>
+                <p className="text-sm text-gray-600 mb-4">Ana sayfa banner reklamları</p>
+                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                  Yeni Banner Ekle
+                </button>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">İşletme Reklamları</h3>
+                <p className="text-sm text-gray-600 mb-4">Sponsorlu işletme listeleri</p>
+                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                  Reklam Oluştur
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'featured' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">⭐ Öne Çıkarılanlar</h2>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Öne Çıkan İşletmeler</h3>
+                <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                  İşletme Ekle
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-semibold">Pizza Palace</h4>
+                  <p className="text-sm text-gray-600">İstanbul • ⭐ Öne Çıkan</p>
+                  <div className="mt-2 space-x-2">
+                    <button className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                      Kaldır
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <p className="text-gray-500">Yeni işletme ekle</p>
+                  <button className="mt-2 text-blue-500 hover:text-blue-600">
+                    + Ekle
+                  </button>
+                </div>
               </div>
             </div>
           </div>
