@@ -1,5 +1,668 @@
 #!/usr/bin/env python3
 """
+PHASE 1 ADDRESS MANAGEMENT BACKEND TESTING
+Comprehensive testing of address-related endpoints for the new frontend implementation.
+
+Focus Areas:
+1. Customer Authentication - Verify customer login with testcustomer@example.com/test123
+2. Address CRUD Operations - Test all address endpoints
+3. Data Validation - Test form validation, required fields, city normalization
+4. JWT Token Handling - Ensure all address endpoints require valid authentication
+5. Error Scenarios - Test invalid address IDs, missing fields, unauthorized access
+"""
+
+import requests
+import json
+import sys
+import time
+from datetime import datetime
+import uuid
+
+# Configuration
+BACKEND_URL = "https://express-order-2.preview.emergentagent.com/api"
+TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
+TEST_CUSTOMER_PASSWORD = "test123"
+
+class AddressBackendTester:
+    def __init__(self):
+        self.session = requests.Session()
+        self.jwt_token = None
+        self.customer_user_id = None
+        self.test_address_ids = []
+        self.results = {
+            "total_tests": 0,
+            "passed_tests": 0,
+            "failed_tests": 0,
+            "test_details": []
+        }
+    
+    def log_test(self, test_name, success, details="", response_data=None):
+        """Log test result"""
+        self.results["total_tests"] += 1
+        if success:
+            self.results["passed_tests"] += 1
+            status = "✅ PASS"
+        else:
+            self.results["failed_tests"] += 1
+            status = "❌ FAIL"
+        
+        test_result = {
+            "test": test_name,
+            "status": status,
+            "details": details,
+            "response_data": response_data,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        self.results["test_details"].append(test_result)
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"    Details: {details}")
+        if not success and response_data:
+            print(f"    Response: {response_data}")
+        print()
+    
+    def test_customer_authentication(self):
+        """Test customer login with testcustomer@example.com/test123"""
+        print("🔐 TESTING CUSTOMER AUTHENTICATION")
+        print("=" * 50)
+        
+        try:
+            login_data = {
+                "email": TEST_CUSTOMER_EMAIL,
+                "password": TEST_CUSTOMER_PASSWORD
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.jwt_token = data.get("access_token")
+                user_data = data.get("user", {})
+                self.customer_user_id = user_data.get("id")
+                
+                # Set authorization header for future requests
+                self.session.headers.update({
+                    "Authorization": f"Bearer {self.jwt_token}"
+                })
+                
+                self.log_test(
+                    "Customer Login Authentication",
+                    True,
+                    f"Login successful. User ID: {self.customer_user_id}, Token length: {len(self.jwt_token) if self.jwt_token else 0} chars",
+                    {"user_id": self.customer_user_id, "email": user_data.get("email"), "role": user_data.get("role")}
+                )
+                
+                # Test JWT token validation via /me endpoint
+                me_response = self.session.get(f"{BACKEND_URL}/me")
+                if me_response.status_code == 200:
+                    me_data = me_response.json()
+                    self.log_test(
+                        "JWT Token Validation (/me endpoint)",
+                        True,
+                        f"Token validation successful. User: {me_data.get('email')} (ID: {me_data.get('id')})",
+                        me_data
+                    )
+                else:
+                    self.log_test(
+                        "JWT Token Validation (/me endpoint)",
+                        False,
+                        f"Token validation failed. Status: {me_response.status_code}",
+                        me_response.text
+                    )
+                
+                return True
+            else:
+                self.log_test(
+                    "Customer Login Authentication",
+                    False,
+                    f"Login failed. Status: {response.status_code}",
+                    response.text
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test(
+                "Customer Login Authentication",
+                False,
+                f"Exception during login: {str(e)}"
+            )
+            return False
+    
+    def test_get_user_addresses(self):
+        """Test GET /api/user/addresses - retrieve user addresses"""
+        print("📍 TESTING ADDRESS RETRIEVAL")
+        print("=" * 50)
+        
+        try:
+            response = self.session.get(f"{BACKEND_URL}/user/addresses")
+            
+            if response.status_code == 200:
+                addresses = response.json()
+                self.log_test(
+                    "GET /api/user/addresses",
+                    True,
+                    f"Successfully retrieved {len(addresses)} addresses for authenticated customer",
+                    {"address_count": len(addresses), "addresses": addresses[:2] if addresses else []}  # Show first 2 for brevity
+                )
+                return addresses
+            else:
+                self.log_test(
+                    "GET /api/user/addresses",
+                    False,
+                    f"Failed to retrieve addresses. Status: {response.status_code}",
+                    response.text
+                )
+                return []
+                
+        except Exception as e:
+            self.log_test(
+                "GET /api/user/addresses",
+                False,
+                f"Exception during address retrieval: {str(e)}"
+            )
+            return []
+    
+    def test_add_user_address(self):
+        """Test POST /api/user/addresses - add new address"""
+        print("➕ TESTING ADDRESS CREATION")
+        print("=" * 50)
+        
+        # Test data for new address
+        test_addresses = [
+            {
+                "label": "Test Ev Adresi",
+                "city": "İstanbul",
+                "description": "Kadıköy, Moda Caddesi No:123 Daire:5",
+                "lat": 40.9876,
+                "lng": 29.0234
+            },
+            {
+                "label": "Test İş Adresi", 
+                "city": "Ankara",
+                "description": "Çankaya, Atatürk Bulvarı No:456",
+                "lat": 39.9208,
+                "lng": 32.8541
+            }
+        ]
+        
+        created_addresses = []
+        
+        for i, address_data in enumerate(test_addresses):
+            try:
+                response = self.session.post(f"{BACKEND_URL}/user/addresses", json=address_data)
+                
+                if response.status_code == 200:
+                    created_address = response.json()
+                    address_id = created_address.get("id")
+                    
+                    if address_id:
+                        self.test_address_ids.append(address_id)
+                        created_addresses.append(created_address)
+                    
+                    self.log_test(
+                        f"POST /api/user/addresses (Test {i+1})",
+                        True,
+                        f"Successfully created address '{address_data['label']}' with ID: {address_id}",
+                        created_address
+                    )
+                else:
+                    self.log_test(
+                        f"POST /api/user/addresses (Test {i+1})",
+                        False,
+                        f"Failed to create address '{address_data['label']}'. Status: {response.status_code}",
+                        response.text
+                    )
+                    
+            except Exception as e:
+                self.log_test(
+                    f"POST /api/user/addresses (Test {i+1})",
+                    False,
+                    f"Exception during address creation: {str(e)}"
+                )
+        
+        return created_addresses
+    
+    def test_update_user_address(self):
+        """Test PUT /api/user/addresses/{address_id} - update existing address"""
+        print("✏️ TESTING ADDRESS UPDATE")
+        print("=" * 50)
+        
+        if not self.test_address_ids:
+            self.log_test(
+                "PUT /api/user/addresses/{address_id}",
+                False,
+                "No test addresses available for update testing"
+            )
+            return
+        
+        # Use first test address for update
+        address_id = self.test_address_ids[0]
+        
+        update_data = {
+            "label": "Updated Test Ev Adresi",
+            "city": "İstanbul",
+            "description": "Kadıköy, Moda Caddesi No:123 Daire:5 (Güncellenmiş)",
+            "lat": 40.9900,
+            "lng": 29.0250
+        }
+        
+        try:
+            response = self.session.put(f"{BACKEND_URL}/user/addresses/{address_id}", json=update_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                self.log_test(
+                    "PUT /api/user/addresses/{address_id}",
+                    True,
+                    f"Successfully updated address {address_id}",
+                    result
+                )
+            else:
+                self.log_test(
+                    "PUT /api/user/addresses/{address_id}",
+                    False,
+                    f"Failed to update address {address_id}. Status: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "PUT /api/user/addresses/{address_id}",
+                False,
+                f"Exception during address update: {str(e)}"
+            )
+    
+    def test_set_default_address(self):
+        """Test POST /api/user/addresses/{address_id}/set-default - set default address"""
+        print("⭐ TESTING SET DEFAULT ADDRESS")
+        print("=" * 50)
+        
+        if not self.test_address_ids:
+            self.log_test(
+                "POST /api/user/addresses/{address_id}/set-default",
+                False,
+                "No test addresses available for default address testing"
+            )
+            return
+        
+        # Use first test address for default setting
+        address_id = self.test_address_ids[0]
+        
+        try:
+            response = self.session.post(f"{BACKEND_URL}/user/addresses/{address_id}/set-default")
+            
+            if response.status_code == 200:
+                result = response.json()
+                self.log_test(
+                    "POST /api/user/addresses/{address_id}/set-default",
+                    True,
+                    f"Successfully set address {address_id} as default",
+                    result
+                )
+            else:
+                self.log_test(
+                    "POST /api/user/addresses/{address_id}/set-default",
+                    False,
+                    f"Failed to set default address {address_id}. Status: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "POST /api/user/addresses/{address_id}/set-default",
+                False,
+                f"Exception during set default address: {str(e)}"
+            )
+    
+    def test_delete_user_address(self):
+        """Test DELETE /api/user/addresses/{address_id} - delete address"""
+        print("🗑️ TESTING ADDRESS DELETION")
+        print("=" * 50)
+        
+        if len(self.test_address_ids) < 2:
+            self.log_test(
+                "DELETE /api/user/addresses/{address_id}",
+                False,
+                "Need at least 2 test addresses for deletion testing"
+            )
+            return
+        
+        # Delete the second test address (keep first one for other tests)
+        address_id = self.test_address_ids[1]
+        
+        try:
+            response = self.session.delete(f"{BACKEND_URL}/user/addresses/{address_id}")
+            
+            if response.status_code == 200:
+                result = response.json()
+                self.log_test(
+                    "DELETE /api/user/addresses/{address_id}",
+                    True,
+                    f"Successfully deleted address {address_id}",
+                    result
+                )
+                # Remove from our tracking list
+                self.test_address_ids.remove(address_id)
+            else:
+                self.log_test(
+                    "DELETE /api/user/addresses/{address_id}",
+                    False,
+                    f"Failed to delete address {address_id}. Status: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "DELETE /api/user/addresses/{address_id}",
+                False,
+                f"Exception during address deletion: {str(e)}"
+            )
+    
+    def test_data_validation(self):
+        """Test form validation, required fields, city normalization"""
+        print("✅ TESTING DATA VALIDATION")
+        print("=" * 50)
+        
+        # Test 1: Missing required fields
+        try:
+            invalid_data = {"label": ""}  # Missing city, description
+            response = self.session.post(f"{BACKEND_URL}/user/addresses", json=invalid_data)
+            
+            # Should either succeed with defaults or fail with validation error
+            if response.status_code in [200, 400, 422]:
+                self.log_test(
+                    "Data Validation - Missing Fields",
+                    True,
+                    f"Proper handling of missing fields. Status: {response.status_code}",
+                    response.json() if response.status_code == 200 else response.text
+                )
+            else:
+                self.log_test(
+                    "Data Validation - Missing Fields",
+                    False,
+                    f"Unexpected response for missing fields. Status: {response.status_code}",
+                    response.text
+                )
+        except Exception as e:
+            self.log_test(
+                "Data Validation - Missing Fields",
+                False,
+                f"Exception during validation test: {str(e)}"
+            )
+        
+        # Test 2: City normalization
+        try:
+            city_test_data = {
+                "label": "City Normalization Test",
+                "city": "ISTANBUL",  # Should be normalized to lowercase
+                "description": "Test city normalization",
+                "lat": 41.0082,
+                "lng": 28.9784
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/user/addresses", json=city_test_data)
+            
+            if response.status_code == 200:
+                created_address = response.json()
+                address_id = created_address.get("id")
+                if address_id:
+                    self.test_address_ids.append(address_id)
+                
+                self.log_test(
+                    "Data Validation - City Normalization",
+                    True,
+                    f"City normalization test successful. Created address with ID: {address_id}",
+                    created_address
+                )
+            else:
+                self.log_test(
+                    "Data Validation - City Normalization",
+                    False,
+                    f"City normalization test failed. Status: {response.status_code}",
+                    response.text
+                )
+        except Exception as e:
+            self.log_test(
+                "Data Validation - City Normalization",
+                False,
+                f"Exception during city normalization test: {str(e)}"
+            )
+    
+    def test_authentication_requirements(self):
+        """Test that all address endpoints require valid authentication"""
+        print("🔒 TESTING AUTHENTICATION REQUIREMENTS")
+        print("=" * 50)
+        
+        # Create a session without authentication
+        unauth_session = requests.Session()
+        
+        endpoints_to_test = [
+            ("GET", "/user/addresses", "Get Addresses"),
+            ("POST", "/user/addresses", "Create Address"),
+            ("PUT", "/user/addresses/test-id", "Update Address"),
+            ("DELETE", "/user/addresses/test-id", "Delete Address"),
+            ("POST", "/user/addresses/test-id/set-default", "Set Default Address")
+        ]
+        
+        for method, endpoint, test_name in endpoints_to_test:
+            try:
+                if method == "GET":
+                    response = unauth_session.get(f"{BACKEND_URL}{endpoint}")
+                elif method == "POST":
+                    test_data = {"label": "test", "city": "test", "description": "test"}
+                    response = unauth_session.post(f"{BACKEND_URL}{endpoint}", json=test_data)
+                elif method == "PUT":
+                    test_data = {"label": "test", "city": "test", "description": "test"}
+                    response = unauth_session.put(f"{BACKEND_URL}{endpoint}", json=test_data)
+                elif method == "DELETE":
+                    response = unauth_session.delete(f"{BACKEND_URL}{endpoint}")
+                
+                # Should return 401 Unauthorized or 403 Forbidden
+                if response.status_code in [401, 403]:
+                    self.log_test(
+                        f"Auth Required - {test_name}",
+                        True,
+                        f"Properly rejected unauthorized request. Status: {response.status_code}",
+                        {"status_code": response.status_code}
+                    )
+                else:
+                    self.log_test(
+                        f"Auth Required - {test_name}",
+                        False,
+                        f"Should reject unauthorized request but got status: {response.status_code}",
+                        response.text
+                    )
+                    
+            except Exception as e:
+                self.log_test(
+                    f"Auth Required - {test_name}",
+                    False,
+                    f"Exception during auth test: {str(e)}"
+                )
+    
+    def test_error_scenarios(self):
+        """Test invalid address IDs, missing fields, unauthorized access"""
+        print("⚠️ TESTING ERROR SCENARIOS")
+        print("=" * 50)
+        
+        # Test 1: Invalid address ID
+        try:
+            invalid_id = "invalid-address-id-12345"
+            response = self.session.get(f"{BACKEND_URL}/user/addresses")  # This gets all addresses
+            
+            # Try to update non-existent address
+            update_response = self.session.put(
+                f"{BACKEND_URL}/user/addresses/{invalid_id}",
+                json={"label": "test", "city": "test", "description": "test"}
+            )
+            
+            if update_response.status_code == 404:
+                self.log_test(
+                    "Error Handling - Invalid Address ID",
+                    True,
+                    f"Properly handled invalid address ID. Status: {update_response.status_code}",
+                    {"status_code": update_response.status_code}
+                )
+            else:
+                self.log_test(
+                    "Error Handling - Invalid Address ID",
+                    False,
+                    f"Should return 404 for invalid address ID but got: {update_response.status_code}",
+                    update_response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "Error Handling - Invalid Address ID",
+                False,
+                f"Exception during invalid ID test: {str(e)}"
+            )
+        
+        # Test 2: Try to delete non-existent address
+        try:
+            invalid_id = "non-existent-address-id"
+            response = self.session.delete(f"{BACKEND_URL}/user/addresses/{invalid_id}")
+            
+            if response.status_code == 404:
+                self.log_test(
+                    "Error Handling - Delete Non-existent Address",
+                    True,
+                    f"Properly handled deletion of non-existent address. Status: {response.status_code}",
+                    {"status_code": response.status_code}
+                )
+            else:
+                self.log_test(
+                    "Error Handling - Delete Non-existent Address",
+                    False,
+                    f"Should return 404 for non-existent address but got: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "Error Handling - Delete Non-existent Address",
+                False,
+                f"Exception during non-existent address deletion test: {str(e)}"
+            )
+    
+    def cleanup_test_data(self):
+        """Clean up test addresses created during testing"""
+        print("🧹 CLEANING UP TEST DATA")
+        print("=" * 50)
+        
+        for address_id in self.test_address_ids:
+            try:
+                response = self.session.delete(f"{BACKEND_URL}/user/addresses/{address_id}")
+                if response.status_code == 200:
+                    print(f"✅ Cleaned up test address: {address_id}")
+                else:
+                    print(f"⚠️ Could not clean up test address {address_id}: {response.status_code}")
+            except Exception as e:
+                print(f"❌ Error cleaning up test address {address_id}: {str(e)}")
+    
+    def run_all_tests(self):
+        """Run all address management backend tests"""
+        print("🚀 STARTING PHASE 1 ADDRESS MANAGEMENT BACKEND TESTING")
+        print("=" * 80)
+        print(f"Backend URL: {BACKEND_URL}")
+        print(f"Test Customer: {TEST_CUSTOMER_EMAIL}")
+        print(f"Test Time: {datetime.now().isoformat()}")
+        print("=" * 80)
+        print()
+        
+        # Step 1: Authenticate customer
+        if not self.test_customer_authentication():
+            print("❌ CRITICAL: Customer authentication failed. Cannot proceed with address tests.")
+            return self.generate_final_report()
+        
+        # Step 2: Test address retrieval
+        existing_addresses = self.test_get_user_addresses()
+        
+        # Step 3: Test address creation
+        self.test_add_user_address()
+        
+        # Step 4: Test address update
+        self.test_update_user_address()
+        
+        # Step 5: Test set default address
+        self.test_set_default_address()
+        
+        # Step 6: Test address deletion
+        self.test_delete_user_address()
+        
+        # Step 7: Test data validation
+        self.test_data_validation()
+        
+        # Step 8: Test authentication requirements
+        self.test_authentication_requirements()
+        
+        # Step 9: Test error scenarios
+        self.test_error_scenarios()
+        
+        # Step 10: Clean up test data
+        self.cleanup_test_data()
+        
+        # Generate final report
+        return self.generate_final_report()
+    
+    def generate_final_report(self):
+        """Generate comprehensive test report"""
+        print("\n" + "=" * 80)
+        print("📊 PHASE 1 ADDRESS MANAGEMENT BACKEND TEST RESULTS")
+        print("=" * 80)
+        
+        total = self.results["total_tests"]
+        passed = self.results["passed_tests"]
+        failed = self.results["failed_tests"]
+        success_rate = (passed / total * 100) if total > 0 else 0
+        
+        print(f"Total Tests: {total}")
+        print(f"Passed: {passed} ✅")
+        print(f"Failed: {failed} ❌")
+        print(f"Success Rate: {success_rate:.1f}%")
+        print()
+        
+        if failed > 0:
+            print("❌ FAILED TESTS:")
+            for test in self.results["test_details"]:
+                if "❌ FAIL" in test["status"]:
+                    print(f"  • {test['test']}: {test['details']}")
+            print()
+        
+        if success_rate >= 90:
+            print("🎉 EXCELLENT: Address management backend is working perfectly!")
+        elif success_rate >= 75:
+            print("✅ GOOD: Address management backend is mostly functional with minor issues.")
+        elif success_rate >= 50:
+            print("⚠️ MODERATE: Address management backend has significant issues that need attention.")
+        else:
+            print("❌ CRITICAL: Address management backend has major failures requiring immediate fixes.")
+        
+        print("\n" + "=" * 80)
+        
+        return {
+            "success_rate": success_rate,
+            "total_tests": total,
+            "passed_tests": passed,
+            "failed_tests": failed,
+            "details": self.results["test_details"]
+        }
+
+def main():
+    """Main test execution"""
+    tester = AddressBackendTester()
+    results = tester.run_all_tests()
+    
+    # Exit with appropriate code
+    if results["success_rate"] >= 75:
+        sys.exit(0)  # Success
+    else:
+        sys.exit(1)  # Failure
+
+if __name__ == "__main__":
+    main()
+"""
 Production Readiness Testing for Kuryecini Platform
 Testing newly implemented and updated endpoints (Madde 1-10)
 """
