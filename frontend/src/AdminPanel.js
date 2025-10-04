@@ -448,8 +448,343 @@ const AdminPanel = ({ user, onLogout }) => {
 
         {currentView === 'businesses' && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">🏪 İşletme Yönetimi</h2>
-            <p className="text-gray-600">İşletme listesi burada görünecek.</p>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">🏪 İşletme Yönetimi</h2>
+              <div className="flex space-x-2">
+                <select className="border rounded px-3 py-2">
+                  <option>Tüm Durumlar</option>
+                  <option>Aktif</option>
+                  <option>Pasif</option>
+                  <option>KYC Bekliyor</option>
+                  <option>Onaylandı</option>
+                  <option>Reddedildi</option>
+                </select>
+                <input type="text" placeholder="İşletme ara..." className="border rounded px-3 py-2" />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Pizza Palace İstanbul</h3>
+                    <p className="text-sm text-gray-600">Pizza & Fast Food</p>
+                    <p className="text-sm text-gray-500">İstanbul, Kadıköy</p>
+                  </div>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    Aktif
+                  </span>
+                </div>
+                
+                <div className="text-sm text-gray-600 space-y-1 mb-4">
+                  <p>📧 pizza@example.com</p>
+                  <p>📞 +90 212 123 4567</p>
+                  <p>⭐ 4.8 (156 değerlendirme)</p>
+                  <p>📦 142 sipariş bu ay</p>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600">
+                    Görüntüle
+                  </button>
+                  <button className="flex-1 bg-gray-500 text-white px-3 py-2 rounded text-sm hover:bg-gray-600">
+                    Düzenle
+                  </button>
+                  <button className="bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600">
+                    🚫
+                  </button>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Burger Deluxe</h3>
+                    <p className="text-sm text-gray-600">Burger & Steakhouse</p>
+                    <p className="text-sm text-gray-500">Ankara, Çankaya</p>
+                  </div>
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                    KYC Bekliyor
+                  </span>
+                </div>
+                
+                <div className="text-sm text-gray-600 space-y-1 mb-4">
+                  <p>📧 burger@example.com</p>
+                  <p>📞 +90 312 987 6543</p>
+                  <p>⭐ 4.6 (89 değerlendirme)</p>
+                  <p>📦 67 sipariş bu ay</p>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600">
+                    ✅ Onayla
+                  </button>
+                  <button className="flex-1 bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600">
+                    ❌ Reddet
+                  </button>
+                </div>
+              </div>
+              
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                <div className="text-gray-400 mb-2">
+                  <svg className="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 font-medium">Yeni İşletme Ekle</p>
+                <button className="mt-2 text-blue-500 hover:text-blue-600 text-sm">
+                  + İşletme Oluştur
+                </button>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-between items-center">
+              <p className="text-sm text-gray-700">
+                Toplam 89 işletme içinden 1-6 arası gösteriliyor
+              </p>
+              <div className="flex space-x-1">
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Önceki</button>
+                <button className="px-3 py-1 bg-blue-500 text-white rounded">1</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Sonraki</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'menus' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">📋 Menü Yönetimi</h2>
+              <div className="flex space-x-2">
+                <select className="border rounded px-3 py-2">
+                  <option>Tüm İşletmeler</option>
+                  <option>Pizza Palace</option>
+                  <option>Burger Deluxe</option>
+                  <option>Döner Evi</option>
+                </select>
+                <input type="text" placeholder="Ürün ara..." className="border rounded px-3 py-2" />
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ürün
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      İşletme
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Kategori
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fiyat
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Durum
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      İşlemler
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0">
+                          <img className="h-10 w-10 rounded-full object-cover" src="https://via.placeholder.com/40" alt="" />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">Margherita Pizza</div>
+                          <div className="text-sm text-gray-500">Klasik domates sosu, mozzarella</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Pizza Palace
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Pizza
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      ₺85.00
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Aktif
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button className="text-blue-600 hover:text-blue-900 mr-2">Düzenle</button>
+                      <button className="text-red-600 hover:text-red-900">Sil</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0">
+                          <img className="h-10 w-10 rounded-full object-cover" src="https://via.placeholder.com/40" alt="" />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">Chicken Burger</div>
+                          <div className="text-sm text-gray-500">Izgara tavuk, salata, sos</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Burger Deluxe
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Burger
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      ₺65.00
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        Pasif
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button className="text-blue-600 hover:text-blue-900 mr-2">Düzenle</button>
+                      <button className="text-green-600 hover:text-green-900">Aktifleştir</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="mt-6 flex justify-between items-center">
+              <p className="text-sm text-gray-700">
+                Toplam 456 ürün içinden 1-10 arası gösteriliyor
+              </p>
+              <div className="flex space-x-1">
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Önceki</button>
+                <button className="px-3 py-1 bg-blue-500 text-white rounded">1</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Sonraki</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'couriers' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">🚴 Kurye Yönetimi</h2>
+              <div className="flex space-x-2">
+                <select className="border rounded px-3 py-2">
+                  <option>Tüm Durumlar</option>
+                  <option>Çevrimiçi</option>
+                  <option>Çevrimdışı</option>
+                  <option>Teslimat Yapıyor</option>
+                  <option>KYC Bekliyor</option>
+                </select>
+                <input type="text" placeholder="Kurye ara..." className="border rounded px-3 py-2" />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center">
+                    <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                      MK
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="font-semibold text-gray-900">Mehmet Kaya</h3>
+                      <p className="text-sm text-gray-600">Motosiklet</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="h-3 w-3 bg-green-400 rounded-full mr-2"></div>
+                    <span className="text-sm text-green-600">Çevrimiçi</span>
+                  </div>
+                </div>
+                
+                <div className="text-sm text-gray-600 space-y-1 mb-4">
+                  <p>📧 mehmet@example.com</p>
+                  <p>📞 +90 532 123 4567</p>
+                  <p>📍 İstanbul, Kadıköy</p>
+                  <p>⭐ 4.9 (234 değerlendirme)</p>
+                  <p>📦 43 teslimat bu ay</p>
+                  <p>💰 ₺2,340 kazanç</p>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600">
+                    Görüntüle
+                  </button>
+                  <button className="flex-1 bg-yellow-500 text-white px-3 py-2 rounded text-sm hover:bg-yellow-600">
+                    Mesaj
+                  </button>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center">
+                    <div className="h-12 w-12 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                      AS
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="font-semibold text-gray-900">Ali Şahin</h3>
+                      <p className="text-sm text-gray-600">Bisiklet</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="h-3 w-3 bg-blue-400 rounded-full mr-2"></div>
+                    <span className="text-sm text-blue-600">Teslimat Yapıyor</span>
+                  </div>
+                </div>
+                
+                <div className="text-sm text-gray-600 space-y-1 mb-4">
+                  <p>📧 ali@example.com</p>
+                  <p>📞 +90 533 987 6543</p>
+                  <p>📍 Ankara, Çankaya</p>
+                  <p>⭐ 4.7 (156 değerlendirme)</p>
+                  <p>📦 38 teslimat bu ay</p>
+                  <p>💰 ₺1,890 kazanç</p>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-orange-500 text-white px-3 py-2 rounded text-sm hover:bg-orange-600">
+                    Takip Et
+                  </button>
+                  <button className="flex-1 bg-yellow-500 text-white px-3 py-2 rounded text-sm hover:bg-yellow-600">
+                    İletişim
+                  </button>
+                </div>
+              </div>
+              
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                <div className="text-gray-400 mb-2">
+                  <svg className="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 font-medium">Yeni Kurye Ekle</p>
+                <button className="mt-2 text-blue-500 hover:text-blue-600 text-sm">
+                  + Kurye Davet Et
+                </button>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-between items-center">
+              <p className="text-sm text-gray-700">
+                Toplam 156 kurye içinden 1-6 arası gösteriliyor
+              </p>
+              <div className="flex space-x-1">
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Önceki</button>
+                <button className="px-3 py-1 bg-blue-500 text-white rounded">1</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                <button className="px-3 py-1 border rounded hover:bg-gray-50">Sonraki</button>
+              </div>
+            </div>
           </div>
         )}
       </main>
