@@ -19,7 +19,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://express-order-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com/api"
 TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
 TEST_CUSTOMER_PASSWORD = "test123"
 
@@ -676,7 +676,7 @@ from pathlib import Path
 import tempfile
 
 # Configuration
-BACKEND_URL = "https://express-order-2.preview.emergentagent.com"
+BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
@@ -1230,7 +1230,7 @@ class ProductionReadinessTest:
         try:
             # Test preflight request
             headers = {
-                'Origin': 'https://express-order-2.preview.emergentagent.com',
+                'Origin': 'https://food-delivery-hub-19.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type,Authorization'
             }

@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://express-order-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com/api"
 
 class AksarayFixVerifier:
     def __init__(self):
