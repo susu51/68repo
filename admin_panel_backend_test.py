@@ -140,7 +140,7 @@ class AdminPanelBackendTester:
                 
         except Exception as e:
             self.log_test(
-                "Admin Authentication (password: 6851)",
+                "Admin Authentication (admin@kuryecini.com)",
                 False,
                 f"Exception during admin login: {str(e)}"
             )
