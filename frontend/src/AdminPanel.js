@@ -69,29 +69,16 @@ const AdminPanel = ({ user, onLogout }) => {
     fetchInitialData();
   }, []);
 
-  // Filter businesses based on city and search query
+  // Server-side filtering with debouncing
   useEffect(() => {
-    let filtered = allBusinesses;
+    const timeoutId = setTimeout(() => {
+      if (currentView === 'businesses') {
+        fetchAllBusinesses(cityFilter, searchQuery);
+      }
+    }, 500); // 500ms debounce
     
-    // City filter
-    if (cityFilter) {
-      filtered = filtered.filter(business => 
-        business.city?.toLowerCase().includes(cityFilter.toLowerCase()) ||
-        business.address?.toLowerCase().includes(cityFilter.toLowerCase())
-      );
-    }
-    
-    // Search query filter
-    if (searchQuery) {
-      filtered = filtered.filter(business =>
-        business.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        business.business_category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        business.email?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    setFilteredBusinesses(filtered);
-  }, [allBusinesses, cityFilter, searchQuery]);
+    return () => clearTimeout(timeoutId);
+  }, [cityFilter, searchQuery, currentView]);
 
   const fetchInitialData = async () => {
     setLoading(true);
