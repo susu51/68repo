@@ -1,7 +1,7 @@
 // Kuryecini Service Worker
 // Handles caching, offline functionality, and background sync
 
-const CACHE_NAME = 'kuryecini-v1.0.0';
+const CACHE_NAME = 'kuryecini-v1.0.1';
 const OFFLINE_URL = '/offline.html';
 
 // Files to cache for offline functionality
