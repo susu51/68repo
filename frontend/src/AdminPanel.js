@@ -1094,4 +1094,92 @@ const CourierCard = ({ courier, onApprove, onReject }) => {
   );
 };
 
+// BusinessKYCCard component for business approval
+const BusinessKYCCard = ({ business, onApprove, onReject }) => {
+  const [notes, setNotes] = useState('');
+
+  return (
+    <Card className="shadow-lg" data-testid={`business-card-${business.id}`}>
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-xl">{business.business_name}</CardTitle>
+            <CardDescription>{business.email}</CardDescription>
+          </div>
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+            Onay Bekliyor
+          </Badge>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-semibold mb-2">İşletme Bilgileri</h4>
+            <div className="space-y-1 text-sm text-gray-600">
+              <p><strong>Kategori:</strong> {business.business_category}</p>
+              <p><strong>Şehir:</strong> {business.city}</p>
+              <p><strong>Adres:</strong> {business.address}</p>
+              <p><strong>Telefon:</strong> {business.phone}</p>
+              <p><strong>Kayıt Tarihi:</strong> {new Date(business.created_at).toLocaleDateString('tr-TR')}</p>
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-semibold mb-2">Durum</h4>
+            <div className="space-y-2">
+              <p className="text-sm">
+                <strong>KYC Durumu:</strong> 
+                <Badge variant="outline" className="ml-2">
+                  {business.kyc_status || 'Bekliyor'}
+                </Badge>
+              </p>
+              <p className="text-sm">
+                <strong>Aktif:</strong> 
+                <Badge variant={business.is_active ? 'default' : 'secondary'} className="ml-2">
+                  {business.is_active ? 'Evet' : 'Hayır'}
+                </Badge>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t pt-4">
+          <div className="flex justify-between items-center">
+            <div className="flex-1 mr-4">
+              <Label htmlFor={`notes-${business.id}`} className="text-sm font-medium">
+                Notlar (İsteğe bağlı)
+              </Label>
+              <Textarea
+                id={`notes-${business.id}`}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Onay/ret notu ekleyin..."
+                className="mt-1"
+                rows={2}
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => onReject(business.id, notes)}
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
+              ❌ Reddet
+            </Button>
+            <Button
+              onClick={() => onApprove(business.id, notes)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              ✅ Onayla
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export default AdminPanel;
