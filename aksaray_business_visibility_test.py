@@ -358,8 +358,7 @@ class AksarayBusinessVisibilityTester:
                             }
                             
                             response = self.session.patch(
-                                f"{BACKEND_URL}/admin/users/{business_id}/kyc",
-                                json=approval_data
+                                f"{BACKEND_URL}/admin/users/{business_id}/approve"
                             )
                             
                             if response.status_code == 200:
