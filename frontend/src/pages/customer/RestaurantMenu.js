@@ -281,7 +281,8 @@ const RestaurantMenu = ({ restaurant, onAddToCart, onBack, cartItems = [], cartT
               </Card>
             );
           })}
-        </div>
+          </div>
+        )}
 
         {/* Floating Cart Button */}
         {cartItems.length > 0 && (
