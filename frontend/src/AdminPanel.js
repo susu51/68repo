@@ -473,21 +473,27 @@ const AdminPanel = ({ user, onLogout }) => {
     </div>
   );
 
-  // KYC Component (existing functionality preserved)
-  const renderKYC = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">KYC Onay Bekleyen Kuryeler</h2>
-        <Badge variant="secondary">{pendingCouriers.length} bekleyen</Badge>
-      </div>
+  // Business KYC Management - converted from courier KYC
+  const renderKYC = () => {
+    // Filter businesses that need approval
+    const pendingBusinesses = allBusinesses.filter(business => 
+      !business.kyc_status || business.kyc_status === 'pending' || business.kyc_status === null
+    );
+    
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">İşletme Onay Bekleyenler</h2>
+          <Badge variant="secondary">{pendingBusinesses.length} bekleyen</Badge>
+        </div>
 
-      {pendingCouriers.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <p className="text-gray-500 text-lg mb-4">Onay bekleyen kurye bulunmuyor</p>
-            <p className="text-sm text-gray-400">Yeni kurye kayıtları burada görünecek</p>
-          </CardContent>
-        </Card>
+        {pendingBusinesses.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-gray-500 text-lg mb-4">Onay bekleyen işletme bulunmuyor</p>
+              <p className="text-sm text-gray-400">Yeni işletme kayıtları burada görünecek</p>
+            </CardContent>
+          </Card>
       ) : (
         <div className="grid gap-6">
           {pendingCouriers.map((courier) => (
