@@ -315,6 +315,21 @@ backend:
         -agent: "testing"
         -comment: "🎉 FRONTEND RESTAURANT VISIBILITY ISSUE COMPLETELY RESOLVED: Fixed API URL construction in FoodOrderSystem.js from 'process.env.REACT_APP_BACKEND_URL || http://localhost:8001/api' to '${process.env.REACT_APP_BACKEND_URL || http://localhost:8001}/api'. ✅ COMPREHENSIVE TESTING CONFIRMS: 1) Customer login working (testcustomer@example.com/test123). 2) Navigation to 'Keşfet' tab successful. 3) All 3 restaurants now displaying correctly: Test Restoranı, Pizza Palace İstanbul, Burger Deluxe. 4) Restaurant cards showing with proper ratings (5, 4.6, 4.9), delivery times (25-45dk, 26-41dk, 34-44dk), and minimum orders (₺95, ₺96, ₺94). 5) Restaurant menu functionality working - clicked Test Restoranı and menu loaded with products (Margherita Pizza ₺85, Chicken Burger ₺65, Coca Cola ₺15, Test Döner Kebap ₺35.5, Künefe ₺25). 6) Console shows 'Restaurants fetched: [Object, Object, Object]' confirming API calls working. 7) Location-based sorting showing '3 restoran' in status. 8) ProfessionalFoodOrderSystem component fully functional with restaurant discovery, menu browsing, and cart management. The user-reported issue 'Müşteri kısmında hiçbir restorant gözükmüyor' is completely resolved - customers can now see and interact with all restaurants in the customer dashboard."
 
+  - task: "Aksaray Business Visibility Investigation"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "user"
+        -comment: "USER REPORTED: Aksaray'da bir işletme kaydı oluşturmuş ama müşteri tarafında görünmüyor - Aksaray business registered but not visible to customers"
+        -working: false
+        -agent: "testing"
+        -comment: "🔍 AKSARAY İŞLETME VİSİBİLİTY SORUNU TESPİT EDİLDİ: Comprehensive investigation reveals ROOT CAUSE - KYC approval issue. ✅ INVESTIGATION FINDINGS: 1) Admin panel shows 7 Aksaray businesses registered in database (başer, işletmew, 1, Aksaray Kebap Evi, Aksaray Pizza Palace, AKSARAY Döner Salonu, AKSARAY yemek). 2) ALL Aksaray businesses have kyc_status='pending' - NONE are approved. 3) Public endpoint GET /api/businesses correctly filters to show only kyc_status='approved' businesses. 4) City normalization working correctly - all Aksaray businesses have city_normalized='aksaray'. 5) Created test business 'Aksaray Test Restoranı' with 3 products successfully. ❌ CRITICAL ISSUE CONFIRMED: Customer visibility shows 0 Aksaray businesses because NO Aksaray businesses have kyc_status='approved'. The filtering system is working correctly - businesses must be KYC approved to appear to customers. 💡 SOLUTION REQUIRED: Admin must approve at least one Aksaray business by changing kyc_status from 'pending' to 'approved' for customer visibility. The system is functioning as designed - only approved businesses are visible to customers for quality control."
+
 frontend:
   - task: "Trendyol Go-style Customer App Implementation"
     implemented: true
