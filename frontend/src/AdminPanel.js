@@ -958,6 +958,8 @@ const AdminPanel = ({ user, onLogout }) => {
   );
 };
 
+export default AdminPanel;
+
 // CourierCard component (preserved from original)
 const CourierCard = ({ courier, onApprove, onReject }) => {
   const [notes, setNotes] = useState('');
