@@ -23,6 +23,10 @@ const AdminPanel = ({ user, onLogout }) => {
   const [ads, setAds] = useState([]);
   const [featuredRequests, setFeaturedRequests] = useState([]);
   const [featuredBusinesses, setFeaturedBusinesses] = useState([]);
+  const [allBusinesses, setAllBusinesses] = useState([]);
+  const [filteredBusinesses, setFilteredBusinesses] = useState([]);
+  const [cityFilter, setCityFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalCouriers: 0,
