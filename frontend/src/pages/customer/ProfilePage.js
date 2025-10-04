@@ -941,6 +941,90 @@ const ProfilePage = ({ user, onLogout }) => {
         </div>
       )}
 
+      {/* Address Modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md">
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">📍 Yeni Adres Ekle</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label>Adres Etiketi</Label>
+                  <Input
+                    type="text"
+                    value={newAddress.label}
+                    onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
+                    placeholder="Ev, İş, Diğer..."
+                  />
+                </div>
+                
+                <div>
+                  <Label>Adres Tarifi</Label>
+                  <textarea
+                    value={newAddress.description}
+                    onChange={(e) => setNewAddress({...newAddress, description: e.target.value})}
+                    placeholder="Cadde, sokak, bina no, kat, daire..."
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm h-20"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Şehir</Label>
+                    <select
+                      value={newAddress.city}
+                      onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg p-2"
+                    >
+                      <option value="">Şehir Seçin</option>
+                      <option value="İstanbul">İstanbul</option>
+                      <option value="Ankara">Ankara</option>
+                      <option value="İzmir">İzmir</option>
+                      <option value="Aksaray">Aksaray</option>
+                      <option value="Bursa">Bursa</option>
+                      <option value="Antalya">Antalya</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label>İlçe</Label>
+                    <Input
+                      type="text"
+                      value={newAddress.district}
+                      onChange={(e) => setNewAddress({...newAddress, district: e.target.value})}
+                      placeholder="İlçe"
+                    />
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-blue-700 text-sm">
+                    📍 Konum bilgisi isteğe bağlıdır. Daha hızlı teslimat için konum paylaşabilirsiniz.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
+                <Button
+                  onClick={() => setShowAddressModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  İptal
+                </Button>
+                <Button
+                  onClick={handleAddAddress}
+                  disabled={loading}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                >
+                  {loading ? 'Ekleniyor...' : 'Adresi Ekle'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Payment Method Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
