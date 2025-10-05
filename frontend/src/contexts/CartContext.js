@@ -134,6 +134,20 @@ export function CartProvider({ children }) {
 
   // Cart utility functions
   const addToCart = (product, quantity = 1) => {
+    if (quantity < 0) {
+      // Handle negative quantity as a decrease
+      const currentItem = cart.items.find(item => item.id === product.id);
+      if (currentItem) {
+        const newQuantity = currentItem.quantity + quantity;
+        if (newQuantity <= 0) {
+          removeFromCart(product.id);
+        } else {
+          updateQuantity(product.id, newQuantity);
+        }
+      }
+      return;
+    }
+    
     dispatch({ 
       type: CART_ACTIONS.ADD_ITEM, 
       payload: { ...product, quantity } 
