@@ -19,8 +19,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         
         # Import here to avoid circular imports
         from server import db
-        user_id = payload.get("sub")
-        user = await db.users.find_one({"_id": user_id})
+        user_email = payload.get("sub")
+        user = await db.users.find_one({"email": user_email})
         
         if not user:
             raise HTTPException(
