@@ -779,13 +779,26 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 {/* Map Section */}
                 <Card>
                   <CardContent className="p-0">
-                    <div style={{ height: '400px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
-                      <div className="text-center">
-                        <div className="text-4xl mb-2">🗺️</div>
-                        <p className="text-gray-600">Harita Yakında Eklenecek</p>
-                        <p className="text-sm text-gray-500">Konum takibi aktif</p>
-                      </div>
-                    </div>
+                    <OpenStreetMap
+                      center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [41.0082, 28.9784]}
+                      zoom={13}
+                      height="400px"
+                      courierLocation={courierLocation}
+                      markers={nearbyOrders.map(order => ({
+                        id: order.id,
+                        title: `Sipariş #${order.id.slice(-8)}`,
+                        type: 'delivery',
+                        lat: order.delivery_lat || 41.0082,
+                        lng: order.delivery_lng || 28.9784,
+                        address: order.delivery_address
+                      }))}
+                      onMarkerClick={(markerId) => {
+                        const order = nearbyOrders.find(o => o.id === markerId);
+                        if (order) {
+                          toast.success(`📦 Sipariş #${order.id.slice(-8)} - ${order.delivery_address}`);
+                        }
+                      }}
+                    />
                   </CardContent>
                 </Card>
 
