@@ -46,7 +46,7 @@ COURIER_TRANSITIONS = {
 async def update_order_status(
     order_id: str,
     status_update: OrderStatusUpdate,
-    current_user: dict = Depends(get_business_user)  # Default: business user
+    current_user: dict = Depends(get_current_user)  # Allow both business and courier
 ):
     """
     Update order status with CAS (Compare-And-Swap) locking
