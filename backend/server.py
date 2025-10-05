@@ -5309,6 +5309,9 @@ from routes.websocket_routes import router as websocket_router
 # Phase 3.5 - localStorage → DB Migration
 from routes.customer_cart import router as customer_cart_router
 
+# Debug routes (temporary for Atlas testing)
+from routes.debug import router as debug_router
+
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
 api_router.include_router(orders_router)
