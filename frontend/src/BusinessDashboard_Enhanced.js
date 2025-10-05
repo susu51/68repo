@@ -1091,21 +1091,51 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                             </div>
                             
                             <div className="ml-4 space-y-2">
-                              <Button
-                                onClick={() => acceptOrder(order.id)}
-                                className="w-full bg-green-600 hover:bg-green-700"
-                                size="sm"
-                              >
-                                ✅ Kabul Et
-                              </Button>
-                              <Button
-                                onClick={() => rejectOrder(order.id)}
-                                variant="outline"
-                                className="w-full border-red-200 text-red-600 hover:bg-red-50"
-                                size="sm"
-                              >
-                                ❌ Reddet
-                              </Button>
+                              {order.status === 'created' && (
+                                <>
+                                  <Button
+                                    onClick={() => acceptOrder(order.id)}
+                                    className="w-full bg-green-600 hover:bg-green-700"
+                                    size="sm"
+                                  >
+                                    ✅ Kabul Et
+                                  </Button>
+                                  <Button
+                                    onClick={() => rejectOrder(order.id)}
+                                    variant="outline"
+                                    className="w-full border-red-200 text-red-600 hover:bg-red-50"
+                                    size="sm"
+                                  >
+                                    ❌ Reddet
+                                  </Button>
+                                </>
+                              )}
+                              
+                              {order.status === 'confirmed' && (
+                                <Button
+                                  onClick={() => startPreparingOrder(order.id)}
+                                  className="w-full bg-orange-600 hover:bg-orange-700"
+                                  size="sm"
+                                >
+                                  👨‍🍳 Hazırlamaya Başla
+                                </Button>
+                              )}
+                              
+                              {order.status === 'preparing' && (
+                                <Button
+                                  onClick={() => markOrderAsReady(order.id)}
+                                  className="w-full bg-blue-600 hover:bg-blue-700"
+                                  size="sm"
+                                >
+                                  ✅ Hazır - Kuryeye Ver
+                                </Button>
+                              )}
+                              
+                              {order.status === 'ready' && (
+                                <div className="text-center">
+                                  <Badge className="bg-purple-600">🚴 Kurye Bekleniyor</Badge>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </CardContent>
