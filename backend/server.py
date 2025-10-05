@@ -5255,6 +5255,9 @@ from routes.courier_location import router as courier_location_router
 from routes.admin_settings import router as admin_settings_router
 from routes.websocket_routes import router as websocket_router
 
+# Phase 3.5 - localStorage → DB Migration
+from routes.customer_cart import router as customer_cart_router
+
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
 api_router.include_router(orders_router)
