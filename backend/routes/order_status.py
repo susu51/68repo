@@ -151,7 +151,7 @@ async def update_order_status(
                 detail="Order status was modified by another user. Please refresh and try again."
             )
         
-        print(f"🔄 ORDER STATUS UPDATE: {order_id} | {current_status} → {status_update.to_status} | By: {user_role} {current_user['id']}")
+        print(f"🔄 ORDER STATUS UPDATE: {order_id} | {current_status} → {status_update.to} | By: {user_role} {current_user['id']}")
         
         # Broadcast status update via WebSocket
         try:
@@ -159,7 +159,7 @@ async def update_order_status(
             await websocket_manager.send_order_status_update(order_id, {
                 "type": "status_changed",
                 "from_status": current_status,
-                "to_status": status_update.to_status,
+                "to_status": status_update.to,
                 "updated_by": current_user["id"],
                 "updated_by_role": user_role
             })
