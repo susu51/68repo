@@ -63,21 +63,21 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         });
         setRestaurants(response.data || []);
       } else {
-        // City-wide listing - filter by selected address city if available
-        let endpoint = `${API}/api/businesses`;
+        // City-wide listing - show ALL restaurants for now (no city filter)
+        let endpoint = `${API}/api/restaurants`;  // Changed to /restaurants endpoint
         let params = {};
         
-        if (selectedAddress && selectedAddress.city) {
-          params.city = selectedAddress.city;
-          console.log(`Filtering restaurants by city: ${selectedAddress.city}`);
-        }
+        // TEMPORARY: Remove city filter to show all approved restaurants
+        // if (selectedAddress && selectedAddress.city) {
+        //   params.city = selectedAddress.city;
+        //   console.log(`Filtering restaurants by city: ${selectedAddress.city}`);
+        // }
         
         const response = await axios.get(endpoint, { params });
         setRestaurants(response.data || []);
         
-        if (selectedAddress && selectedAddress.city) {
-          console.log(`Found ${response.data?.length || 0} restaurants in ${selectedAddress.city}`);
-        }
+        console.log(`Found ${response.data?.length || 0} total restaurants`);
+        console.log('Restaurant data:', response.data);
       }
       
     } catch (error) {
