@@ -154,14 +154,16 @@ const OpenStreetMap = ({
             stroke-width="4"
             stroke-dasharray="8,4"
             opacity="0.8"
+            class="route-line"
           />
           <line
             x1="48%" y1="45%"
             x2="${45 + (markers.indexOf(destination) * 3)}%" y2="${40 + (markers.indexOf(destination) * 5)}%"
             stroke="#1d4ed8"
             stroke-width="2"
-            stroke-dasharray="8,4"
+            stroke-dasharray="4,2"
             opacity="1"
+            class="route-line"
           />
         </svg>
       `;
