@@ -212,7 +212,7 @@ export const CustomerApp = ({ user, onLogout }) => {
       )}
 
       {/* Floating Cart Button - Show on restaurant page when cart has items */}
-      {activeView === 'restaurant' && cart.items.length > 0 && (
+      {activeView === 'restaurant' && cart?.items?.length > 0 && (
         <div className="fixed bottom-6 right-6 z-40">
           <button 
             onClick={handleGoToCart}
