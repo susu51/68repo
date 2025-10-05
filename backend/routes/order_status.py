@@ -120,11 +120,11 @@ async def update_order_status(
         # CAS (Compare-And-Swap) Operation
         current_status = order["status"]
         
-        # If from_status is specified, verify it matches current status
-        if status_update.from_status and status_update.from_status != current_status:
+        # If from_ is specified, verify it matches current status (CAS)
+        if status_update.from_ and status_update.from_ != current_status:
             raise HTTPException(
                 status_code=409,  # Conflict - CAS failed
-                detail=f"Status mismatch: expected '{status_update.from_status}', found '{current_status}'"
+                detail=f"Status mismatch: expected '{status_update.from_}', found '{current_status}'"
             )
         
         # Atomic update with CAS
