@@ -4169,7 +4169,6 @@ async def get_nearby_restaurants(
     """Get nearby restaurants using geospatial query"""
     try:
         query_filter = {
-            "role": "business",
             "kyc_status": "approved",
             "location": {
                 "$near": {
