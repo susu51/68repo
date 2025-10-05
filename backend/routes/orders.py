@@ -3,17 +3,14 @@ Customer Order Creation & Management Routes
 Phase 2: Customer Order Implementation
 """
 from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime, timezone
 import uuid
-import jwt
-import os
 from models import UserRole, OrderStatus
+from auth_dependencies import get_customer_user
 
 router = APIRouter(prefix="/orders", tags=["orders"])
-security = HTTPBearer()
 
 # Request/Response Models
 class OrderItem(BaseModel):
@@ -49,39 +46,6 @@ class OrderResponse(BaseModel):
     status: OrderStatus
     estimated_delivery: Optional[str] = None
     created_at: datetime
-
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify JWT token and return user data"""
-    try:
-        token = credentials.credentials
-        secret_key = os.environ.get("JWT_SECRET", "kuryecini_secret_key_2024")
-        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
-        
-        from server import db
-        user_id = payload.get("sub")
-        user = await db.users.find_one({"_id": user_id})
-        
-        if not user:
-            raise HTTPException(status_code=401, detail="User not found")
-            
-        return {
-            "id": user["_id"],
-            "email": user["email"],
-            "role": user["role"]
-        }
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-async def get_customer_user(current_user: dict = Depends(get_current_user)):
-    """Require customer role"""
-    if current_user.get("role") != "customer":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Customer access required"
-        )
-    return current_user
 
 @router.post("/", response_model=OrderResponse)
 async def create_order(
