@@ -320,8 +320,7 @@ class KYCApprovalTester:
             response = requests.get(f"{BACKEND_URL}/admin/couriers/{courier_id}", headers=headers)
             
             if response.status_code == 200:
-                data = response.json()
-                courier = data.get("courier", {})
+                courier = response.json()  # API returns courier data directly
                 actual_status = courier.get("kyc_status")
                 
                 if actual_status == expected_status:
