@@ -10,7 +10,7 @@ import json
 import time
 
 async def final_test():
-    base_url = "https://kurye-platform.preview.emergentagent.com/api"
+    base_url = "https://meal-dash-163.preview.emergentagent.com/api"
     test_email = "admin@kuryecini.com"
     current_password = "KuryeciniAdmin2024!"
     new_password = "NewSecurePassword123!"

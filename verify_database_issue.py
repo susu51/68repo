@@ -7,7 +7,7 @@ import requests
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://kurye-platform.preview.emergentagent.com/api"
+BACKEND_URL = "https://meal-dash-163.preview.emergentagent.com/api"
 TEST_BUSINESS_EMAIL = "testbusiness@example.com"
 TEST_BUSINESS_PASSWORD = "test123"
 
