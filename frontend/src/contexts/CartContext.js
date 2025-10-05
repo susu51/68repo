@@ -186,10 +186,12 @@ export function CartProvider({ children }) {
 
   // Calculate totals
   const getItemCount = () => {
+    if (!cart || !cart.items) return 0;
     return cart.items.reduce((total, item) => total + item.quantity, 0);
   };
 
   const getSubtotal = () => {
+    if (!cart || !cart.items) return 0;
     return cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
