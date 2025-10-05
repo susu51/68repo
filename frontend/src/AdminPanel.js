@@ -227,6 +227,150 @@ const AdminPanel = ({ user, onLogout }) => {
       setLoading(false);
     }
   };
+
+  // Promotion management handlers
+  const handleCreatePromotion = async (promotionData) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/promotions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(promotionData)
+      });
+      
+      if (response.ok) {
+        alert('✅ Promosyon başarıyla oluşturuldu!');
+        await fetchPromotions(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Promosyon oluşturulamadı: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Create promotion error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTogglePromotion = async (promotionId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}/toggle`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        alert('✅ Promosyon durumu güncellendi!');
+        await fetchPromotions(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Durum güncellenemedi: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Toggle promotion error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePromotion = async (promotionId) => {
+    if (!window.confirm('Bu promosyonu silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        alert('✅ Promosyon silindi!');
+        await fetchPromotions(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Silinemedi: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Delete promotion error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Product management handlers
+  const handleToggleProduct = async (productId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}/toggle`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        alert('✅ Ürün durumu güncellendi!');
+        await fetchProducts(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Durum güncellenemedi: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Toggle product error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        alert('✅ Ürün silindi!');
+        await fetchProducts(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Silinemedi: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Delete product error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   if (!user) {
     return (
