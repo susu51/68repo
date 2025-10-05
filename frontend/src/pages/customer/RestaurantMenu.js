@@ -201,13 +201,13 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
 
         {/* Category Filter */}
         <Card className="mb-6 border-0 shadow-lg rounded-2xl">
-          <CardContent className="p-6">
-            <div className="flex gap-4 overflow-x-auto">
+          <CardContent className="p-3 md:p-4 lg:p-6">
+            <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2">
               {categories.map(category => (
                 <Button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`min-w-fit rounded-xl px-6 py-3 font-semibold transition-all duration-300 ${
+                  className={`min-w-fit whitespace-nowrap rounded-xl px-3 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold transition-all duration-300 touch-manipulation ${
                     selectedCategory === category.id
                       ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
