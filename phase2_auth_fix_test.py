@@ -45,7 +45,7 @@ BACKEND_URL = "https://meal-dash-163.preview.emergentagent.com/api"
 
 # Test credentials from review request
 TEST_CREDENTIALS = {
-    "business": {"email": "testrestoran@example.com", "password": "test123"},
+    "business": {"email": "testbusiness@example.com", "password": "test123"},
     "customer": {"email": "testcustomer@example.com", "password": "test123"}
 }
 
