@@ -718,11 +718,22 @@ const AdminPanel = ({ user, onLogout }) => {
                 </div>
                 
                 <div className="flex space-x-2">
-                  <button className="flex-1 bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600">
+                  <button 
+                    onClick={() => handleTogglePromotion('promo-1')}
+                    disabled={loading}
+                    className="flex-1 bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600 disabled:opacity-50"
+                  >
                     Başlat
                   </button>
                   <button className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600">
                     Düzenle
+                  </button>
+                  <button 
+                    onClick={() => handleDeletePromotion('promo-1')}
+                    disabled={loading}
+                    className="bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 disabled:opacity-50"
+                  >
+                    🗑️
                   </button>
                 </div>
               </div>
@@ -734,7 +745,23 @@ const AdminPanel = ({ user, onLogout }) => {
                   </svg>
                 </div>
                 <p className="text-gray-500 font-medium">Yeni Promosyon</p>
-                <button className="mt-2 text-blue-500 hover:text-blue-600 text-sm">
+                <button 
+                  onClick={() => {
+                    const promotionData = {
+                      title: 'Yeni Kampanya',
+                      description: 'Test kampanya açıklaması',
+                      type: 'percentage',
+                      value: 10,
+                      min_order_amount: 50,
+                      max_usage: 100,
+                      start_date: new Date().toISOString().split('T')[0],
+                      end_date: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0]
+                    };
+                    handleCreatePromotion(promotionData);
+                  }}
+                  disabled={loading}
+                  className="mt-2 text-blue-500 hover:text-blue-600 text-sm disabled:opacity-50"
+                >
                   + Kampanya Oluştur
                 </button>
               </div>
