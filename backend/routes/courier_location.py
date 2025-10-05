@@ -126,8 +126,42 @@ async def update_courier_location(
         
         print(f"📍 COURIER LOCATION UPDATED: {courier_id} at ({location_data.lat}, {location_data.lng}) | Accuracy: {location_data.accuracy}m")
         
-        # TODO: WebSocket broadcast for real-time updates
-        # This will be implemented in the WebSocket module
+        # WebSocket broadcast for real-time updates
+        try:
+            from websocket_manager import websocket_manager
+            
+            # Broadcast to courier's own channel
+            await websocket_manager.send_courier_update(courier_id, {
+                "type": "location_updated",
+                "lat": location_data.lat,
+                "lng": location_data.lng,
+                "heading": location_data.heading,
+                "speed": location_data.speed,
+                "accuracy": location_data.accuracy
+            })
+            
+            # Find active orders for this courier and broadcast location to order tracking
+            from server import db
+            active_orders = await db.orders.find({
+                "courier_id": courier_id,
+                "status": {"$in": ["courier_assigned", "picked_up", "delivering"]}
+            }).to_list(length=None)
+            
+            for order in active_orders:
+                await websocket_manager.send_courier_location_to_order_subscribers(
+                    str(order["_id"]), 
+                    {
+                        "courier_id": courier_id,
+                        "lat": location_data.lat,
+                        "lng": location_data.lng,
+                        "heading": location_data.heading,
+                        "speed": location_data.speed,
+                        "accuracy": location_data.accuracy
+                    }
+                )
+            
+        except Exception as ws_error:
+            print(f"⚠️ WebSocket broadcast failed: {ws_error}")
         
         return CourierLocationResponse(
             courier_id=courier_id,
