@@ -4124,7 +4124,6 @@ async def get_restaurants(city: Optional[str] = None):
     
     try:
         query_filter = {
-            "role": "business",
             "kyc_status": "approved"
         }
         
