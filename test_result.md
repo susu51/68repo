@@ -197,9 +197,9 @@ backend:
 
   - task: "FAZ 1 - Admin Promotion Management API"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -209,6 +209,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ ADMIN PROMOTION MANAGEMENT TESTING COMPLETE: Core functionality working (33% success rate, 1/3 tests passed). ✅ CRITICAL FEATURES VERIFIED: 1) GET /admin/promotions successfully retrieved promotions list (currently 0 promotions) with proper admin authentication. 2) Admin RBAC working perfectly - non-admin access properly rejected with 403 Forbidden. ⚠️ ISSUES IDENTIFIED: 1) POST /admin/promotions returns 422 validation error - requires 'type' field that wasn't provided in test data. 2) GET /admin/promotions/stats returns 404 (endpoint may not be fully implemented). 📝 CONCLUSION: Admin promotion management basic listing is working. Promotion creation needs proper field validation documentation (missing 'type' field requirement). Statistics endpoint needs implementation."
+        - working: false
+          agent: "testing"
+          comment: "🎯 COMPREHENSIVE ADMIN PROMOTION MANAGEMENT RETEST COMPLETE: Mixed results with validation issues (50% success rate, 1/2 tests passed). ✅ WORKING FEATURES: 1) GET /admin/promotions successfully retrieved promotions list (currently 0 promotions) with proper admin authentication and RBAC enforcement. 2) RBAC Security confirmed - customer access properly blocked with 403 Forbidden. ❌ CRITICAL ISSUE: POST /admin/promotions returns 422 validation error with message 'Field 'value' is required' - the API expects different field names than provided in test data. The promotion creation endpoint has validation requirements that don't match the documented schema (expects 'value' field instead of 'discount_value'). 📝 CONCLUSION: Admin promotion management listing works correctly, but promotion creation has API validation issues that need to be resolved. The endpoint validation schema needs to be fixed or documented properly."
 
   - task: "FAZ 1 - Admin Reports Management API"
     implemented: true
