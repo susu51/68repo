@@ -13,8 +13,13 @@ from auth_dependencies import get_business_user, get_courier_user
 router = APIRouter(prefix="/orders", tags=["order-status"])
 
 class OrderStatusUpdate(BaseModel):
-    from_status: str = None  # Compare-And-Swap - mevcut durum kontrolü
-    to_status: str           # Hedef durum
+    from_: Optional[str] = None  # Compare-And-Swap - mevcut durum kontrolü (named 'from_' due to Python keyword)
+    to: str                      # Hedef durum
+    
+    class Config:
+        # Map 'from' in JSON to 'from_' in Python  
+        allow_population_by_field_name = True
+        fields = {'from_': 'from'}
 
 class OrderStatusResponse(BaseModel):
     id: str
