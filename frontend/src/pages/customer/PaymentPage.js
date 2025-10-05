@@ -418,13 +418,66 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
           </div>
         )}
 
+        {/* Address Selector Modal */}
+        {showAddressSelector && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+              <div className="p-4 border-b">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-gray-900">Teslimat Adresi Seç</h3>
+                  <button 
+                    onClick={() => setShowAddressSelector(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-4">
+                {userAddresses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <span className="text-4xl mb-2 block">📍</span>
+                    <p className="text-gray-600 mb-4">Henüz kayıtlı adresiniz yok</p>
+                    <p className="text-sm text-gray-500">Sepet sayfasına geri dönüp adres ekleyin</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {userAddresses.map((address) => (
+                      <div 
+                        key={address.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          selectedAddress?.id === address.id 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:bg-gray-50'
+                        }`}
+                        onClick={() => {
+                          setSelectedAddress(address);
+                          setShowAddressSelector(false);
+                          toast.success('Teslimat adresi seçildi');
+                        }}
+                      >
+                        <p className="font-medium text-gray-900">{address.title}</p>
+                        <p className="text-sm text-gray-600">{address.description}</p>
+                        {address.city && (
+                          <p className="text-xs text-gray-500 mt-1">🏙️ {address.city}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Complete Order Button */}
         <button
           onClick={handleCompleteOrder}
-          disabled={processing}
+          disabled={processing || !selectedAddress}
           className="w-full bg-blue-500 text-white py-4 rounded-lg font-semibold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {processing ? 'İşleniyor...' : `₺${cartSummary.total.toFixed(2)} - Siparişi Tamamla`}
+          {processing ? 'İşleniyor...' : !selectedAddress ? 'Önce Adres Seçin' : `₺${cartSummary.total.toFixed(2)} - Siparişi Tamamla`}
         </button>
 
         {/* Security Note */}
