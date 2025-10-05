@@ -5243,13 +5243,29 @@ async def get_business_statistics(current_user: dict = Depends(get_admin_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving business statistics: {str(e)}")
 
-# Include Route Modules - Phase 2 Implementation
+# Include Route Modules - Phase 2 & 3 Implementation
 from routes.business import router as business_router
 from routes.nearby import router as nearby_router
 from routes.orders import router as orders_router
 
+# Phase 3 Route Modules
+from routes.order_status import router as order_status_router
+from routes.courier_workflow import router as courier_workflow_router  
+from routes.courier_location import router as courier_location_router
+from routes.admin_settings import router as admin_settings_router
+from routes.websocket_routes import router as websocket_router
+
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
 api_router.include_router(orders_router)
+
+# Phase 3 Routers
+api_router.include_router(order_status_router)
+api_router.include_router(courier_workflow_router)
+api_router.include_router(courier_location_router)
+api_router.include_router(admin_settings_router)
+
+# WebSocket router (separate from API router due to WebSocket protocol)
+app.include_router(websocket_router)
 
 app.include_router(api_router)
