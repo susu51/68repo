@@ -177,11 +177,11 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
               
               <div className="flex items-center gap-4">
                 {/* Cart Summary */}
-                {cartItems.length > 0 && (
-                  <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
+                {cart.items.length > 0 && (
+                  <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center cursor-pointer" onClick={onGoToCart}>
                     <p className="text-sm text-white/90">Sepet</p>
-                    <p className="text-xl font-bold">{cartItems.length} ürün</p>
-                    <p className="text-lg">₺{cartTotal.toFixed(2)}</p>
+                    <p className="text-xl font-bold">{cartSummary.itemCount} ürün</p>
+                    <p className="text-lg">₺{cartSummary.total.toFixed(2)}</p>
                   </div>
                 )}
                 
