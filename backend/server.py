@@ -2691,15 +2691,6 @@ class MockPaymentResponse(BaseModel):
     message: str
     transaction_id: Optional[str] = None
 
-# Courier Location Models
-class CourierLocation(BaseModel):
-    lat: float
-    lng: float
-    heading: Optional[float] = None
-    speed: Optional[float] = None
-    accuracy: Optional[float] = None
-    ts: Optional[int] = None
-
 @api_router.post("/payments/mock", response_model=MockPaymentResponse)
 async def process_mock_payment(
     payment_request: MockPaymentRequest,
