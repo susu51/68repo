@@ -5268,6 +5268,9 @@ api_router.include_router(courier_workflow_router)
 api_router.include_router(courier_location_router)
 api_router.include_router(admin_settings_router)
 
+# Phase 3.5 - localStorage → DB Migration
+api_router.include_router(customer_cart_router)
+
 # WebSocket router (separate from API router due to WebSocket protocol)
 app.include_router(websocket_router)
 
