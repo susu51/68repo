@@ -92,8 +92,7 @@ class KYCApprovalTester:
             response = requests.get(f"{BACKEND_URL}/admin/businesses?kyc_status=pending", headers=headers)
             
             if response.status_code == 200:
-                data = response.json()
-                businesses = data.get("businesses", [])
+                businesses = response.json()  # API returns direct list
                 self.pending_businesses = businesses
                 
                 self.log_test(
