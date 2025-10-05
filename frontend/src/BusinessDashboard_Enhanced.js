@@ -498,12 +498,33 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   const toggleProductAvailability = async (productId, isAvailable) => {
     try {
-      setProducts(prev => prev.map(p => 
-        p.id === productId ? { ...p, is_available: isAvailable } : p
-      ));
-      toast.success(isAvailable ? '✅ Ürün stokta' : '❌ Ürün stoktan çıkarıldı');
+      const token = localStorage.getItem('token');
+      const response = await axios.patch(`${API}/business/menu/${productId}`, 
+        { is_available: isAvailable }, 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data) {
+        setProducts(prev => prev.map(p => 
+          p.id === productId ? { ...p, is_available: isAvailable } : p
+        ));
+        toast.success(isAvailable ? '✅ Ürün stokta' : '❌ Ürün stoktan çıkarıldı');
+      }
     } catch (error) {
-      toast.error('Stok durumu güncellenemedi');
+      console.error('❌ Stok durumu güncelleme hatası:', error);
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Tekrar giriş yapın.');
+        onLogout();
+      } else if (error.response?.status === 403) {
+        toast.error('Bu işlem için yetkiniz bulunmuyor.');
+      } else {
+        toast.error('❌ Stok durumu güncellenemedi');
+      }
     }
   };
 
