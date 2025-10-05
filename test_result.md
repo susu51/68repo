@@ -992,7 +992,9 @@ frontend:
 
 test_plan:
   current_focus:
-    - "EMERGENCY BUSINESS VISIBILITY FIX"
+    - "Phase 2 - Business Menu CRUD Operations"
+    - "Phase 2 - Geospatial Nearby Businesses Discovery"
+    - "Phase 2 - Customer Order Creation System"
   stuck_tasks:
     - "EMERGENCY BUSINESS VISIBILITY FIX"
   test_all: false
