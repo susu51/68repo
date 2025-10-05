@@ -528,16 +528,41 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     }
   };
 
-  const updateProductPrice = (productId, newPrice) => {
+  const updateProductPrice = async (productId, newPrice) => {
     if (!newPrice || isNaN(newPrice)) {
       toast.error('Geçerli bir fiyat girin');
       return;
     }
 
-    setProducts(prev => prev.map(p => 
-      p.id === productId ? { ...p, price: parseFloat(newPrice) } : p
-    ));
-    toast.success('Fiyat güncellendi!');
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.patch(`${API}/business/menu/${productId}`, 
+        { price: parseFloat(newPrice) }, 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data) {
+        setProducts(prev => prev.map(p => 
+          p.id === productId ? { ...p, price: parseFloat(newPrice) } : p
+        ));
+        toast.success('✅ Fiyat başarıyla güncellendi!');
+      }
+    } catch (error) {
+      console.error('❌ Fiyat güncelleme hatası:', error);
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Tekrar giriş yapın.');
+        onLogout();
+      } else if (error.response?.status === 403) {
+        toast.error('Bu işlem için yetkiniz bulunmuyor.');
+      } else {
+        toast.error('❌ Fiyat güncellenemedi. Tekrar deneyin.');
+      }
+    }
   };
 
   const resetProductForm = () => {
