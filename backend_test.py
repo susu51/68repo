@@ -1,27 +1,34 @@
 #!/usr/bin/env python3
 """
-PHASE 1 ADDRESS MANAGEMENT BACKEND TESTING
-Comprehensive testing of address-related endpoints for the new frontend implementation.
+PHASE 1 COURIER LOCATION SYSTEM BACKEND TESTING
+Comprehensive testing of the newly implemented courier location tracking system.
 
-Focus Areas:
-1. Customer Authentication - Verify customer login with testcustomer@example.com/test123
-2. Address CRUD Operations - Test all address endpoints
-3. Data Validation - Test form validation, required fields, city normalization
-4. JWT Token Handling - Ensure all address endpoints require valid authentication
-5. Error Scenarios - Test invalid address IDs, missing fields, unauthorized access
+Test Coverage:
+1. POST /api/courier/location - Real-time location updates (courier role required)
+2. GET /api/courier/location/{courier_id} - Get courier location access
+3. GET /api/orders/{order_id}/courier/location - Order-specific courier tracking
+4. RBAC security testing
+5. Redis integration verification
+6. MongoDB historical storage testing
+7. Integration with existing order system
 """
 
 import requests
 import json
-import sys
 import time
-from datetime import datetime
-import uuid
+import random
+from datetime import datetime, timezone
 
 # Configuration
 BACKEND_URL = "https://kurye-platform.preview.emergentagent.com/api"
-TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
-TEST_CUSTOMER_PASSWORD = "test123"
+
+# Test credentials from review request
+TEST_CREDENTIALS = {
+    "admin": {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
+    "courier": {"email": "testkurye@example.com", "password": "test123"},
+    "customer": {"email": "testcustomer@example.com", "password": "test123"},
+    "business": {"email": "testbusiness@example.com", "password": "test123"}
+}
 
 class AddressBackendTester:
     def __init__(self):
