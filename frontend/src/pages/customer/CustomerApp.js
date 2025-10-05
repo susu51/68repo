@@ -1,160 +1,229 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
 import DiscoverPage from './DiscoverPage';
+import RestaurantMenu from './RestaurantMenu';
 import CartPage from './CartPage';
 import OrdersPage from './OrdersPage';
 import ProfilePage from './ProfilePage';
+import PaymentPage from './PaymentPage';
+import OrderTrackingPage from './OrderTrackingPage';
+import { useCart } from '../../contexts/CartContext';
 
-// Yeni Trendyol Go tarzı Customer App
+// FAZ 2 - Customer App with complete cart & payment flow
 export const CustomerApp = ({ user, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('discover');
-  const [cartItems, setCartItems] = useState([]);
-  const [orderTotal, setOrderTotal] = useState(0);
+  const [activeView, setActiveView] = useState('discover'); // discover, restaurant, cart, payment, orders, profile, orderTracking
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
+  
+  const { cart, getCartSummary } = useCart();
+  const cartSummary = getCartSummary();
 
-  console.log('🚀 CustomerApp rendered - activeTab:', activeTab, 'user:', user?.first_name);
+  console.log('🚀 CustomerApp FAZ 2 rendered - activeView:', activeView, 'user:', user?.first_name);
 
-  // Cart management functions
-  const handleAddToCart = (item) => {
-    console.log('Adding to cart:', item);
-    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
-    
-    if (existingItem) {
-      setCartItems(cartItems.map(cartItem => 
-        cartItem.id === item.id 
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
-          : cartItem
-      ));
-    } else {
-      setCartItems([...cartItems, { ...item, quantity: 1 }]);
-    }
-    
-    setOrderTotal(orderTotal + item.price);
+  // Navigation handlers for the customer journey
+  const handleRestaurantSelect = (restaurant) => {
+    setSelectedRestaurant(restaurant);
+    setActiveView('restaurant');
   };
 
-  const handleRemoveFromCart = (itemId) => {
-    const item = cartItems.find(cartItem => cartItem.id === itemId);
-    if (item) {
-      if (item.quantity > 1) {
-        setCartItems(cartItems.map(cartItem => 
-          cartItem.id === itemId 
-            ? { ...cartItem, quantity: cartItem.quantity - 1 }
-            : cartItem
-        ));
-      } else {
-        setCartItems(cartItems.filter(cartItem => cartItem.id !== itemId));
-      }
-      
-      setOrderTotal(orderTotal - item.price);
-    }
+  const handleGoToCart = () => {
+    setActiveView('cart');
   };
 
-  const handleUpdateCart = (itemId, newQuantity) => {
-    if (newQuantity === 0) {
-      handleRemoveFromCart(itemId);
-      return;
-    }
-    
-    setCartItems(cartItems.map(item => 
-      item.id === itemId ? { ...item, quantity: newQuantity } : item
-    ));
-    
-    // Recalculate total
-    const newTotal = cartItems.reduce((total, item) => 
-      total + (item.id === itemId ? item.price * newQuantity : item.price * item.quantity), 0
-    );
-    setOrderTotal(newTotal);
+  const handleProceedToPayment = (cartData) => {
+    console.log('Proceeding to payment with cart data:', cartData);
+    setActiveView('payment');
   };
 
-  // Tabs configuration
+  const handlePaymentSuccess = (orderData) => {
+    console.log('Payment successful:', orderData);
+    setCurrentOrderId(orderData.order.id);
+    setActiveView('orderTracking');
+  };
+
+  const handleOrderSelect = (orderId) => {
+    setCurrentOrderId(orderId);
+    setActiveView('orderTracking');
+  };
+
+  const handleBackToDiscover = () => {
+    setActiveView('discover');
+    setSelectedRestaurant(null);
+  };
+
+  const handleBackToCart = () => {
+    setActiveView('cart');
+  };
+
+  const handleBackToOrders = () => {
+    setActiveView('orders');
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveView(tab);
+  };
+
+  // Bottom tab navigation data
   const tabs = [
-    {
-      id: 'discover',
-      label: 'Keşfet',
+    { 
+      id: 'discover', 
+      label: 'Keşfet', 
       icon: '🔍',
-      component: DiscoverPage
+      active: activeView === 'discover'
     },
-    {
-      id: 'cart',
-      label: 'Sepet',
+    { 
+      id: 'cart', 
+      label: 'Sepet', 
       icon: '🛒',
-      badge: cartItems.reduce((total, item) => total + item.quantity, 0),
-      component: CartPage
+      badge: cart.items.length > 0 ? cartSummary.itemCount : null,
+      active: activeView === 'cart'
     },
-    {
-      id: 'orders',
-      label: 'Siparişler',
+    { 
+      id: 'orders', 
+      label: 'Siparişler', 
       icon: '📦',
-      component: OrdersPage
+      active: activeView === 'orders'
     },
-    {
-      id: 'profile',
-      label: 'Profil',
+    { 
+      id: 'profile', 
+      label: 'Profil', 
       icon: '👤',
-      component: ProfilePage
+      active: activeView === 'profile'
     }
   ];
 
-  const activeTabData = tabs.find(tab => tab.id === activeTab);
-  const ActiveComponent = activeTabData?.component;
+  // Render current view
+  const renderCurrentView = () => {
+    switch (activeView) {
+      case 'discover':
+        return (
+          <DiscoverPage 
+            user={user}
+            onRestaurantSelect={handleRestaurantSelect}
+          />
+        );
+
+      case 'restaurant':
+        return (
+          <RestaurantMenu 
+            restaurant={selectedRestaurant}
+            onBack={handleBackToDiscover}
+            onGoToCart={handleGoToCart}
+          />
+        );
+
+      case 'cart':
+        return (
+          <CartPage 
+            onBack={handleBackToDiscover}
+            onProceedToPayment={handleProceedToPayment}
+            user={user}
+          />
+        );
+
+      case 'payment':
+        return (
+          <PaymentPage 
+            selectedAddress={selectedAddress}
+            onBack={handleBackToCart}
+            onPaymentSuccess={handlePaymentSuccess}
+            user={user}
+          />
+        );
+
+      case 'orders':
+        return (
+          <OrdersPage 
+            user={user}
+            onOrderSelect={handleOrderSelect}
+            onTabChange={handleTabChange}
+          />
+        );
+
+      case 'profile':
+        return (
+          <ProfilePage 
+            user={user}
+            onLogout={onLogout}
+            onTabChange={handleTabChange}
+            onAddressChange={setSelectedAddress}
+            selectedAddress={selectedAddress}
+          />
+        );
+
+      case 'orderTracking':
+        return (
+          <OrderTrackingPage 
+            orderId={currentOrderId}
+            onBack={handleBackToOrders}
+            user={user}
+          />
+        );
+
+      default:
+        return (
+          <DiscoverPage 
+            user={user}
+            onRestaurantSelect={handleRestaurantSelect}
+          />
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto pb-20">
-        {ActiveComponent && (
-          <ActiveComponent
-            user={user}
-            cartItems={cartItems}
-            orderTotal={orderTotal}
-            onAddToCart={handleAddToCart}
-            onRemoveFromCart={handleRemoveFromCart}
-            onUpdateCart={handleUpdateCart}
-            onLogout={onLogout}
-            onTabChange={setActiveTab}
-          />
-        )}
+      {/* Main Content */}
+      <div className="flex-1 pb-20"> {/* Bottom padding for tab bar */}
+        {renderCurrentView()}
       </div>
 
-      {/* Bottom Navigation - Trendyol Go Style */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <div className="flex items-center justify-around px-2 py-2">
-          {tabs.map(tab => (
-            <Button
-              key={tab.id}
-              variant="ghost"
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center justify-center py-3 px-2 relative rounded-lg transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'text-orange-600 bg-orange-50'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-              }`}
-            >
-              <div className="relative">
-                <span className="text-xl mb-1 block">{tab.icon}</span>
-                
-                {/* Badge for cart items */}
-                {tab.badge && tab.badge > 0 && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                    {tab.badge > 99 ? '99+' : tab.badge}
-                  </div>
-                )}
-                
-                {/* Active indicator */}
-                {activeTab === tab.id && (
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-orange-600 rounded-full"></div>
-                )}
-              </div>
-              
-              <span className={`text-xs font-medium ${
-                activeTab === tab.id ? 'text-orange-600' : 'text-gray-600'
-              }`}>
-                {tab.label}
-              </span>
-            </Button>
-          ))}
+      {/* Bottom Tab Navigation - Only show on main tabs, not on sub-pages */}
+      {['discover', 'cart', 'orders', 'profile'].includes(activeView) && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+          <div className="flex justify-around items-center py-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`flex flex-col items-center py-2 px-4 rounded-lg transition-colors ${
+                  tab.active
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                }`}
+              >
+                <div className="relative">
+                  <span className="text-xl">{tab.icon}</span>
+                  {tab.badge && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-5">
+                      {tab.badge > 99 ? '99+' : tab.badge}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs mt-1 font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Floating Cart Button - Show on restaurant page when cart has items */}
+      {activeView === 'restaurant' && cart.items.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-40">
+          <button 
+            onClick={handleGoToCart}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            🛒 Sepet ({cartSummary.itemCount}) - ₺{cartSummary.total.toFixed(2)}
+          </button>
+        </div>
+      )}
+
+      {/* Debug Info - Remove in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-4 right-4 bg-black text-white p-2 rounded text-xs z-50 opacity-70">
+          View: {activeView} | Cart: {cart.items.length} items
+        </div>
+      )}
     </div>
   );
 };
