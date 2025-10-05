@@ -177,20 +177,20 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 md:gap-4 w-full sm:w-auto">
                 {/* Cart Summary */}
                 {cart.items.length > 0 && (
-                  <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center cursor-pointer" onClick={onGoToCart}>
-                    <p className="text-sm text-white/90">Sepet</p>
-                    <p className="text-xl font-bold">{cartSummary.itemCount} ürün</p>
-                    <p className="text-lg">₺{cartSummary.total.toFixed(2)}</p>
+                  <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-4 text-center cursor-pointer flex-1 sm:flex-none" onClick={onGoToCart}>
+                    <p className="text-xs md:text-sm text-white/90">Sepet</p>
+                    <p className="text-sm md:text-xl font-bold">{cartSummary.itemCount} ürün</p>
+                    <p className="text-sm md:text-lg">₺{cartSummary.total.toFixed(2)}</p>
                   </div>
                 )}
                 
                 <Button 
                   variant="outline" 
                   onClick={onBack}
-                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl backdrop-blur-sm"
+                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl backdrop-blur-sm px-3 md:px-4 py-2 text-sm md:text-base"
                 >
                   ← Geri
                 </Button>
