@@ -84,10 +84,10 @@ async def update_order_status(
                     detail=f"Business cannot modify order in status: {current_status}"
                 )
                 
-            if status_update.to_status not in BUSINESS_TRANSITIONS[current_status]:
+            if status_update.to not in BUSINESS_TRANSITIONS[current_status]:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid transition: {current_status} → {status_update.to_status}"
+                    detail=f"Invalid transition: {current_status} → {status_update.to}"
                 )
         
         elif user_role == "courier":
