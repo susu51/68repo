@@ -1,0 +1,296 @@
+"""
+Customer Order Creation & Management Routes
+Phase 2: Customer Order Implementation
+"""
+from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import datetime, timezone
+import uuid
+import jwt
+import os
+from models import UserRole, OrderStatus
+
+router = APIRouter(prefix="/orders", tags=["orders"])
+security = HTTPBearer()
+
+# Request/Response Models
+class OrderItem(BaseModel):
+    product_id: str
+    title: str
+    price: float
+    quantity: int
+    notes: Optional[str] = None
+
+class DeliveryAddress(BaseModel):
+    label: str
+    address: str
+    lat: float
+    lng: float
+    notes: Optional[str] = None
+
+class OrderCreate(BaseModel):
+    business_id: str
+    items: List[OrderItem]
+    delivery_address: DeliveryAddress
+    payment_method: str = "cash_on_delivery"  # online, cash_on_delivery, pos_on_delivery
+    notes: Optional[str] = None
+
+class OrderResponse(BaseModel):
+    id: str
+    customer_id: str
+    business_id: str
+    business_name: str
+    items: List[OrderItem]
+    total_amount: float
+    delivery_address: DeliveryAddress
+    payment_method: str
+    status: OrderStatus
+    estimated_delivery: Optional[str] = None
+    created_at: datetime
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verify JWT token and return user data"""
+    try:
+        token = credentials.credentials
+        secret_key = os.environ.get("JWT_SECRET", "kuryecini_secret_key_2024")
+        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+        
+        from server import db
+        user_id = payload.get("sub")
+        user = await db.users.find_one({"_id": user_id})
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+            
+        return {
+            "id": user["_id"],
+            "email": user["email"],
+            "role": user["role"]
+        }
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def get_customer_user(current_user: dict = Depends(get_current_user)):
+    """Require customer role"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Customer access required"
+        )
+    return current_user
+
+@router.post("/", response_model=OrderResponse)
+async def create_order(
+    order_data: OrderCreate,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Create new customer order"""
+    try:
+        from server import db
+        
+        # Verify business exists and is active
+        business = await db.businesses.find_one({
+            "_id": order_data.business_id,
+            "is_active": True
+        })
+        
+        if not business:
+            raise HTTPException(
+                status_code=404,
+                detail="Business not found or inactive"
+            )
+        
+        # Verify all products exist and are available
+        product_ids = [item.product_id for item in order_data.items]
+        products = await db.menu_items.find({
+            "_id": {"$in": product_ids},
+            "business_id": order_data.business_id,
+            "is_available": True
+        }).to_list(length=None)
+        
+        if len(products) != len(product_ids):
+            raise HTTPException(
+                status_code=400,
+                detail="Some products are not available or don't belong to this business"
+            )
+        
+        # Calculate total amount
+        total_amount = 0
+        for item in order_data.items:
+            product = next((p for p in products if p["_id"] == item.product_id), None)
+            if product:
+                total_amount += product["price"] * item.quantity
+        
+        # Create order document
+        order_doc = {
+            "_id": str(uuid.uuid4()),
+            "customer_id": current_user["id"],
+            "business_id": order_data.business_id,
+            "business_name": business["name"],
+            "items": [item.dict() for item in order_data.items],
+            "total_amount": round(total_amount, 2),
+            "delivery_address": order_data.delivery_address.dict(),
+            "payment_method": order_data.payment_method,
+            "status": OrderStatus.CREATED.value,
+            "notes": order_data.notes,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        # Insert to database
+        await db.orders.insert_one(order_doc)
+        
+        # Calculate estimated delivery time (45 minutes from creation)
+        estimated_delivery = datetime.now(timezone.utc)
+        estimated_delivery = estimated_delivery.replace(minute=estimated_delivery.minute + 45)
+        
+        return OrderResponse(
+            id=order_doc["_id"],
+            customer_id=order_doc["customer_id"],
+            business_id=order_doc["business_id"],
+            business_name=order_doc["business_name"],
+            items=[OrderItem(**item) for item in order_doc["items"]],
+            total_amount=order_doc["total_amount"],
+            delivery_address=DeliveryAddress(**order_doc["delivery_address"]),
+            payment_method=order_doc["payment_method"],
+            status=OrderStatus(order_doc["status"]),
+            estimated_delivery=estimated_delivery.strftime("%H:%M"),
+            created_at=order_doc["created_at"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error creating order: {str(e)}"
+        )
+
+@router.get("/my", response_model=List[OrderResponse])
+async def get_my_orders(
+    current_user: dict = Depends(get_customer_user)
+):
+    """Get customer's own orders"""
+    try:
+        from server import db
+        
+        orders = await db.orders.find({
+            "customer_id": current_user["id"]
+        }).sort("created_at", -1).to_list(length=None)
+        
+        order_responses = []
+        for order in orders:
+            # Calculate estimated delivery based on status
+            if order["status"] in ["created", "preparing"]:
+                estimated_time = "45 dk"
+            elif order["status"] in ["picked_up", "delivering"]:
+                estimated_time = "15 dk"
+            elif order["status"] == "delivered":
+                estimated_time = "Teslim edildi"
+            else:
+                estimated_time = "Hazırlanıyor"
+                
+            order_responses.append(OrderResponse(
+                id=str(order["_id"]),
+                customer_id=order["customer_id"],
+                business_id=order["business_id"],
+                business_name=order.get("business_name", "Unknown Business"),
+                items=[OrderItem(**item) for item in order["items"]],
+                total_amount=order["total_amount"],
+                delivery_address=DeliveryAddress(**order["delivery_address"]),
+                payment_method=order["payment_method"],
+                status=OrderStatus(order["status"]),
+                estimated_delivery=estimated_time,
+                created_at=order["created_at"]
+            ))
+        
+        return order_responses
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching orders: {str(e)}"
+        )
+
+@router.get("/{order_id}/track")
+async def track_order(
+    order_id: str,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Track specific order - customer can only track their own orders"""
+    try:
+        from server import db
+        
+        order = await db.orders.find_one({
+            "_id": order_id,
+            "customer_id": current_user["id"]
+        })
+        
+        if not order:
+            raise HTTPException(
+                status_code=404,
+                detail="Order not found or access denied"
+            )
+        
+        # Get courier location if order is being delivered
+        courier_location = None
+        if order["status"] in ["picked_up", "delivering"] and order.get("courier_id"):
+            try:
+                # Check Redis first for real-time location
+                import redis
+                r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+                location_key = f"courier_location:{order['courier_id']}"
+                location_data = r.get(location_key)
+                
+                if location_data:
+                    import json
+                    courier_location = json.loads(location_data)
+                else:
+                    # Fallback to MongoDB
+                    courier_loc = await db.courier_locations.find_one(
+                        {"courier_id": order["courier_id"]},
+                        sort=[("timestamp", -1)]
+                    )
+                    if courier_loc:
+                        courier_location = {
+                            "lat": courier_loc["location"]["coordinates"][1],
+                            "lng": courier_loc["location"]["coordinates"][0],
+                            "timestamp": courier_loc["timestamp"].isoformat()
+                        }
+            except Exception as e:
+                print(f"Error fetching courier location: {e}")
+        
+        # Calculate estimated delivery
+        if order["status"] in ["created", "preparing"]:
+            estimated_delivery = "45 dakika"
+        elif order["status"] in ["picked_up", "delivering"]:
+            estimated_delivery = "15 dakika"
+        elif order["status"] == "delivered":
+            estimated_delivery = "Teslim edildi"
+        else:
+            estimated_delivery = "Hazırlanıyor"
+        
+        return {
+            "order_id": order_id,
+            "status": order["status"],
+            "business_name": order.get("business_name", "Unknown"),
+            "total_amount": order["total_amount"],
+            "estimated_delivery": estimated_delivery,
+            "courier_location": courier_location,
+            "delivery_address": order["delivery_address"],
+            "created_at": order["created_at"].isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error tracking order: {str(e)}"
+        )
