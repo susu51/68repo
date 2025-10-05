@@ -576,7 +576,9 @@ class KYCApprovalTester:
                     if success:
                         self.verify_business_status_update(business_id, "rejected")
         else:
-            print("⚠️  No pending businesses found for testing")
+            # If no pending businesses, let's test with existing ones by setting them to pending first
+            print("⚠️  No pending businesses found. Testing with existing businesses...")
+            self.test_with_existing_businesses()
         
         # Step 4: Test courier KYC approval/rejection
         print("\n📋 STEP 4: COURIER KYC APPROVAL TESTING")
