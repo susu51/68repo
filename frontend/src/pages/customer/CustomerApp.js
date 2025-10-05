@@ -78,7 +78,7 @@ export const CustomerApp = ({ user, onLogout }) => {
       id: 'cart', 
       label: 'Sepet', 
       icon: '🛒',
-      badge: cart.items.length > 0 ? cartSummary.itemCount : null,
+      badge: cart?.items?.length > 0 ? cartSummary.itemCount : null,
       active: activeView === 'cart'
     },
     { 
