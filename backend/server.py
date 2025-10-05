@@ -4701,7 +4701,8 @@ async def get_all_businesses_admin(
         # City filter - case-insensitive
         if city:
             import re
-            normalized_city = normalize_city_name(city)
+            # normalized_city = normalize_city_name(city)  # Commented out due to missing import
+            normalized_city = city.lower().strip()  # Simple normalization fallback
             query_filter["$or"] = [
                 {"city_normalized": normalized_city},
                 {"city": {"$regex": f"^{re.escape(city)}$", "$options": "i"}},
