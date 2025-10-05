@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/button';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
-const OrdersPage = ({ user }) => {
+const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
