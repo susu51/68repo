@@ -4,7 +4,95 @@ const AdminPanel = ({ user, onLogout }) => {
   const [currentView, setCurrentView] = useState('dashboard');
   const [pendingBusinesses, setPendingBusinesses] = useState([]);
   const [pendingCouriers, setPendingCouriers] = useState([]);
+  const [promotions, setPromotions] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Fetch pending businesses for KYC
+  const fetchPendingBusinesses = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/businesses?kyc_status=pending`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const businesses = await response.json();
+        setPendingBusinesses(businesses);
+      }
+    } catch (error) {
+      console.error('Fetch pending businesses error:', error);
+    }
+  };
+
+  // Fetch pending couriers for KYC
+  const fetchPendingCouriers = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/couriers?kyc_status=pending`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const couriers = await response.json();
+        setPendingCouriers(couriers);
+      }
+    } catch (error) {
+      console.error('Fetch pending couriers error:', error);
+    }
+  };
+
+  // Fetch all promotions
+  const fetchPromotions = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/promotions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const promoData = await response.json();
+        setPromotions(promoData);
+      }
+    } catch (error) {
+      console.error('Fetch promotions error:', error);
+    }
+  };
+
+  // Fetch all products for menu management
+  const fetchProducts = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/products`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const productData = await response.json();
+        setProducts(productData);
+      }
+    } catch (error) {
+      console.error('Fetch products error:', error);
+    }
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      fetchPendingBusinesses();
+      fetchPendingCouriers();
+      fetchPromotions();
+      fetchProducts();
+    }
+  }, [user]);
 
   // Business approval handler
   const handleBusinessApprove = async (businessId) => {
