@@ -3955,33 +3955,13 @@ const CustomerDashboard = ({ user }) => {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <LeafletMap
-                    center={mapCenter}
-                    zoom={userLocation ? 14 : 6}
-                    height="500px"
-                    markers={[
-                      // User location marker
-                      ...(userLocation ? [{
-                        lat: userLocation.lat,
-                        lng: userLocation.lng,
-                        type: 'user',
-                        popup: true,
-                        title: '📍 Benim Konumum',
-                        description: `${user.first_name || 'Müşteri'}`,
-                        address: 'Şu anki konumunuz'
-                      }] : []),
-                      // Order markers
-                      ...orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
-                        lat: order.delivery_lat,
-                        lng: order.delivery_lng,
-                        type: 'delivery',
-                        popup: true,
-                        title: `Sipariş #${order.id.slice(-8)}`,
-                        description: `Durum: ${order.status}`,
-                        address: order.delivery_address
-                      }))
-                    ]}
-                  />
+                  <div style={{ height: '500px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
+                    <div className="text-center">
+                      <div className="text-4xl mb-2">🗺️</div>
+                      <p className="text-gray-600">Harita Yakında Eklenecek</p>
+                      <p className="text-sm text-gray-500">Teslimat noktaları için</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
