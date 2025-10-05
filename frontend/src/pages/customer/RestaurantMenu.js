@@ -249,8 +249,8 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                 </div>
                 
                 <CardContent className="p-3 md:p-4 lg:p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{item.name}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">{item.description}</p>
+                  <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1 md:mb-2 line-clamp-1">{item.name}</h3>
+                  <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-3 md:mb-4 line-clamp-2">{item.description}</p>
                   
                   <div className="flex items-center justify-between mb-4">
                     <div className="text-2xl font-bold text-orange-500">₺{item.price.toFixed(2)}</div>
