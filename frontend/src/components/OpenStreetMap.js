@@ -263,7 +263,10 @@ const OpenStreetMap = ({
   const showDirections = () => {
     setDirectionsVisible(true);
     
-    // Simple directions display
+    // Enhanced directions display with real route data
+    const distance = routeData ? (routeData.distance / 1000).toFixed(1) : '1.2';
+    const duration = routeData ? Math.ceil(routeData.duration / 60) : '8-12';
+    
     const directionsHTML = `
       <div style="
         position: absolute;
@@ -273,18 +276,36 @@ const OpenStreetMap = ({
         padding: 12px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        max-width: 200px;
+        max-width: 220px;
         z-index: 25;
         font-size: 12px;
       ">
-        <div style="font-weight: bold; margin-bottom: 8px;">🛣️ Yol Tarifi</div>
-        <div style="color: #666;">
-          1. İstanbul Cd. üzerinden 500m<br/>
-          2. Atatürk Blv.'ya dön 1.2km<br/>
-          3. Hedefe ulaştınız
+        <div style="font-weight: bold; margin-bottom: 8px; color: #3b82f6;">
+          🛣️ Aktif Rota
         </div>
-        <div style="margin-top: 8px; font-size: 10px; color: #888;">
-          Tahmini süre: 8-12 dakika
+        <div style="color: #666; line-height: 1.4;">
+          ${routeData ? `
+            <div style="background: #f0f9ff; padding: 6px; border-radius: 4px; margin-bottom: 8px;">
+              📍 Mesafe: <strong>${distance} km</strong><br/>
+              ⏱️ Süre: <strong>~${duration} dakika</strong>
+            </div>
+            <div style="font-size: 11px;">
+              1. Mevcut konumdan çık<br/>
+              2. Ana yol üzerinden ${distance}km<br/>
+              3. Teslimat adresine ulaş
+            </div>
+          ` : `
+            <div>
+              1. Konum bilgisi bekleniyor...<br/>
+              2. Rota hesaplanıyor...<br/>
+              3. Yönlendirme hazırlanıyor
+            </div>
+          `}
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
+          <div style="font-size: 10px; color: #6b7280; text-align: center;">
+            🚴 Gerçek zamanlı takip aktif
+          </div>
         </div>
         <button onclick="window.hideDirections && window.hideDirections()" style="
           position: absolute;
@@ -294,6 +315,7 @@ const OpenStreetMap = ({
           border: none;
           font-size: 16px;
           cursor: pointer;
+          color: #6b7280;
         ">×</button>
       </div>
     `;
