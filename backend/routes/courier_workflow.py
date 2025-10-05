@@ -8,6 +8,7 @@ from typing import List, Optional
 from datetime import datetime, timezone
 import math
 import asyncio
+import uuid
 from models import OrderStatus
 from auth_dependencies import get_courier_user
 
