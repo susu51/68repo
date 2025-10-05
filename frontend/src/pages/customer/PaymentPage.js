@@ -280,12 +280,22 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
           )}
 
           {/* Address */}
-          <div className="flex items-center mb-4">
-            <span className="text-2xl mr-3">📍</span>
-            <div>
-              <p className="font-medium">Teslimat Adresi</p>
-              <p className="text-sm text-gray-600">{selectedAddress?.description}</p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">📍</span>
+              <div>
+                <p className="font-medium">Teslimat Adresi</p>
+                <p className="text-sm text-gray-600">
+                  {selectedAddress?.description || 'Adres seçilmedi'}
+                </p>
+              </div>
             </div>
+            <button 
+              onClick={() => setShowAddressSelector(true)}
+              className="text-blue-500 hover:text-blue-600 text-sm font-medium"
+            >
+              {selectedAddress ? 'Değiştir' : 'Seç'}
+            </button>
           </div>
 
           {/* Price Breakdown */}
