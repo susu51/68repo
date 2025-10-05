@@ -348,15 +348,16 @@ export const CourierDashboard = ({ user, onLogout }) => {
   const acceptOrder = async (orderId) => {
     try {
       const token = localStorage.getItem('kuryecini_access_token');
-      const response = await axios.post(`${API}/orders/${orderId}/accept`, {}, {
+      const response = await axios.patch(`${API}/courier/orders/${orderId}/pickup`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      toast.success('Sipariş kabul edildi!');
-      setCurrentOrder(response.data.order);
+      toast.success('Sipariş alındı! Teslim etmeye başlayabilirsiniz.');
+      // Update current order or refresh list
       fetchNearbyOrders();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Sipariş kabul edilemedi');
+      console.error('Error picking up order:', error);
+      toast.error(error.response?.data?.detail || 'Sipariş alınamadı');
     }
   };
 
