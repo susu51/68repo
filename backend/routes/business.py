@@ -177,7 +177,7 @@ async def get_my_menu(
 async def update_menu_item(
     item_id: str,
     item_data: MenuItemUpdate,
-    current_user: dict = Depends(require_role(UserRole.BUSINESS))
+    current_user: dict = Depends(get_business_user)
 ):
     """Update menu item - Business can only update their own items"""
     try:
