@@ -632,15 +632,18 @@ backend:
 
   - task: "Phase 2 - Geospatial Nearby Businesses Discovery"
     implemented: true
-    working: "NA"
+    working: false
     file: "routes/nearby.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "IMPLEMENTED: Complete geospatial business discovery system using MongoDB 2dsphere indexes. Created routes/nearby.py with endpoints: GET /api/nearby/businesses (radius-based business discovery with lat/lng parameters), GET /api/nearby/businesses/{business_id}/menu (full menu for specific business). Features: MongoDB 2dsphere geospatial queries with configurable radius (default 5km), Haversine distance calculation for precise sorting, menu item preview with category grouping, business activity status filtering, comprehensive error handling for location edge cases."
+        - working: false
+          agent: "testing"
+          comment: "❌ GEOSPATIAL NEARBY BUSINESSES ENDPOINTS FAILING - AUTHENTICATION ISSUE: Comprehensive testing shows endpoints are implemented but have critical authentication problems (0% success rate). ✅ ENDPOINTS EXIST: Geospatial discovery endpoints are properly implemented in routes/nearby.py and included in server.py (GET /api/nearby/businesses with lat/lng parameters, GET /api/nearby/businesses/{business_id}/menu). ❌ CRITICAL AUTHENTICATION BUG: All endpoints return 401 'User not found' despite valid JWT tokens. ROOT CAUSE: Same issue as Business Menu CRUD - routes/nearby.py has its own get_current_user() function (lines 17-39) that tries to find users by _id field using email from JWT token, but JWT tokens contain email in 'sub' field. This conflicts with main server.py authentication logic. ❌ IMPACT: Customers cannot discover nearby businesses using geospatial queries. All location-based business discovery blocked by authentication failure. 🔧 REQUIRED FIX: Update routes/nearby.py authentication to use same logic as main server.py get_current_user() function. The geospatial implementation with MongoDB 2dsphere queries and Haversine distance calculation is correctly implemented but authentication integration is broken."
 
   - task: "Phase 2 - Customer Order Creation System"
     implemented: true
