@@ -261,10 +261,11 @@ class Phase2AuthFixTester:
             # Success criteria: Should return 200 instead of 401
             if response.status_code == 200:
                 data = response.json()
+                orders_count = len(data) if isinstance(data, list) else len(data.get('orders', [])) if isinstance(data, dict) else 0
                 self.log_test(
                     "Customer Orders Authentication - GET /api/orders/my",
                     True,
-                    f"Status: {response.status_code} (SUCCESS - Fixed from previous 401), Orders found: {len(data.get('orders', []))}"
+                    f"Status: {response.status_code} (SUCCESS - Fixed from previous 401), Orders found: {orders_count}"
                 )
             elif response.status_code == 403:
                 self.log_test(
