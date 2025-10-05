@@ -222,6 +222,7 @@ export function CartProvider({ children }) {
 
   // Get item quantity in cart
   const getItemQuantity = (itemId) => {
+    if (!cart || !cart.items || !itemId) return 0;
     const item = cart.items.find(item => item.id === itemId);
     return item ? item.quantity : 0;
   };
