@@ -80,35 +80,22 @@ except ImportError:
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection with error handling
-mongo_uri = os.getenv('MONGO_URI', '').strip()
-client = None
-db = None
-
-if mongo_uri:
+# MongoDB connection with error handling - Real Database Only
+mongo_url = os.getenv('MONGO_URL')
+if mongo_url:
     try:
-        client = AsyncIOMotorClient(mongo_uri)
-        # Extract database name from URI or use default
-        if "/kuryecini_database" in mongo_uri or mongo_uri.endswith("/"):
-            db = client.kuryecini_database
-        else:
-            # Try to get database from connection string
-            try:
-                db_name = mongo_uri.split("/")[-1].split("?")[0]
-                if db_name:
-                    db = client[db_name]
-                else:
-                    db = client.kuryecini_database
-            except:
-                db = client.kuryecini_database
-        
-        print(f"MongoDB connected: {mongo_uri.split('@')[1] if '@' in mongo_uri else 'localhost'}")
+        client = AsyncIOMotorClient(mongo_url)
+        db_name = mongo_url.split('/')[-1] or 'kuryecini'
+        db = client[db_name]
+        print(f"✅ MongoDB connected: {db_name}")
+        print(f"📍 Database URL: {mongo_url}")
     except Exception as e:
-        print(f"MongoDB connection error: {e}")
-        client = None
+        print(f"❌ MongoDB connection error: {e}")
         db = None
+        raise RuntimeError("Database connection required - no mock data allowed")
 else:
-    print("No MONGO_URI provided, running without database")
+    print("❌ No MONGO_URL provided - Real database required!")
+    raise RuntimeError("MONGO_URL environment variable required")
 
 # Redis connection for courier location caching
 redis_client = None
