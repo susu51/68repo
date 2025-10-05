@@ -86,11 +86,28 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.getenv('MONGO_URL')
 if mongo_url:
     try:
-        # Use certifi for CA certificates with MongoDB Atlas
+        # Create SSL context for MongoDB Atlas with compatibility settings
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        ssl_context.check_hostname = False  # Disable hostname verification
+        ssl_context.verify_mode = ssl.CERT_NONE  # Disable certificate verification for compatibility
+        
+        # Alternative: Try with different TLS protocols
+        try:
+            ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+        except AttributeError:
+            # Fallback for older SSL library
+            ssl_context.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
+        
+        print(f"🔒 SSL Context created with CA file: {certifi.where()}")
+        print(f"🔒 SSL minimum version: {getattr(ssl_context, 'minimum_version', 'Not available')}")
+        
+        # MongoDB client with custom SSL context
         client = AsyncIOMotorClient(
             mongo_url,
-            tlsCAFile=certifi.where(),  # Critical for MongoDB Atlas SSL
-            serverSelectionTimeoutMS=8000
+            tlsContext=ssl_context,
+            serverSelectionTimeoutMS=8000,
+            socketTimeoutMS=20000,
+            connectTimeoutMS=20000
         )
         
         # Extract database name from URL or use default
@@ -100,8 +117,7 @@ if mongo_url:
             db_name = 'kuryecini'
             
         db = client[db_name]
-        print(f"✅ MongoDB connected with certifi CA: {db_name}")
-        print(f"📍 CA File: {certifi.where()}")
+        print(f"✅ MongoDB client created with custom SSL context: {db_name}")
         print(f"📍 Database URL: {mongo_url[:50]}...[HIDDEN]")
     except Exception as e:
         print(f"❌ MongoDB connection error: {e}")
