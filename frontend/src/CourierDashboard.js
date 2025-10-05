@@ -172,12 +172,12 @@ export const CourierDashboard = ({ user, onLogout }) => {
   const fetchNearbyOrders = async () => {
     try {
       const token = localStorage.getItem('kuryecini_access_token');
-      const response = await axios.get(`${API}/orders/nearby`, {
+      const response = await axios.get(`${API}/courier/orders/available`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       if (isMounted) {
-        const orders = response.data || [];
+        const orders = response.data?.orders || [];
         setNearbyOrders(orders);
         
         if (courierLocation && orders.length > 0) {
