@@ -5326,7 +5326,7 @@ api_router.include_router(admin_settings_router)
 api_router.include_router(customer_cart_router)
 
 # Debug routes (temporary)
-app.include_router(debug_router)
+api_router.include_router(debug_router)
 
 # WebSocket router (separate from API router due to WebSocket protocol)
 app.include_router(websocket_router)
