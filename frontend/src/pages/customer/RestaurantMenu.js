@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
+import { useCart } from '../../contexts/CartContext';
 
-const RestaurantMenu = ({ restaurant, onAddToCart, onBack, cartItems = [], cartTotal = 0, onGoToCart }) => {
+const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
