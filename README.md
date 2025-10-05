@@ -1,307 +1,163 @@
-# 🚀 Kuryecini - Türkiye'nin En Hızlı Teslimat Platformu
+# Kuryecini - Real-Time Delivery Platform
 
-<div align="center">
+Modern kurye ve yemek teslimat platformu. **Gerçek MongoDB veritabanı** kullanır, mock data yoktur.
 
-![Kuryecini Logo](https://via.placeholder.com/200x60/f97316/ffffff?text=Kuryecini)
+## 🚀 Özellikler
 
-**Modern, scalable food delivery platform for Turkish market**
+- **Gerçek Zamanlı Konum Takibi** (5 saniye güncellemeler)
+- **Geospatial Sorgu Sistemi** (MongoDB 2dsphere)
+- **JWT + RBAC Güvenlik** (customer, business, courier, admin)
+- **Sipariş Durum Yönetimi** (CAS locking ile atomik)
+- **Kazanç Hesaplama Sistemi** (admin ayarları ile)
+- **Harita & Rota Sistemi** (OSRM + fallback polylines)
 
-[![Build Status](https://github.com/kuryecini/kuryecini-platform/workflows/CI/badge.svg)](https://github.com/kuryecini/kuryecini-platform/actions)
-[![Frontend](https://img.shields.io/badge/Frontend-React%2018-blue)](https://reactjs.org/)
-[![Backend](https://img.shields.io/badge/Backend-FastAPI-green)](https://fastapi.tiangolo.com/)
-[![Database](https://img.shields.io/badge/Database-MongoDB-green)](https://www.mongodb.com/)
-[![License](https://img.shields.io/badge/License-Proprietary-red)](./LICENSE)
+## 📋 Kurulum
 
-[🌐 Live Demo](https://kuryecini.vercel.app) • [📖 API Docs](https://api.kuryecini.com/docs) • [🐛 Issues](https://github.com/kuryecini/kuryecini-platform/issues)
-
-</div>
-
-## 🏗️ Architecture
-
-**Modern Full-Stack Platform with Production-Ready Infrastructure**
-
-- **🎨 Frontend**: React 18 + Vite + Tailwind CSS + shadcn/ui
-- **⚡ Backend**: FastAPI + MongoDB + JWT Authentication  
-- **🗺️ Maps**: Leaflet + OpenStreetMap integration
-- **☁️ Deployment**: Vercel (Frontend) + Render (Backend)
-- **📱 Mobile**: Progressive Web App (PWA) ready
-- **🔒 Security**: httpOnly cookies + CSRF protection
-
-## ⚡ Quick Start
-
-### 🛠️ Prerequisites
+### 1. Environment Setup
 
 ```bash
-# Required versions
-- Node.js 18+ and yarn
-- Python 3.10+
-- MongoDB 6.0+
+# Backend .env dosyasını kopyala
+cp /app/backend/.env.example /app/backend/.env
+
+# Gerekli değişkenleri ayarla:
+MONGO_URL=mongodb://localhost:27017/kuryecini
+JWT_SECRET=your_secure_secret_here
 ```
 
-### 🚀 Local Development
-
-#### Backend Setup
-```bash
-# 1. Clone and navigate
-git clone https://github.com/kuryecini/kuryecini-platform.git
-cd kuryecini-platform/backend
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your MongoDB URL
-
-# 4. Start server
-uvicorn server:app --reload --host 0.0.0.0 --port 8001
-```
-
-✅ **Backend Ready**: http://localhost:8001
-- 🏥 Health: `/healthz`
-- 📚 API Docs: `/docs` 
-- 🔍 Interactive: `/redoc`
-
-#### Frontend Setup
-```bash
-# 1. Navigate to frontend
-cd ../frontend
-
-# 2. Install dependencies (using yarn)
-yarn install
-
-# 3. Configure environment  
-cp .env.example .env
-# Edit REACT_APP_BACKEND_URL=http://localhost:8001
-
-# 4. Start development server
-yarn start
-```
-
-✅ **Frontend Ready**: http://localhost:3000
-
-## 🚀 Production Deployment
-
-### 🔧 Prerequisites for Production
-
-1. **MongoDB Atlas** account and connection string
-2. **Render** account for backend deployment  
-3. **Vercel** account for frontend deployment
-4. **Domain** (optional) for custom URLs
-
-### 📦 Backend Deployment (Render)
-
-#### Step 1: Create Web Service on Render
-
-1. Connect GitHub repository to [Render](https://render.com)
-2. Create new **Web Service**
-3. Configure deployment:
-
-```yaml
-# Render Configuration
-Repository: your-github-repo
-Branch: main  
-Root Directory: backend
-Runtime: Python 3.10
-
-# Build Settings
-Build Command: pip install -r requirements.txt
-Start Command: uvicorn server:app --host 0.0.0.0 --port $PORT
-```
-
-#### Step 2: Environment Variables
+### 2. Database Initialize
 
 ```bash
-# Required Environment Variables
-MONGO_URL=mongodb+srv://user:pass@cluster.mongodb.net/kuryecini_db
-JWT_SECRET_KEY=your-super-secure-jwt-secret-key-here
-CORS_ORIGINS=https://your-frontend-domain.vercel.app,https://kuryecini.com
+cd /app/backend
+python db_init.py
 ```
 
-#### Step 3: Verify Deployment
+### 3. Servisleri Başlat
 
 ```bash
-# Test endpoints after deployment
-curl https://your-backend.onrender.com/healthz
-curl https://your-backend.onrender.com/api/menus/public
+sudo supervisorctl restart all
 ```
 
-### 🌐 Frontend Deployment (Vercel)
-
-#### Step 1: Deploy to Vercel
-
-1. Connect GitHub repository to [Vercel](https://vercel.com)
-2. Import project with these settings:
-
-```yaml
-# Vercel Configuration  
-Framework Preset: Create React App
-Root Directory: frontend
-Build Command: yarn build
-Output Directory: build
-Install Command: yarn install
-```
-
-#### Step 2: Environment Variables
-
-```bash
-# Production Environment Variables
-REACT_APP_BACKEND_URL=https://your-backend.onrender.com
-```
-
-#### Step 3: Verify SPA Routing
-
-The `frontend/vercel.json` file handles SPA routing:
-
-```json
-{
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
-}
-```
-
-## 🏭 Production Environment Files
-
-### Create Production Environment Files
-
-#### Backend `.env` (Production)
-```bash
-# backend/.env
-MONGO_URL="mongodb+srv://username:password@cluster.mongodb.net/kuryecini_production"
-JWT_SECRET_KEY="your-production-jwt-secret-very-long-and-secure"
-CORS_ORIGINS="https://kuryecini.vercel.app,https://kuryecini.com"
-```
-
-#### Frontend `.env` (Production)
-```bash
-# frontend/.env
-REACT_APP_BACKEND_URL="https://kuryecini-api.onrender.com"
-```
-
-## 🔧 CI/CD Pipeline
-
-### GitHub Actions Workflow
-
-The repository includes automated CI/CD with comprehensive testing:
-
-```yaml
-# .github/workflows/ci.yml
-- Frontend build and validation
-- Backend API testing  
-- Integration testing
-- Deployment artifacts
-```
-
-### Running Tests Locally
-
-```bash
-# Backend tests
-cd backend
-pytest -v
-
-# Frontend tests  
-cd frontend
-yarn test
-
-# E2E tests
-yarn test:e2e
-```
-
-## Features
-
-### Customer App
-- Browse restaurants and menus
-- Add items to cart with quantities
-- Address management (81 Turkish cities)
-- Order tracking with live map
-- Rating and reviews
-
-### Restaurant Dashboard
-- Menu management (add/edit/delete items)
-- Order processing and status updates
-- Analytics dashboard
-- Business profile management
-
-### Courier App
-- Interactive map with Leaflet
-- Available orders nearby
-- Route optimization
-- Earnings tracking
-- Real-time location sharing
-
-### Admin Panel
-- User management
-- Restaurant approval (KYC)
-- Order monitoring
-- Platform analytics
-
-## API Endpoints
+## 🔧 API Endpoints
 
 ### Health Check
-```
-GET /healthz
-Response: {"status": "ok"}
-```
-
-### Menus
-```
-GET /menus
-Response: [
-  {
-    "id": "string",
-    "title": "string", 
-    "price": number,
-    "imageUrl": "string",
-    "category": "string"
-  }
-]
-```
-
-## Testing
-
-Run the end-to-end tests:
 ```bash
-npm run test:e2e
+curl http://localhost:8001/api/health
 ```
 
-## Common Issues
-
-### CORS Errors
-- Ensure backend CORS is configured for your frontend domain
-- Check REACT_APP_BACKEND_URL is correct
-
-### SPA 404 on Refresh
-- Vercel: `vercel.json` rewrites are configured
-- Netlify: `_redirects` file in `public/` folder
-
-### Map Not Loading
-- Check Leaflet CSS import: `import 'leaflet/dist/leaflet.css'`
-- Map container needs fixed height (e.g., `height: 100vh`)
-- Handle geolocation permissions gracefully
-
-### Build Errors
+### Test Authentication
 ```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-npm run build
+# Admin Login
+curl -X POST http://localhost:8001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@kuryecini.com","password":"KuryeciniAdmin2024!"}'
 ```
 
-## Contributing
+## 📊 Database Schema
 
-1. Create feature branch: `git checkout -b feat/your-feature`
-2. Make changes and test locally
-3. Run linting: `npm run lint`
-4. Open PR to `main`
+### Collections
+- **businesses** - İşletme bilgileri (2dsphere index)
+- **menu_items** - Menü ürünleri
+- **orders** - Siparişler (durum geçişleri)
+- **courier_locations** - Kurye konumları (son 100 nokta)
+- **earnings** - Kazanç kayıtları
+- **settings** - Global platform ayarları
 
-## Rollback Plan
+### Indexes
+- `businesses.location` → 2dsphere (geospatial)
+- `orders.status` → Durum sorguları için
+- `courier_locations.ts` → Zamana göre sıralama
 
-If deployment fails:
-1. Revert to previous commit: `git revert HEAD`
-2. Redeploy previous version
-3. Check environment variables
-4. Monitor error logs
+## 🎯 Implementation Phases
+
+### ✅ Phase 1: Temel Altyapı
+- MongoDB bağlantısı ve indexler
+- JWT + RBAC güvenlik
+- Health check endpoint
+- Global settings sistemi
+
+### 🔄 Phase 2: İşletme & Müşteri (Devam ediyor)
+- Business menü CRUD
+- Nearby restaurants (2dsphere)
+- Sipariş oluşturma
+
+### 📋 Phase 3: Kurye Sistemi (Planlı)
+- Kurye konum tracking
+- Sipariş kabul/teslim akışı
+- Kazanç sistemi
+
+### 🗺️ Phase 4: Canlı Harita (Planlı)
+- WebSocket canlı takip
+- OSRM routing entegrasyonu
+- Frontend harita bileşenleri
+
+### 🧪 Phase 5: Testing (Planlı)
+- Playwright E2E testler
+- API validation
+- Performance tests
+
+## 🔐 Güvenlik
+
+- **JWT Tokens**: Tüm API endpoints korumalı
+- **Role-Based Access**: customer/business/courier/admin
+- **Rate Limiting**: IP ve kullanıcı bazlı
+- **Input Validation**: Schema validation (Pydantic)
+- **CAS Locking**: Atomik durum değişiklikleri
+
+## 🌍 Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MONGO_URL` | - | MongoDB bağlantı URL'si (ZORUNLU) |
+| `JWT_SECRET` | - | JWT token secret key (ZORUNLU) |
+| `NEARBY_RADIUS_M` | 5000 | Yakın işletme arama yarıçapı (metre) |
+| `COURIER_RATE_PER_PACKAGE` | 20 | Kurye paket başı kazanç (TL) |
+| `BUSINESS_COMMISSION_PCT` | 5 | İşletme komisyon oranı (%) |
+| `COURIER_UPDATE_SEC` | 5 | Kurye konum güncelleme aralığı |
+| `COURIER_TIMEOUT_SEC` | 10 | Kurye konum timeout süresi |
+| `OSRM_URL` | - | OSRM routing service URL (opsiyonel) |
+
+## 📱 User Roles
+
+### 👥 Customer
+- Yakın restoran keşfetme
+- Sipariş verme ve takip
+- Gerçek zamanlı kurye konum takibi
+
+### 🏪 Business
+- Menü yönetimi (CRUD)
+- Sipariş durum güncelleme
+- Kazanç takibi
+
+### 🚴 Courier
+- Uygun siparişleri görme
+- Sipariş kabul/teslim
+- Konum paylaşımı (5 sn)
+- Kazanç hesaplama
+
+### 🛡️ Admin
+- Sistem ayarları yönetimi
+- Platform istatistikleri
+- Kullanıcı yönetimi
+
+## 🚫 Önemli Notlar
+
+- **Mock Data YOK**: Tüm veriler gerçek MongoDB'den
+- **localStorage YOK**: Veriler database'de kalıcı
+- **Gerçek Geolocation**: 2dsphere indexleri ile
+- **Production Ready**: RBAC güvenlik ve rate limiting
+
+## 🔗 Useful Commands
+
+```bash
+# Database durumu
+curl http://localhost:8001/api/health
+
+# Backend logları
+tail -f /var/log/supervisor/backend.*.log
+
+# Frontend restart
+sudo supervisorctl restart frontend
+
+# Database reindex
+python /app/backend/db_init.py
+```
