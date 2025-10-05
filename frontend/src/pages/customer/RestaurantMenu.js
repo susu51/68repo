@@ -292,14 +292,20 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
           </div>
         )}
 
-        {/* Floating Cart Button */}
+        {/* Floating Cart Button - Mobile Optimized */}
         {cart.items.length > 0 && (
           <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
-            <Button 
+            <Button
               onClick={onGoToCart}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 text-sm md:text-base touch-manipulation"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 px-4 md:py-4 md:px-8 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 touch-manipulation"
             >
-              🛒 Sepete Git ({cartSummary.itemCount}) - ₺{cartSummary.total.toFixed(2)}
+              <div className="flex items-center gap-2 md:gap-3">
+                <span className="text-xl md:text-2xl">🛒</span>
+                <div className="text-left">
+                  <p className="text-xs md:text-sm opacity-90">Sepet</p>
+                  <p className="text-sm md:text-lg font-bold">{cartSummary.itemCount} ürün - ₺{cartSummary.total.toFixed(2)}</p>
+                </div>
+              </div>
             </Button>
           </div>
         )}
