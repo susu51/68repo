@@ -382,7 +382,7 @@ api_router = APIRouter(
 
 # Health Check Endpoint
 @api_router.get("/health")
-async def health_check():
+async def api_health_check():
     """Database and system health check - Real DB only"""
     try:
         # Test MongoDB connection
