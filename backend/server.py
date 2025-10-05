@@ -3176,6 +3176,10 @@ async def get_all_couriers_admin(
             elif status == "rejected":
                 query_filter["kyc_status"] = "rejected"
         
+        # KYC status filter (direct KYC filtering)
+        if kyc_status:
+            query_filter["kyc_status"] = kyc_status
+        
         # City filter
         if city:
             import re
