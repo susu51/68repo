@@ -215,7 +215,7 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
         ) : (
           <div className="space-y-4">
             {orders.map(order => (
-              <Card key={order.id} className="overflow-hidden">
+              <Card key={order.id} className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onOrderSelect && onOrderSelect(order.id)}>
                 <CardContent className="p-0">
                   {/* Order Header */}
                   <div className="p-4 bg-gray-50 border-b">
