@@ -6,6 +6,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPExce
 from fastapi.security import HTTPBearer
 import jwt
 import os
+import json
 from websocket_manager import websocket_manager
 import logging
 
