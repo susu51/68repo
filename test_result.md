@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "FAZ 2 - MÜŞTERİ SEPET & ÖDEME AKIŞİ: Complete customer cart and payment flow implementation. Customer journey: Keşfet→Ürün→Sepet→Adres→Ödeme(mock)→Sipariş→Takip. Mock payment options: Online / Kapıda Nakit / Kapıda POS. Order creation, status tracking, and business/admin visibility required. Order status flow: created→confirmed→preparing→picked_up→delivering→delivered|cancelled."
+user_problem_statement: "PHASE 2 - İŞLETME & MÜŞTERİ IMPLEMENTATION: Implement Business Menu CRUD operations, GET /nearby/businesses endpoint with 2dsphere geospatial queries for radius-based business discovery, and Customer Order creation system. Continue with comprehensive project plan focusing on business menu management and customer order flow."
 
 backend:
   - task: "FAZ 1 - Admin Order Management API"
