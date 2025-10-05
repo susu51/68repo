@@ -79,7 +79,7 @@ class MenuItemResponse(BaseModel):
 @router.post("/menu", response_model=MenuItemResponse)
 async def create_menu_item(
     item_data: MenuItemCreate,
-    current_user: dict = Depends(lambda: get_business_user())
+    current_user: dict = Depends(get_business_user)
 ):
     """Create new menu item - Business role only"""
     try:
