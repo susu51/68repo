@@ -1587,6 +1587,223 @@ async def pickup_order(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error picking up order: {str(e)}")
 
+# Courier Location Management Endpoints
+@api_router.post("/courier/location")
+async def update_courier_location(
+    location_data: CourierLocation,
+    current_user: dict = Depends(get_courier_user)
+):
+    """Update courier's real-time location"""
+    try:
+        courier_id = current_user["id"]
+        timestamp = location_data.ts or int(time.time() * 1000)
+        
+        # Store current location in Redis for real-time access
+        if redis_client:
+            location_cache = {
+                "lat": location_data.lat,
+                "lng": location_data.lng,
+                "heading": location_data.heading or "",
+                "speed": location_data.speed or "",
+                "accuracy": location_data.accuracy or "",
+                "ts": timestamp
+            }
+            
+            # Store in Redis with 10-minute expiry
+            redis_key = f"courier:loc:{courier_id}"
+            redis_client.hset(redis_key, mapping=location_cache)
+            redis_client.expire(redis_key, 600)  # 10 minutes
+        
+        # Store in MongoDB for historical tracking (keep last 100 points)
+        location_record = {
+            "courier_id": courier_id,
+            "lat": location_data.lat,
+            "lng": location_data.lng,
+            "heading": location_data.heading,
+            "speed": location_data.speed,
+            "accuracy": location_data.accuracy,
+            "ts": timestamp,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.courier_locations.insert_one(location_record)
+        
+        # Keep only last 100 locations per courier
+        locations_count = await db.courier_locations.count_documents({"courier_id": courier_id})
+        if locations_count > 100:
+            # Remove oldest records beyond 100
+            old_locations = await db.courier_locations.find(
+                {"courier_id": courier_id}
+            ).sort("created_at", 1).limit(locations_count - 100).to_list(None)
+            
+            old_ids = [loc["_id"] for loc in old_locations]
+            await db.courier_locations.delete_many({"_id": {"$in": old_ids}})
+        
+        # Broadcast location update via WebSocket (if implemented)
+        # broadcaster.publish(channel=f"courier:{courier_id}", message={"type": "location", "data": location_data.dict()})
+        
+        return {"success": True, "message": "Location updated successfully", "timestamp": timestamp}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating location: {str(e)}")
+
+@api_router.get("/courier/location/{courier_id}")
+async def get_courier_location(
+    courier_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get current courier location (for customers/businesses tracking orders)"""
+    try:
+        # Only allow customers with active orders or businesses to access courier locations
+        user_role = current_user.get("role")
+        
+        if user_role not in ["customer", "business", "admin"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # If customer, verify they have an active order with this courier
+        if user_role == "customer":
+            active_order = await db.orders.find_one({
+                "customer_id": current_user["id"],
+                "courier_id": courier_id,
+                "status": {"$in": ["picked_up", "delivering"]}
+            })
+            
+            if not active_order:
+                raise HTTPException(status_code=403, detail="No active order with this courier")
+        
+        # Get location from Redis first (real-time)
+        location_data = None
+        if redis_client:
+            redis_key = f"courier:loc:{courier_id}"
+            cached_location = redis_client.hgetall(redis_key)
+            
+            if cached_location:
+                location_data = {
+                    "lat": float(cached_location.get("lat", 0)),
+                    "lng": float(cached_location.get("lng", 0)),
+                    "heading": float(cached_location["heading"]) if cached_location.get("heading") else None,
+                    "speed": float(cached_location["speed"]) if cached_location.get("speed") else None,
+                    "accuracy": float(cached_location["accuracy"]) if cached_location.get("accuracy") else None,
+                    "ts": int(cached_location.get("ts", 0)),
+                    "source": "realtime"
+                }
+        
+        # Fall back to MongoDB if no Redis data
+        if not location_data:
+            last_location = await db.courier_locations.find_one(
+                {"courier_id": courier_id},
+                sort=[("created_at", -1)]
+            )
+            
+            if last_location:
+                location_data = {
+                    "lat": last_location["lat"],
+                    "lng": last_location["lng"],
+                    "heading": last_location.get("heading"),
+                    "speed": last_location.get("speed"),
+                    "accuracy": last_location.get("accuracy"),
+                    "ts": last_location.get("ts"),
+                    "source": "historical"
+                }
+        
+        if not location_data:
+            raise HTTPException(status_code=404, detail="Courier location not available")
+        
+        return location_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching courier location: {str(e)}")
+
+@api_router.get("/orders/{order_id}/courier/location")
+async def get_order_courier_location(
+    order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get courier location for a specific order (for order tracking)"""
+    try:
+        # Get order details
+        try:
+            from bson import ObjectId
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Verify user has access to this order
+        user_role = current_user.get("role")
+        if user_role == "customer" and order.get("customer_id") != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        elif user_role == "business" and order.get("business_id") != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        elif user_role not in ["customer", "business", "admin"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Check if order has an assigned courier
+        courier_id = order.get("courier_id")
+        if not courier_id:
+            return {"message": "No courier assigned to this order yet", "status": order.get("status")}
+        
+        # Check if order is in trackable status
+        if order.get("status") not in ["picked_up", "delivering"]:
+            return {"message": "Order not yet picked up by courier", "status": order.get("status")}
+        
+        # Get courier location
+        location_data = None
+        if redis_client:
+            redis_key = f"courier:loc:{courier_id}"
+            cached_location = redis_client.hgetall(redis_key)
+            
+            if cached_location:
+                location_data = {
+                    "courier_id": courier_id,
+                    "lat": float(cached_location.get("lat", 0)),
+                    "lng": float(cached_location.get("lng", 0)),
+                    "heading": float(cached_location["heading"]) if cached_location.get("heading") else None,
+                    "speed": float(cached_location["speed"]) if cached_location.get("speed") else None,
+                    "accuracy": float(cached_location["accuracy"]) if cached_location.get("accuracy") else None,
+                    "ts": int(cached_location.get("ts", 0)),
+                    "last_updated": datetime.fromtimestamp(int(cached_location.get("ts", 0)) / 1000, tz=timezone.utc).isoformat(),
+                    "source": "realtime"
+                }
+        
+        # Fall back to MongoDB
+        if not location_data:
+            last_location = await db.courier_locations.find_one(
+                {"courier_id": courier_id},
+                sort=[("created_at", -1)]
+            )
+            
+            if last_location:
+                location_data = {
+                    "courier_id": courier_id,
+                    "lat": last_location["lat"],
+                    "lng": last_location["lng"],
+                    "heading": last_location.get("heading"),
+                    "speed": last_location.get("speed"),
+                    "accuracy": last_location.get("accuracy"),
+                    "ts": last_location.get("ts"),
+                    "last_updated": last_location["created_at"].isoformat(),
+                    "source": "historical"
+                }
+        
+        if not location_data:
+            return {"message": "Courier location not available", "status": order.get("status")}
+        
+        return {
+            "order_id": order_id,
+            "order_status": order.get("status"),
+            "courier_location": location_data
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching order courier location: {str(e)}")
+
 # Product Management Endpoints
 @api_router.post("/products")
 async def create_product(product_data: ProductCreate, current_user: dict = Depends(get_business_user)):
