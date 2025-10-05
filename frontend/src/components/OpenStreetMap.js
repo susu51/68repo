@@ -366,6 +366,15 @@ const OpenStreetMap = ({
         100% { transform: translate(-50%, -50%) scale(1); }
       }
       
+      @keyframes routeFlow {
+        0% { stroke-dashoffset: 0; }
+        100% { stroke-dashoffset: 24; }
+      }
+      
+      .route-line {
+        animation: routeFlow 2s linear infinite;
+      }
+      
       .marker-tooltip:hover {
         display: block !important;
       }
