@@ -82,11 +82,22 @@ const OrderTrackingPage = ({ orderId, onBack, user }) => {
     if (orderId) {
       fetchOrderDetails();
       
-      // Auto refresh every 30 seconds for live tracking
-      const interval = setInterval(fetchOrderDetails, 30000);
-      return () => clearInterval(interval);
+      // Auto refresh order details every 30 seconds
+      const orderInterval = setInterval(fetchOrderDetails, 30000);
+      
+      // Auto refresh courier location every 5 seconds when courier is delivering
+      const locationInterval = setInterval(() => {
+        if (order && order.courier_id && ['picked_up', 'delivering'].includes(order.status)) {
+          fetchCourierLocation();
+        }
+      }, 5000);
+      
+      return () => {
+        clearInterval(orderInterval);
+        clearInterval(locationInterval);
+      };
     }
-  }, [orderId]);
+  }, [orderId, order]);
 
   const getStatusTimeline = () => {
     if (!order) return [];
