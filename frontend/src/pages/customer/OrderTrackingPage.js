@@ -354,6 +354,52 @@ const OrderTrackingPage = ({ orderId, onBack, user }) => {
           </div>
         )}
 
+        {/* Real-time Map with Courier Location */}
+        {courierLocation && ['picked_up', 'delivering'].includes(order.status) && (
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-900">🛣️ Canlı Takip</h3>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-green-600">Gerçek Zamanlı</span>
+              </div>
+            </div>
+            
+            <div className="rounded-lg overflow-hidden">
+              <OpenStreetMap
+                center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [41.0082, 28.9784]}
+                zoom={15}
+                height="300px"
+                courierLocation={courierLocation}
+                markers={[{
+                  id: 'delivery-address',
+                  title: `Teslimat: ${order.delivery_address}`,
+                  type: 'delivery',
+                  lat: order.delivery_lat || courierLocation.lat + 0.01,
+                  lng: order.delivery_lng || courierLocation.lng + 0.01,
+                  address: order.delivery_address
+                }]}
+                onMarkerClick={() => {
+                  toast.success(`📍 Teslimat Adresi: ${order.delivery_address}`);
+                }}
+              />
+            </div>
+            
+            <div className="mt-3 text-center">
+              <p className="text-xs text-gray-600">
+                🚴 Kuryeniz size doğru geliyor • Son güncelleme: {
+                  courierLocation.ts ? 
+                    new Date(courierLocation.ts).toLocaleTimeString('tr-TR', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    }) : 
+                    'Şimdi'
+                }
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Status Timeline */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
           <h3 className="font-semibold text-gray-900 mb-4">Sipariş Durumu</h3>
