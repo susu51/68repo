@@ -4615,10 +4615,11 @@ function App() {
   
   return (
     <AuthProvider>
-      <div className="App">
-        <BrowserRouter>
-          <AuthRouter showAuth={showAuth} setShowAuth={setShowAuth} />
-        </BrowserRouter>
+      <CartProvider>
+        <div className="App">
+          <BrowserRouter>
+            <AuthRouter showAuth={showAuth} setShowAuth={setShowAuth} />
+          </BrowserRouter>
         <Toaster 
           position="top-right"
           toastOptions={{
