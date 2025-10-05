@@ -103,6 +103,16 @@ if mongo_uri:
 else:
     print("No MONGO_URI provided, running without database")
 
+# Redis connection for courier location caching
+redis_client = None
+try:
+    redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    redis_client.ping()  # Test connection
+    print("Redis connected successfully")
+except Exception as e:
+    print(f"Redis connection error: {e}")
+    redis_client = None
+
 # Create uploads directory
 UPLOAD_DIR = Path("/app/backend/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
