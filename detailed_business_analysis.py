@@ -6,7 +6,7 @@ DETAILED BUSINESS ANALYSIS - Check specific business statuses
 import requests
 import json
 
-BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com/api"
+BACKEND_URL = "https://kurye-platform.preview.emergentagent.com/api"
 
 def analyze_businesses():
     # Admin login

@@ -6,7 +6,7 @@ FINAL VERIFICATION TEST - Confirm Aksaray business visibility is resolved
 import requests
 import json
 
-BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com/api"
+BACKEND_URL = "https://kurye-platform.preview.emergentagent.com/api"
 
 def final_verification():
     print("🎯 FINAL VERIFICATION - AKSARAY BUSINESS VISIBILITY")

@@ -11,7 +11,7 @@ import jwt
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com"
+BACKEND_URL = "https://kurye-platform.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 class AdminLoginTest:

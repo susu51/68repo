@@ -12,7 +12,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com/api"
+BACKEND_URL = "https://kurye-platform.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_BUSINESS_EMAIL = "testbusiness@example.com"

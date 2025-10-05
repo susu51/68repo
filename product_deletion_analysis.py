@@ -25,7 +25,7 @@ import subprocess
 import os
 
 # Configuration
-BACKEND_URL = "https://food-delivery-hub-19.preview.emergentagent.com/api"
+BACKEND_URL = "https://kurye-platform.preview.emergentagent.com/api"
 TEST_BUSINESS_EMAIL = "testbusiness@example.com"
 TEST_BUSINESS_PASSWORD = "test123"
 
