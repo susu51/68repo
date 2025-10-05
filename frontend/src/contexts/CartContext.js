@@ -134,9 +134,14 @@ export function CartProvider({ children }) {
 
   // Cart utility functions
   const addToCart = (product, quantity = 1) => {
+    if (!product || !product.id) {
+      console.error('Invalid product data:', product);
+      return;
+    }
+
     if (quantity < 0) {
       // Handle negative quantity as a decrease
-      const currentItem = cart.items.find(item => item.id === product.id);
+      const currentItem = cart.items?.find(item => item.id === product.id);
       if (currentItem) {
         const newQuantity = currentItem.quantity + quantity;
         if (newQuantity <= 0) {
