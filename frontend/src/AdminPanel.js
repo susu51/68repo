@@ -1069,19 +1069,9 @@ const AdminPanel = ({ user, onLogout }) => {
         {currentView === 'businesses' && (
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">🏪 İşletme Yönetimi</h2>
-              <div className="flex space-x-2">
-                <select className="border rounded px-3 py-2">
-                  <option>Tüm Durumlar</option>
-                  <option>Aktif</option>
-                  <option>Pasif</option>
-                  <option>KYC Bekliyor</option>
-                  <option>Onaylandı</option>
-                  <option>Reddedildi</option>
-                </select>
-                <input type="text" placeholder="İşletme ara..." className="border rounded px-3 py-2" />
-              </div>
+              <h2 className="text-xl font-semibold text-gray-900">🏪 İşletme & Kurye KYC Yönetimi</h2>
             </div>
+            <KYCManagement user={user} />
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
