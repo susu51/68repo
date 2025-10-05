@@ -166,6 +166,7 @@ export const CustomerApp = ({ user, onLogout }) => {
           <DiscoverPage 
             user={user}
             onRestaurantSelect={handleRestaurantSelect}
+            onTabChange={handleTabChange}
           />
         );
     }
