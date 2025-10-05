@@ -4688,6 +4688,8 @@ async def get_all_businesses_admin(
     current_user: dict = Depends(get_current_user)
 ):
     """Get all businesses for admin management with filtering"""
+    from utils.city_normalize import normalize_city_name
+    
     try:
         # Check admin permissions
         if current_user.get("role") != "admin":
