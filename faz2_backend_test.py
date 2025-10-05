@@ -263,7 +263,7 @@ class FAZ2BackendTester:
                     
                     if response.status_code == 200:
                         payment_result = response.json()
-                        payment_success = payment_result.get("success", False)
+                        payment_success = payment_result.get("status") == "success"
                         
                         if payment_success:
                             success_count += 1
