@@ -1276,7 +1276,13 @@ const AdminPanel = ({ user, onLogout }) => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <button className="text-blue-600 hover:text-blue-900 mr-2">Düzenle</button>
-                      <button className="text-green-600 hover:text-green-900">Aktifleştir</button>
+                      <button 
+                        onClick={() => handleToggleProduct('product-2')}
+                        disabled={loading}
+                        className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                      >
+                        Aktifleştir
+                      </button>
                     </td>
                   </tr>
                 </tbody>
