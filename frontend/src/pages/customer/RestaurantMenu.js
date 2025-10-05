@@ -4,9 +4,17 @@ import { Button } from '../../components/ui/button';
 import { useCart } from '../../contexts/CartContext';
 
 const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
+  const { cart, addToCart, getItemQuantity, setRestaurant, getCartSummary } = useCart();
   const [menuItems, setMenuItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
+
+  // Set restaurant in cart context when component mounts
+  useEffect(() => {
+    if (restaurant) {
+      setRestaurant(restaurant);
+    }
+  }, [restaurant, setRestaurant]);
 
   // Mock menu data - gerçek API'den gelecek
   const mockMenuItems = [
