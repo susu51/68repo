@@ -126,6 +126,23 @@ class BusinessCourierIntegrationTester:
         
         headers = {"Authorization": f"Bearer {self.tokens['customer']}"}
         
+        # First, get available products from the test business
+        business_headers = {"Authorization": f"Bearer {self.tokens['business']}"}
+        products_response = self.session.get(f"{BACKEND_URL}/products/my", headers=business_headers)
+        
+        if products_response.status_code != 200 or not products_response.json():
+            self.log_test("Create Test Order", False, "No products available for test business")
+            return False
+        
+        products = products_response.json()
+        if len(products) < 2:
+            self.log_test("Create Test Order", False, f"Need at least 2 products, found {len(products)}")
+            return False
+        
+        # Use actual product IDs from the database
+        product1 = products[0]
+        product2 = products[1]
+        
         # Create test order
         order_data = {
             "delivery_address": "Test Delivery Address, Kadıköy, İstanbul",
@@ -133,21 +150,21 @@ class BusinessCourierIntegrationTester:
             "delivery_lng": 29.0234,
             "items": [
                 {
-                    "product_id": "test-product-1",
-                    "product_name": "Test Burger",
-                    "product_price": 45.0,
+                    "product_id": product1["id"],
+                    "product_name": product1["name"],
+                    "product_price": product1["price"],
                     "quantity": 2,
-                    "subtotal": 90.0
+                    "subtotal": product1["price"] * 2
                 },
                 {
-                    "product_id": "test-product-2",
-                    "product_name": "Test Drink",
-                    "product_price": 15.0,
+                    "product_id": product2["id"],
+                    "product_name": product2["name"],
+                    "product_price": product2["price"],
                     "quantity": 1,
-                    "subtotal": 15.0
+                    "subtotal": product2["price"]
                 }
             ],
-            "total_amount": 105.0,
+            "total_amount": (product1["price"] * 2) + product2["price"],
             "notes": "Test order for integration testing"
         }
         
