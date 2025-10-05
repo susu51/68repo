@@ -41,6 +41,14 @@ const CartPage = ({ onBack, onProceedToPayment, user }) => {
         if (addresses.length > 0 && !selectedAddress) {
           setSelectedAddress(addresses[0]);
         }
+      } else if (response.status === 401) {
+        // Token expired or invalid
+        console.log('Authentication failed, token may be expired');
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+        localStorage.removeItem('kuryecini_access_token');
+        // You could redirect to login here
+      } else {
+        console.error('Error loading addresses:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error loading addresses:', error);
