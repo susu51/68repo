@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import KYCManagement from './components/KYCManagement';
 
 const AdminPanel = ({ user, onLogout }) => {
   const [currentView, setCurrentView] = useState('dashboard');
