@@ -195,10 +195,11 @@ class Phase2AuthFixTester:
             # Success criteria: Should return 200 instead of 401
             if response.status_code == 200:
                 data = response.json()
+                businesses_count = len(data) if isinstance(data, list) else len(data.get('businesses', [])) if isinstance(data, dict) else 0
                 self.log_test(
                     "Geospatial Authentication - GET /api/nearby/businesses",
                     True,
-                    f"Status: {response.status_code} (SUCCESS - Fixed from previous 401), Businesses found: {len(data.get('businesses', []))}"
+                    f"Status: {response.status_code} (SUCCESS - Fixed from previous 401), Businesses found: {businesses_count}"
                 )
             elif response.status_code == 403:
                 self.log_test(
