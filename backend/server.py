@@ -3530,10 +3530,18 @@ async def create_promotion(
     """Create new promotion (Admin only)"""
     try:
         # Validate required fields
-        required_fields = ["title", "description", "type", "value"]
+        required_fields = ["title", "description", "type"]
         for field in required_fields:
             if field not in promotion_data:
-                raise HTTPException(status_code=422, detail=f"Field '{field}' is required")
+                raise HTTPException(status_code=422, detail=f"Missing required field: {field}")
+        
+        # Handle both 'value' and 'discount_value' fields (flexible)
+        if "value" not in promotion_data and "discount_value" not in promotion_data:
+            raise HTTPException(status_code=422, detail="Missing required field: 'value' or 'discount_value'")
+        
+        # Normalize to 'value' field
+        if "discount_value" in promotion_data and "value" not in promotion_data:
+            promotion_data["value"] = promotion_data["discount_value"]
         
         # Validate promotion type and value
         valid_types = ["percentage", "fixed_amount", "free_delivery", "buy_x_get_y"]
