@@ -85,11 +85,23 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.getenv('MONGO_URL')
 if mongo_url:
     try:
-        client = AsyncIOMotorClient(mongo_url)
-        db_name = mongo_url.split('/')[-1] or 'kuryecini'
+        # Use certifi for CA certificates with MongoDB Atlas
+        client = AsyncIOMotorClient(
+            mongo_url,
+            tlsCAFile=certifi.where(),  # Critical for MongoDB Atlas SSL
+            serverSelectionTimeoutMS=8000
+        )
+        
+        # Extract database name from URL or use default
+        if '/' in mongo_url and mongo_url.split('/')[-1]:
+            db_name = mongo_url.split('/')[-1].split('?')[0]  # Handle query params
+        else:
+            db_name = 'kuryecini'
+            
         db = client[db_name]
-        print(f"✅ MongoDB connected: {db_name}")
-        print(f"📍 Database URL: {mongo_url}")
+        print(f"✅ MongoDB connected with certifi CA: {db_name}")
+        print(f"📍 CA File: {certifi.where()}")
+        print(f"📍 Database URL: {mongo_url[:50]}...[HIDDEN]")
     except Exception as e:
         print(f"❌ MongoDB connection error: {e}")
         db = None
