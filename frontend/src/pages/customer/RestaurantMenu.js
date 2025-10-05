@@ -252,11 +252,11 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                   <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1 md:mb-2 line-clamp-1">{item.name}</h3>
                   <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-3 md:mb-4 line-clamp-2">{item.description}</p>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-2xl font-bold text-orange-500">₺{item.price.toFixed(2)}</div>
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <div className="text-lg md:text-2xl font-bold text-orange-500">₺{item.price?.toFixed(2) || '0.00'}</div>
                     <div className="flex items-center text-green-600">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                      <span className="text-sm font-medium">Mevcut</span>
+                      <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full mr-1 md:mr-2"></span>
+                      <span className="text-xs md:text-sm font-medium">Mevcut</span>
                     </div>
                   </div>
 
