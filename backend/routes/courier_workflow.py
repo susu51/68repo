@@ -429,3 +429,6 @@ async def deliver_order(
             status_code=500,
             detail=f"Error delivering order: {str(e)}"
         )
+
+# Add import for uuid
+import uuid
