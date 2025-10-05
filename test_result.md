@@ -1010,9 +1010,12 @@ frontend:
 
 test_plan:
   current_focus:
-    - "PHASE 3 - İşletme Durum Akışı & Kurye Sistemi"
+    - "Phase 3 - Order Status Flow Management"
+    - "Phase 3 - Courier Workflow System"
+    - "Phase 3 - Real-time Location Tracking"
+    - "Phase 3 - Admin Settings & Earnings"
   stuck_tasks:
-    - "EMERGENCY BUSINESS VISIBILITY FIX"
+    - "Phase 3 - CAS Status Transitions"
   test_all: false
   test_priority: "critical_first"
 
