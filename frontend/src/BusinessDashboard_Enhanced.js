@@ -574,56 +574,35 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      // Mock products data for demo
-      const mockProducts = [
-        {
-          id: 'PRD-001',
-          name: 'Chicken Burger',
-          description: 'Sulu tavuk göğsü, taze sebzeler ve özel sosumuzla',
-          price: 45.00,
-          category: 'Burger',
-          preparation_time: 15,
-          is_available: true,
-          image_url: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=300',
-          ingredients: 'Tavuk göğsü, marul, domates, soğan, turşu',
-          allergens: 'Gluten',
-          order_count: 245,
-          rating: 4.8
-        },
-        {
-          id: 'PRD-002',
-          name: 'Margarita Pizza',
-          description: 'Klasik İtalyan pizzası - mozzarella, domates, fesleğen',
-          price: 65.00,
-          category: 'Pizza',
-          preparation_time: 20,
-          is_available: true,
-          image_url: 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=300',
-          ingredients: 'Pizza hamuru, mozzarella, domates sosu, fesleğen',
-          allergens: 'Gluten, Süt',
-          order_count: 189,
-          rating: 4.9
-        },
-        {
-          id: 'PRD-003',
-          name: 'Adana Kebap',
-          description: 'Geleneksel Adana kebabı, lavash ekmeği ile',
-          price: 55.00,
-          category: 'Ana Yemekler',
-          preparation_time: 25,
-          is_available: false,
-          image_url: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=300',
-          ingredients: 'Dana kıyma, soğan, baharat, lavash',
-          allergens: 'Gluten',
-          order_count: 156,
-          rating: 4.7
-        }
-      ];
       
-      setProducts(mockProducts);
-      toast.success('Menü güncellendi');
+      // Gerçek API çağrısı - Phase 2 Business Menu CRUD
+      const response = await axios.get(`${API}/business/menu`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.data) {
+        setProducts(response.data);
+        toast.success(`${response.data.length} ürün yüklendi`);
+      } else {
+        setProducts([]);
+        console.log('🍽️ Henüz menü öğesi yok - yeni ürün ekleyin');
+      }
     } catch (error) {
-      toast.error('Menü yüklenemedi');
+      console.error('❌ Menü yükleme hatası:', error);
+      if (error.response?.status === 404) {
+        // İşletme kaydı bulunamadı - ilk kez giriş yapan işletme
+        setProducts([]);
+        toast.error('İşletme kaydınız bulunamadı. Lütfen profil bilgilerinizi tamamlayın.');
+      } else if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Tekrar giriş yapın.');
+        onLogout();
+      } else {
+        setProducts([]);
+        toast.error('Menü yüklenemedi. İnternet bağlantınızı kontrol edin.');
+      }
     } finally {
       setLoading(false);
     }
