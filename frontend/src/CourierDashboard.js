@@ -1631,4 +1631,4 @@ export const CourierDashboard = ({ user, onLogout }) => {
   );
 };
 
-export default CourierDashboard;
+export default React.memo(CourierDashboard);
