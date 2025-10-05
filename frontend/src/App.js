@@ -41,7 +41,12 @@ const API = `${BACKEND_URL}/api`;
 console.log('Frontend connecting to:', API);
 
 // Auth Context
-const AuthContext = React.createContext();
+const AuthContext = React.createContext({
+  user: null,
+  login: () => {},
+  logout: () => {},
+  loading: true
+});
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
