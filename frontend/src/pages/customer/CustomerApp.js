@@ -16,7 +16,7 @@ export const CustomerApp = ({ user, onLogout }) => {
   const [currentOrderId, setCurrentOrderId] = useState(null);
   
   const { cart, getCartSummary } = useCart();
-  const cartSummary = getCartSummary();
+  const cartSummary = getCartSummary ? getCartSummary() : { itemCount: 0, total: 0 };
 
   console.log('🚀 CustomerApp FAZ 2 rendered - activeView:', activeView, 'user:', user?.first_name);
 
