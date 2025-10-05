@@ -272,42 +272,88 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   // Professional Business Functions
   const acceptOrder = async (orderId) => {
     try {
-      const order = incomingOrders.find(o => o.id === orderId);
-      if (order) {
-        // Move from incoming to active
-        setIncomingOrders(prev => prev.filter(o => o.id !== orderId));
-        setActiveOrders(prev => [...prev, {
-          ...order,
-          status: 'accepted',
-          accepted_at: new Date(),
-          estimated_ready: new Date(Date.now() + order.items[0]?.preparation_time * 60000 || 900000)
-        }]);
-        setUnprocessedCount(prev => Math.max(0, prev - 1));
-        
-        toast.success(`Sipariş #${orderId} kabul edildi!`);
-        
-        // Update stats
-        setStats(prev => ({
-          ...prev,
-          today: {
-            ...prev.today,
-            orders: prev.today.orders + 1,
-            revenue: prev.today.revenue + order.total_amount
-          }
-        }));
+      const token = localStorage.getItem('kuryecini_access_token');
+      
+      const response = await axios.patch(
+        `${API}/business/orders/${orderId}/status`,
+        { status: 'confirmed' },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      if (response.data) {
+        // Refresh orders to get updated status
+        await fetchIncomingOrders();
+        toast.success(`Sipariş kabul edildi ve onaylandı!`);
       }
     } catch (error) {
-      toast.error('Sipariş kabul edilemedi');
+      console.error('Error accepting order:', error);
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+      } else {
+        toast.error('Sipariş kabul edilemedi');
+      }
     }
   };
 
   const rejectOrder = async (orderId, reason = 'İşletme tarafından reddedildi') => {
     try {
+      // For now, we'll handle rejection by removing from list
+      // In production, you'd want a proper rejection endpoint
       setIncomingOrders(prev => prev.filter(o => o.id !== orderId));
       setUnprocessedCount(prev => Math.max(0, prev - 1));
-      toast.success(`Sipariş #${orderId} reddedildi`);
+      toast.success(`Sipariş reddedildi`);
     } catch (error) {
       toast.error('Sipariş reddedilemedi');
+    }
+  };
+
+  const markOrderAsReady = async (orderId) => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      
+      const response = await axios.patch(
+        `${API}/business/orders/${orderId}/status`,
+        { status: 'ready' },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      if (response.data) {
+        // Refresh orders to get updated status
+        await fetchIncomingOrders();
+        toast.success(`Sipariş hazır! Kurye atanması bekleniyor.`);
+      }
+    } catch (error) {
+      console.error('Error marking order as ready:', error);
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+      } else {
+        toast.error('Sipariş durumu güncellenemedi');
+      }
+    }
+  };
+
+  const startPreparingOrder = async (orderId) => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      
+      const response = await axios.patch(
+        `${API}/business/orders/${orderId}/status`,
+        { status: 'preparing' },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      if (response.data) {
+        // Refresh orders to get updated status
+        await fetchIncomingOrders();
+        toast.success(`Sipariş hazırlanmaya başladı!`);
+      }
+    } catch (error) {
+      console.error('Error starting preparation:', error);
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+      } else {
+        toast.error('Sipariş durumu güncellenemedi');
+      }
     }
   };
 
