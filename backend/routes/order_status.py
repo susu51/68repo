@@ -148,6 +148,19 @@ async def update_order_status(
         
         print(f"🔄 ORDER STATUS UPDATE: {order_id} | {current_status} → {status_update.to_status} | By: {user_role} {current_user['id']}")
         
+        # Broadcast status update via WebSocket
+        try:
+            from websocket_manager import websocket_manager
+            await websocket_manager.send_order_status_update(order_id, {
+                "type": "status_changed",
+                "from_status": current_status,
+                "to_status": status_update.to_status,
+                "updated_by": current_user["id"],
+                "updated_by_role": user_role
+            })
+        except Exception as ws_error:
+            print(f"⚠️ WebSocket broadcast failed: {ws_error}")
+        
         return OrderStatusResponse(
             id=order_id,
             status=result["status"],
