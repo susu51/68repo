@@ -264,7 +264,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                   {quantityInCart === 0 ? (
                     <Button 
                       onClick={() => addToCart(item)}
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-2 md:py-3 px-2 md:px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm md:text-base touch-manipulation"
                     >
                       🛒 Sepete Ekle
                     </Button>
