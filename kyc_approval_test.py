@@ -282,8 +282,7 @@ class KYCApprovalTester:
             response = requests.get(f"{BACKEND_URL}/admin/businesses/{business_id}", headers=headers)
             
             if response.status_code == 200:
-                data = response.json()
-                business = data.get("business", {})
+                business = response.json()  # API returns business data directly
                 actual_status = business.get("kyc_status")
                 
                 if actual_status == expected_status:
