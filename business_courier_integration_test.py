@@ -462,6 +462,10 @@ class BusinessCourierIntegrationTester:
             # Get order details to verify complete flow
             response = self.session.get(f"{BACKEND_URL}/orders", headers=headers)
             
+            # Also try the customer-specific orders endpoint
+            if response.status_code != 200:
+                response = self.session.get(f"{BACKEND_URL}/orders/my", headers=headers)
+            
             if response.status_code == 200:
                 orders = response.json()
                 test_order = next((order for order in orders if order.get("id") == self.test_order_id), None)
