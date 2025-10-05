@@ -248,7 +248,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                   />
                 </div>
                 
-                <CardContent className="p-6">
+                <CardContent className="p-3 md:p-4 lg:p-6">
                   <h3 className="text-xl font-bold text-gray-800 mb-2">{item.name}</h3>
                   <p className="text-gray-600 text-sm leading-relaxed mb-4">{item.description}</p>
                   
