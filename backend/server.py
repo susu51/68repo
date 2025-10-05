@@ -89,21 +89,31 @@ if mongo_url:
         print(f"🔗 Connecting to MongoDB Atlas...")
         print(f"📍 CA File: {certifi.where()}")
         
-        # Motor client with proper Atlas SSL settings
-        client = AsyncIOMotorClient(
-            mongo_url,
-            # Motor-specific SSL parameters (no tlsContext!)
-            tls=True,  # Enable TLS
-            tlsCAFile=certifi.where(),  # CA certificates
-            tlsAllowInvalidHostnames=True,  # Allow hostname mismatch for compatibility
-            tlsAllowInvalidCertificates=True,  # Allow invalid certs for compatibility
-            serverSelectionTimeoutMS=10000,  # Increased timeout
-            socketTimeoutMS=30000,
-            connectTimeoutMS=30000,
-            # Additional connection settings
-            retryWrites=True,
-            w='majority'
-        )
+        # Check if this is Atlas or local MongoDB
+        is_atlas = 'mongodb+srv://' in mongo_url or 'mongodb.net' in mongo_url
+        
+        if is_atlas:
+            # Motor client with proper Atlas SSL settings
+            client = AsyncIOMotorClient(
+                mongo_url,
+                tls=True,
+                tlsCAFile=certifi.where(),
+                tlsAllowInvalidHostnames=True,
+                tlsAllowInvalidCertificates=True,
+                serverSelectionTimeoutMS=10000,
+                socketTimeoutMS=30000,
+                connectTimeoutMS=30000,
+                retryWrites=True,
+                w='majority'
+            )
+            print("🌍 Configured for MongoDB Atlas")
+        else:
+            # Local MongoDB client (no SSL)
+            client = AsyncIOMotorClient(
+                mongo_url,
+                serverSelectionTimeoutMS=5000
+            )
+            print("🏠 Configured for local MongoDB")
         
         # Extract database name from URL or use default
         if '/' in mongo_url and mongo_url.split('/')[-1]:
