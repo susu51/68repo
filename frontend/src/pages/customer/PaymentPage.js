@@ -200,6 +200,7 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
     // Validation
     if (!selectedAddress) {
       toast.error('Teslimat adresi seçilmedi');
+      setShowAddressSelector(true);
       return;
     }
 
