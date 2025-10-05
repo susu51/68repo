@@ -475,7 +475,7 @@ class FAZ2BackendTester:
                 
                 if payment_response.status_code == 200:
                     payment_result = payment_response.json()
-                    payment_success = payment_result.get("success", False)
+                    payment_success = payment_result.get("status") == "success"
                     
                     self.log_test(
                         "E2E Flow Step 2 - Payment Processing",
@@ -572,7 +572,7 @@ class FAZ2BackendTester:
                 
                 if payment_response.status_code == 200:
                     payment_result = payment_response.json()
-                    payment_success = payment_result.get("success", False)
+                    payment_success = payment_result.get("status") == "success"
                     
                     if payment_success:
                         self.log_test(
