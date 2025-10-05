@@ -390,7 +390,7 @@ class FAZ2BackendTester:
                     )
                     
                     # Verify estimated delivery time is provided
-                    estimated_delivery = tracking_data.get("estimated_delivery_time")
+                    estimated_delivery = tracking_data.get("estimated_delivery")
                     if estimated_delivery:
                         self.log_test(
                             f"Estimated Delivery Time - Order {i+1}",
