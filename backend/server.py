@@ -86,28 +86,23 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.getenv('MONGO_URL')
 if mongo_url:
     try:
-        # Create SSL context for MongoDB Atlas with compatibility settings
-        ssl_context = ssl.create_default_context(cafile=certifi.where())
-        ssl_context.check_hostname = False  # Disable hostname verification
-        ssl_context.verify_mode = ssl.CERT_NONE  # Disable certificate verification for compatibility
+        print(f"🔗 Connecting to MongoDB Atlas...")
+        print(f"📍 CA File: {certifi.where()}")
         
-        # Alternative: Try with different TLS protocols
-        try:
-            ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
-        except AttributeError:
-            # Fallback for older SSL library
-            ssl_context.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
-        
-        print(f"🔒 SSL Context created with CA file: {certifi.where()}")
-        print(f"🔒 SSL minimum version: {getattr(ssl_context, 'minimum_version', 'Not available')}")
-        
-        # MongoDB client with custom SSL context
+        # Motor client with proper Atlas SSL settings
         client = AsyncIOMotorClient(
             mongo_url,
-            tlsContext=ssl_context,
-            serverSelectionTimeoutMS=8000,
-            socketTimeoutMS=20000,
-            connectTimeoutMS=20000
+            # Motor-specific SSL parameters (no tlsContext!)
+            tls=True,  # Enable TLS
+            tlsCAFile=certifi.where(),  # CA certificates
+            tlsAllowInvalidHostnames=True,  # Allow hostname mismatch for compatibility
+            tlsAllowInvalidCertificates=True,  # Allow invalid certs for compatibility
+            serverSelectionTimeoutMS=10000,  # Increased timeout
+            socketTimeoutMS=30000,
+            connectTimeoutMS=30000,
+            # Additional connection settings
+            retryWrites=True,
+            w='majority'
         )
         
         # Extract database name from URL or use default
@@ -117,12 +112,32 @@ if mongo_url:
             db_name = 'kuryecini'
             
         db = client[db_name]
-        print(f"✅ MongoDB client created with custom SSL context: {db_name}")
+        print(f"✅ MongoDB client created for Atlas: {db_name}")
         print(f"📍 Database URL: {mongo_url[:50]}...[HIDDEN]")
     except Exception as e:
         print(f"❌ MongoDB connection error: {e}")
-        db = None
-        raise RuntimeError("Database connection required - no mock data allowed")
+        print(f"🔍 Trying fallback connection method...")
+        
+        try:
+            # Fallback: Less strict SSL settings
+            client = AsyncIOMotorClient(
+                mongo_url,
+                tls=True,
+                serverSelectionTimeoutMS=10000
+            )
+            
+            if '/' in mongo_url and mongo_url.split('/')[-1]:
+                db_name = mongo_url.split('/')[-1].split('?')[0]
+            else:
+                db_name = 'kuryecini'
+                
+            db = client[db_name]
+            print(f"✅ Fallback MongoDB connection successful: {db_name}")
+            
+        except Exception as e2:
+            print(f"❌ Fallback connection also failed: {e2}")
+            db = None
+            raise RuntimeError("Database connection required - no mock data allowed")
 else:
     print("❌ No MONGO_URL provided - Real database required!")
     raise RuntimeError("MONGO_URL environment variable required")
