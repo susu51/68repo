@@ -3990,7 +3990,7 @@ async def get_public_businesses(
                 }
             }
         
-        businesses = await db.users.find(query_filter).to_list(length=None)
+        businesses = await db.businesses.find(query_filter).to_list(length=None)
         
         business_list = []
         for business in businesses:
@@ -4137,7 +4137,7 @@ async def get_restaurants(city: Optional[str] = None):
                 {"address": {"$regex": f".*{re.escape(city)}.*", "$options": "i"}}
             ]
         
-        businesses = await db.users.find(query_filter).to_list(length=None)
+        businesses = await db.businesses.find(query_filter).to_list(length=None)
         
         restaurant_list = []
         for business in businesses:
@@ -4185,7 +4185,7 @@ async def get_nearby_restaurants(
             }
         }
         
-        businesses = await db.users.find(query_filter).to_list(length=None)
+        businesses = await db.businesses.find(query_filter).to_list(length=None)
         
         restaurant_list = []
         for business in businesses:
