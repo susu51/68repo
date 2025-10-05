@@ -219,6 +219,7 @@ export function CartProvider({ children }) {
 
   // Check if item is in cart
   const isInCart = (itemId) => {
+    if (!cart || !cart.items || !itemId) return false;
     return cart.items.some(item => item.id === itemId);
   };
 
