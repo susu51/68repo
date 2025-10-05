@@ -617,15 +617,18 @@ backend:
 
   - task: "Phase 2 - Business Menu CRUD Operations"
     implemented: true
-    working: "NA"
+    working: false
     file: "routes/business.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "IMPLEMENTED: Complete Business Menu CRUD system with proper authentication. Created routes/business.py with endpoints: POST /api/business/menu (create menu item), GET /api/business/menu (get business's menu items), PATCH /api/business/menu/{item_id} (update menu item), DELETE /api/business/menu/{item_id} (delete menu item). Features: JWT authentication with business role requirement, proper business ownership validation, menu item validation with price/availability controls, UUID-based IDs for consistency, proper error handling and HTTP status codes."
+        - working: false
+          agent: "testing"
+          comment: "❌ BUSINESS MENU CRUD ENDPOINTS FAILING - AUTHENTICATION ISSUE: Comprehensive testing shows endpoints are implemented but have critical authentication problems (0% success rate). ✅ ENDPOINTS EXIST: All Business Menu CRUD endpoints are properly implemented in routes/business.py and included in server.py (POST /api/business/menu, GET /api/business/menu, PATCH /api/business/menu/{item_id}, DELETE /api/business/menu/{item_id}). ❌ CRITICAL AUTHENTICATION BUG: All endpoints return 401 'User not found' despite valid JWT tokens. ROOT CAUSE: routes/business.py has its own get_current_user() function that looks for users by _id field using email from JWT token (line 27: user = await db.users.find_one({'_id': user_id})), but JWT tokens contain email in 'sub' field, not user ID. This conflicts with main server.py authentication which handles test users correctly. ❌ IMPACT: Business users cannot access any menu management functionality. All CRUD operations blocked by authentication failure. 🔧 REQUIRED FIX: Update routes/business.py authentication to use same logic as main server.py get_current_user() function, or import and use the main authentication function instead of duplicating it. The endpoints are correctly implemented but authentication integration is broken."
 
   - task: "Phase 2 - Geospatial Nearby Businesses Discovery"
     implemented: true
