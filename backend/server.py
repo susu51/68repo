@@ -1103,7 +1103,8 @@ async def register_business(business_data: BusinessRegister):
         "business_category": business_data.business_category,
         "description": business_data.description,
         "is_active": True,
-        "business_status": "pending",  # pending, approved, rejected
+        "kyc_status": "pending",  # pending, approved, rejected
+        "business_status": "pending",  # Keep for backward compatibility
         "approved_at": None,
         "created_at": datetime.now(timezone.utc)
     }
