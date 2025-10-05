@@ -129,18 +129,24 @@ const initialState = {
 export function CartProvider({ children }) {
   const [cart, dispatch] = useReducer(cartReducer, initialState);
 
-  // Load cart from localStorage on mount
+  // Load cart from DB on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('kuryecini_cart');
-    if (savedCart) {
+    const loadCartFromDB = async () => {
       try {
-        const parsedCart = JSON.parse(savedCart);
-        dispatch({ type: CART_ACTIONS.LOAD_CART, payload: parsedCart });
+        console.log('🛒 Loading cart from database...');
+        const cartData = await CartAPI.loadCart();
+        if (cartData) {
+          dispatch({ type: CART_ACTIONS.LOAD_CART, payload: cartData });
+          console.log('✅ Cart loaded from DB:', cartData);
+        }
       } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
-        localStorage.removeItem('kuryecini_cart');
+        console.error('❌ Error loading cart from DB:', error);
+        // Fallback to empty cart
+        dispatch({ type: CART_ACTIONS.CLEAR_CART });
       }
-    }
+    };
+
+    loadCartFromDB();
   }, []);
 
   // Save cart to localStorage whenever cart changes
