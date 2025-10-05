@@ -497,41 +497,29 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   const fetchIncomingOrders = async () => {
     try {
       setLoading(true);
-      // Mock data for demo purposes - in real app this would be API call
-      const mockOrders = [
-        {
-          id: 'ORD-001',
-          customer_name: 'Ahmet Yılmaz',
-          customer_phone: '+90 532 123 4567',
-          items: [
-            { name: 'Chicken Burger', quantity: 2, price: 45.00 },
-            { name: 'Patates Kızartması', quantity: 1, price: 15.00 }
-          ],
-          total_amount: 105.00,
-          delivery_address: { address: 'Kadıköy, Moda Cad. No:15' },
-          status: 'pending',
-          created_at: new Date().toISOString()
-        },
-        {
-          id: 'ORD-002',
-          customer_name: 'Zeynep Kaya', 
-          customer_phone: '+90 533 987 6543',
-          items: [
-            { name: 'Margarita Pizza', quantity: 1, price: 65.00 },
-            { name: 'Cola', quantity: 2, price: 10.00 }
-          ],
-          total_amount: 85.00,
-          delivery_address: { address: 'Şişli, Nişantaşı Cad. No:42' },
-          status: 'pending', 
-          created_at: new Date(Date.now() - 10000).toISOString()
-        }
-      ];
+      const token = localStorage.getItem('kuryecini_access_token');
       
-      setIncomingOrders(mockOrders);
-      setUnprocessedCount(mockOrders.length);
-      toast.success('Siparişler güncellendi');
+      const response = await axios.get(`${API}/business/orders/incoming`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.data && response.data.orders) {
+        setIncomingOrders(response.data.orders);
+        setUnprocessedCount(response.data.orders.filter(o => o.status === 'created').length);
+        toast.success('Siparişler güncellendi');
+      } else {
+        setIncomingOrders([]);
+        setUnprocessedCount(0);
+      }
     } catch (error) {
-      toast.error('Siparişler yüklenemedi');
+      console.error('Error fetching orders:', error);
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+      } else {
+        toast.error('Siparişler yüklenemedi');
+      }
+      setIncomingOrders([]);
+      setUnprocessedCount(0);
     } finally {
       setLoading(false);
     }
