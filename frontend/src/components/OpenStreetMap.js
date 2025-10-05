@@ -1,0 +1,317 @@
+import React, { useEffect, useRef, useState } from 'react';
+
+const OpenStreetMap = ({ 
+  center = [41.0082, 28.9784], 
+  zoom = 13, 
+  height = "400px",
+  markers = [],
+  onMarkerClick = null,
+  courierLocation = null,
+  showDirections = false
+}) => {
+  const mapRef = useRef(null);
+  const [mapInstance, setMapInstance] = useState(null);
+  const [directionsVisible, setDirectionsVisible] = useState(false);
+
+  useEffect(() => {
+    // Initialize map with vanilla JavaScript (no React-leaflet dependency)
+    if (mapRef.current && !mapInstance) {
+      initializeMap();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mapInstance) {
+      updateMapMarkers();
+    }
+  }, [markers, courierLocation, mapInstance]);
+
+  const initializeMap = () => {
+    const mapContainer = mapRef.current;
+    
+    // Create simple map using OpenStreetMap tiles
+    const mapHTML = `
+      <div style="position: relative; width: 100%; height: 100%; background: #f0f0f0; border-radius: 8px;">
+        <iframe
+          width="100%"
+          height="100%"
+          frameborder="0"
+          scrolling="no"
+          marginheight="0"
+          marginwidth="0"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=${center[1]-0.01},${center[0]-0.01},${center[1]+0.01},${center[0]+0.01}&layer=mapnik&marker=${center[0]},${center[1]}"
+          style="border-radius: 8px;">
+        </iframe>
+        
+        <!-- Custom overlay for markers and controls -->
+        <div id="map-overlay" style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          pointer-events: none;
+          z-index: 10;
+        ">
+          <div id="markers-container" style="position: relative; width: 100%; height: 100%;">
+            ${renderMarkersOverlay()}
+          </div>
+        </div>
+        
+        <!-- Controls -->
+        <div style="
+          position: absolute;
+          bottom: 10px;
+          right: 10px;
+          z-index: 20;
+          background: white;
+          padding: 8px;
+          border-radius: 4px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          pointer-events: auto;
+        ">
+          <button 
+            onclick="window.toggleDirections && window.toggleDirections()"
+            style="
+              background: #007cba;
+              color: white;
+              border: none;
+              padding: 6px 12px;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 12px;
+            "
+          >
+            🛣️ Yol Tarifi
+          </button>
+        </div>
+      </div>
+    `;
+    
+    mapContainer.innerHTML = mapHTML;
+    setMapInstance(true);
+  };
+
+  const renderMarkersOverlay = () => {
+    let overlayHTML = '';
+    
+    // Courier location marker
+    if (courierLocation) {
+      overlayHTML += `
+        <div style="
+          position: absolute;
+          top: 45%;
+          left: 48%;
+          transform: translate(-50%, -50%);
+          z-index: 15;
+          animation: pulse 2s infinite;
+        ">
+          <div style="
+            background: #10b981;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #10b981;
+          "></div>
+          <div style="
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+          ">
+            🚴 Kurye
+          </div>
+        </div>
+      `;
+    }
+    
+    // Package/Order markers
+    markers.forEach((marker, index) => {
+      const topPos = 40 + (index * 5); // Distribute markers
+      const leftPos = 45 + (index * 3);
+      
+      overlayHTML += `
+        <div 
+          style="
+            position: absolute;
+            top: ${topPos}%;
+            left: ${leftPos}%;
+            transform: translate(-50%, -50%);
+            z-index: 12;
+            cursor: pointer;
+          "
+          onclick="window.handleMarkerClick && window.handleMarkerClick('${marker.id || index}')"
+        >
+          <div style="
+            background: ${marker.type === 'delivery' ? '#f59e0b' : '#ef4444'};
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          "></div>
+          <div style="
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            display: none;
+          " class="marker-tooltip">
+            📦 ${marker.title || 'Paket'}
+          </div>
+        </div>
+      `;
+    });
+    
+    return overlayHTML;
+  };
+
+  const updateMapMarkers = () => {
+    if (mapRef.current) {
+      const markersContainer = mapRef.current.querySelector('#markers-container');
+      if (markersContainer) {
+        markersContainer.innerHTML = renderMarkersOverlay();
+      }
+    }
+  };
+
+  const showDirections = () => {
+    setDirectionsVisible(true);
+    
+    // Simple directions display
+    const directionsHTML = `
+      <div style="
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: white;
+        padding: 12px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        max-width: 200px;
+        z-index: 25;
+        font-size: 12px;
+      ">
+        <div style="font-weight: bold; margin-bottom: 8px;">🛣️ Yol Tarifi</div>
+        <div style="color: #666;">
+          1. İstanbul Cd. üzerinden 500m<br/>
+          2. Atatürk Blv.'ya dön 1.2km<br/>
+          3. Hedefe ulaştınız
+        </div>
+        <div style="margin-top: 8px; font-size: 10px; color: #888;">
+          Tahmini süre: 8-12 dakika
+        </div>
+        <button onclick="window.hideDirections && window.hideDirections()" style="
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background: none;
+          border: none;
+          font-size: 16px;
+          cursor: pointer;
+        ">×</button>
+      </div>
+    `;
+    
+    const overlay = mapRef.current?.querySelector('#map-overlay');
+    if (overlay) {
+      const directionsDiv = document.createElement('div');
+      directionsDiv.id = 'directions-panel';
+      directionsDiv.innerHTML = directionsHTML;
+      overlay.appendChild(directionsDiv);
+    }
+  };
+
+  const hideDirections = () => {
+    setDirectionsVisible(false);
+    const directionsPanel = mapRef.current?.querySelector('#directions-panel');
+    if (directionsPanel) {
+      directionsPanel.remove();
+    }
+  };
+
+  useEffect(() => {
+    // Global functions for map interactions
+    window.toggleDirections = () => {
+      if (directionsVisible) {
+        hideDirections();
+      } else {
+        showDirections();
+      }
+    };
+
+    window.hideDirections = hideDirections;
+
+    window.handleMarkerClick = (markerId) => {
+      if (onMarkerClick) {
+        onMarkerClick(markerId);
+      } else {
+        showDirections();
+      }
+    };
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0% { transform: translate(-50%, -50%) scale(1); }
+        50% { transform: translate(-50%, -50%) scale(1.2); }
+        100% { transform: translate(-50%, -50%) scale(1); }
+      }
+      
+      .marker-tooltip:hover {
+        display: block !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      window.toggleDirections = null;
+      window.hideDirections = null;
+      window.handleMarkerClick = null;
+    };
+  }, [directionsVisible, onMarkerClick]);
+
+  return (
+    <div 
+      ref={mapRef} 
+      style={{ 
+        width: '100%', 
+        height: height, 
+        borderRadius: '8px',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Loading placeholder */}
+      <div style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f3f4f6',
+        color: '#6b7280'
+      }}>
+        <div className="text-center">
+          <div className="text-2xl mb-2">🗺️</div>
+          <p>Harita yükleniyor...</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default OpenStreetMap;
