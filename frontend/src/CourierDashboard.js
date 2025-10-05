@@ -78,7 +78,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   useEffect(() => {
     setIsMounted(true);
-    startLocationTracking();
+    const stopLocationTracking = startLocationTracking();
     fetchInitialData();
 
     // Auto refresh intervals
@@ -99,6 +99,9 @@ export const CourierDashboard = ({ user, onLogout }) => {
       setIsMounted(false);
       clearInterval(ordersInterval);
       clearInterval(statsInterval);
+      if (stopLocationTracking) {
+        stopLocationTracking();
+      }
     };
   }, []);
 
