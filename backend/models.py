@@ -3,6 +3,187 @@ MongoDB Data Models for Kuryecini
 All persistent data structures for localStorage migration
 """
 
+"""
+MongoDB Collections and Models for Kuryecini Platform
+Real Database Schema - No Mock Data
+"""
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from enum import Enum
+
+class OrderStatus(str, Enum):
+    CREATED = "created"
+    PREPARING = "preparing" 
+    READY = "ready"
+    COURIER_PENDING = "courier_pending"
+    COURIER_ASSIGNED = "courier_assigned"
+    PICKED_UP = "picked_up"
+    DELIVERING = "delivering"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+
+class UserRole(str, Enum):
+    CUSTOMER = "customer"
+    BUSINESS = "business"  
+    COURIER = "courier"
+    ADMIN = "admin"
+
+# MongoDB Collections Schema Definitions
+
+class BusinessLocation(BaseModel):
+    type: str = "Point"
+    coordinates: List[float]  # [lng, lat]
+
+class Business(BaseModel):
+    owner_user_id: str
+    name: str
+    address: str
+    location: BusinessLocation
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class MenuItem(BaseModel):
+    business_id: str
+    title: str
+    description: str
+    price: float
+    is_available: bool = True
+    photo_url: Optional[str] = None
+    category: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class OrderItem(BaseModel):
+    menu_item_id: str
+    qty: int
+    unit_price: float
+
+class OrderTotals(BaseModel):
+    subtotal: float
+    commission_business_pct: float
+    courier_earning: float
+    grand_total: float
+
+class DeliveryLocation(BaseModel):
+    type: str = "Point"
+    coordinates: List[float]  # [lng, lat]
+
+class OrderDelivery(BaseModel):
+    address: str
+    location: DeliveryLocation
+
+class StatusHistory(BaseModel):
+    status: OrderStatus
+    at: datetime
+    by_role: UserRole
+    by_user_id: str
+
+class Order(BaseModel):
+    customer_id: str
+    business_id: str
+    courier_id: Optional[str] = None
+    items: List[OrderItem]
+    totals: OrderTotals
+    delivery: OrderDelivery
+    status: OrderStatus = OrderStatus.CREATED
+    status_history: List[StatusHistory] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CourierLocationPoint(BaseModel):
+    type: str = "Point"
+    coordinates: List[float]  # [lng, lat]
+
+class CourierLocation(BaseModel):
+    courier_id: str
+    point: CourierLocationPoint
+    heading: Optional[float] = None
+    speed: Optional[float] = None
+    accuracy: Optional[float] = None
+    ts: int  # timestamp in milliseconds
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class GlobalSettings(BaseModel):
+    _id: str = "global"
+    courier_rate_per_package: float = 20.0
+    business_commission_pct: float = 5.0
+    nearby_radius_m: int = 5000
+    courier_update_sec: int = 5
+    courier_timeout_sec: int = 10
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_by: Optional[str] = None
+
+class Earning(BaseModel):
+    courier_id: str
+    order_id: str
+    amount: float
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# MongoDB Index Definitions
+INDEXES = {
+    "businesses": [
+        {"location": "2dsphere"},  # Geospatial queries
+        {"owner_user_id": 1},
+        {"is_active": 1}
+    ],
+    "menu_items": [
+        {"business_id": 1},
+        {"is_available": 1},
+        {"business_id": 1, "is_available": 1}
+    ],
+    "orders": [
+        {"customer_id": 1},
+        {"business_id": 1}, 
+        {"courier_id": 1},
+        {"status": 1},
+        {"created_at": -1},
+        {"business_id": 1, "status": 1},
+        {"courier_id": 1, "status": 1}
+    ],
+    "courier_locations": [
+        {"courier_id": 1, "ts": -1},  # Latest first
+        {"point": "2dsphere"},  # Geospatial queries
+        {"created_at": -1}  # TTL index potential
+    ],
+    "earnings": [
+        {"courier_id": 1},
+        {"order_id": 1},
+        {"created_at": -1}
+    ]
+}
+
+# Status Transition Rules
+STATUS_TRANSITIONS = {
+    OrderStatus.CREATED: [OrderStatus.PREPARING, OrderStatus.CANCELLED],
+    OrderStatus.PREPARING: [OrderStatus.READY, OrderStatus.CANCELLED],
+    OrderStatus.READY: [OrderStatus.COURIER_PENDING, OrderStatus.CANCELLED],
+    OrderStatus.COURIER_PENDING: [OrderStatus.COURIER_ASSIGNED, OrderStatus.CANCELLED],
+    OrderStatus.COURIER_ASSIGNED: [OrderStatus.PICKED_UP, OrderStatus.COURIER_PENDING],
+    OrderStatus.PICKED_UP: [OrderStatus.DELIVERING],
+    OrderStatus.DELIVERING: [OrderStatus.DELIVERED],
+    OrderStatus.DELIVERED: [],  # Terminal state
+    OrderStatus.CANCELLED: []   # Terminal state
+}
+
+# Role-based transition permissions
+ROLE_TRANSITIONS = {
+    UserRole.BUSINESS: {
+        OrderStatus.CREATED: [OrderStatus.PREPARING],
+        OrderStatus.PREPARING: [OrderStatus.READY],
+        OrderStatus.READY: [OrderStatus.COURIER_PENDING]
+    },
+    UserRole.COURIER: {
+        OrderStatus.COURIER_PENDING: [OrderStatus.COURIER_ASSIGNED],
+        OrderStatus.COURIER_ASSIGNED: [OrderStatus.PICKED_UP],
+        OrderStatus.PICKED_UP: [OrderStatus.DELIVERING],
+        OrderStatus.DELIVERING: [OrderStatus.DELIVERED]
+    },
+    UserRole.ADMIN: {
+        # Admin can transition between any valid states
+        **STATUS_TRANSITIONS
+    }
+}
+
 from pydantic import BaseModel, Field, EmailStr, validator
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime, timezone
