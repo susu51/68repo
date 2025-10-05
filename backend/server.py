@@ -5243,4 +5243,11 @@ async def get_business_statistics(current_user: dict = Depends(get_admin_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving business statistics: {str(e)}")
 
+# Include Route Modules - Phase 2 Implementation
+from routes.business import router as business_router
+from routes.nearby import router as nearby_router
+
+api_router.include_router(business_router)
+api_router.include_router(nearby_router)
+
 app.include_router(api_router)
