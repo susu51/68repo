@@ -12,6 +12,7 @@ const OpenStreetMap = ({
   const mapRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [directionsVisible, setDirectionsVisible] = useState(false);
+  const [routeData, setRouteData] = useState(null);
 
   useEffect(() => {
     // Initialize map with vanilla JavaScript (no React-leaflet dependency)
