@@ -121,8 +121,7 @@ class KYCApprovalTester:
             response = requests.get(f"{BACKEND_URL}/admin/couriers?kyc_status=pending", headers=headers)
             
             if response.status_code == 200:
-                data = response.json()
-                couriers = data.get("couriers", [])
+                couriers = response.json()  # API returns direct list
                 self.pending_couriers = couriers
                 
                 self.log_test(
