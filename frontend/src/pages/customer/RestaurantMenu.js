@@ -240,11 +240,11 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
             
             return (
               <Card key={item.id} className="group hover:shadow-2xl hover:scale-105 transition-all duration-300 border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
-                <div className="aspect-w-16 aspect-h-9">
+                <div className="relative">
                   <img 
                     src={item.image} 
                     alt={item.name}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-32 sm:h-40 md:h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
                 
