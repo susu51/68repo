@@ -122,20 +122,9 @@ const DiscoverPage = ({ user, onRestaurantSelect }) => {
   }, [sortMode, userLocation, selectedAddress]);
 
   const handleRestaurantClick = async (restaurant) => {
-    try {
-      setSelectedRestaurant(restaurant);
-      setLoading(true);
-
-      // Load restaurant products
-      const response = await axios.get(`${API}/api/businesses/${restaurant.id}/products`);
-      setRestaurantProducts(response.data || []);
-      
-    } catch (error) {
-      console.error('Error loading restaurant products:', error);
-      toast.error('Restoran menüsü yüklenemedi');
-      setRestaurantProducts([]);
-    } finally {
-      setLoading(false);
+    // Call parent component's handler to navigate to restaurant menu page
+    if (onRestaurantSelect) {
+      onRestaurantSelect(restaurant);
     }
   };
 
