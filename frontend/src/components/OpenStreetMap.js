@@ -24,8 +24,39 @@ const OpenStreetMap = ({
   useEffect(() => {
     if (mapInstance) {
       updateMapMarkers();
+      // Fetch route if courier location and delivery markers exist
+      if (courierLocation && markers.length > 0) {
+        fetchRouteData();
+      }
     }
   }, [markers, courierLocation, mapInstance]);
+
+  const fetchRouteData = async () => {
+    if (!courierLocation || markers.length === 0) return;
+    
+    try {
+      // Use the first delivery marker as destination
+      const destination = markers.find(m => m.type === 'delivery') || markers[0];
+      
+      // OSRM API for route calculation (free)
+      const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${courierLocation.lng},${courierLocation.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson`;
+      
+      const response = await fetch(osrmUrl);
+      const data = await response.json();
+      
+      if (data.routes && data.routes.length > 0) {
+        const route = data.routes[0];
+        setRouteData({
+          coordinates: route.geometry.coordinates,
+          distance: route.distance, // meters
+          duration: route.duration  // seconds
+        });
+      }
+    } catch (error) {
+      console.error('Route fetch error:', error);
+      setRouteData(null);
+    }
+  };
 
   const initializeMap = () => {
     const mapContainer = mapRef.current;
