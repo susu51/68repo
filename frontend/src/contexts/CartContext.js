@@ -245,22 +245,53 @@ export function CartProvider({ children }) {
     return item ? item.quantity : 0;
   };
 
-  const value = {
+  // Memoize all functions to prevent unnecessary re-renders
+  const addToCartMemo = React.useCallback(addToCart, [cart]);
+  const removeFromCartMemo = React.useCallback(removeFromCart, []);
+  const updateQuantityMemo = React.useCallback(updateQuantity, []);
+  const clearCartMemo = React.useCallback(clearCart, []);
+  const setRestaurantMemo = React.useCallback(setRestaurant, [cart]);
+  const getItemCountMemo = React.useCallback(getItemCount, [cart]);
+  const getSubtotalMemo = React.useCallback(getSubtotal, [cart]);
+  const getDeliveryFeeMemo = React.useCallback(getDeliveryFee, [cart]);
+  const getServiceFeeMemo = React.useCallback(getServiceFee, [cart]);
+  const getTotalMemo = React.useCallback(getTotal, [cart]);
+  const getCartSummaryMemo = React.useCallback(getCartSummary, [cart]);
+  const isInCartMemo = React.useCallback(isInCart, [cart]);
+  const getItemQuantityMemo = React.useCallback(getItemQuantity, [cart]);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const value = React.useMemo(() => ({
     cart,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    setRestaurant,
-    getItemCount,
-    getSubtotal,
-    getDeliveryFee,
-    getServiceFee,
-    getTotal,
-    getCartSummary,
-    isInCart,
-    getItemQuantity
-  };
+    addToCart: addToCartMemo,
+    removeFromCart: removeFromCartMemo,
+    updateQuantity: updateQuantityMemo,
+    clearCart: clearCartMemo,
+    setRestaurant: setRestaurantMemo,
+    getItemCount: getItemCountMemo,
+    getSubtotal: getSubtotalMemo,
+    getDeliveryFee: getDeliveryFeeMemo,
+    getServiceFee: getServiceFeeMemo,
+    getTotal: getTotalMemo,
+    getCartSummary: getCartSummaryMemo,
+    isInCart: isInCartMemo,
+    getItemQuantity: getItemQuantityMemo
+  }), [
+    cart,
+    addToCartMemo,
+    removeFromCartMemo,
+    updateQuantityMemo,
+    clearCartMemo,
+    setRestaurantMemo,
+    getItemCountMemo,
+    getSubtotalMemo,
+    getDeliveryFeeMemo,
+    getServiceFeeMemo,
+    getTotalMemo,
+    getCartSummaryMemo,
+    isInCartMemo,
+    getItemQuantityMemo
+  ]);
 
   return (
     <CartContext.Provider value={value}>
