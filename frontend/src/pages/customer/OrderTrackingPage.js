@@ -290,25 +290,66 @@ const OrderTrackingPage = ({ orderId, onBack, user }) => {
         </div>
 
         {/* Courier Info */}
-        {order.courier_name && (
+        {(order.courier_name || order.courier_id) && (
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
                 <span className="text-2xl mr-3">🚴</span>
                 <div>
                   <p className="font-semibold">Kuryeniz</p>
-                  <p className="text-gray-600">{order.courier_name}</p>
+                  <p className="text-gray-600">{order.courier_name || 'Kurye atandı'}</p>
                 </div>
               </div>
-              {order.courier_location && (
-                <div className="text-right">
-                  <p className="text-sm text-green-600 font-medium">🟢 Aktif</p>
-                  <p className="text-xs text-gray-500">
-                    Son güncelleme: {formatTime(order.courier_location.last_updated)}
+              <div className="text-right">
+                {courierLocation ? (
+                  <div>
+                    <p className="text-sm text-green-600 font-medium">🟢 Canlı Konum</p>
+                    <p className="text-xs text-gray-500">
+                      {courierLocation.ts ? 
+                        new Date(courierLocation.ts).toLocaleTimeString('tr-TR', { 
+                          hour: '2-digit', 
+                          minute: '2-digit',
+                          second: '2-digit' 
+                        }) : 
+                        'Şimdi'
+                      }
+                    </p>
+                  </div>
+                ) : locationLoading ? (
+                  <p className="text-sm text-yellow-600">📡 Konum alınıyor...</p>
+                ) : ['picked_up', 'delivering'].includes(order.status) ? (
+                  <p className="text-sm text-gray-600">📍 Konum bekleniyor</p>
+                ) : (
+                  <p className="text-sm text-gray-500">📍 Henüz yolda değil</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Live Location Details */}
+            {courierLocation && ['picked_up', 'delivering'].includes(order.status) && (
+              <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-green-800">Kurye Konumu</p>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-700">Canlı</span>
+                  </div>
+                </div>
+                <div className="text-xs text-green-700 space-y-1">
+                  <p>Enlem: {courierLocation.lat?.toFixed(6)}</p>
+                  <p>Boylam: {courierLocation.lng?.toFixed(6)}</p>
+                  {courierLocation.accuracy && (
+                    <p>Hassasiyet: ±{courierLocation.accuracy.toFixed(0)}m</p>
+                  )}
+                  {courierLocation.speed && courierLocation.speed > 0 && (
+                    <p>Hız: {(courierLocation.speed * 3.6).toFixed(1)} km/s</p>
+                  )}
+                  <p className="text-xs text-green-600 mt-2">
+                    📡 {courierLocation.source === 'realtime' ? '5 saniyede bir güncelleniyor' : 'Son bilinen konum'}
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
