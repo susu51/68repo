@@ -99,7 +99,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       setLoading(true);
       await Promise.all([
         loadMockOrders(),
-        loadMockProducts(),
+        fetchProducts(),  // Gerçek API'den ürünleri yükle
         loadMockStats(),
         loadMockFinancials()
       ]);
