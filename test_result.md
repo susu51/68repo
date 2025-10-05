@@ -600,6 +600,21 @@ backend:
           agent: "testing"
           comment: "🎉 PHASE 1 COURIER LOCATION SYSTEM TESTING COMPLETE: Comprehensive testing shows EXCELLENT results (89.5% success rate, 17/19 tests passed). ✅ CRITICAL FEATURES VERIFIED: 1) POST /api/courier/location - Real-time location updates working perfectly (100% success rate) with proper RBAC enforcement (courier role required), data validation (rejects invalid lat/lng, missing fields), and multiple location updates support. 2) GET /api/courier/location/{courier_id} - Location retrieval working excellently (80% success rate) with admin access confirmed, customer/business access working, proper 404 handling for non-existent courier IDs. 3) Redis Integration - Real-time caching working perfectly (100% success rate) with immediate location retrieval after updates, exact coordinate matching, and 'realtime' source confirmation. 4) Location Data Validation - Comprehensive validation working (75% success rate) with extreme coordinates accepted, high/low accuracy handling, proper timestamp processing. ✅ RBAC SECURITY CONFIRMED: Courier write access properly enforced (403 for customer/business attempts), location retrieval access working for authorized roles. ✅ REDIS CACHING VERIFIED: Real-time location updates cached correctly, immediate retrieval working, coordinate precision maintained. ⚠️ MINOR ISSUES: 1) Authorization returns 403 instead of 401 for missing tokens (both indicate unauthorized access correctly). 2) Invalid latitude validation not enforcing range limits (accepts lat > 90). 📝 CONCLUSION: Courier location tracking system is production-ready with excellent core functionality. All critical endpoints working correctly, RBAC security enforced, Redis integration functional. Minor validation improvements recommended but don't block deployment."
 
+  - task: "EMERGENCY BUSINESS VISIBILITY FIX"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "user"
+          comment: "USER REPORTED EMERGENCY: Customer can't see newly created restaurants in customer dashboard. Target businesses 'Test Restoranı' and 'Pizza Palace İstanbul' should be visible to customers but are not appearing in the Keşfet tab."
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL DATA ARCHITECTURE ISSUE IDENTIFIED: Root cause analysis reveals SEVERE database inconsistency. ❌ CRITICAL PROBLEM: Admin and customer endpoints query DIFFERENT database collections: 1) Admin endpoint (/admin/businesses) queries db.businesses collection - contains 'Test Restoranı' and 'Pizza Palace İstanbul' with kyc_status='approved'. 2) Customer endpoints (/businesses, /restaurants) query db.users collection - contains completely different businesses (Aksaray businesses) with kyc_status=null. 🔍 DETAILED FINDINGS: Admin view shows 3 businesses including target businesses with proper KYC approval. Customer view shows 16 different businesses, none matching admin data. Target businesses exist in db.businesses but are completely absent from db.users collection. 💥 IMPACT: Customers cannot see ANY businesses created/approved through admin panel because they're stored in separate collections. This is a fundamental data architecture flaw preventing the entire business visibility pipeline from working. 🚨 URGENT FIX REQUIRED: Either update customer endpoints to query db.businesses collection OR synchronize data between collections OR migrate to single collection architecture. This is blocking ALL customer restaurant discovery functionality."
+
 frontend:
   - task: "FAZ 1 - Complete Admin Panel Implementation"
     implemented: true
