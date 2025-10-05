@@ -100,13 +100,20 @@ const CartPage = ({ onBack, onProceedToPayment, user }) => {
       return;
     }
 
-    // Pass cart data and totals to payment process
+    if (!selectedAddress) {
+      toast.error('Lütfen teslimat adresi seçin');
+      setShowAddressSelector(true);
+      return;
+    }
+
+    // Pass cart data, selected address and totals to payment process
     onProceedToPayment({
       cart,
       cartSummary,
       discount,
       appliedCoupon,
-      finalTotal
+      finalTotal,
+      selectedAddress
     });
   };
 
