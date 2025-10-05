@@ -413,28 +413,53 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
 
-      const newProduct = {
-        id: `PRD-${Date.now()}`,
-        ...productForm,
+      const productData = {
+        title: productForm.name,  // API expects 'title' not 'name'
+        description: productForm.description,
         price: parseFloat(productForm.price),
-        order_count: 0,
-        rating: 0,
-        created_at: new Date()
+        category: productForm.category,
+        preparation_time_minutes: parseInt(productForm.preparation_time || 15),
+        is_available: productForm.is_available,
+        photo_url: productForm.image_url,
+      };
+
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       };
 
       if (editingProduct) {
-        // Update existing
-        setProducts(prev => prev.map(p => p.id === editingProduct.id ? newProduct : p));
-        toast.success('Ürün güncellendi!');
+        // Update existing product
+        const response = await axios.patch(`${API}/business/menu/${editingProduct.id}`, productData, { headers });
+        
+        if (response.data) {
+          setProducts(prev => prev.map(p => p.id === editingProduct.id ? response.data : p));
+          toast.success('✅ Ürün başarıyla güncellendi!');
+        }
       } else {
-        // Add new
-        setProducts(prev => [...prev, newProduct]);
-        toast.success('Yeni ürün eklendi!');
+        // Add new product
+        const response = await axios.post(`${API}/business/menu`, productData, { headers });
+        
+        if (response.data) {
+          setProducts(prev => [...prev, response.data]);
+          toast.success('✅ Yeni ürün başarıyla eklendi!');
+        }
       }
 
       resetProductForm();
     } catch (error) {
-      toast.error('Ürün kaydedilemedi');
+      console.error('❌ Ürün kaydetme hatası:', error);
+      if (error.response?.status === 404) {
+        toast.error('İşletme kaydınız bulunamadı. Profil ayarlarınızı kontrol edin.');
+      } else if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Tekrar giriş yapın.');
+        onLogout();
+      } else if (error.response?.status === 403) {
+        toast.error('Bu işlem için yetkiniz bulunmuyor.');
+      } else {
+        toast.error('❌ Ürün kaydedilemedi. Tekrar deneyin.');
+      }
     }
   };
 
