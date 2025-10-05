@@ -106,10 +106,10 @@ async def update_order_status(
                     detail=f"Courier cannot modify order in status: {current_status}"
                 )
                 
-            if status_update.to_status not in COURIER_TRANSITIONS[current_status]:
+            if status_update.to not in COURIER_TRANSITIONS[current_status]:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid transition: {current_status} → {status_update.to_status}"
+                    detail=f"Invalid transition: {current_status} → {status_update.to}"
                 )
         else:
             raise HTTPException(
