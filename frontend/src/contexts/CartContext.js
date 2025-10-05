@@ -1,8 +1,23 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 
-// Cart Context
-const CartContext = createContext();
+// Cart Context with default value
+const CartContext = createContext({
+  cart: { items: [], restaurant: null },
+  addToCart: () => {},
+  removeFromCart: () => {},
+  updateQuantity: () => {},
+  clearCart: () => {},
+  setRestaurant: () => {},
+  getItemCount: () => 0,
+  getSubtotal: () => 0,
+  getDeliveryFee: () => 0,
+  getServiceFee: () => 0,
+  getTotal: () => 0,
+  getCartSummary: () => ({ itemCount: 0, subtotal: 0, deliveryFee: 0, serviceFee: 0, total: 0 }),
+  isInCart: () => false,
+  getItemQuantity: () => 0
+});
 
 // Cart Actions
 const CART_ACTIONS = {
