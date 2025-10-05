@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useCart } from '../../contexts/CartContext';
 
@@ -13,6 +13,39 @@ const CartPage = ({ onBack, onProceedToPayment, user }) => {
   
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
+
+  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+
+  // Load user addresses
+  useEffect(() => {
+    loadUserAddresses();
+  }, []);
+
+  const loadUserAddresses = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      if (!token) return;
+
+      const response = await fetch(`${API}/api/addresses`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const addresses = await response.json();
+        setUserAddresses(addresses || []);
+        
+        // Auto-select first address if available
+        if (addresses.length > 0 && !selectedAddress) {
+          setSelectedAddress(addresses[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading addresses:', error);
+    }
+  };
 
   const cartSummary = getCartSummary();
   const discount = appliedCoupon ? appliedCoupon.amount : 0;
