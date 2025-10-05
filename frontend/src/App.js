@@ -83,7 +83,7 @@ const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const login = (authData) => {
+  const login = React.useCallback((authData) => {
     if (!isMounted) return;
     
     try {
@@ -98,9 +98,9 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Login error:', error);
     }
-  };
+  }, [isMounted]);
 
-  const logout = () => {
+  const logout = React.useCallback(() => {
     if (!isMounted) return;
     
     try {
@@ -111,10 +111,18 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     }
-  };
+  }, [isMounted]);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = React.useMemo(() => ({
+    user,
+    login,
+    logout,
+    loading
+  }), [user, login, logout, loading]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
