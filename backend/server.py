@@ -5246,8 +5246,10 @@ async def get_business_statistics(current_user: dict = Depends(get_admin_user)):
 # Include Route Modules - Phase 2 Implementation
 from routes.business import router as business_router
 from routes.nearby import router as nearby_router
+from routes.orders import router as orders_router
 
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
+api_router.include_router(orders_router)
 
 app.include_router(api_router)
