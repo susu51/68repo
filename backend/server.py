@@ -1349,32 +1349,231 @@ async def get_business_stats(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Stats retrieval failed")
 
 @api_router.get("/business/orders/incoming")
-async def get_incoming_orders(current_user: dict = Depends(get_current_user)):
-    """Get incoming orders for business"""
-    if current_user.get("role") != "business":
-        raise HTTPException(status_code=403, detail="Business access required")
-    
+async def get_incoming_orders(current_user: dict = Depends(get_business_user)):
+    """Get incoming orders for business - real implementation"""
     try:
-        # Return mock incoming orders
-        mock_orders = [
-            {
-                "id": "ORD-001",
-                "customer_name": "Ahmet Yılmaz",
-                "customer_phone": "+90 532 123 4567",
-                "items": [
-                    {"name": "Chicken Burger", "quantity": 2, "price": 45.00},
-                    {"name": "Patates Kızartması", "quantity": 1, "price": 15.00}
-                ],
-                "total_amount": 105.00,
-                "delivery_address": {"address": "Kadıköy, Moda Cad. No:15"},
-                "status": "pending",
-                "created_at": datetime.now(timezone.utc).isoformat()
-            }
-        ]
+        business_id = current_user["id"]
         
-        return {"orders": mock_orders}
+        # Get orders for this business with status 'created' or 'confirmed'
+        orders_cursor = db.orders.find({
+            "business_id": business_id,
+            "status": {"$in": ["created", "confirmed", "preparing"]}
+        }).sort("created_at", -1)
+        
+        orders = await orders_cursor.to_list(length=None)
+        
+        # Format orders for business dashboard
+        formatted_orders = []
+        for order in orders:
+            # Get customer details
+            customer = await db.users.find_one({"id": order.get("customer_id")})
+            
+            formatted_order = {
+                "id": str(order.get("_id", order.get("id", ""))),
+                "order_id": order.get("id", str(order.get("_id", ""))),
+                "customer_name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip() if customer else "Müşteri",
+                "customer_phone": customer.get("phone", "") if customer else "",
+                "customer_email": customer.get("email", "") if customer else "",
+                "items": order.get("items", []),
+                "total_amount": order.get("total_amount", 0),
+                "delivery_address": order.get("delivery_address", ""),
+                "status": order.get("status", "created"),
+                "created_at": order.get("created_at").isoformat() if order.get("created_at") else "",
+                "notes": order.get("notes", ""),
+                "payment_method": order.get("payment_method", ""),
+                "payment_status": order.get("payment_status", "pending")
+            }
+            formatted_orders.append(formatted_order)
+        
+        return {"orders": formatted_orders}
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Orders retrieval failed")
+        print(f"Error fetching business orders: {e}")
+        raise HTTPException(status_code=500, detail=f"Orders retrieval failed: {str(e)}")
+
+@api_router.patch("/business/orders/{order_id}/status")
+async def update_business_order_status(
+    order_id: str,
+    status_data: dict,
+    current_user: dict = Depends(get_business_user)
+):
+    """Update order status by business (confirm, preparing, ready)"""
+    try:
+        new_status = status_data.get("status")
+        valid_business_statuses = ["confirmed", "preparing", "ready"]
+        
+        if new_status not in valid_business_statuses:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Invalid status. Business can set: {valid_business_statuses}"
+            )
+        
+        # Find order and verify it belongs to this business
+        from bson import ObjectId
+        try:
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["business_id"] != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Access denied - order belongs to different business")
+        
+        # Update order status with timestamp
+        update_data = {"status": new_status}
+        current_time = datetime.now(timezone.utc)
+        
+        if new_status == "confirmed":
+            update_data["confirmed_at"] = current_time
+        elif new_status == "preparing":
+            update_data["preparing_at"] = current_time
+        elif new_status == "ready":
+            update_data["ready_at"] = current_time
+            # Make order available for couriers
+            update_data["available_for_pickup"] = True
+        
+        # Update in database
+        try:
+            result = await db.orders.update_one(
+                {"_id": ObjectId(order_id)},
+                {"$set": update_data}
+            )
+        except:
+            result = await db.orders.update_one(
+                {"id": order_id},
+                {"$set": update_data}
+            )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found or no changes made")
+        
+        return {
+            "message": f"Order status updated to {new_status}",
+            "order_id": order_id,
+            "new_status": new_status,
+            "timestamp": current_time.isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating order status: {str(e)}")
+
+@api_router.get("/courier/orders/available")
+async def get_available_orders_for_courier(current_user: dict = Depends(get_courier_user)):
+    """Get orders ready for pickup by couriers"""
+    try:
+        courier_id = current_user["id"]
+        
+        # Get orders that are ready for pickup and not assigned to any courier
+        orders_cursor = db.orders.find({
+            "status": {"$in": ["ready", "picked_up"]},
+            "$or": [
+                {"courier_id": {"$exists": False}},
+                {"courier_id": None},
+                {"courier_id": courier_id}  # Include orders already assigned to this courier
+            ]
+        }).sort("ready_at", 1)  # Oldest ready orders first
+        
+        orders = await orders_cursor.to_list(length=None)
+        
+        # Format orders for courier dashboard
+        formatted_orders = []
+        for order in orders:
+            # Get business details
+            business = await db.businesses.find_one({"id": order.get("business_id")}) or \
+                      await db.users.find_one({"id": order.get("business_id")})
+            
+            # Get customer details
+            customer = await db.users.find_one({"id": order.get("customer_id")})
+            
+            formatted_order = {
+                "id": str(order.get("_id", order.get("id", ""))),
+                "order_id": order.get("id", str(order.get("_id", ""))),
+                "business_name": business.get("business_name") or business.get("name", "İşletme") if business else "İşletme",
+                "business_address": business.get("address", "") if business else "",
+                "customer_name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip() if customer else "Müşteri",
+                "customer_phone": customer.get("phone", "") if customer else "",
+                "delivery_address": order.get("delivery_address", ""),
+                "delivery_lat": order.get("delivery_lat"),
+                "delivery_lng": order.get("delivery_lng"),
+                "total_amount": order.get("total_amount", 0),
+                "status": order.get("status", "ready"),
+                "ready_at": order.get("ready_at").isoformat() if order.get("ready_at") else "",
+                "estimated_pickup_time": (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+                "payment_method": order.get("payment_method", ""),
+                "is_assigned_to_me": order.get("courier_id") == courier_id
+            }
+            formatted_orders.append(formatted_order)
+        
+        return {"orders": formatted_orders}
+        
+    except Exception as e:
+        print(f"Error fetching courier orders: {e}")
+        raise HTTPException(status_code=500, detail=f"Orders retrieval failed: {str(e)}")
+
+@api_router.patch("/courier/orders/{order_id}/pickup")
+async def pickup_order(
+    order_id: str,
+    current_user: dict = Depends(get_courier_user)
+):
+    """Courier picks up an order"""
+    try:
+        courier_id = current_user["id"]
+        
+        # Find order
+        from bson import ObjectId
+        try:
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            order = await db.orders.find_one({"id": order_id})
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["status"] != "ready":
+            raise HTTPException(status_code=400, detail="Order is not ready for pickup")
+        
+        # Check if order is already assigned to another courier
+        if order.get("courier_id") and order["courier_id"] != courier_id:
+            raise HTTPException(status_code=400, detail="Order already assigned to another courier")
+        
+        # Update order status to picked_up and assign courier
+        update_data = {
+            "status": "picked_up",
+            "courier_id": courier_id,
+            "picked_up_at": datetime.now(timezone.utc),
+            "assigned_at": datetime.now(timezone.utc)
+        }
+        
+        # Update in database
+        try:
+            result = await db.orders.update_one(
+                {"_id": ObjectId(order_id)},
+                {"$set": update_data}
+            )
+        except:
+            result = await db.orders.update_one(
+                {"id": order_id},
+                {"$set": update_data}
+            )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found or already picked up")
+        
+        return {
+            "message": "Order picked up successfully",
+            "order_id": order_id,
+            "courier_id": courier_id,
+            "pickup_time": update_data["picked_up_at"].isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error picking up order: {str(e)}")
 
 # Product Management Endpoints
 @api_router.post("/products")
