@@ -35,11 +35,46 @@ const OrderTrackingPage = ({ orderId, onBack, user }) => {
 
       const orderData = await response.json();
       setOrder(orderData);
+      
+      // If order has courier and is being delivered, fetch courier location
+      if (orderData.courier_id && ['picked_up', 'delivering'].includes(orderData.status)) {
+        fetchCourierLocation();
+      }
     } catch (error) {
       console.error('Order tracking error:', error);
       setError(error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCourierLocation = async () => {
+    try {
+      setLocationLoading(true);
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const token = localStorage.getItem('kuryecini_access_token');
+
+      const response = await fetch(`${BACKEND_URL}/api/orders/${orderId}/courier/location`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const locationData = await response.json();
+        if (locationData.courier_location) {
+          setCourierLocation(locationData.courier_location);
+        } else {
+          setCourierLocation(null);
+        }
+      } else {
+        setCourierLocation(null);
+      }
+    } catch (error) {
+      console.error('Courier location fetch error:', error);
+      setCourierLocation(null);
+    } finally {
+      setLocationLoading(false);
     }
   };
 
