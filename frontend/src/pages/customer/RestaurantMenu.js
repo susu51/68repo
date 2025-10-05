@@ -92,44 +92,43 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
         setLoading(false);
         return;
       }
-      
+
       try {
         setLoading(true);
-        const API = process.env.REACT_APP_BACKEND_URL || import.meta.env.VITE_REACT_APP_BACKEND_URL;
+        console.log(`Loading menu for business ID: ${restaurant.id}`);
         
-        const response = await fetch(`${API}/api/businesses/${restaurant.id}/products`);
+        // First try to get business products
+        const response = await axios.get(`${BACKEND_URL}/api/businesses/${restaurant.id}/products`);
+        console.log('API Response:', response.data);
         
-        if (response.ok) {
-          const products = await response.json();
-          console.log(`Loaded ${products.length} products for restaurant:`, restaurant.name);
-          
-          // Convert API format to component format
-          const convertedItems = products.map(product => ({
-            id: product.id,
-            name: product.name,
-            description: product.description || 'Lezzetli seçenek',
-            price: product.price || 0,
-            category: product.category?.toLowerCase().replace(/[^a-z]/g, '') || 'main',
-            image: product.image_url || `https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=300`,
-            availability: product.is_available !== false,
-            preparation_time: product.preparation_time_minutes || 15
-          }));
-          
-          setMenuItems(convertedItems);
+        if (response.data && response.data.length > 0) {
+          setMenuItems(response.data);
+          console.log(`Loaded ${response.data.length} real menu items`);
         } else {
-          console.error('Failed to load products:', response.status);
-          // Fallback to mock items if API fails
-          setMenuItems(mockMenuItems);
+          console.log('No products found, trying admin endpoint...');
+          
+          // Try admin products endpoint as fallback
+          const adminResponse = await axios.get(`${BACKEND_URL}/api/admin/products?business_id=${restaurant.id}`);
+          
+          if (adminResponse.data && adminResponse.data.length > 0) {
+            setMenuItems(adminResponse.data);
+            console.log(`Loaded ${adminResponse.data.length} products from admin endpoint`);
+          } else {
+            console.log('No products found anywhere - business may not have menu items');
+            setMenuItems([]);
+          }
         }
       } catch (error) {
         console.error('Error loading menu items:', error);
-        // Fallback to mock items if API fails
-        setMenuItems(mockMenuItems);
+        console.error('Error details:', error.response?.data);
+        
+        // Show empty menu instead of mock data
+        setMenuItems([]);
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadMenuItems();
   }, [restaurant?.id]);
 
