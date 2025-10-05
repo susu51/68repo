@@ -467,10 +467,32 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     if (!window.confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
     
     try {
-      setProducts(prev => prev.filter(p => p.id !== productId));
-      toast.success('Ürün silindi');
+      const token = localStorage.getItem('token');
+      const response = await axios.delete(`${API}/business/menu/${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200 || response.status === 204) {
+        setProducts(prev => prev.filter(p => p.id !== productId));
+        toast.success('✅ Ürün başarıyla silindi');
+      }
     } catch (error) {
-      toast.error('Ürün silinemedi');
+      console.error('❌ Ürün silme hatası:', error);
+      if (error.response?.status === 404) {
+        toast.error('Silinecek ürün bulunamadı.');
+        // Remove from local state anyway
+        setProducts(prev => prev.filter(p => p.id !== productId));
+      } else if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Tekrar giriş yapın.');
+        onLogout();
+      } else if (error.response?.status === 403) {
+        toast.error('Bu ürünü silme yetkiniz bulunmuyor.');
+      } else {
+        toast.error('❌ Ürün silinemedi. Tekrar deneyin.');
+      }
     }
   };
 
