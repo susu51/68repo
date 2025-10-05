@@ -18,6 +18,42 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
   const cartSummary = getCartSummary();
 
+  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+
+  // Load user addresses and set initial address
+  useEffect(() => {
+    loadUserAddresses();
+    console.log('PaymentPage - Initial address:', initialAddress);
+    if (initialAddress) {
+      setSelectedAddress(initialAddress);
+    }
+  }, [initialAddress]);
+
+  const loadUserAddresses = async () => {
+    try {
+      const token = localStorage.getItem('kuryecini_access_token');
+      if (!token) return;
+
+      const response = await fetch(`${API}/api/addresses`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const addresses = await response.json();
+        setUserAddresses(addresses || []);
+        console.log('Loaded addresses:', addresses);
+        
+        // If no address selected but addresses available, select first one
+        if (!selectedAddress && addresses.length > 0) {
+          setSelectedAddress(addresses[0]);
+          console.log('Auto-selected first address:', addresses[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading addresses:', error);
+    }
+  };
+
   const paymentMethods = [
     {
       id: 'cash_on_delivery',
