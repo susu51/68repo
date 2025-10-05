@@ -779,18 +779,12 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 {/* Map Section */}
                 <Card>
                   <CardContent className="p-0">
-                    <div style={{ height: '400px', width: '100%' }}>
-                      {typeof window !== 'undefined' && (
-                        <LeafletMap
-                          center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [41.0082, 28.9784]}
-                          zoom={13}
-                          height="400px"
-                          markers={mapMarkers || []}
-                          courierMode={true}
-                          routePolyline={routePolyline}
-                          className="rounded-lg w-full h-full"
-                        />
-                      )}
+                    <div style={{ height: '400px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
+                      <div className="text-center">
+                        <div className="text-4xl mb-2">🗺️</div>
+                        <p className="text-gray-600">Harita Yakında Eklenecek</p>
+                        <p className="text-sm text-gray-500">Konum takibi aktif</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
