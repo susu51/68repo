@@ -172,7 +172,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
   const updateLocationOnServer = async (location) => {
     try {
       const token = localStorage.getItem('kuryecini_access_token');
-      await axios.post(`${API}/courier/location/update`, location, {
+      await axios.post(`${API}/courier/location`, location, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (error) {
