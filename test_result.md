@@ -1010,9 +1010,7 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Phase 2 - Business Menu CRUD Operations"
-    - "Phase 2 - Geospatial Nearby Businesses Discovery"
-    - "Phase 2 - Customer Order Creation System"
+    - "PHASE 3 - İşletme Durum Akışı & Kurye Sistemi"
   stuck_tasks:
     - "EMERGENCY BUSINESS VISIBILITY FIX"
   test_all: false
