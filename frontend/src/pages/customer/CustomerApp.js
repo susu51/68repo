@@ -32,6 +32,9 @@ export const CustomerApp = ({ user, onLogout }) => {
 
   const handleProceedToPayment = (cartData) => {
     console.log('Proceeding to payment with cart data:', cartData);
+    if (cartData.selectedAddress) {
+      setSelectedAddress(cartData.selectedAddress);
+    }
     setActiveView('payment');
   };
 
