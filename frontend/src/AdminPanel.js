@@ -500,25 +500,31 @@ const AdminPanel = ({ user, onLogout }) => {
                   <div className="flex justify-between items-center py-2 border-b">
                     <div>
                       <p className="font-medium">İşletme KYC</p>
-                      <p className="text-sm text-gray-600">3 bekleyen başvuru</p>
+                      <p className="text-sm text-gray-600">{pendingBusinesses.length} bekleyen başvuru</p>
                     </div>
-                    <button className="text-blue-600 hover:text-blue-800">
+                    <button 
+                      onClick={() => setCurrentView('business-kyc')}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
                       Görüntüle →
                     </button>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b">
                     <div>
                       <p className="font-medium">Kurye KYC</p>
-                      <p className="text-sm text-gray-600">7 bekleyen başvuru</p>
+                      <p className="text-sm text-gray-600">{pendingCouriers.length} bekleyen başvuru</p>
                     </div>
-                    <button className="text-blue-600 hover:text-blue-800">
+                    <button 
+                      onClick={() => setCurrentView('courier-kyc')}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
                       Görüntüle →
                     </button>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <div>
                       <p className="font-medium">Promosyonlar</p>
-                      <p className="text-sm text-gray-600">2 aktif kampanya</p>
+                      <p className="text-sm text-gray-600">{promotions.length} toplam kampanya</p>
                     </div>
                     <button className="text-blue-600 hover:text-blue-800">
                       Yönet →
