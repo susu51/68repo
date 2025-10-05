@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useCart } from '../../contexts/CartContext';
 
-const PaymentPage = ({ selectedAddress, onBack, onPaymentSuccess, user }) => {
+const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess, user }) => {
+  const [selectedAddress, setSelectedAddress] = useState(initialAddress);
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
   const { cart, getCartSummary, clearCart } = useCart();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash_on_delivery');
   const [processing, setProcessing] = useState(false);
