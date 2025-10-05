@@ -226,7 +226,7 @@ export const CustomerApp = ({ user, onLogout }) => {
       {/* Debug Info - Remove in production */}
       {process.env.NODE_ENV === 'development' && (
         <div className="fixed top-4 right-4 bg-black text-white p-2 rounded text-xs z-50 opacity-70">
-          View: {activeView} | Cart: {cart.items.length} items
+          View: {activeView} | Cart: {cart?.items?.length || 0} items
         </div>
       )}
     </div>
