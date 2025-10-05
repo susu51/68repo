@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
 import { toast } from 'react-hot-toast';
+import { useCart } from '../../contexts/CartContext';
 
-const CartPage = ({ cartItems, orderTotal, onUpdateCart, onRemoveFromCart, onTabChange, user }) => {
+const CartPage = ({ onBack, onProceedToPayment, user }) => {
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod' | 'online'
