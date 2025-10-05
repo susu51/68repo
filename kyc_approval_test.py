@@ -483,6 +483,54 @@ class KYCApprovalTester:
         except Exception as e:
             self.log_test("Invalid Data Handling", False, "", str(e))
     
+    def create_test_data(self):
+        """Create test businesses and couriers with pending status"""
+        try:
+            # Create test business
+            business_data = {
+                "email": f"test-business-{int(time.time())}@kyc-test.com",
+                "password": "testpass123",
+                "business_name": "KYC Test Restaurant",
+                "tax_number": "1234567890",
+                "address": "Test Address, Istanbul",
+                "city": "İstanbul",
+                "business_category": "gida",
+                "description": "Test restaurant for KYC approval testing"
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/register/business", json=business_data)
+            if response.status_code == 200:
+                self.log_test(
+                    "Create Test Business",
+                    True,
+                    "Test business created successfully for KYC testing"
+                )
+            
+            # Create test courier
+            courier_data = {
+                "email": f"test-courier-{int(time.time())}@kyc-test.com",
+                "password": "testpass123",
+                "first_name": "Test",
+                "last_name": "Courier",
+                "iban": "TR123456789012345678901234",
+                "vehicle_type": "motor",
+                "vehicle_model": "Honda CBR",
+                "license_class": "A2",
+                "license_number": "TEST123456",
+                "city": "İstanbul"
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/register/courier", json=courier_data)
+            if response.status_code == 200:
+                self.log_test(
+                    "Create Test Courier",
+                    True,
+                    "Test courier created successfully for KYC testing"
+                )
+                
+        except Exception as e:
+            self.log_test("Create Test Data", False, "", str(e))
+
     def run_comprehensive_test(self):
         """Run comprehensive KYC approval system test"""
         print("🎯 STARTING KYC APPROVAL SYSTEM TESTING")
@@ -498,6 +546,10 @@ class KYCApprovalTester:
         # Also authenticate other users for RBAC testing
         self.authenticate_user("customer")
         self.authenticate_user("business")
+        
+        # Step 1.5: Create test data
+        print("\n📋 STEP 1.5: CREATING TEST DATA")
+        self.create_test_data()
         
         # Step 2: Get pending businesses and couriers
         print("\n📋 STEP 2: DATA FETCHING TESTING")
