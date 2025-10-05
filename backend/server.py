@@ -3155,6 +3155,7 @@ async def get_all_couriers_admin(
     status: Optional[str] = None,
     city: Optional[str] = None,
     search: Optional[str] = None,
+    kyc_status: Optional[str] = None,  # KYC status filter eklendi
     current_user: dict = Depends(get_admin_user)
 ):
     """Get all couriers for admin management with filtering"""
