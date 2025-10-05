@@ -2952,20 +2952,13 @@ const BusinessDashboard = ({ user }) => {
                 <CardTitle>Teslimat Haritası</CardTitle>
               </CardHeader>
               <CardContent>
-                <LeafletMap
-                  center={[39.925533, 32.866287]}
-                  zoom={12}
-                  height="500px"
-                  markers={orders.filter(order => order.delivery_lat && order.delivery_lng).map(order => ({
-                    lat: order.delivery_lat,
-                    lng: order.delivery_lng,
-                    type: 'delivery',
-                    popup: true,
-                    title: `Sipariş #${order.id.slice(-8)}`,
-                    description: order.customer_name,
-                    address: order.delivery_address
-                  }))}
-                />
+                <div style={{ height: '500px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">🗺️</div>
+                    <p className="text-gray-600">Harita Yakında Eklenecek</p>
+                    <p className="text-sm text-gray-500">Teslimat noktaları için</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
