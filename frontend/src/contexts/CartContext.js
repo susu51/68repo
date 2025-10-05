@@ -149,9 +149,20 @@ export function CartProvider({ children }) {
     loadCartFromDB();
   }, []);
 
-  // Save cart to localStorage whenever cart changes
+  // Save cart to DB whenever cart changes (debounced)
   useEffect(() => {
-    localStorage.setItem('kuryecini_cart', JSON.stringify(cart));
+    const saveCartToDB = async () => {
+      try {
+        await CartAPI.saveCart(cart);
+        console.log('✅ Cart auto-saved to DB');
+      } catch (error) {
+        console.error('❌ Error auto-saving cart to DB:', error);
+      }
+    };
+
+    // Debounce cart saves (wait 1 second after last change)
+    const timer = setTimeout(saveCartToDB, 1000);
+    return () => clearTimeout(timer);
   }, [cart]);
 
   // Cart utility functions
