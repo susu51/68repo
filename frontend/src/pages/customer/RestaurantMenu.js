@@ -134,10 +134,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
     ? menuItems 
     : menuItems.filter(item => item.category === selectedCategory);
 
-  const getItemQuantityInCart = (itemId) => {
-    const item = cartItems.find(cartItem => cartItem.id === itemId);
-    return item ? item.quantity : 0;
-  };
+  const cartSummary = getCartSummary();
 
   if (loading) {
     return (
