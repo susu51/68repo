@@ -374,8 +374,55 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 # Create a router with the /api prefix and comprehensive tagging
 api_router = APIRouter(
     prefix="/api",
-    responses={404: {"description": "Not found"}},
+    responses={
+        404: {"description": "Not found"},
+        500: {"description": "Internal server error"}
+    }
 )
+
+# Health Check Endpoint
+@api_router.get("/health")
+async def health_check():
+    """Database and system health check - Real DB only"""
+    try:
+        # Test MongoDB connection
+        await db.command("ping")
+        
+        # Check settings collection
+        settings = await db.settings.find_one({"_id": "global"})
+        
+        # Test Redis if available
+        redis_status = "not_configured"
+        if redis_client:
+            try:
+                redis_client.ping()
+                redis_status = "connected"
+            except:
+                redis_status = "disconnected"
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "database": {
+                "mongodb": "connected",
+                "collections": ["businesses", "menu_items", "orders", "courier_locations", "earnings", "settings"],
+                "settings_initialized": bool(settings)
+            },
+            "cache": {
+                "redis": redis_status
+            },
+            "environment": {
+                "nearby_radius_m": int(os.getenv('NEARBY_RADIUS_M', 5000)),
+                "courier_rate_per_package": float(os.getenv('COURIER_RATE_PER_PACKAGE', 20)),
+                "business_commission_pct": float(os.getenv('BUSINESS_COMMISSION_PCT', 5))
+            }
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy", 
+            "error": str(e),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
 
 # Security
 # JWT Configuration - Real Secret Required
