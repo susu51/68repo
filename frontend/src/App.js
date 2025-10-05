@@ -4642,7 +4642,8 @@ function App() {
             },
           }}
         />
-      </div>
+        </div>
+      </CartProvider>
     </AuthProvider>
   );
 }
