@@ -129,7 +129,7 @@ async def update_order_status(
         
         # Atomic update with CAS
         update_data = {
-            "status": status_update.to_status,
+            "status": status_update.to,
             "updated_at": datetime.now(timezone.utc),
             "updated_by": current_user["id"],
             "updated_by_role": user_role
