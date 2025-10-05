@@ -1420,14 +1420,10 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                           <span className="text-lg font-bold text-green-700">₺{product.price}</span>
                           <div className="flex items-center space-x-2">
                             <Button
-                              onClick={() => {
-                                const newPrice = prompt(`${product.name} için yeni fiyat:`, product.price);
+                              onClick={async () => {
+                                const newPrice = prompt(`${product.name || product.title} için yeni fiyat:`, product.price);
                                 if (newPrice && !isNaN(newPrice)) {
-                                  // Update price
-                                  setProducts(prev => prev.map(p => 
-                                    p.id === product.id ? { ...p, price: parseFloat(newPrice) } : p
-                                  ));
-                                  toast.success('Fiyat güncellendi (Demo)');
+                                  await updateProductPrice(product.id, newPrice);
                                 }
                               }}
                               variant="outline"
