@@ -600,7 +600,9 @@ class KYCApprovalTester:
                     if success:
                         self.verify_courier_status_update(courier_id, "rejected")
         else:
-            print("⚠️  No pending couriers found for testing")
+            # If no pending couriers, let's test with existing ones
+            print("⚠️  No pending couriers found. Testing with existing couriers...")
+            self.test_with_existing_couriers()
         
         # Step 5: Test RBAC security
         print("\n📋 STEP 5: RBAC SECURITY TESTING")
