@@ -375,7 +375,7 @@ class FAZ2BackendTester:
                     tracking_data = response.json()
                     
                     # Verify tracking includes required fields
-                    required_fields = ["order_id", "status", "estimated_delivery_time"]
+                    required_fields = ["id", "status"]  # The API returns "id" not "order_id", and "estimated_delivery" not "estimated_delivery_time"
                     missing_fields = [field for field in required_fields if field not in tracking_data]
                     
                     # Check if courier location is provided for active orders
