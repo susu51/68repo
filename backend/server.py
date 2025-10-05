@@ -27,6 +27,12 @@ import redis
 import asyncio
 import time
 
+# Import real database models
+from models import (
+    OrderStatus, UserRole, Business, MenuItem, Order, CourierLocation,
+    GlobalSettings, Earning, INDEXES, STATUS_TRANSITIONS, ROLE_TRANSITIONS
+)
+
 # Import logging configuration
 from logging_config import get_loggers, log_health_check
 import logging
