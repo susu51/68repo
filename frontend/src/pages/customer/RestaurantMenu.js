@@ -269,17 +269,17 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                       🛒 Sepete Ekle
                     </Button>
                   ) : (
-                    <div className="flex items-center justify-between bg-orange-50 rounded-xl p-3">
+                    <div className="flex items-center justify-between bg-orange-50 rounded-xl p-2 md:p-3">
                       <Button 
                         onClick={() => addToCart(item, -1)}
-                        className="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-0"
+                        className="w-8 h-8 md:w-10 md:h-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-0 text-sm md:text-base touch-manipulation"
                       >
                         -
                       </Button>
-                      <span className="text-lg font-bold text-orange-600">{quantityInCart}</span>
+                      <span className="text-base md:text-lg font-bold text-orange-600 mx-2">{quantityInCart}</span>
                       <Button 
                         onClick={() => addToCart(item, 1)}
-                        className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full p-0"
+                        className="w-8 h-8 md:w-10 md:h-10 bg-green-500 hover:bg-green-600 text-white rounded-full p-0 text-sm md:text-base touch-manipulation"
                       >
                         +
                       </Button>
