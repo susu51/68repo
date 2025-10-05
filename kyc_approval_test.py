@@ -652,6 +652,106 @@ class KYCApprovalTester:
                 print(f"   🔥 {failure['test']}: {failure['error']}")
         
         print(f"\n⏰ Test completed at: {datetime.now().isoformat()}")
+    
+    def test_with_existing_businesses(self):
+        """Test KYC approval with existing businesses by first setting them to pending"""
+        try:
+            headers = {"Authorization": f"Bearer {self.tokens['admin']}"}
+            
+            # Get all businesses
+            response = requests.get(f"{BACKEND_URL}/admin/businesses", headers=headers)
+            if response.status_code == 200:
+                all_businesses = response.json()
+                
+                if all_businesses:
+                    # Take first business and set it to pending for testing
+                    test_business = all_businesses[0]
+                    business_id = test_business.get("id")
+                    
+                    # Set to pending first
+                    payload = {"kyc_status": "pending"}
+                    response = requests.patch(
+                        f"{BACKEND_URL}/admin/businesses/{business_id}/status",
+                        headers=headers,
+                        json=payload
+                    )
+                    
+                    if response.status_code == 200:
+                        self.log_test(
+                            f"Set Business to Pending - {business_id}",
+                            True,
+                            f"Business {test_business.get('business_name')} set to pending for testing"
+                        )
+                        
+                        # Now test approval
+                        success = self.approve_business_kyc(business_id)
+                        if success:
+                            self.verify_business_status_update(business_id, "approved")
+                        
+                        # Test rejection with another business if available
+                        if len(all_businesses) > 1:
+                            second_business = all_businesses[1]
+                            second_id = second_business.get("id")
+                            
+                            # Set to pending
+                            response = requests.patch(
+                                f"{BACKEND_URL}/admin/businesses/{second_id}/status",
+                                headers=headers,
+                                json={"kyc_status": "pending"}
+                            )
+                            
+                            if response.status_code == 200:
+                                success = self.reject_business_kyc(second_id, "Test rejection for comprehensive testing")
+                                if success:
+                                    self.verify_business_status_update(second_id, "rejected")
+                    
+        except Exception as e:
+            self.log_test("Test with Existing Businesses", False, "", str(e))
+    
+    def test_with_existing_couriers(self):
+        """Test KYC approval with existing couriers"""
+        try:
+            headers = {"Authorization": f"Bearer {self.tokens['admin']}"}
+            
+            # Get all couriers
+            response = requests.get(f"{BACKEND_URL}/admin/couriers", headers=headers)
+            if response.status_code == 200:
+                all_couriers = response.json()
+                
+                if all_couriers:
+                    # Take first courier and set it to pending for testing
+                    test_courier = all_couriers[0]
+                    courier_id = test_courier.get("id")
+                    
+                    # Set to pending first
+                    payload = {"kyc_status": "pending"}
+                    response = requests.patch(
+                        f"{BACKEND_URL}/admin/couriers/{courier_id}/status",
+                        headers=headers,
+                        json=payload
+                    )
+                    
+                    if response.status_code == 200:
+                        self.log_test(
+                            f"Set Courier to Pending - {courier_id}",
+                            True,
+                            f"Courier {test_courier.get('first_name', '')} {test_courier.get('last_name', '')} set to pending for testing"
+                        )
+                        
+                        # Now test approval
+                        success = self.approve_courier_kyc(courier_id)
+                        if success:
+                            self.verify_courier_status_update(courier_id, "approved")
+                else:
+                    self.log_test(
+                        "No Couriers Available",
+                        False,
+                        "No couriers found in system for testing",
+                        "Consider creating test courier data"
+                    )
+                    
+        except Exception as e:
+            self.log_test("Test with Existing Couriers", False, "", str(e))
 
 def main():
     """Main test execution"""
