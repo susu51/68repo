@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useCart } from '../../contexts/CartContext';
+import axios from 'axios';
 
 const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
   const { cart, addToCart, getItemQuantity, setRestaurant, getCartSummary } = useCart();
