@@ -8,6 +8,8 @@ from typing import List, Optional
 from datetime import datetime
 import uuid
 from models import MenuItem, UserRole
+import sys
+sys.path.append('..')  # Add parent directory to path
 
 router = APIRouter(prefix="/business", tags=["business"])
 
