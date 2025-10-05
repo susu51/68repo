@@ -397,7 +397,7 @@ async def api_health_check():
             try:
                 redis_client.ping()
                 redis_status = "connected"
-            except:
+            except Exception:
                 redis_status = "disconnected"
         
         return {
