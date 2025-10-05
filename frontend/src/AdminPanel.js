@@ -411,8 +411,10 @@ const AdminPanel = ({ user, onLogout }) => {
               { id: 'dashboard', label: '📊 Dashboard' },
               { id: 'orders', label: '📦 Siparişler' },
               { id: 'businesses', label: '🏪 İşletmeler' },
-              { id: 'menus', label: '📋 Menü Yönetimi' },
+              { id: 'business-kyc', label: '✅ İşletme KYC' },
               { id: 'couriers', label: '🚴 Kuryeler' },
+              { id: 'courier-kyc', label: '✅ Kurye KYC' },
+              { id: 'menus', label: '📋 Menü Yönetimi' },
               { id: 'promotions', label: '🎯 Promosyonlar' },
               { id: 'settings', label: '⚙️ Ayarlar' },
               { id: 'reports', label: '📈 Raporlar' }
