@@ -249,7 +249,7 @@ async def update_menu_item(
 @router.delete("/menu/{item_id}")
 async def delete_menu_item(
     item_id: str,
-    current_user: dict = Depends(require_role(UserRole.BUSINESS))
+    current_user: dict = Depends(get_business_user)
 ):
     """Delete menu item - Business can only delete their own items"""
     try:
