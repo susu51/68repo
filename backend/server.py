@@ -387,7 +387,7 @@ if not JWT_SECRET or JWT_SECRET == "change_me_to_strong_secret_key":
 JWT_SECRET_KEY = JWT_SECRET  # Keep backward compatibility
 JWT_REFRESH_SECRET_KEY = os.getenv("JWT_REFRESH_SECRET_KEY", f"{JWT_SECRET}_refresh")
 ALGORITHM = "HS256"
-print(f"🔐 JWT Authentication configured")
+print("🔐 JWT Authentication configured")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TTL_MIN", 15))  # Short-lived
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("JWT_REFRESH_TTL_DAY", 7))  # Long-lived
 security = HTTPBearer()
