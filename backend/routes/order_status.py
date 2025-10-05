@@ -8,7 +8,7 @@ from typing import Optional, List
 from datetime import datetime, timezone
 import uuid
 from models import OrderStatus
-from auth_dependencies import get_business_user, get_courier_user
+from auth_dependencies import get_business_user, get_courier_user, get_current_user
 
 router = APIRouter(prefix="/orders", tags=["order-status"])
 
