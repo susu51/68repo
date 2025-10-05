@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
+import CartAPI from '../utils/cartAPI';
 
 // Cart Context with default value
 const CartContext = createContext({
