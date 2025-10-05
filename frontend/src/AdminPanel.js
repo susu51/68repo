@@ -11,24 +11,130 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
-      const response = await fetch(`/api/admin/users/${businessId}/approve`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          kyc_status: 'approved'
+        })
       });
       
       if (response.ok) {
-        alert('İşletme başarıyla onaylandı!');
-        // Refresh data in real implementation
+        alert('✅ İşletme KYC başarıyla onaylandı!');
+        await fetchPendingBusinesses(); // Refresh data
       } else {
-        alert('Onaylama başarısız!');
+        const errorData = await response.json();
+        alert(`❌ Onaylama başarısız: ${errorData.detail || 'Bilinmeyen hata'}`);
       }
     } catch (error) {
-      console.error('Approval error:', error);
-      alert('Hata oluştu!');
+      console.error('Business approval error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Business rejection handler
+  const handleBusinessReject = async (businessId, reason = '') => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          kyc_status: 'rejected',
+          rejection_reason: reason || 'Belgelerde eksiklik veya hata tespit edildi'
+        })
+      });
+      
+      if (response.ok) {
+        alert('✅ İşletme KYC reddedildi!');
+        await fetchPendingBusinesses(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Red işlemi başarısız: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Business rejection error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Courier approval handler
+  const handleCourierApprove = async (courierId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/couriers/${courierId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          kyc_status: 'approved'
+        })
+      });
+      
+      if (response.ok) {
+        alert('✅ Kurye KYC başarıyla onaylandı!');
+        await fetchPendingCouriers(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Onaylama başarısız: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Courier approval error:', error);
+      alert('❌ Ağ hatası oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Courier rejection handler
+  const handleCourierReject = async (courierId, reason = '') => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('kuryecini_access_token');
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const response = await fetch(`${BACKEND_URL}/api/admin/couriers/${courierId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          kyc_status: 'rejected',
+          rejection_reason: reason || 'Belgeler yetersiz veya hatalı'
+        })
+      });
+      
+      if (response.ok) {
+        alert('✅ Kurye KYC reddedildi!');
+        await fetchPendingCouriers(); // Refresh data
+      } else {
+        const errorData = await response.json();
+        alert(`❌ Red işlemi başarısız: ${errorData.detail || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Courier rejection error:', error);
+      alert('❌ Ağ hatası oluştu!');
     } finally {
       setLoading(false);
     }
