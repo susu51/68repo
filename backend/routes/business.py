@@ -3,15 +3,50 @@ Business Menu CRUD Routes - Real Database Only
 Phase 2: Business & Customer Implementation
 """
 from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 import uuid
+import jwt
+import os
 from models import MenuItem, UserRole
-import sys
-sys.path.append('..')  # Add parent directory to path
 
 router = APIRouter(prefix="/business", tags=["business"])
+security = HTTPBearer()
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verify JWT token and return user data"""
+    try:
+        token = credentials.credentials
+        secret_key = os.environ.get("JWT_SECRET", "kuryecini_secret_key_2024")
+        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+        
+        from server import db
+        user_id = payload.get("sub")
+        user = await db.users.find_one({"_id": user_id})
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+            
+        return {
+            "id": user["_id"],
+            "email": user["email"],
+            "role": user["role"]
+        }
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def get_business_user(current_user: dict = Depends(get_current_user)):
+    """Require business role"""
+    if current_user.get("role") != "business":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Business access required"
+        )
+    return current_user
 
 # Request/Response Models
 class MenuItemCreate(BaseModel):
