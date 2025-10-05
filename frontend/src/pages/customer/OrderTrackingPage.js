@@ -5,6 +5,8 @@ const OrderTrackingPage = ({ orderId, onBack, user }) => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [courierLocation, setCourierLocation] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const orderStatuses = {
     'created': { label: 'Sipariş Alındı', icon: '📝', color: 'text-blue-600', bgColor: 'bg-blue-100' },
