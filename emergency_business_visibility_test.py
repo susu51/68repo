@@ -248,7 +248,8 @@ class EmergencyBusinessVisibilityTester:
                 details = f"Customer sees {restaurant_count} restaurants, {len(valid_restaurants)} approved"
                 
                 if target_restaurants:
-                    details += f", Target restaurants: {[f\"{r['name']} (status: {r['kyc_status']})\" for r in target_restaurants]}"
+                    target_info = [f"{r['name']} (status: {r['kyc_status']})" for r in target_restaurants]
+                    details += f", Target restaurants: {target_info}"
                 else:
                     details += ", TARGET RESTAURANTS NOT VISIBLE TO CUSTOMER"
                 
