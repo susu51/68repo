@@ -5025,6 +5025,7 @@ async def get_all_businesses_admin(
     city: Optional[str] = None, 
     search: Optional[str] = None,
     status: Optional[str] = None,
+    kyc_status: Optional[str] = None,  # KYC status filter eklendi
     current_user: dict = Depends(get_current_user)
 ):
     """Get all businesses for admin management with filtering"""
