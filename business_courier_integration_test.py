@@ -616,7 +616,8 @@ class BusinessCourierIntegrationTester:
         # Step 5: Test role-based access control
         self.test_rbac_access_control()
         
-        # Step 6: Test complete E2E flow
+        # Step 6: Test complete E2E flow (with small delay for data consistency)
+        time.sleep(2)
         self.test_complete_e2e_flow()
         
         # Step 7: Test data flow validation
