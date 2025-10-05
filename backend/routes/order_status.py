@@ -183,13 +183,4 @@ async def update_order_status(
         )
 
 
-# Override endpoint for courier access
-@router.patch("/{order_id}/status")
-async def update_order_status_courier(
-    order_id: str,
-    status_update: OrderStatusUpdate,
-    current_user: dict = Depends(get_courier_user)  # Courier version
-):
-    """Courier version of status update - same logic but with courier dependency"""
-    # Use the same function but with courier user
-    return await update_order_status(order_id, status_update, current_user)
+# No need for separate courier endpoint - single endpoint handles both roles
