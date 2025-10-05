@@ -956,10 +956,11 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Phase 2 - Comprehensive Frontend Testing Complete"
-  stuck_tasks: []
+    - "EMERGENCY BUSINESS VISIBILITY FIX"
+  stuck_tasks:
+    - "EMERGENCY BUSINESS VISIBILITY FIX"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
     -agent: "main"
