@@ -5086,6 +5086,10 @@ async def get_all_businesses_admin(
             elif status == "approved":
                 query_filter["kyc_status"] = "approved"
         
+        # KYC status filter (direct KYC filtering)
+        if kyc_status:
+            query_filter["kyc_status"] = kyc_status
+        
         # Fetch businesses
         businesses = await db.businesses.find(query_filter).to_list(length=None)
         
