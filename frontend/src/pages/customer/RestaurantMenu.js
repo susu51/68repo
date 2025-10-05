@@ -234,7 +234,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredItems.map(item => {
-            const quantityInCart = getItemQuantityInCart(item.id);
+            const quantityInCart = getItemQuantity(item.id);
             
             return (
               <Card key={item.id} className="group hover:shadow-2xl hover:scale-105 transition-all duration-300 border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
@@ -261,7 +261,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                   {/* Add to Cart Controls */}
                   {quantityInCart === 0 ? (
                     <Button 
-                      onClick={() => onAddToCart(item)}
+                      onClick={() => addToCart(item)}
                       className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       🛒 Sepete Ekle
@@ -269,14 +269,14 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                   ) : (
                     <div className="flex items-center justify-between bg-orange-50 rounded-xl p-3">
                       <Button 
-                        onClick={() => onAddToCart({...item, action: 'decrease'})}
+                        onClick={() => addToCart(item, -1)}
                         className="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-0"
                       >
                         -
                       </Button>
                       <span className="text-lg font-bold text-orange-600">{quantityInCart}</span>
                       <Button 
-                        onClick={() => onAddToCart(item)}
+                        onClick={() => addToCart(item, 1)}
                         className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full p-0"
                       >
                         +
