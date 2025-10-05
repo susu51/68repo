@@ -5,7 +5,7 @@ import { Input } from '../../components/ui/input';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
-const DiscoverPage = ({ user, onAddToCart, onTabChange }) => {
+const DiscoverPage = ({ user, onRestaurantSelect }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
