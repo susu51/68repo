@@ -172,7 +172,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     };
   };
 
-  const updateLocationOnServer = async (location) => {
+  const updateLocationOnServer = React.useCallback(async (location) => {
     try {
       const token = localStorage.getItem('kuryecini_access_token');
       await axios.post(`${API}/courier/location`, location, {
@@ -181,7 +181,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     } catch (error) {
       console.error('Location update failed:', error);
     }
-  };
+  }, []);
 
   // Data fetching functions
   const fetchNearbyOrders = async () => {
