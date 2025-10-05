@@ -7,7 +7,7 @@ import { MenuManagement, MenuDisplay } from "./MenuManagement";
 import { CreatePackageOrder, PackageOrderHistory } from "./PackageOrder";
 import CourierBalance from "./CourierBalance";
 import FileUpload from "./FileUpload";
-// LeafletMap removed due to React version conflict
+import OpenStreetMap from "./components/OpenStreetMap";
 import { ProfessionalFoodOrderSystem } from "./FoodOrderSystem";
 import FoodOrderErrorBoundary from "./components/FoodOrderErrorBoundary";
 import GlobalErrorBoundary from "./components/ErrorBoundary";
