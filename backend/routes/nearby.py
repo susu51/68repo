@@ -8,35 +8,7 @@ from typing import List, Optional
 from datetime import datetime
 import math
 from models import UserRole
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import jwt
-import os
-
-security = HTTPBearer()
-
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify JWT token and return user data"""
-    try:
-        token = credentials.credentials
-        secret_key = os.environ.get("JWT_SECRET", "kuryecini_secret_key_2024")
-        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
-        
-        from server import db
-        user_id = payload.get("sub")
-        user = await db.users.find_one({"_id": user_id})
-        
-        if not user:
-            raise HTTPException(status_code=401, detail="User not found")
-            
-        return {
-            "id": user["_id"],
-            "email": user["email"],
-            "role": user["role"]
-        }
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+from auth_dependencies import get_current_user
 
 router = APIRouter(prefix="/nearby", tags=["geospatial"])
 
