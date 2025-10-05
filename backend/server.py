@@ -129,13 +129,9 @@ if mongo_url:
         print(f"🔍 Trying fallback connection method...")
         
         try:
-            # Fallback: Less strict SSL settings
-            client = AsyncIOMotorClient(
-                mongo_url,
-                tls=True,
-                serverSelectionTimeoutMS=10000
-            )
-            
+            # Fallback: Simple connection without SSL
+            client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=5000)
+                
             if '/' in mongo_url and mongo_url.split('/')[-1]:
                 db_name = mongo_url.split('/')[-1].split('?')[0]
             else:
