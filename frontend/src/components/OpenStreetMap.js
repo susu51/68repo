@@ -127,6 +127,46 @@ const OpenStreetMap = ({
   const renderMarkersOverlay = () => {
     let overlayHTML = '';
     
+    // Route line (drawn first, under markers)
+    if (routeData && courierLocation && markers.length > 0) {
+      const destination = markers.find(m => m.type === 'delivery') || markers[0];
+      
+      overlayHTML += `
+        <svg style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 5;
+          pointer-events: none;
+        ">
+          <defs>
+            <pattern id="routePattern" patternUnits="userSpaceOnUse" width="10" height="10">
+              <rect width="10" height="10" fill="#3b82f6"/>
+              <rect width="5" height="10" fill="#1d4ed8"/>
+            </pattern>
+          </defs>
+          <line
+            x1="48%" y1="45%"
+            x2="${45 + (markers.indexOf(destination) * 3)}%" y2="${40 + (markers.indexOf(destination) * 5)}%"
+            stroke="#3b82f6"
+            stroke-width="4"
+            stroke-dasharray="8,4"
+            opacity="0.8"
+          />
+          <line
+            x1="48%" y1="45%"
+            x2="${45 + (markers.indexOf(destination) * 3)}%" y2="${40 + (markers.indexOf(destination) * 5)}%"
+            stroke="#1d4ed8"
+            stroke-width="2"
+            stroke-dasharray="8,4"
+            opacity="1"
+          />
+        </svg>
+      `;
+    }
+    
     // Courier location marker
     if (courierLocation) {
       overlayHTML += `
