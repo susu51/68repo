@@ -156,7 +156,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
       <div className="max-w-6xl mx-auto">
         {/* Restaurant Header */}
         <Card className="mb-6 border-0 shadow-xl rounded-3xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white overflow-hidden">
-          <CardContent className="p-8 relative">
+          <CardContent className="p-4 md:p-6 lg:p-8 relative">
             <div className="absolute inset-0 bg-white/10 opacity-40">
               <div className="absolute top-0 right-0 w-48 h-48 bg-white/20 rounded-full -mr-24 -mt-24"></div>
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/15 rounded-full -ml-16 -mb-16"></div>
