@@ -915,7 +915,6 @@ frontend:
 test_plan:
   current_focus:
     - "Phase 1 - Courier Location System Implementation"
-    - "COMPREHENSIVE BACKEND SYSTEM VALIDATION"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
