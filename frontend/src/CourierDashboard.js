@@ -739,32 +739,39 @@ export const CourierDashboard = ({ user, onLogout }) => {
             </div>
 
             {/* Location Status */}
-            {!courierLocation && (
-              <Card className="border-yellow-200 bg-yellow-50">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="text-yellow-600">📍</div>
-                    <div>
-                      <p className="font-semibold text-yellow-800">Konum Durumu</p>
-                      {locationError ? (
-                        <div>
-                          <p className="text-yellow-700 mb-2">{locationError}</p>
-                          <Button
-                            onClick={startLocationTracking}
-                            className="bg-yellow-600 hover:bg-yellow-700"
-                            size="sm"
-                          >
-                            🔄 Konumu Tekrar Dene
-                          </Button>
-                        </div>
-                      ) : (
-                        <p className="text-yellow-600">Konum alınıyor...</p>
-                      )}
-                    </div>
+            <Card className={courierLocation ? "border-green-200 bg-green-50" : "border-yellow-200 bg-yellow-50"}>
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <div className={courierLocation ? "text-green-600" : "text-yellow-600"}>📍</div>
+                  <div className="flex-1">
+                    <p className={`font-semibold ${courierLocation ? "text-green-800" : "text-yellow-800"}`}>
+                      Konum: {courierLocation ? "AKTİF" : "KAPALI"}
+                    </p>
+                    {courierLocation ? (
+                      <div className="text-green-700 text-sm">
+                        <p>Lat: {courierLocation.lat?.toFixed(6)}, Lng: {courierLocation.lng?.toFixed(6)}</p>
+                        {courierLocation.accuracy && (
+                          <p>Hassasiyet: {courierLocation.accuracy.toFixed(0)}m</p>
+                        )}
+                      </div>
+                    ) : locationError ? (
+                      <div>
+                        <p className="text-yellow-700 mb-2">{locationError}</p>
+                        <Button
+                          onClick={() => startLocationTracking()}
+                          className="bg-yellow-600 hover:bg-yellow-700"
+                          size="sm"
+                        >
+                          🔄 Konumu Tekrar Dene
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-yellow-600">Konum alınıyor...</p>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Interactive Map with Orders */}
             {courierLocation && (
