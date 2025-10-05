@@ -656,6 +656,15 @@ class PaymentMethod(BaseModel):
     expiry_year: str
     created_at: str
 
+# Courier Location Models
+class CourierLocation(BaseModel):
+    lat: float
+    lng: float
+    heading: Optional[float] = None
+    speed: Optional[float] = None
+    accuracy: Optional[float] = None
+    ts: Optional[int] = None
+
 class Review(BaseModel):
     id: str
     order_id: str
