@@ -269,6 +269,93 @@ const CartPage = ({ onBack, onProceedToPayment, user }) => {
           </div>
         </div>
 
+        {/* Delivery Address Selection */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+          <h3 className="font-semibold text-gray-900 mb-3">Teslimat Adresi</h3>
+          
+          {selectedAddress ? (
+            <div className="flex items-start justify-between">
+              <div className="flex items-start">
+                <span className="text-2xl mr-3 mt-1">📍</span>
+                <div>
+                  <p className="font-medium text-gray-900">{selectedAddress.title}</p>
+                  <p className="text-sm text-gray-600">{selectedAddress.description}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowAddressSelector(true)}
+                className="text-blue-500 hover:text-blue-600 text-sm font-medium"
+              >
+                Değiştir
+              </button>
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <span className="text-4xl mb-2 block">📍</span>
+              <p className="text-gray-600 mb-3">Teslimat adresi seçilmedi</p>
+              <button 
+                onClick={() => setShowAddressSelector(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                Adres Seç
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Address Selector Modal */}
+        {showAddressSelector && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+              <div className="p-4 border-b">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-gray-900">Teslimat Adresi Seç</h3>
+                  <button 
+                    onClick={() => setShowAddressSelector(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-4">
+                {userAddresses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <span className="text-4xl mb-2 block">📍</span>
+                    <p className="text-gray-600 mb-4">Henüz kayıtlı adresiniz yok</p>
+                    <p className="text-sm text-gray-500">Profil bölümünden adres ekleyebilirsiniz</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {userAddresses.map((address) => (
+                      <div 
+                        key={address.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          selectedAddress?.id === address.id 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:bg-gray-50'
+                        }`}
+                        onClick={() => {
+                          setSelectedAddress(address);
+                          setShowAddressSelector(false);
+                          toast.success('Teslimat adresi seçildi');
+                        }}
+                      >
+                        <p className="font-medium text-gray-900">{address.title}</p>
+                        <p className="text-sm text-gray-600">{address.description}</p>
+                        {address.city && (
+                          <p className="text-xs text-gray-500 mt-1">🏙️ {address.city}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Price Summary */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
           <h3 className="font-semibold text-gray-900 mb-3">Ödeme Özeti</h3>
