@@ -134,7 +134,7 @@ const AdminPanel = ({ user, onLogout }) => {
       const token = localStorage.getItem('kuryecini_access_token');
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
-      const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}/status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
