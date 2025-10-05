@@ -1379,6 +1379,205 @@ const AdminPanel = ({ user, onLogout }) => {
             </div>
           </div>
         )}
+
+        {/* Business KYC View */}
+        {currentView === 'business-kyc' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">✅ İşletme KYC Onayları</h2>
+              <div className="text-sm text-gray-600">
+                {pendingBusinesses.length} bekleyen başvuru
+              </div>
+            </div>
+            
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="text-gray-500">Yükleniyor...</div>
+              </div>
+            ) : pendingBusinesses.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-500">
+                  🎉 Tüm işletme KYC başvuruları işlenmiş!
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {pendingBusinesses.map((business) => (
+                  <div key={business.id} className="border rounded-lg p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{business.business_name}</h3>
+                        <p className="text-gray-600">{business.category}</p>
+                        <p className="text-sm text-gray-500">{business.address}</p>
+                      </div>
+                      <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
+                        KYC Bekliyor
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-6 mb-6">
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-2">İşletme Bilgileri</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="text-gray-600">Email:</span> {business.email}</p>
+                          <p><span className="text-gray-600">Telefon:</span> {business.phone}</p>
+                          <p><span className="text-gray-600">Yetkili Kişi:</span> {business.owner_name}</p>
+                          <p><span className="text-gray-600">Vergi No:</span> {business.tax_number}</p>
+                          <p><span className="text-gray-600">Başvuru Tarihi:</span> {new Date(business.created_at).toLocaleDateString('tr-TR')}</p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-2">Belgeler</h4>
+                        <div className="space-y-2 text-sm">
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            Ticaret Sicil Belgesi
+                          </p>
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            Vergi Levhası
+                          </p>
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            İmza Sirküleri
+                          </p>
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            İşyeri Fotoğrafları
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-4 pt-4 border-t">
+                      <button
+                        onClick={() => handleBusinessApprove(business.id)}
+                        disabled={loading}
+                        className="flex-1 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+                      >
+                        ✅ Onayla
+                      </button>
+                      <button
+                        onClick={() => {
+                          const reason = prompt('Red nedeni girin (isteğe bağlı):');
+                          if (reason !== null) {
+                            handleBusinessReject(business.id, reason);
+                          }
+                        }}
+                        disabled={loading}
+                        className="flex-1 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50"
+                      >
+                        ❌ Reddet
+                      </button>
+                      <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
+                        📄 Detay Görüntüle
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Courier KYC View */}
+        {currentView === 'courier-kyc' && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">✅ Kurye KYC Onayları</h2>
+              <div className="text-sm text-gray-600">
+                {pendingCouriers.length} bekleyen başvuru
+              </div>
+            </div>
+            
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="text-gray-500">Yükleniyor...</div>
+              </div>
+            ) : pendingCouriers.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-500">
+                  🎉 Tüm kurye KYC başvuruları işlenmiş!
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {pendingCouriers.map((courier) => (
+                  <div key={courier.id} className="border rounded-lg p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex items-center mb-4">
+                      <div className="h-16 w-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                        {courier.first_name?.charAt(0)}{courier.last_name?.charAt(0)}
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {courier.first_name} {courier.last_name}
+                        </h3>
+                        <p className="text-gray-600">{courier.vehicle_type || 'Motosiklet'}</p>
+                        <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                          KYC Bekliyor
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3 mb-6">
+                      <div className="text-sm">
+                        <p><span className="text-gray-600">Email:</span> {courier.email}</p>
+                        <p><span className="text-gray-600">Telefon:</span> {courier.phone}</p>
+                        <p><span className="text-gray-600">Doğum Tarihi:</span> {courier.birth_date || 'Belirtilmemiş'}</p>
+                        <p><span className="text-gray-600">Başvuru Tarihi:</span> {new Date(courier.created_at).toLocaleDateString('tr-TR')}</p>
+                      </div>
+                      
+                      <div className="pt-3 border-t">
+                        <h4 className="font-medium text-gray-900 mb-2">Belgeler</h4>
+                        <div className="space-y-1 text-sm">
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            TC Kimlik Belgesi
+                          </p>
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            Ehliyet
+                          </p>
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            Araç Ruhsatı
+                          </p>
+                          <p className="flex items-center">
+                            <span className="text-green-500 mr-2">✓</span>
+                            Adli Sicil Belgesi
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => handleCourierApprove(courier.id)}
+                        disabled={loading}
+                        className="flex-1 bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600 disabled:opacity-50"
+                      >
+                        ✅ Onayla
+                      </button>
+                      <button
+                        onClick={() => {
+                          const reason = prompt('Red nedeni girin (isteğe bağlı):');
+                          if (reason !== null) {
+                            handleCourierReject(courier.id, reason);
+                          }
+                        }}
+                        disabled={loading}
+                        className="flex-1 bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 disabled:opacity-50"
+                      >
+                        ❌ Reddet
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );
