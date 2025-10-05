@@ -162,16 +162,16 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/15 rounded-full -ml-16 -mb-16"></div>
             </div>
             
-            <div className="relative flex items-center justify-between">
+            <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center">
-                <div className="w-16 h-16 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-6 shadow-lg">
-                  <span className="text-3xl">🍽️</span>
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-3 md:mr-6 shadow-lg">
+                  <span className="text-2xl md:text-3xl">🍽️</span>
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">{restaurant?.name || 'Restoran'}</h1>
-                  <p className="text-white/90 text-lg flex items-center">
-                    <span className="mr-4">⭐ {restaurant?.rating || '4.5'}</span>
-                    <span className="mr-4">🕒 {restaurant?.deliveryTime || '25-35'} dk</span>
+                  <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">{restaurant?.name || 'Restoran'}</h1>
+                  <p className="text-white/90 text-sm md:text-base lg:text-lg flex flex-wrap items-center gap-2 md:gap-4">
+                    <span>⭐ {restaurant?.rating || '4.5'}</span>
+                    <span>🕒 {restaurant?.deliveryTime || '25-35'} dk</span>
                     <span>💰 Min: ₺{restaurant?.minOrder || '50'}</span>
                   </p>
                 </div>
