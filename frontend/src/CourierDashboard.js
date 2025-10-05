@@ -120,7 +120,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     setLoading(false);
   };
 
-  // Location tracking
+  // Location tracking with watchPosition for continuous updates
   const startLocationTracking = () => {
     if (!navigator.geolocation) {
       if (isMounted) {
@@ -130,12 +130,17 @@ export const CourierDashboard = ({ user, onLogout }) => {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
+    // Start continuous location tracking with watchPosition
+    const watchId = navigator.geolocation.watchPosition(
       (position) => {
         if (isMounted) {
           const location = {
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
+            heading: position.coords.heading,
+            speed: position.coords.speed,
+            accuracy: position.coords.accuracy,
+            ts: Date.now()
           };
           setCourierLocation(location);
           setLocationError(null);
@@ -155,6 +160,13 @@ export const CourierDashboard = ({ user, onLogout }) => {
         maximumAge: 0
       }
     );
+
+    // Store watchId for cleanup
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
   };
 
   const updateLocationOnServer = async (location) => {
