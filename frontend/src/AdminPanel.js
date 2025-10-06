@@ -14,17 +14,8 @@ const AdminPanel = ({ user, onLogout }) => {
   // Fetch pending businesses for KYC
   const fetchPendingBusinesses = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      
-      const response = await fetch(`${BACKEND_URL}/api/admin/businesses?kyc_status=pending`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (response.ok) {
-        const businesses = await response.json();
-        setPendingBusinesses(businesses);
-      }
+      const response = await apiClient.get('/admin/businesses?kyc_status=pending');
+      setPendingBusinesses(response.data);
     } catch (error) {
       console.error('Fetch pending businesses error:', error);
     }
