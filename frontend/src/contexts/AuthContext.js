@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { apiClient } from '../utils/apiClient';
 
 // Auth Context with default values
 const AuthContext = createContext({
