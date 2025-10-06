@@ -14,7 +14,7 @@ from typing import Dict, List, Optional
 class CourierPanelTester:
     def __init__(self):
         # Get backend URL from environment
-        self.base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://meal-dash-163.preview.emergentagent.com')
+        self.base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://delivery-platform-10.preview.emergentagent.com')
         if not self.base_url.endswith('/api'):
             self.base_url = f"{self.base_url}/api"
         

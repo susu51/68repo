@@ -15,7 +15,7 @@ from datetime import datetime
 import time
 
 class AuthVerificationTester:
-    def __init__(self, base_url="https://meal-dash-163.preview.emergentagent.com"):
+    def __init__(self, base_url="https://delivery-platform-10.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0

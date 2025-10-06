@@ -28,7 +28,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://meal-dash-163.preview.emergentagent.com/api"
+BACKEND_URL = "https://delivery-platform-10.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_CREDENTIALS = {
