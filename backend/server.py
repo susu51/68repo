@@ -5508,4 +5508,96 @@ async def get_business_products(business_id: str):
         traceback.print_exc()
         return []
 
+# Review/Rating System Endpoints
+@api_router.post("/reviews")
+async def create_review(
+    review_data: dict,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Create customer review for completed order"""
+    try:
+        order_id = review_data.get("order_id")
+        target_type = review_data.get("target_type", "business")  # business or courier
+        target_id = review_data.get("target_id")
+        rating = review_data.get("rating", 5)
+        comment = review_data.get("comment", "")
+        
+        if not all([order_id, target_id, rating]):
+            raise HTTPException(status_code=422, detail="Missing required fields")
+            
+        # Verify order exists and belongs to customer
+        order = None
+        try:
+            from bson import ObjectId
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            order = await db.orders.find_one({"id": order_id})
+            
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+            
+        if order.get("customer_id") != current_user["id"]:
+            raise HTTPException(status_code=403, detail="Order does not belong to customer")
+            
+        # Check if order is delivered
+        if order.get("status") != "delivered":
+            raise HTTPException(status_code=422, detail="Can only review delivered orders")
+            
+        # Create review
+        review = {
+            "id": str(uuid.uuid4()),
+            "order_id": order_id,
+            "customer_id": current_user["id"],
+            "target_type": target_type,
+            "target_id": target_id,
+            "rating": min(max(int(rating), 1), 5),  # Ensure rating is 1-5
+            "comment": comment,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.reviews.insert_one(review)
+        
+        return {
+            "success": True,
+            "message": "Review created successfully",
+            "review_id": review["id"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error creating review: {e}")
+        raise HTTPException(status_code=500, detail=f"Review creation failed: {str(e)}")
+
+@api_router.get("/reviews/{target_id}")
+async def get_reviews(target_id: str, target_type: str = "business"):
+    """Get reviews for business or courier"""
+    try:
+        reviews = await db.reviews.find({
+            "target_id": target_id,
+            "target_type": target_type
+        }).sort("created_at", -1).to_list(length=50)
+        
+        # Calculate average rating
+        total_rating = sum(review.get("rating", 5) for review in reviews)
+        avg_rating = total_rating / len(reviews) if reviews else 0
+        
+        return {
+            "reviews": [
+                {
+                    "id": review.get("id", ""),
+                    "rating": review.get("rating", 5),
+                    "comment": review.get("comment", ""),
+                    "created_at": review.get("created_at", "").isoformat() if hasattr(review.get("created_at", ""), 'isoformat') else str(review.get("created_at", ""))
+                }
+                for review in reviews
+            ],
+            "average_rating": round(avg_rating, 1),
+            "total_reviews": len(reviews)
+        }
+        
+    except Exception as e:
+        print(f"❌ Error getting reviews: {e}")
+        return {"reviews": [], "average_rating": 4.5, "total_reviews": 0}
+
 app.include_router(api_router)
