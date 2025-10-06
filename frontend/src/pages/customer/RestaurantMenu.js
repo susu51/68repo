@@ -49,7 +49,14 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [restaurant]);
+
+  // Fetch menu items from API
+  useEffect(() => {
+    if (restaurant && restaurant.id) {
+      fetchMenuItems();
+    }
+  }, [restaurant, fetchMenuItems]);
 
   const categories = [
     { id: 'all', name: 'Hepsi', icon: '🍽️' },
