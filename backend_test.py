@@ -108,62 +108,68 @@ class ContentMediaTester:
         
         return False
 
-    def create_test_order(self):
-        """Create a test order for location tracking testing"""
-        print("📦 CREATING TEST ORDER FOR LOCATION TRACKING...")
+    def test_content_blocks_endpoints(self):
+        """Test content blocks API endpoints"""
+        print("\n🔍 TESTING CONTENT BLOCKS ENDPOINTS")
         
+        # Test GET /api/content/blocks
         try:
-            # First, create an order as customer
-            order_data = {
-                "delivery_address": "Test Address, Istanbul",
-                "delivery_lat": 41.0082,
-                "delivery_lng": 28.9784,
-                "items": [
-                    {
-                        "product_id": "test-product-1",
-                        "product_name": "Test Pizza",
-                        "product_price": 45.0,
-                        "quantity": 1,
-                        "subtotal": 45.0
-                    }
-                ],
-                "total_amount": 45.0,
-                "notes": "Test order for courier location tracking"
-            }
-            
-            headers = {"Authorization": f"Bearer {self.tokens['customer']}"}
-            response = requests.post(
-                f"{BACKEND_URL}/orders",
-                json=order_data,
-                headers=headers,
-                timeout=10
-            )
-            
-            if response.status_code in [200, 201]:
+            response = self.session.get(f"{BACKEND_URL}/content/blocks")
+            if response.status_code == 200:
                 data = response.json()
-                self.test_order_id = data.get("id") or data.get("order_id")
-                self.log_test(
-                    "Create Test Order",
-                    True,
-                    f"Order ID: {self.test_order_id}, Status: {data.get('status', 'created')}"
-                )
-                
-                # Update order status to picked_up to enable location tracking
-                self.update_order_for_tracking()
-                
+                self.log_test("GET /api/content/blocks", True, 
+                            f"Retrieved content blocks successfully, count: {len(data) if isinstance(data, list) else 'N/A'}")
+            elif response.status_code == 404:
+                self.log_test("GET /api/content/blocks", False, 
+                            "Endpoint not found - content blocks API not implemented")
             else:
-                self.log_test(
-                    "Create Test Order",
-                    False,
-                    f"Status: {response.status_code}",
-                    response.text
-                )
+                self.log_test("GET /api/content/blocks", False, 
+                            f"Unexpected response: {response.status_code} - {response.text}")
         except Exception as e:
-            self.log_test(
-                "Create Test Order",
-                False,
-                error=str(e)
-            )
+            self.log_test("GET /api/content/blocks", False, f"Request error: {str(e)}")
+        
+        # Test GET /api/content/blocks/home_admin
+        try:
+            response = self.session.get(f"{BACKEND_URL}/content/blocks/home_admin")
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("GET /api/content/blocks/home_admin", True, 
+                            f"Retrieved admin dashboard content successfully")
+            elif response.status_code == 404:
+                self.log_test("GET /api/content/blocks/home_admin", False, 
+                            "Endpoint not found - admin dashboard content API not implemented")
+            else:
+                self.log_test("GET /api/content/blocks/home_admin", False, 
+                            f"Unexpected response: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.log_test("GET /api/content/blocks/home_admin", False, f"Request error: {str(e)}")
+        
+        # Test PUT /api/content/blocks/home_admin (admin auth required)
+        try:
+            update_data = {
+                "sections": [
+                    {
+                        "id": "welcome",
+                        "title": "Welcome Admin",
+                        "content": "Updated admin dashboard content"
+                    }
+                ]
+            }
+            response = self.session.put(f"{BACKEND_URL}/content/blocks/home_admin", json=update_data)
+            if response.status_code == 200:
+                self.log_test("PUT /api/content/blocks/home_admin", True, 
+                            "Successfully updated admin dashboard content")
+            elif response.status_code == 404:
+                self.log_test("PUT /api/content/blocks/home_admin", False, 
+                            "Endpoint not found - admin dashboard content update API not implemented")
+            elif response.status_code == 403:
+                self.log_test("PUT /api/content/blocks/home_admin", False, 
+                            "Access denied - admin authentication may not be working properly")
+            else:
+                self.log_test("PUT /api/content/blocks/home_admin", False, 
+                            f"Unexpected response: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.log_test("PUT /api/content/blocks/home_admin", False, f"Request error: {str(e)}")
 
     def update_order_for_tracking(self):
         """Update order status to enable courier location tracking"""
