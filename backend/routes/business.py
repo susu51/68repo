@@ -70,8 +70,25 @@ async def create_menu_item(
             "created_at": datetime.utcnow()
         }
         
-        # Insert to database
-        await db.menu_items.insert_one(menu_item_doc)
+        # Insert into both collections for compatibility
+        # Insert into menu_items (business management)
+        await db.menu_items.insert_one(menu_item_doc.copy())
+        
+        # Also insert into products (customer access) with compatible schema
+        product_doc = {
+            "_id": menu_item_doc["_id"],
+            "business_id": menu_item_doc["business_id"],
+            "name": item_data.title,  # products uses 'name' field
+            "description": item_data.description,
+            "price": item_data.price,
+            "image": item_data.photo_url,  # products uses 'image' field
+            "category": item_data.category,
+            "availability": item_data.is_available,  # products uses 'availability' field
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        await db.products.insert_one(product_doc)
         
         return MenuItemResponse(
             id=menu_item_doc["_id"],
