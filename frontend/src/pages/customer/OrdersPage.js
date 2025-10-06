@@ -36,9 +36,7 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
         return;
       }
 
-      const response = await axios.get(`${API}/api/orders/my`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await apiClient.get('/orders/my');
       
       // Ensure all required properties exist and handle item objects
       const ordersData = (response.data || []).map(order => ({
