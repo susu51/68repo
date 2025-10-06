@@ -107,26 +107,23 @@ const KYCManagement = ({ user }) => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token') || localStorage.getItem('token');
+      
+      if (!isAuthenticated) {
+        toast.error('Admin girişi gereklidir');
+        return;
+      }
       
       const endpoint = type === 'business'
-        ? `${API_BASE}/api/admin/businesses/${id}/status`
-        : `${API_BASE}/api/admin/couriers/${id}/status`;
+        ? `/admin/businesses/${id}/status`
+        : `/admin/couriers/${id}/status`;
 
-      const response = await fetch(endpoint, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          kyc_status: 'rejected',
-          rejection_reason: reason
-        })
+      const response = await apiClient.patch(endpoint, { 
+        kyc_status: 'rejected',
+        rejection_reason: reason
       });
 
-      if (response.ok) {
-        alert(`✅ ${type === 'business' ? 'İşletme' : 'Kurye'} KYC reddedildi!`);
+      if (response.data.success) {
+        toast.success(`✅ ${type === 'business' ? 'İşletme' : 'Kurye'} KYC reddedildi!`);
         
         // Refresh lists
         await Promise.all([
@@ -136,8 +133,7 @@ const KYCManagement = ({ user }) => {
           fetchCouriers('rejected')
         ]);
       } else {
-        const error = await response.json();
-        alert(`❌ Reddetme başarısız: ${error.detail || 'Bilinmeyen hata'}`);
+        toast.error(`❌ Reddetme başarısız: ${response.data.message || 'Bilinmeyen hata'}`);
       }
     } catch (error) {
       console.error('❌ Rejection error:', error);
