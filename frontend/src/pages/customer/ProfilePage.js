@@ -415,27 +415,7 @@ const ProfilePage = ({ user, onLogout }) => {
 
   // Duplicate functions removed - using the updated versions above
 
-  const handleSetDefaultAddress = async (addressId) => {
-    try {
-      setLoading(true);
-
-      await apiClient.post(`/user/addresses/${addressId}/set-default`, {});
-
-      toast.success('Varsayılan adres başarıyla güncellendi!');
-      
-      // Refresh addresses
-      loadTabData('addresses');
-    } catch (error) {
-      console.error('Error setting default address:', error);
-      if (error.response?.data?.detail) {
-        toast.error(error.response.data.detail);
-      } else {
-        toast.error('Varsayılan adres ayarlanırken hata oluştu');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Duplicate function removed
 
   // Mock data
   const mockCoupons = [
