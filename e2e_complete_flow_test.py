@@ -197,8 +197,7 @@ class E2EFlowTester:
             )
             
             if response.status_code == 200:
-                data = response.json()
-                businesses = data.get("businesses", [])
+                businesses = response.json()  # API returns list directly
                 self.log_test(
                     "Nearby Businesses Discovery",
                     True,
