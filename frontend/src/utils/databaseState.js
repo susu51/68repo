@@ -199,7 +199,7 @@ export class AddressManager {
 
   static async updateAddress(addressId, updates) {
     try {
-      const updatedAddress = await apiClient.patch(`/api/addresses/${addressId}`, updates);
+      const updatedAddress = await apiClient.patch(`/user/addresses/${addressId}`, updates);
       
       // Refresh addresses list
       await this.getAddresses();
