@@ -82,8 +82,9 @@ export function AuthProvider({ children }) {
       setToken(null);
       setUser(null);
       
-      // Remove axios authorization header
+      // Remove axios authorization header and apiClient token
       delete axios.defaults.headers.common['Authorization'];
+      apiClient.setToken(null);
       
       console.log('✅ User logged out via Context API');
     } catch (error) {
