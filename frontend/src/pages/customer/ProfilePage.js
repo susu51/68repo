@@ -252,11 +252,8 @@ const ProfilePage = ({ user, onLogout }) => {
       }
 
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
 
-      await axios.post(`${API}/api/user/addresses`, newAddress, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await apiClient.post('/user/addresses', newAddress);
 
       toast.success('Adres başarıyla eklendi!');
       setShowAddressModal(false);
