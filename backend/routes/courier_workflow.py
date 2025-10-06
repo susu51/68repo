@@ -12,7 +12,7 @@ import uuid
 from models import OrderStatus
 from auth_dependencies import get_courier_user
 
-router = APIRouter(prefix="/orders", tags=["courier-workflow"])
+router = APIRouter(prefix="/courier", tags=["courier-workflow"])
 
 class AvailableOrderResponse(BaseModel):
     id: str
