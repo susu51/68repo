@@ -4099,6 +4099,13 @@ const HomePage = ({ onAuthStart }) => {
             >
               🚀 Hemen Sipariş Ver
             </Button>
+            <Button 
+              onClick={() => window.location.href = '/customer'}
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              🧪 Test Customer App
+            </Button>
             <div className="flex items-center space-x-4 text-sm text-gray-600">
               <span className="flex items-center">⭐ 4.8 Ortalama Puan</span>
               <span className="flex items-center">🚚 Ücretsiz Teslimat</span>
