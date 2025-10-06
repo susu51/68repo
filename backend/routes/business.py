@@ -101,17 +101,12 @@ async def get_my_menu(
     try:
         from server import db
         
-        # Get business ID
-        business = await db.businesses.find_one({"owner_user_id": current_user["id"]})
-        if not business:
-            raise HTTPException(
-                status_code=404,
-                detail="Business not found"
-            )
+        # Use current user ID as business ID (since business is registered as user)
+        business_user_id = current_user["id"]
         
-        # Get menu items
+        # Get menu items for this business user
         menu_items = await db.menu_items.find({
-            "business_id": str(business["_id"])
+            "business_id": business_user_id
         }).sort("created_at", -1).to_list(length=None)
         
         return [
