@@ -75,8 +75,6 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
         rating: reviewData.rating,
         comment: reviewData.comment
       });
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
 
       toast.success('Değerlendirmeniz kaydedildi!');
       setShowReviewModal(false);
