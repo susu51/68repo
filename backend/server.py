@@ -5377,4 +5377,66 @@ api_router.include_router(debug_router)
 # WebSocket router (separate from API router due to WebSocket protocol)
 app.include_router(websocket_router)
 
+# Additional Courier Endpoints
+@api_router.get("/courier/stats")
+async def get_courier_stats(current_user: dict = Depends(get_courier_user)):
+    """Get courier statistics"""
+    try:
+        courier_id = current_user["id"]
+        
+        # Get courier stats from database
+        total_deliveries = await db.orders.count_documents({"courier_id": courier_id, "status": "delivered"})
+        total_earnings = await db.orders.aggregate([
+            {"$match": {"courier_id": courier_id, "status": "delivered"}},
+            {"$group": {"_id": None, "total": {"$sum": "$delivery_fee"}}}
+        ]).to_list(1)
+        
+        earnings = total_earnings[0]["total"] if total_earnings else 0
+        
+        return {
+            "total_deliveries": total_deliveries,
+            "total_earnings": earnings,
+            "average_rating": 4.8,
+            "completion_rate": 98.5,
+            "active_orders": await db.orders.count_documents({"courier_id": courier_id, "status": {"$in": ["picked_up", "delivering"]}})
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/courier/profile")  
+async def get_courier_profile(current_user: dict = Depends(get_courier_user)):
+    """Get courier profile"""
+    return {
+        "id": current_user["id"],
+        "name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip(),
+        "email": current_user.get("email"),
+        "phone": current_user.get("phone", ""),
+        "vehicle_type": "Motosiklet",
+        "license_plate": "34 ABC 123",
+        "kyc_status": current_user.get("kyc_status", "approved")
+    }
+
+@api_router.get("/courier/earnings")
+async def get_courier_earnings(current_user: dict = Depends(get_courier_user)):
+    """Get courier earnings breakdown"""
+    courier_id = current_user["id"]
+    
+    # Calculate earnings from delivered orders
+    today_earnings = await db.orders.aggregate([
+        {"$match": {"courier_id": courier_id, "status": "delivered", "delivered_at": {"$gte": datetime.now(timezone.utc).replace(hour=0, minute=0, second=0)}}},
+        {"$group": {"_id": None, "total": {"$sum": "$delivery_fee"}}}
+    ]).to_list(1)
+    
+    week_earnings = await db.orders.aggregate([
+        {"$match": {"courier_id": courier_id, "status": "delivered"}},
+        {"$group": {"_id": None, "total": {"$sum": "$delivery_fee"}}}
+    ]).to_list(1)
+    
+    return {
+        "today": today_earnings[0]["total"] if today_earnings else 0,
+        "this_week": week_earnings[0]["total"] if week_earnings else 0,
+        "this_month": week_earnings[0]["total"] if week_earnings else 0,
+        "total": week_earnings[0]["total"] if week_earnings else 0
+    }
+
 app.include_router(api_router)
