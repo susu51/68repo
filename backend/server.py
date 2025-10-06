@@ -1451,13 +1451,29 @@ async def get_business_stats(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Business access required")
     
     try:
-        # Return mock statistics data
+        # Get business statistics from database
+        business_id = current_user.get("user_id")
+        today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Get today's orders for this business
+        today_orders = await db.orders.find({
+            "business_id": business_id,
+            "created_at": {"$gte": today.isoformat()}
+        }).to_list(length=None)
+        
+        # Calculate statistics
+        total_orders = len(today_orders)
+        total_revenue = sum(order.get("total_amount", 0) for order in today_orders)
+        avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+        completed_orders = len([o for o in today_orders if o.get("status") == "delivered"])
+        completion_rate = (completed_orders / total_orders * 100) if total_orders > 0 else 100
+        
         return {
             "today": {
-                "orders": 23,
-                "revenue": 1247.50,
-                "avgOrderValue": 54.24,
-                "completionRate": 96.5
+                "orders": total_orders,
+                "revenue": total_revenue,
+                "avgOrderValue": avg_order_value,
+                "completionRate": completion_rate
             },
             "week": {
                 "orders": 187,
