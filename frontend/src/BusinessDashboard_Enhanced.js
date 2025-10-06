@@ -313,12 +313,13 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   const markOrderAsReady = async (orderId) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        return;
+      }
       
-      const response = await axios.patch(
-        `${API}/business/orders/${orderId}/status`,
-        { status: 'ready' },
-        { headers: { 'Authorization': `Bearer ${token}` } }
+      const response = await apiClient.patch(`/business/orders/${orderId}/status`,
+        { status: 'ready' }
       );
 
       if (response.data) {
