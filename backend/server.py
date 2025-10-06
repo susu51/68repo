@@ -5165,11 +5165,11 @@ async def get_business_by_id_admin(business_id: str, current_user: dict = Depend
     try:
         from bson import ObjectId
         
-        # Try ObjectId first, then string ID
+        # Try ObjectId first, then string ID - businesses are stored in users collection
         try:
-            business = await db.businesses.find_one({"_id": ObjectId(business_id)})
+            business = await db.users.find_one({"_id": ObjectId(business_id), "role": "business"})
         except:
-            business = await db.businesses.find_one({"id": business_id})
+            business = await db.users.find_one({"id": business_id, "role": "business"})
         
         if not business:
             raise HTTPException(status_code=404, detail="Business not found")
