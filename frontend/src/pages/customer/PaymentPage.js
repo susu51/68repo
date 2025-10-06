@@ -133,21 +133,8 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
         notes: `Ödeme yöntemi: ${paymentMethods.find(p => p.id === selectedPaymentMethod)?.name}`
       };
 
-      const response = await fetch(`${BACKEND_URL}/api/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Order creation failed: ${error}`);
-      }
-
-      const order = await response.json();
+      const response = await apiClient.post('/orders', orderData);
+      const order = response.data;
       return order;
 
     } catch (error) {
