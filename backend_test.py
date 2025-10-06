@@ -32,10 +32,9 @@ ALTERNATIVE_ADMIN_CREDENTIALS = [
 
 class ContentMediaTester:
     def __init__(self):
-        self.tokens = {}
+        self.session = requests.Session()
+        self.admin_token = None
         self.test_results = []
-        self.test_order_id = None
-        self.test_courier_id = None
         
     def log_test(self, test_name, success, details="", error=""):
         """Log test results"""
