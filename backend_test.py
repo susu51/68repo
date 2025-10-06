@@ -208,46 +208,131 @@ class ContentMediaTester:
             self.log_test("GET /api/content/media-assets/courier_gallery", False, f"Request error: {str(e)}")
 
     def test_admin_stats_endpoint(self):
-        """Test POST /api/courier/location - Real-time location updates"""
-        print("📍 TESTING COURIER LOCATION UPDATES...")
+        """Test admin stats endpoint"""
+        print("\n📊 TESTING ADMIN STATS ENDPOINT")
         
-        # Test 1: Valid courier location update
         try:
-            location_data = {
-                "lat": 41.0082,
-                "lng": 28.9784,
-                "heading": 45.5,
-                "speed": 25.0,
-                "accuracy": 10.0,
-                "ts": int(time.time() * 1000)
-            }
-            
-            headers = {"Authorization": f"Bearer {self.tokens['courier']}"}
-            response = requests.post(
-                f"{BACKEND_URL}/courier/location",
-                json=location_data,
-                headers=headers,
-                timeout=10
-            )
-            
+            response = self.session.get(f"{BACKEND_URL}/content/admin/stats")
             if response.status_code == 200:
                 data = response.json()
-                self.log_test(
-                    "Courier Location Update - Valid Data",
-                    True,
-                    f"Success: {data.get('success')}, Message: {data.get('message')}"
-                )
+                # Check for expected stats structure
+                expected_fields = ['orders', 'revenue', 'users', 'businesses']
+                has_expected_structure = any(field in str(data).lower() for field in expected_fields)
+                
+                self.log_test("GET /api/content/admin/stats", True, 
+                            f"Retrieved admin stats successfully, has expected structure: {has_expected_structure}")
+            elif response.status_code == 404:
+                self.log_test("GET /api/content/admin/stats", False, 
+                            "Endpoint not found - admin stats API not implemented")
+            elif response.status_code == 403:
+                self.log_test("GET /api/content/admin/stats", False, 
+                            "Access denied - admin authentication may not be working properly")
             else:
-                self.log_test(
-                    "Courier Location Update - Valid Data",
-                    False,
-                    f"Status: {response.status_code}",
-                    response.text
-                )
+                self.log_test("GET /api/content/admin/stats", False, 
+                            f"Unexpected response: {response.status_code} - {response.text}")
         except Exception as e:
-            self.log_test(
-                "Courier Location Update - Valid Data",
-                False,
+            self.log_test("GET /api/content/admin/stats", False, f"Request error: {str(e)}")
+
+    def test_popular_products_endpoint(self):
+        """Test popular products endpoint"""
+        print("\n🔥 TESTING POPULAR PRODUCTS ENDPOINT")
+        
+        try:
+            response = self.session.get(f"{BACKEND_URL}/content/popular-products")
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("GET /api/content/popular-products", True, 
+                            f"Retrieved popular products successfully, count: {len(data) if isinstance(data, list) else 'N/A'}")
+            elif response.status_code == 404:
+                self.log_test("GET /api/content/popular-products", False, 
+                            "Endpoint not found - popular products API not implemented")
+            else:
+                self.log_test("GET /api/content/popular-products", False, 
+                            f"Unexpected response: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.log_test("GET /api/content/popular-products", False, f"Request error: {str(e)}")
+
+    def run_all_tests(self):
+        """Run all content and media foundation tests"""
+        print("🚀 STARTING PHASE 2 CONTENT & MEDIA FOUNDATION TESTING")
+        print("=" * 60)
+        
+        # Try admin authentication
+        auth_success = self.authenticate_admin()
+        
+        if not auth_success:
+            print("\n⚠️ WARNING: Admin authentication failed, testing endpoints without auth...")
+        
+        # Run all endpoint tests
+        self.test_content_blocks_endpoints()
+        self.test_media_assets_endpoints()
+        self.test_admin_stats_endpoint()
+        self.test_popular_products_endpoint()
+        
+        # Generate summary
+        self.generate_summary()
+
+    def generate_summary(self):
+        """Generate test summary"""
+        print("\n" + "=" * 60)
+        print("📊 PHASE 2 CONTENT & MEDIA FOUNDATION TEST SUMMARY")
+        print("=" * 60)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t["success"]])
+        failed_tests = total_tests - passed_tests
+        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
+        
+        print(f"Total Tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success Rate: {success_rate:.1f}%")
+        
+        print("\n🔍 DETAILED RESULTS:")
+        for result in self.test_results:
+            status = "✅" if result["success"] else "❌"
+            print(f"{status} {result['test']}: {result['details']}")
+        
+        # Critical findings
+        print("\n🚨 CRITICAL FINDINGS:")
+        
+        # Check for missing endpoints
+        missing_endpoints = []
+        for result in self.test_results:
+            if not result["success"] and "not found" in result["details"].lower():
+                missing_endpoints.append(result["test"])
+        
+        if missing_endpoints:
+            print(f"❌ MISSING ENDPOINTS: {len(missing_endpoints)} critical endpoints not implemented:")
+            for endpoint in missing_endpoints:
+                print(f"   - {endpoint}")
+        
+        # Check authentication issues
+        auth_issues = []
+        for result in self.test_results:
+            if not result["success"] and ("authentication" in result["details"].lower() or 
+                                        "access denied" in result["details"].lower()):
+                auth_issues.append(result["test"])
+        
+        if auth_issues:
+            print(f"🔐 AUTHENTICATION ISSUES: {len(auth_issues)} endpoints have auth problems:")
+            for issue in auth_issues:
+                print(f"   - {issue}")
+        
+        print(f"\n📝 CONCLUSION:")
+        if success_rate < 50:
+            print("❌ CRITICAL: Phase 2 Content & Media Foundation is NOT READY")
+            print("   Major implementation gaps detected - endpoints missing")
+        elif success_rate < 80:
+            print("⚠️ WARNING: Phase 2 Content & Media Foundation has significant issues")
+            print("   Some functionality working but critical gaps remain")
+        else:
+            print("✅ SUCCESS: Phase 2 Content & Media Foundation is functional")
+            print("   Most endpoints working correctly")
+
+if __name__ == "__main__":
+    tester = ContentMediaTester()
+    tester.run_all_tests()
                 error=str(e)
             )
 
