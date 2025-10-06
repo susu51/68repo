@@ -21,16 +21,16 @@ from datetime import datetime, timezone
 
 # Configuration
 BACKEND_URL = "https://delivery-platform-10.preview.emergentagent.com/api"
+ADMIN_EMAIL = "admin@kuryecini.com"
+ADMIN_PASSWORD = "admin123"
 
-# Test credentials from review request
-TEST_CREDENTIALS = {
-    "admin": {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
-    "courier": {"email": "testkurye@example.com", "password": "test123"},
-    "customer": {"email": "testcustomer@example.com", "password": "test123"},
-    "business": {"email": "testbusiness@example.com", "password": "test123"}
-}
+# Alternative admin credentials to try
+ALTERNATIVE_ADMIN_CREDENTIALS = [
+    {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
+    {"email": "admin@delivertr.com", "password": "6851"}
+]
 
-class CourierLocationTester:
+class ContentMediaTester:
     def __init__(self):
         self.tokens = {}
         self.test_results = []
