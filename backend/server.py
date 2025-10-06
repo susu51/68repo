@@ -1545,7 +1545,7 @@ async def get_incoming_orders(current_user: dict = Depends(get_approved_business
 async def update_business_order_status(
     order_id: str,
     status_data: dict,
-    current_user: dict = Depends(get_business_user)
+    current_user: dict = Depends(get_approved_business_user)
 ):
     """Update order status by business (confirm, preparing, ready)"""
     try:
