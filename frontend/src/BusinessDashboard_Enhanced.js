@@ -502,15 +502,13 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   const toggleProductAvailability = async (productId, isAvailable) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.patch(`${API}/business/menu/${productId}`, 
-        { is_available: isAvailable }, 
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        return;
+      }
+      
+      const response = await apiClient.patch(`/business/menu/${productId}`, 
+        { is_available: isAvailable }
       );
 
       if (response.data) {
