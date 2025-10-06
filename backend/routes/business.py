@@ -49,13 +49,8 @@ async def create_menu_item(
     try:
         from server import db
         
-        # Get business ID from user
-        business = await db.businesses.find_one({"owner_user_id": current_user["id"]})
-        if not business:
-            raise HTTPException(
-                status_code=404, 
-                detail="Business not found for this user"
-            )
+        # Use current user ID as business ID (since business is registered as user)
+        business_user_id = current_user["id"]
         
         # Create menu item document
         menu_item_doc = {
