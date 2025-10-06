@@ -93,8 +93,9 @@ async def get_nearby_businesses(
             "is_active": True
         }
         
-        # Find nearby businesses
-        businesses = await db.businesses.find(geospatial_query).to_list(length=None)
+        # Find nearby businesses from users collection (role: business)
+        geospatial_query["role"] = "business"
+        businesses = await db.users.find(geospatial_query).to_list(length=None)
         
         print(f"📍 Found {len(businesses)} businesses in radius")
         
