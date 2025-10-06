@@ -54,7 +54,7 @@ class ContentMediaTester:
             print(f"   Error: {error}")
         print()
 
-    def authenticate_users(self):
+    def authenticate_admin(self):
         """Authenticate all test users and get JWT tokens"""
         print("🔐 AUTHENTICATING TEST USERS...")
         
