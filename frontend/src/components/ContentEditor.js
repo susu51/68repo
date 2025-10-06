@@ -265,24 +265,7 @@ const ContentEditor = () => {
 
     if (section.type === 'popular_products') {
       return (
-        <div className="space-y-4">
-          <div>
-            <Label>Başlık</Label>
-            <Input
-              value={section.title || ''}
-              onChange={(e) => handleChange('title', e.target.value)}
-              placeholder="Popüler Ürünler"
-            />
-          </div>
-          <div>
-            <Label>Limit</Label>
-            <Input
-              type="number"
-              value={section.limit || 8}
-              onChange={(e) => handleChange('limit', parseInt(e.target.value) || 8)}
-            />
-          </div>
-        </div>
+        <PopularProductsEditor section={section} onUpdate={onUpdate} />
       );
     }
 
