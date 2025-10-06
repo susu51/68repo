@@ -5244,6 +5244,7 @@ async def update_business_status_admin(
             raise HTTPException(status_code=400, detail="No changes made")
         
         return {
+            "success": True,
             "message": "Business status updated successfully",
             "business_id": business_id,
             "updates": update_data
