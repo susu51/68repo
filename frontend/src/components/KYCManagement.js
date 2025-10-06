@@ -32,6 +32,7 @@ const KYCManagement = ({ user }) => {
       console.log(`✅ Loaded ${data.length} businesses with status: ${status}`);
     } catch (error) {
       console.error('❌ Fetch businesses error:', error);
+      toast.error('İşletmeler yüklenirken hata oluştu');
       setBusinesses([]);
     } finally {
       setLoading(false);
