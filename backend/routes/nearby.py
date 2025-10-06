@@ -126,9 +126,9 @@ async def get_nearby_businesses(
                 
                 nearby_businesses.append(
                     NearbyBusinessResponse(
-                        id=str(business["_id"]),
-                        name=business["name"],
-                        address=business["address"],
+                        id=business.get("id", str(business["_id"])),
+                        name=business.get("business_name", business.get("name", "Unknown Business")),
+                        address=business.get("full_address", business.get("address", "")),
                         distance_m=round(distance, 0),
                         location={
                             "lat": biz_coords[1],
