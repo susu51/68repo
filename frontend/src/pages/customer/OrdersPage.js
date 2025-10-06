@@ -51,13 +51,8 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
       setOrders(ordersData);
     } catch (error) {
       console.error('Error loading orders:', error);
-      // Fallback to mock data with safe properties
-      const safeOrders = mockOrders.map(order => ({
-        ...order,
-        total: order.total || 0,
-        items: order.items || []
-      }));
-      setOrders(safeOrders);
+      toast.error('Siparişler yüklenirken hata oluştu.');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
