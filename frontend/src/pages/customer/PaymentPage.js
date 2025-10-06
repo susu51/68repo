@@ -117,8 +117,6 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
   const createOrder = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const token = localStorage.getItem('kuryecini_access_token');
 
       const orderData = {
         delivery_address: selectedAddress.description,
@@ -160,8 +158,6 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
   const processPayment = async (orderId) => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const token = localStorage.getItem('kuryecini_access_token');
 
       const paymentData = {
         order_id: orderId,
