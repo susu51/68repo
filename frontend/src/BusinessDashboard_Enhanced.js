@@ -636,11 +636,14 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   const fetchIncomingOrders = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
       
-      const response = await axios.get(`${API}/business/orders/incoming`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        setLoading(false);
+        return;
+      }
+      
+      const response = await apiClient.get('/business/orders/incoming');
       
       if (response.data && response.data.orders) {
         setIncomingOrders(response.data.orders);
