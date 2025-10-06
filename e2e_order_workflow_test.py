@@ -354,6 +354,14 @@ class E2EOrderWorkflowTester:
                     f"Order {self.created_order_id} confirmed successfully. New status: {data.get('new_status')}"
                 )
                 return True
+            elif response.status_code == 403 and "KYC approval required" in response.text:
+                self.log_test(
+                    "Business Order Confirmation",
+                    False,
+                    "Business KYC not approved - cannot confirm orders",
+                    "KYC approval required for business order management"
+                )
+                return False
             else:
                 self.log_test(
                     "Business Order Confirmation",
