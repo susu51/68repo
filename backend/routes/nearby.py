@@ -166,9 +166,10 @@ async def get_business_full_menu(
     try:
         from server import db
         
-        # Verify business exists and is active
-        business = await db.businesses.find_one({
-            "_id": business_id,
+        # Verify business exists and is active (from users collection)
+        business = await db.users.find_one({
+            "id": business_id,
+            "role": "business",
             "is_active": True
         })
         
