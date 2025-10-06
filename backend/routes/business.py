@@ -193,10 +193,33 @@ async def update_menu_item(
         
         update_data["updated_at"] = datetime.utcnow()
         
-        # Update in database
+        # Update in both collections for consistency
         await db.menu_items.update_one(
             {"_id": item_id},
             {"$set": update_data}
+        )
+        
+        # Prepare product update data with field mapping
+        product_update_data = {}
+        if item_data.title is not None:
+            product_update_data["name"] = item_data.title  # products uses 'name'
+        if item_data.description is not None:
+            product_update_data["description"] = item_data.description
+        if item_data.price is not None:
+            product_update_data["price"] = float(item_data.price)
+        if item_data.photo_url is not None:
+            product_update_data["image"] = item_data.photo_url  # products uses 'image'
+        if item_data.category is not None:
+            product_update_data["category"] = item_data.category
+        if item_data.is_available is not None:
+            product_update_data["availability"] = item_data.is_available  # products uses 'availability'
+        
+        product_update_data["updated_at"] = datetime.utcnow()
+        
+        # Update products collection
+        await db.products.update_one(
+            {"_id": item_id},
+            {"$set": product_update_data}
         )
         
         # Get updated item
