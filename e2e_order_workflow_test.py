@@ -307,6 +307,14 @@ class E2EOrderWorkflowTester:
                         print(f"   ⚠️ Created order {self.created_order_id} not found in business orders")
                 
                 return True
+            elif response.status_code == 403 and "KYC approval required" in response.text:
+                self.log_test(
+                    "Business Incoming Orders",
+                    False,
+                    "Business KYC not approved - test business needs admin approval",
+                    "KYC approval required for business endpoints"
+                )
+                return False
             else:
                 self.log_test(
                     "Business Incoming Orders",
