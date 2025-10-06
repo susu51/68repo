@@ -3,6 +3,9 @@
  * Temizlenmiş ve düzenli KYC yönetim paneli
  */
 import React, { useState, useEffect } from 'react';
+import { apiClient } from '../utils/apiClient';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const KYCManagement = ({ user }) => {
   const [activeTab, setActiveTab] = useState('pending');
