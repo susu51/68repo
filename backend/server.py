@@ -40,6 +40,9 @@ from logging_config import get_loggers, log_health_check
 import logging
 import time
 
+# Import authentication dependencies
+from auth_dependencies import get_current_user, get_business_user, get_approved_business_user
+
 # Import phone validation function
 try:
     from models import ForgotPasswordRequest, ResetPasswordRequest
