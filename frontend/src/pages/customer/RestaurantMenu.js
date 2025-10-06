@@ -29,135 +29,43 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
+      console.log(`Loading menu for business ID: ${restaurant.id}`);
+      
+      // Use the correct customer endpoint for business products
       const response = await axios.get(`${BACKEND_URL}/api/businesses/${restaurant.id}/products`);
       
-      if (response.data && Array.isArray(response.data)) {
-        setMenuItems(response.data);
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        setMenuItems(response.data.map(item => ({
+          id: item.id || item._id,
+          name: item.name || item.title,
+          description: item.description || 'Lezzetli ürün',
+          price: parseFloat(item.price) || 0,
+          category: item.category || 'main',
+          image: item.image || 'https://via.placeholder.com/300x200?text=Yemek',
+          availability: item.availability !== false
+        })));
+        console.log(`Loaded ${response.data.length} real menu items`);
       } else {
-        // Fallback to mock data if no real menu
-        setMenuItems(mockMenuItems);
+        console.log('No products found - showing empty menu');
+        setMenuItems([]);
       }
     } catch (error) {
       console.error('Error fetching menu:', error);
-      // Use mock data on error
-      setMenuItems(mockMenuItems);
+      // Show empty menu on error instead of mock data
+      setMenuItems([]);
     } finally {
       setLoading(false);
     }
   };
-
-  // Mock menu data as fallback
-  const mockMenuItems = [
-    {
-      id: 1,
-      name: 'Margherita Pizza',
-      description: 'Domates sosu, mozzarella, fesleğen',
-      price: 45.00,
-      category: 'pizza',
-      image: 'https://images.unsplash.com/photo-1604382354936-07c5b6f67692?w=300',
-      availability: true
-    },
-    {
-      id: 2,
-      name: 'Pepperoni Pizza',
-      description: 'Domates sosu, mozzarella, pepperoni',
-      price: 52.00,
-      category: 'pizza',
-      image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300',
-      availability: true
-    },
-    {
-      id: 3,
-      name: 'Tavuk Şiş',
-      description: 'Izgara tavuk şiş, pilav, salata',
-      price: 38.00,
-      category: 'main',
-      image: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=300',
-      availability: true
-    },
-    {
-      id: 4,
-      name: 'Köfte',
-      description: 'Ev yapımı köfte, patates kızartması',
-      price: 42.00,
-      category: 'main',
-      image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=300',
-      availability: true
-    },
-    {
-      id: 5,
-      name: 'Caesar Salata',
-      description: 'Marul, parmesan, kruton, sezar sosu',
-      price: 28.00,
-      category: 'salad',
-      image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=300',
-      availability: true
-    },
-    {
-      id: 6,
-      name: 'Tiramisu',
-      description: 'Geleneksel İtalyan tatlısı',
-      price: 22.00,
-      category: 'dessert',
-      image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300',
-      availability: true
-    }
-  ];
 
   const categories = [
     { id: 'all', name: 'Hepsi', icon: '🍽️' },
     { id: 'pizza', name: 'Pizza', icon: '🍕' },
     { id: 'main', name: 'Ana Yemek', icon: '🍖' },
     { id: 'salad', name: 'Salata', icon: '🥗' },
-    { id: 'dessert', name: 'Tatlı', icon: '🍰' }
+    { id: 'dessert', name: 'Tatlı', icon: '🍰' },
+    { id: 'drink', name: 'İçecek', icon: '🥤' }
   ];
-
-  useEffect(() => {
-    const loadMenuItems = async () => {
-      if (!restaurant?.id) {
-        console.error('No restaurant ID provided');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        console.log(`Loading menu for business ID: ${restaurant.id}`);
-        
-        // First try to get business products
-        const response = await axios.get(`${BACKEND_URL}/api/businesses/${restaurant.id}/products`);
-        console.log('API Response:', response.data);
-        
-        if (response.data && response.data.length > 0) {
-          setMenuItems(response.data);
-          console.log(`Loaded ${response.data.length} real menu items`);
-        } else {
-          console.log('No products found, trying admin endpoint...');
-          
-          // Try admin products endpoint as fallback
-          const adminResponse = await axios.get(`${BACKEND_URL}/api/admin/products?business_id=${restaurant.id}`);
-          
-          if (adminResponse.data && adminResponse.data.length > 0) {
-            setMenuItems(adminResponse.data);
-            console.log(`Loaded ${adminResponse.data.length} products from admin endpoint`);
-          } else {
-            console.log('No products found anywhere - business may not have menu items');
-            setMenuItems([]);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading menu items:', error);
-        console.error('Error details:', error.response?.data);
-        
-        // Show empty menu instead of mock data
-        setMenuItems([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMenuItems();
-  }, [restaurant?.id]);
 
   const filteredItems = selectedCategory === 'all' 
     ? menuItems 
@@ -198,142 +106,143 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
                   <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">{restaurant?.name || 'Restoran'}</h1>
                   <p className="text-white/90 text-sm md:text-base lg:text-lg flex flex-wrap items-center gap-2 md:gap-4">
                     <span>⭐ {restaurant?.rating || '4.5'}</span>
-                    <span>🕒 {restaurant?.deliveryTime || '25-35'} dk</span>
-                    <span>💰 Min: ₺{restaurant?.minOrder || '50'}</span>
+                    <span>📍 {restaurant?.distance ? `${restaurant.distance}m` : 'Yakın'}</span>
+                    <span>⏱️ {restaurant?.deliveryTime || '30-45 dk'}</span>
                   </p>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-2 md:gap-4 w-full sm:w-auto">
-                {/* Cart Summary */}
-                {cart.items.length > 0 && (
-                  <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 md:p-4 text-center cursor-pointer flex-1 sm:flex-none" onClick={onGoToCart}>
-                    <p className="text-xs md:text-sm text-white/90">Sepet</p>
-                    <p className="text-sm md:text-xl font-bold">{cartSummary.itemCount} ürün</p>
-                    <p className="text-sm md:text-lg">₺{cartSummary.total.toFixed(2)}</p>
-                  </div>
-                )}
-                
-                <Button 
-                  variant="outline" 
-                  onClick={onBack}
-                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl backdrop-blur-sm px-3 md:px-4 py-2 text-sm md:text-base"
-                >
-                  ← Geri
-                </Button>
-              </div>
+              <Button
+                onClick={onBack}
+                variant="outline"
+                size="sm"
+                className="bg-white/20 border-white/30 text-white hover:bg-white/30 transition-all duration-300 backdrop-blur-sm"
+              >
+                ← Geri Dön
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Category Filter */}
-        <Card className="mb-6 border-0 shadow-lg rounded-2xl">
-          <CardContent className="p-3 md:p-4 lg:p-6">
-            <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2">
-              {categories.map(category => (
-                <Button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`min-w-fit whitespace-nowrap rounded-xl px-3 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold transition-all duration-300 touch-manipulation ${
-                    selectedCategory === category.id
-                      ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {category.icon} {category.name}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Category Filters */}
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                variant={selectedCategory === category.id ? "default" : "outline"}
+                size="sm"
+                className={`
+                  rounded-full transition-all duration-300 min-w-24
+                  ${selectedCategory === category.id 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105' 
+                    : 'bg-white/80 text-gray-700 hover:bg-white hover:shadow-md'
+                  }
+                `}
+              >
+                <span className="mr-1">{category.icon}</span>
+                {category.name}
+              </Button>
+            ))}
+          </div>
+        </div>
 
         {/* Menu Items */}
-        {filteredItems.length === 0 ? (
-          <div className="text-center py-16">
-            <span className="text-6xl mb-4 block">🍽️</span>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              {menuItems.length === 0 ? 'Henüz menü eklenmemiş' : 'Bu kategoride ürün bulunamadı'}
-            </h3>
-            <p className="text-gray-600">
-              {menuItems.length === 0 
-                ? 'Bu işletme henüz menü ürünlerini yüklememiş. Lütfen daha sonra tekrar deneyin.' 
-                : 'Farklı bir kategori seçmeyi deneyin.'}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {filteredItems.map(item => {
-            const quantityInCart = getItemQuantity(item.id);
-            
-            return (
-              <Card key={item.id} className="group hover:shadow-2xl hover:scale-105 transition-all duration-300 border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
-                <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          {filteredItems.length === 0 ? (
+            <div className="col-span-full text-center py-16">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl text-gray-400">🍽️</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">Henüz menü eklenmemiş</h3>
+              <p className="text-gray-500">Bu restoran henüz menüsünü eklemiyor. Daha sonra tekrar deneyin.</p>
+            </div>
+          ) : (
+            filteredItems.map((item) => (
+              <Card key={item.id} className="border-0 shadow-lg rounded-2xl overflow-hidden bg-white/90 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div className="aspect-video bg-gradient-to-br from-orange-100 to-red-100 overflow-hidden">
                   <img 
                     src={item.image} 
                     alt={item.name}
-                    className="w-full h-32 sm:h-40 md:h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/300x200?text=Yemek';
+                    }}
                   />
                 </div>
-                
-                <CardContent className="p-3 md:p-4 lg:p-6">
-                  <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1 md:mb-2 line-clamp-1">{item.name}</h3>
-                  <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-3 md:mb-4 line-clamp-2">{item.description}</p>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-gray-900 text-lg leading-tight">{item.name}</h3>
+                    <span className="text-xl font-bold text-orange-600 ml-2">₺{item.price.toFixed(2)}</span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
                   
-                  <div className="flex items-center justify-between mb-3 md:mb-4">
-                    <div className="text-lg md:text-2xl font-bold text-orange-500">₺{item.price?.toFixed(2) || '0.00'}</div>
-                    <div className="flex items-center text-green-600">
-                      <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full mr-1 md:mr-2"></span>
-                      <span className="text-xs md:text-sm font-medium">Mevcut</span>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      {getItemQuantity(item.id) > 0 ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => addToCart(item, -1)}
+                            className="w-8 h-8 p-0 rounded-full border-orange-300 text-orange-600 hover:bg-orange-50"
+                          >
+                            -
+                          </Button>
+                          <span className="font-semibold text-orange-600 min-w-8 text-center">
+                            {getItemQuantity(item.id)}
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => addToCart(item, 1)}
+                            className="w-8 h-8 p-0 rounded-full border-orange-300 text-orange-600 hover:bg-orange-50"
+                          >
+                            +
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          onClick={() => addToCart(item)}
+                          className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transition-all duration-300 rounded-full px-6"
+                          disabled={!item.availability}
+                        >
+                          {item.availability ? 'Sepete Ekle' : 'Tükendi'}
+                        </Button>
+                      )}
                     </div>
                   </div>
-
-                  {/* Add to Cart Controls */}
-                  {quantityInCart === 0 ? (
-                    <Button 
-                      onClick={() => addToCart(item)}
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-2 md:py-3 px-2 md:px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm md:text-base touch-manipulation"
-                    >
-                      🛒 Sepete Ekle
-                    </Button>
-                  ) : (
-                    <div className="flex items-center justify-between bg-orange-50 rounded-xl p-2 md:p-3">
-                      <Button 
-                        onClick={() => addToCart(item, -1)}
-                        className="w-8 h-8 md:w-10 md:h-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-0 text-sm md:text-base touch-manipulation"
-                      >
-                        -
-                      </Button>
-                      <span className="text-base md:text-lg font-bold text-orange-600 mx-2">{quantityInCart}</span>
-                      <Button 
-                        onClick={() => addToCart(item, 1)}
-                        className="w-8 h-8 md:w-10 md:h-10 bg-green-500 hover:bg-green-600 text-white rounded-full p-0 text-sm md:text-base touch-manipulation"
-                      >
-                        +
-                      </Button>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
-            );
-          })}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
-        {/* Floating Cart Button - Mobile Optimized */}
-        {cart.items.length > 0 && (
-          <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
-            <Button
-              onClick={onGoToCart}
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 px-4 md:py-4 md:px-8 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 touch-manipulation"
-            >
-              <div className="flex items-center gap-2 md:gap-3">
-                <span className="text-xl md:text-2xl">🛒</span>
-                <div className="text-left">
-                  <p className="text-xs md:text-sm opacity-90">Sepet</p>
-                  <p className="text-sm md:text-lg font-bold">{cartSummary.itemCount} ürün - ₺{cartSummary.total.toFixed(2)}</p>
-                </div>
-              </div>
-            </Button>
+        {/* Fixed Bottom Cart Summary */}
+        {cartSummary.totalItems > 0 && (
+          <div className="fixed bottom-4 left-4 right-4 z-50">
+            <div className="max-w-6xl mx-auto">
+              <Card className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white shadow-2xl border-0 rounded-2xl">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-white/90">
+                        {cartSummary.totalItems} ürün
+                      </p>
+                      <p className="text-xl font-bold">
+                        ₺{cartSummary.totalPrice.toFixed(2)}
+                      </p>
+                    </div>
+                    <Button
+                      onClick={onGoToCart}
+                      className="bg-white/20 border-white/30 text-white hover:bg-white/30 transition-all duration-300 backdrop-blur-sm rounded-xl px-6"
+                    >
+                      Sepete Git
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
       </div>
