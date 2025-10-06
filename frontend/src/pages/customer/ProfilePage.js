@@ -98,7 +98,7 @@ const ProfilePage = ({ user, onLogout }) => {
 
       switch (tab) {
         case 'addresses':
-          const addressesRes = await apiClient.get('/user/addresses');
+          const addressesRes = await apiClient.get('/customer/addresses');
           setUserAddresses(addressesRes.data || []);
           break;
         case 'coupons':
