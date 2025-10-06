@@ -34,8 +34,9 @@ export function AuthProvider({ children }) {
           setToken(existingToken);
           setUser(parsedUser);
           
-          // Set axios default authorization header
+          // Set axios default authorization header and apiClient token
           axios.defaults.headers.common['Authorization'] = `Bearer ${existingToken}`;
+          apiClient.setToken(existingToken);
           
           // CLEAN UP localStorage after migration
           localStorage.removeItem('kuryecini_access_token');
