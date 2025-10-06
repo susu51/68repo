@@ -5431,8 +5431,15 @@ async def get_business_products(business_id: str):
         # Format products for customer view
         formatted_products = []
         for product in products:
+            # Handle ObjectId properly
+            product_id = product.get("_id")
+            if hasattr(product_id, '__str__'):
+                product_id = str(product_id)
+            else:
+                product_id = product.get("id", "unknown")
+                
             formatted_product = {
-                "id": product.get("_id", str(product.get("id", ""))),
+                "id": product_id,
                 "name": product.get("name", ""),
                 "description": product.get("description", ""),
                 "price": float(product.get("price", 0)),
