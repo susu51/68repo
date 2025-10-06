@@ -172,57 +172,40 @@ class ContentMediaTester:
             self.log_test("PUT /api/content/blocks/home_admin", False, f"Request error: {str(e)}")
 
     def test_media_assets_endpoints(self):
-        """Update order status to enable courier location tracking"""
-        if not self.test_order_id:
-            return
-            
+        """Test media assets API endpoints"""
+        print("\n🖼️ TESTING MEDIA ASSETS ENDPOINTS")
+        
+        # Test GET /api/content/media-assets
         try:
-            # Simulate order progression: created -> confirmed -> preparing -> ready -> picked_up
-            statuses = ["confirmed", "preparing", "ready"]
-            
-            for status in statuses:
-                # Update as business
-                headers = {"Authorization": f"Bearer {self.tokens['business']}"}
-                response = requests.patch(
-                    f"{BACKEND_URL}/business/orders/{self.test_order_id}/status",
-                    json={"status": status},
-                    headers=headers,
-                    timeout=10
-                )
-                
-                if response.status_code == 200:
-                    print(f"   Order status updated to: {status}")
-                else:
-                    print(f"   Failed to update order to {status}: {response.status_code}")
-            
-            # Courier picks up the order
-            headers = {"Authorization": f"Bearer {self.tokens['courier']}"}
-            response = requests.patch(
-                f"{BACKEND_URL}/courier/orders/{self.test_order_id}/pickup",
-                headers=headers,
-                timeout=10
-            )
-            
+            response = self.session.get(f"{BACKEND_URL}/content/media-assets")
             if response.status_code == 200:
-                self.log_test(
-                    "Order Pickup for Tracking",
-                    True,
-                    "Order picked up by courier, ready for location tracking"
-                )
+                data = response.json()
+                self.log_test("GET /api/content/media-assets", True, 
+                            f"Retrieved media galleries successfully, count: {len(data) if isinstance(data, list) else 'N/A'}")
+            elif response.status_code == 404:
+                self.log_test("GET /api/content/media-assets", False, 
+                            "Endpoint not found - media assets API not implemented")
             else:
-                self.log_test(
-                    "Order Pickup for Tracking",
-                    False,
-                    f"Status: {response.status_code}",
-                    response.text
-                )
-                
+                self.log_test("GET /api/content/media-assets", False, 
+                            f"Unexpected response: {response.status_code} - {response.text}")
         except Exception as e:
-            self.log_test(
-                "Order Pickup for Tracking",
-                False,
-                error=str(e)
-            )
+            self.log_test("GET /api/content/media-assets", False, f"Request error: {str(e)}")
+        
+        # Test GET /api/content/media-assets/courier_gallery
+        try:
+            response = self.session.get(f"{BACKEND_URL}/content/media-assets/courier_gallery")
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("GET /api/content/media-assets/courier_gallery", True, 
+                            f"Retrieved courier gallery successfully, images count: {len(data.get('images', [])) if isinstance(data, dict) else 'N/A'}")
+            elif response.status_code == 404:
+                self.log_test("GET /api/content/media-assets/courier_gallery", False, 
+                            "Endpoint not found - courier gallery API not implemented")
+            else:
+                self.log_test("GET /api/content/media-assets/courier_gallery", False, 
+                            f"Unexpected response: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.log_test("GET /api/content/media-assets/courier_gallery", False, f"Request error: {str(e)}")
 
     def test_courier_location_update(self):
         """Test POST /api/courier/location - Real-time location updates"""
