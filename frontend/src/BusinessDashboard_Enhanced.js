@@ -281,8 +281,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       }
       
       const response = await apiClient.patch(`/business/orders/${orderId}/status`,
-        { status: 'confirmed' },
-        { headers: { 'Authorization': `Bearer ${token}` } }
+        { status: 'accepted' }
       );
 
       if (response.data) {
