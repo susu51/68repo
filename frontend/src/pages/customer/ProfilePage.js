@@ -49,12 +49,18 @@ const ProfilePage = ({ user, onLogout }) => {
   const [userAddresses, setUserAddresses] = useState([]);
   const [editingAddress, setEditingAddress] = useState(null);
   const [newAddress, setNewAddress] = useState({
-    label: '',
-    description: '',
-    city: '',
+    title: 'Ev',
+    full_address: '',
     district: '',
-    lat: 0,
-    lng: 0
+    city: '',
+    building_no: '',
+    apartment_no: '',
+    floor: '',
+    instructions: '',
+    phone: '',
+    lat: null,
+    lng: null,
+    is_default: false
   });
   
   // Notification settings states
