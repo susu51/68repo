@@ -1424,14 +1424,25 @@ async def update_business_status(status_data: dict, current_user: dict = Depends
         raise HTTPException(status_code=403, detail="Business access required")
     
     try:
-        # For demo purposes, return success with mock data
-        return {
-            "success": True,
-            "status": status_data.get("isOpen", True),
-            "message": "Restaurant status updated successfully"
-        }
+        # Update business status in database
+        business_id = current_user.get("user_id")
+        is_open = status_data.get("isOpen", True)
+        
+        result = await db.users.update_one(
+            {"id": business_id, "role": "business"}, 
+            {"$set": {"is_open": is_open}}
+        )
+        
+        if result.modified_count > 0:
+            return {
+                "success": True,
+                "status": is_open,
+                "message": "Restaurant status updated successfully"
+            }
+        else:
+            raise HTTPException(status_code=404, detail="Business not found")
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Status update failed")
+        raise HTTPException(status_code=500, detail=f"Status update failed: {str(e)}")
 
 @api_router.get("/business/stats")
 async def get_business_stats(current_user: dict = Depends(get_current_user)):
