@@ -171,7 +171,7 @@ class ContentMediaTester:
         except Exception as e:
             self.log_test("PUT /api/content/blocks/home_admin", False, f"Request error: {str(e)}")
 
-    def update_order_for_tracking(self):
+    def test_media_assets_endpoints(self):
         """Update order status to enable courier location tracking"""
         if not self.test_order_id:
             return
