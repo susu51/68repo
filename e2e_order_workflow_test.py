@@ -194,15 +194,19 @@ class E2EOrderWorkflowTester:
     def test_customer_order_creation(self):
         """Test POST /api/orders - Customer creates an order"""
         try:
-            # First get available businesses and products
-            businesses_response = self.session.get(f"{BACKEND_URL}/businesses", timeout=10)
+            # First get available businesses from working endpoint
+            businesses_response = self.session.get(
+                f"{BACKEND_URL}/restaurants/near",
+                params={"lat": 41.0082, "lng": 28.9784},
+                timeout=10
+            )
             if businesses_response.status_code != 200:
-                self.log_test("Customer Order Creation", False, "Failed to get businesses", businesses_response.text)
+                self.log_test("Customer Order Creation", False, "Failed to get restaurants", businesses_response.text)
                 return False
             
-            businesses = businesses_response.json().get("businesses", [])
+            businesses = businesses_response.json()
             if not businesses:
-                self.log_test("Customer Order Creation", False, "No businesses available", "")
+                self.log_test("Customer Order Creation", False, "No restaurants available", "")
                 return False
             
             # Use first available business
