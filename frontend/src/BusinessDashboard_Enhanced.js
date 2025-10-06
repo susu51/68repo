@@ -472,13 +472,12 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     if (!window.confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
     
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.delete(`${API}/business/menu/${productId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        return;
+      }
+      
+      const response = await apiClient.delete(`/business/menu/${productId}`);
 
       if (response.status === 200 || response.status === 204) {
         setProducts(prev => prev.filter(p => p.id !== productId));
