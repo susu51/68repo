@@ -16,6 +16,7 @@ const BACKEND_URL = process.env.VITE_API_URL || process.env.REACT_APP_BACKEND_UR
 const API = `${BACKEND_URL}/api`;
 
 export const BusinessDashboard = ({ user, onLogout }) => {
+  const { isAuthenticated, token } = useAuth();
   // Navigation state
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(false);
