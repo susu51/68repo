@@ -5418,6 +5418,56 @@ async def get_courier_earnings(current_user: dict = Depends(get_courier_user)):
         "total": week_earnings[0]["total"] if week_earnings else 0
     }
 
+@api_router.get("/businesses")
+async def get_businesses(lat: float = None, lng: float = None, radius: int = 5000):
+    """Get list of active businesses (public endpoint for customers)"""
+    try:
+        from server import db
+        
+        # Get active businesses from users collection
+        query = {"role": "business", "is_active": True, "kyc_status": "approved"}
+        
+        businesses = await db.users.find(query).to_list(length=None)
+        
+        formatted_businesses = []
+        for business in businesses:
+            # Handle ObjectId properly
+            business_id = business.get("_id")
+            if hasattr(business_id, '__str__'):
+                business_id = str(business_id)
+            else:
+                business_id = business.get("id", "unknown")
+                
+            formatted_business = {
+                "id": business_id,
+                "name": business.get("business_name", "İsimsiz İşletme"),
+                "category": business.get("business_category", "Restaurant"),
+                "city": business.get("city", ""),
+                "address": business.get("address", ""),
+                "description": business.get("description", ""),
+                "rating": 4.5,  # Default rating
+                "delivery_time": "30-45 dk",
+                "is_active": business.get("is_active", True)
+            }
+            
+            # Add location if available
+            location = business.get("location")
+            if location and isinstance(location, dict):
+                coordinates = location.get("coordinates", [])
+                if len(coordinates) >= 2:
+                    formatted_business["lat"] = coordinates[1] 
+                    formatted_business["lng"] = coordinates[0]
+                    
+            formatted_businesses.append(formatted_business)
+        
+        return formatted_businesses
+        
+    except Exception as e:
+        print(f"❌ Error getting businesses: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error fetching businesses: {str(e)}")
+
 @api_router.get("/businesses/{business_id}/products")
 async def get_business_products(business_id: str):
     """Get products for a specific business (public endpoint for customers)"""
