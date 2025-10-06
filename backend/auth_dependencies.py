@@ -66,7 +66,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         return {
             "id": user.get("id", str(user.get("_id", ""))),
             "email": user["email"],
-            "role": user.get("role", "customer")
+            "role": user.get("role", "customer"),
+            "kyc_status": user.get("kyc_status", "pending"),
+            "business_name": user.get("business_name", ""),
+            "first_name": user.get("first_name", ""),
+            "last_name": user.get("last_name", ""),
+            "is_active": user.get("is_active", True)
         }
     except jwt.ExpiredSignatureError:
         raise HTTPException(
