@@ -5439,4 +5439,30 @@ async def get_courier_earnings(current_user: dict = Depends(get_courier_user)):
         "total": week_earnings[0]["total"] if week_earnings else 0
     }
 
+@api_router.get("/businesses/{business_id}/products")
+async def get_business_products(business_id: str):
+    """Get products for a specific business (public endpoint for customers)"""
+    try:
+        # Get products for this business
+        products = await db.products.find({"business_id": business_id}).to_list(length=None)
+        
+        # Format products for customer view
+        formatted_products = []
+        for product in products:
+            formatted_products.append({
+                "id": product.get("_id", str(product.get("id", ""))),
+                "name": product.get("name", ""),
+                "description": product.get("description", ""),
+                "price": float(product.get("price", 0)),
+                "category": product.get("category", "main"),
+                "image": product.get("image", ""),
+                "availability": product.get("availability", True)
+            })
+        
+        return formatted_products
+        
+    except Exception as e:
+        print(f"Error getting business products: {e}")
+        return []
+
 app.include_router(api_router)
