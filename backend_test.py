@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-PHASE 1 COURIER LOCATION SYSTEM BACKEND TESTING
-Comprehensive testing of the newly implemented courier location tracking system.
+Phase 2 Content & Media Foundation Backend Testing
+Testing content blocks, media assets, admin stats, and popular products endpoints
 
 Test Coverage:
-1. POST /api/courier/location - Real-time location updates (courier role required)
-2. GET /api/courier/location/{courier_id} - Get courier location access
-3. GET /api/orders/{order_id}/courier/location - Order-specific courier tracking
-4. RBAC security testing
-5. Redis integration verification
-6. MongoDB historical storage testing
-7. Integration with existing order system
+1. GET /api/content/blocks - Content blocks retrieval
+2. GET /api/content/blocks/home_admin - Admin dashboard content
+3. PUT /api/content/blocks/home_admin - Update admin content (auth required)
+4. GET /api/content/media-assets - Media galleries retrieval
+5. GET /api/content/media-assets/courier_gallery - Courier images
+6. GET /api/content/admin/stats - Real-time dashboard stats
+7. GET /api/content/popular-products - Popular products data
 """
 
 import requests
