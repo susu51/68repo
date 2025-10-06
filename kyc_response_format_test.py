@@ -46,7 +46,11 @@ def test_kyc_response_format():
         return False
     
     businesses_data = businesses_response.json()
-    businesses = businesses_data.get("businesses", [])
+    # Handle both list and dict response formats
+    if isinstance(businesses_data, list):
+        businesses = businesses_data
+    else:
+        businesses = businesses_data.get("businesses", [])
     print(f"✅ Found {len(businesses)} pending businesses")
     
     if not businesses:
