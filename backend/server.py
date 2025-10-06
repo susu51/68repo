@@ -4660,28 +4660,7 @@ async def get_nearby_restaurants(lat: float, lng: float, radius: int = 50000):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/businesses/{business_id}/products")
-async def get_business_products(business_id: str):
-    """Get products for a specific business"""
-    try:
-        products = await db.products.find({
-            "business_id": business_id,
-            "is_available": True
-        }).to_list(None)
-        
-        # Convert ObjectId to string
-        for product in products:
-            if "_id" in product:
-                product["id"] = str(product["_id"])
-                del product["_id"]
-            
-            # Handle datetime conversion
-            if "created_at" in product and hasattr(product["created_at"], 'isoformat'):
-                product["created_at"] = product["created_at"].isoformat()
-        
-        return products
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# Duplicate endpoint removed - using enhanced version below
 
 def calculate_distance(lat1, lng1, lat2, lng2):
     """Calculate distance between two coordinates using Haversine formula"""
