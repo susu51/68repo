@@ -27,17 +27,12 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
       
-      if (!token) {
-        // Show mock data if not authenticated with safe properties
-        const safeOrders = mockOrders.map(order => ({
-          ...order,
-          total: order.total || 0,
-          items: order.items || []
-        }));
-        setOrders(safeOrders);
+      if (!isAuthenticated) {
+        // No authentication - show empty orders instead of mock data
+        setOrders([]);
         setLoading(false);
+        toast.error('Siparişleri görmek için giriş yapmalısınız.');
         return;
       }
 
