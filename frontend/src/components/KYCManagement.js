@@ -8,13 +8,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 
 const KYCManagement = ({ user }) => {
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState('pending');
   const [businesses, setBusinesses] = useState([]);
   const [couriers, setCouriers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
-
-  const API_BASE = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
   // Fetch businesses by status
   const fetchBusinesses = async (status = 'pending') => {
