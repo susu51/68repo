@@ -1515,6 +1515,11 @@ const AdminPanel = ({ user, onLogout }) => {
             )}
           </div>
         )}
+
+        {/* Content Editor View */}
+        {currentView === 'content-editor' && (
+          <ContentEditor />
+        )}
       </main>
     </div>
   );
