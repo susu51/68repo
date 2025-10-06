@@ -213,7 +213,7 @@ export class AddressManager {
 
   static async deleteAddress(addressId) {
     try {
-      await apiClient.delete(`/api/addresses/${addressId}`);
+      await apiClient.delete(`/user/addresses/${addressId}`);
       
       // Refresh addresses list
       await this.getAddresses();
