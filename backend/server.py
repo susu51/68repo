@@ -5123,9 +5123,12 @@ async def get_all_businesses_admin(
         # KYC status filter (direct KYC filtering)
         if kyc_status:
             query_filter["kyc_status"] = kyc_status
+            
+        # Add role filter for business users
+        query_filter["role"] = "business"
         
-        # Fetch businesses
-        businesses = await db.businesses.find(query_filter).to_list(length=None)
+        # Get businesses from users collection (not businesses collection)
+        businesses = await db.users.find(query_filter).to_list(length=None)
         
         # Convert ObjectId to string and prepare response
         result = []
