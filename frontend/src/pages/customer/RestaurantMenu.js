@@ -19,7 +19,34 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
     }
   }, [restaurant, setRestaurant]);
 
-  // Mock menu data - gerçek API'den gelecek
+  // Fetch menu items from API
+  useEffect(() => {
+    if (restaurant && restaurant.id) {
+      fetchMenuItems();
+    }
+  }, [restaurant]);
+
+  const fetchMenuItems = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${BACKEND_URL}/api/businesses/${restaurant.id}/products`);
+      
+      if (response.data && Array.isArray(response.data)) {
+        setMenuItems(response.data);
+      } else {
+        // Fallback to mock data if no real menu
+        setMenuItems(mockMenuItems);
+      }
+    } catch (error) {
+      console.error('Error fetching menu:', error);
+      // Use mock data on error
+      setMenuItems(mockMenuItems);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock menu data as fallback
   const mockMenuItems = [
     {
       id: 1,
