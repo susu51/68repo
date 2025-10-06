@@ -185,7 +185,7 @@ export class AddressManager {
 
   static async addAddress(addressData) {
     try {
-      const newAddress = await apiClient.post('/api/addresses', addressData);
+      const newAddress = await apiClient.post('/user/addresses', addressData);
       
       // Refresh addresses list
       const updatedAddresses = await this.getAddresses();
