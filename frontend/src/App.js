@@ -41,9 +41,6 @@ const API = `${BACKEND_URL}/api`;
 // Console log for debugging
 console.log('Frontend connecting to:', API);
 
-// Import Auth Context
-import { AuthContext, useAuth } from "./contexts/AuthContext";
-
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
   const { login } = useAuth();
