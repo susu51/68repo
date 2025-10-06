@@ -19,20 +19,17 @@ const KYCManagement = ({ user }) => {
   const fetchBusinesses = async (status = 'pending') => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token') || localStorage.getItem('token');
       
-      const response = await fetch(`${API_BASE}/api/admin/businesses?kyc_status=${status}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setBusinesses(data);
-        console.log(`✅ Loaded ${data.length} businesses with status: ${status}`);
-      } else {
-        console.error(`❌ Failed to fetch businesses: ${response.status}`);
-        setBusinesses([]);
+      if (!isAuthenticated) {
+        toast.error('Admin girişi gereklidir');
+        return;
       }
+      
+      const response = await apiClient.get(`/admin/businesses?kyc_status=${status}`);
+      const data = response.data;
+      
+      setBusinesses(data);
+      console.log(`✅ Loaded ${data.length} businesses with status: ${status}`);
     } catch (error) {
       console.error('❌ Fetch businesses error:', error);
       setBusinesses([]);
