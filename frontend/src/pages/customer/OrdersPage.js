@@ -62,20 +62,19 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
     if (!selectedOrder || !reviewTarget) return;
 
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
-      if (!token) {
-        toast.success('Değerlendirmeniz kaydedildi!');
+      if (!isAuthenticated) {
+        toast.error('Değerlendirme yapmak için giriş yapmalısınız.');
         setShowReviewModal(false);
         return;
       }
 
-      await axios.post(`${API}/api/reviews`, {
+      await apiClient.post('/reviews', {
         orderId: selectedOrder.id,
         targetType: reviewTarget,
         targetId: reviewTarget === 'business' ? selectedOrder.businessId : selectedOrder.courierId,
         rating: reviewData.rating,
         comment: reviewData.comment
-      }, {
+      });
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
