@@ -37,24 +37,14 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
       const response = await apiClient.get('/user/addresses');
 
-      if (response.ok) {
-        const addresses = await response.json();
-        setUserAddresses(addresses || []);
-        console.log('Loaded addresses:', addresses);
-        
-        // If no address selected but addresses available, select first one
-        if (!selectedAddress && addresses.length > 0) {
-          setSelectedAddress(addresses[0]);
-          console.log('Auto-selected first address:', addresses[0]);
-        }
-      } else if (response.status === 401) {
-        // Token expired or invalid
-        console.log('Authentication failed in PaymentPage, token may be expired');
-        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-        localStorage.removeItem('kuryecini_access_token');
-      } else {
-        console.error('Error loading addresses:', response.status, response.statusText);
-        toast.error('Adresler yüklenirken bir hata oluştu');
+      const addresses = response.data || [];
+      setUserAddresses(addresses);
+      console.log('Loaded addresses:', addresses);
+      
+      // If no address selected but addresses available, select first one
+      if (!selectedAddress && addresses.length > 0) {
+        setSelectedAddress(addresses[0]);
+        console.log('Auto-selected first address:', addresses[0]);
       }
     } catch (error) {
       console.error('Error loading addresses:', error);
