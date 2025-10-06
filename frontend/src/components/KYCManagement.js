@@ -56,6 +56,7 @@ const KYCManagement = ({ user }) => {
       console.log(`✅ Loaded ${data.length} couriers with status: ${status}`);
     } catch (error) {
       console.error('❌ Fetch couriers error:', error);
+      toast.error('Kuryeler yüklenirken hata oluştu');
       setCouriers([]);
     } finally {
       setLoading(false);
