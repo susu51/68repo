@@ -1375,12 +1375,18 @@ const ProfilePage = ({ user, onLogout }) => {
                     setShowAddressModal(false);
                     setEditingAddress(null);
                     setNewAddress({
-                      label: '',
-                      description: '',
-                      city: '',
+                      title: 'Ev',
+                      full_address: '',
                       district: '',
-                      lat: 0,
-                      lng: 0
+                      city: '',
+                      building_no: '',
+                      apartment_no: '',
+                      floor: '',
+                      instructions: '',
+                      phone: '',
+                      lat: null,
+                      lng: null,
+                      is_default: false
                     });
                   }}
                   variant="outline"
@@ -1389,8 +1395,8 @@ const ProfilePage = ({ user, onLogout }) => {
                   İptal
                 </Button>
                 <Button
-                  onClick={editingAddress ? handleUpdateAddress : handleAddAddress}
-                  disabled={loading}
+                  onClick={handleSaveAddress}
+                  disabled={loading || !newAddress.full_address || !newAddress.city}
                   className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
                 >
                   {loading ? (editingAddress ? 'Güncelleniyor...' : 'Ekleniyor...') : 
