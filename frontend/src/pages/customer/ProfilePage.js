@@ -867,12 +867,18 @@ const ProfilePage = ({ user, onLogout }) => {
             onClick={() => {
               setEditingAddress(null);
               setNewAddress({
-                label: '',
-                description: '',
-                city: '',
+                title: 'Ev',
+                full_address: '',
                 district: '',
-                lat: 0,
-                lng: 0
+                city: '',
+                building_no: '',
+                apartment_no: '',
+                floor: '',
+                instructions: '',
+                phone: '',
+                lat: null,
+                lng: null,
+                is_default: false
               });
               setShowAddressModal(true);
             }}
