@@ -33,12 +33,9 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
   const loadUserAddresses = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
-      if (!token) return;
+      if (!apiClient.isAuthenticated()) return;
 
-      const response = await fetch(`${API}/api/user/addresses`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await apiClient.get('/user/addresses');
 
       if (response.ok) {
         const addresses = await response.json();
