@@ -1499,7 +1499,7 @@ async def get_business_stats(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Stats retrieval failed")
 
 @api_router.get("/business/orders/incoming")
-async def get_incoming_orders(current_user: dict = Depends(get_business_user)):
+async def get_incoming_orders(current_user: dict = Depends(get_approved_business_user)):
     """Get incoming orders for business - real implementation"""
     try:
         business_id = current_user["id"]
