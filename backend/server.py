@@ -5443,13 +5443,16 @@ async def get_courier_earnings(current_user: dict = Depends(get_courier_user)):
 async def get_business_products(business_id: str):
     """Get products for a specific business (public endpoint for customers)"""
     try:
+        print(f"🍽️ Getting products for business_id: {business_id}")
+        
         # Get products for this business
         products = await db.products.find({"business_id": business_id}).to_list(length=None)
+        print(f"🍽️ Found {len(products)} products in database")
         
         # Format products for customer view
         formatted_products = []
         for product in products:
-            formatted_products.append({
+            formatted_product = {
                 "id": product.get("_id", str(product.get("id", ""))),
                 "name": product.get("name", ""),
                 "description": product.get("description", ""),
@@ -5457,12 +5460,16 @@ async def get_business_products(business_id: str):
                 "category": product.get("category", "main"),
                 "image": product.get("image", ""),
                 "availability": product.get("availability", True)
-            })
+            }
+            formatted_products.append(formatted_product)
+            print(f"🍽️ Added product: {formatted_product['name']} - ₺{formatted_product['price']}")
         
         return formatted_products
         
     except Exception as e:
-        print(f"Error getting business products: {e}")
+        print(f"❌ Error getting business products: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 app.include_router(api_router)
