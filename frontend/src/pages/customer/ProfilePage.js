@@ -365,11 +365,8 @@ const ProfilePage = ({ user, onLogout }) => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
 
-      await axios.delete(`${API}/api/user/addresses/${addressId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await apiClient.delete(`/user/addresses/${addressId}`);
 
       toast.success('Adres başarıyla silindi!');
       
