@@ -278,21 +278,62 @@ const ContentEditor = () => {
           </Button>
         </div>
 
-        {/* Sections List */}
+        {/* Sections List with Drag & Drop */}
         <div className="space-y-4">
           {sections.map((section, index) => (
-            <Card key={section.id || index} className="border-2">
+            <Card 
+              key={section.id || index} 
+              className="border-2 cursor-move hover:border-orange-300 transition-colors"
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/plain', index.toString());
+                e.currentTarget.style.opacity = '0.5';
+              }}
+              onDragEnd={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.currentTarget.style.borderColor = '#fb923c';
+              }}
+              onDragLeave={(e) => {
+                e.currentTarget.style.borderColor = '';
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.style.borderColor = '';
+                const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                const targetIndex = index;
+                
+                if (draggedIndex !== targetIndex) {
+                  const newSections = [...sections];
+                  const [draggedSection] = newSections.splice(draggedIndex, 1);
+                  newSections.splice(targetIndex, 0, draggedSection);
+                  setSections(newSections);
+                  toast.success('Bölüm sırası değiştirildi');
+                }
+              }}
+            >
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-lg capitalize">
-                    {section.type.replace('_', ' ')}
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <div className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
+                      ⋮⋮
+                    </div>
+                    <CardTitle className="text-lg capitalize">
+                      {section.type.replace('_', ' ')}
+                    </CardTitle>
+                    <Badge variant="outline" className="text-xs">
+                      #{index + 1}
+                    </Badge>
+                  </div>
                   <div className="flex gap-2">
                     {index > 0 && (
                       <Button 
                         size="sm" 
                         variant="ghost"
                         onClick={() => moveSection(index, 'up')}
+                        title="Yukarı taşı"
                       >
                         ⬆️
                       </Button>
@@ -302,6 +343,7 @@ const ContentEditor = () => {
                         size="sm" 
                         variant="ghost"
                         onClick={() => moveSection(index, 'down')}
+                        title="Aşağı taşı"
                       >
                         ⬇️
                       </Button>
@@ -309,7 +351,12 @@ const ContentEditor = () => {
                     <Button 
                       size="sm" 
                       variant="destructive"
-                      onClick={() => removeSection(index)}
+                      onClick={() => {
+                        if (window.confirm('Bu bölümü silmek istediğinizden emin misiniz?')) {
+                          removeSection(index);
+                        }
+                      }}
+                      title="Sil"
                     >
                       🗑️
                     </Button>
@@ -324,6 +371,17 @@ const ContentEditor = () => {
               </CardContent>
             </Card>
           ))}
+          
+          {sections.length === 0 && (
+            <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-gray-500 mb-4">
+                📋 Henüz hiç bölüm eklenmemiş
+              </div>
+              <div className="text-sm text-gray-400">
+                Yukarıdaki butonları kullanarak bölüm ekleyebilirsin
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Live Preview */}
