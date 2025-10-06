@@ -1448,7 +1448,7 @@ async def update_business_status(status_data: dict, current_user: dict = Depends
         raise HTTPException(status_code=500, detail=f"Status update failed: {str(e)}")
 
 @api_router.get("/business/stats")
-async def get_business_stats(current_user: dict = Depends(get_current_user)):
+async def get_business_stats(current_user: dict = Depends(get_approved_business_user)):
     """Get business statistics and analytics"""
     if current_user.get("role") != "business":
         raise HTTPException(status_code=403, detail="Business access required")
