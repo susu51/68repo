@@ -2096,12 +2096,14 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
         "delivered_at": None
     }
     
-    # Get business info from first product
+    # Get business info from first menu item
     if order_data.items:
-        first_product = await db.products.find_one({"id": order_data.items[0].product_id})
-        if first_product:
-            order_doc["business_id"] = first_product["business_id"]
-            order_doc["business_name"] = first_product["business_name"]
+        first_item = await db.menu_items.find_one({"_id": order_data.items[0].product_id})
+        if first_item:
+            order_doc["business_id"] = first_item["business_id"]
+            # Get business name from users collection
+            business = await db.users.find_one({"id": first_item["business_id"]})
+            order_doc["business_name"] = business.get("business_name", "") if business else ""
     
     await db.orders.insert_one(order_doc)
     
