@@ -26,9 +26,9 @@ from datetime import datetime, timezone
 # Configuration from frontend/.env
 BACKEND_URL = "https://delivery-platform-10.preview.emergentagent.com/api"
 
-# Test credentials from review request
+# Test credentials from review request (corrected business email)
 TEST_CREDENTIALS = {
-    "business": {"email": "testfix@example.com", "password": "test123"},
+    "business": {"email": "testbusiness@example.com", "password": "test123"},
     "customer": {"email": "testcustomer@example.com", "password": "test123"},
     "courier": {"email": "testkurye@example.com", "password": "test123"}
 }
