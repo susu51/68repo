@@ -59,6 +59,8 @@
 ## agent_communication:
 ##     -agent: "main"
 ##     -message: "STARTING CUSTOMER AUTHENTICATION FIX: Identified root cause of JWT token/user ID mismatch issue. The get_current_user function returns user object with 'id' field, but address endpoints incorrectly try to extract 'sub' field. Will fix this by using current_user.get('id') directly instead of trying to extract from JWT payload."
+##     -agent: "testing"
+##     -message: "🚨 CRITICAL E2E WORKFLOW TESTING RESULTS: Direct customer access (/customer route) and test button work perfectly, but MAJOR BACKEND DATA ISSUES prevent complete workflow testing. ✅ WORKING: Customer app loads, navigation works, restaurant discovery shows 3 restaurants. ❌ CRITICAL FAILURES: All restaurants show as 'İsimsiz Restoran' with no business names, categories, or cities. Zero products in entire system - no Margherita Pizza (₺45), Chicken Burger (₺35), or Caesar Salad (₺25) as claimed in review request. All restaurants show 'Henüz menü eklenmemiş' (no menu added). Backend APIs return empty data: /api/restaurants has null fields, /api/businesses returns error, /api/products returns empty array. The 'Menu API Fixed' and 'Real products available' claims in review request are FALSE. Complete E2E order workflow cannot be tested due to missing backend data. URGENT: Backend database needs proper restaurant and product data setup."
 
 # Protocol Guidelines for Main agent
 #
