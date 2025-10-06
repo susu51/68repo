@@ -98,7 +98,7 @@ const ProfilePage = ({ user, onLogout }) => {
 
       switch (tab) {
         case 'addresses':
-          const addressesRes = await axios.get(`${API}/api/user/addresses`, { headers });
+          const addressesRes = await apiClient.get('/user/addresses');
           setUserAddresses(addressesRes.data || []);
           break;
         case 'coupons':
