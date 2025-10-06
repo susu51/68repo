@@ -8,7 +8,7 @@ from typing import List, Optional
 from datetime import datetime
 import uuid
 from models import MenuItem, UserRole
-from auth_dependencies import get_business_user
+from auth_dependencies import get_business_user, get_approved_business_user
 
 router = APIRouter(prefix="/business", tags=["business"])
 
