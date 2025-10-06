@@ -154,32 +154,111 @@ async def get_total_revenue():
         return 0
 
 @router.get("/popular-products")
-async def get_popular_products(limit: int = 8):
-    """Get popular products for admin dashboard"""
+async def get_popular_products(
+    limit: int = 8,
+    sort_by: str = "order_count",
+    time_range: str = "all_time"
+):
+    """Get popular products for admin dashboard with advanced filtering"""
     try:
-        # Aggregate orders to find most ordered products
-        pipeline = [
-            {"$unwind": "$items"},
-            {"$group": {
-                "_id": "$items.product_id",
-                "name": {"$first": "$items.product_name"}, 
-                "order_count": {"$sum": "$items.quantity"},
-                "business_name": {"$first": "$business_name"}
-            }},
-            {"$sort": {"order_count": -1}},
-            {"$limit": limit}
-        ]
+        # Time filter
+        time_filter = {}
+        if time_range != "all_time":
+            from datetime import timedelta
+            now = datetime.now(timezone.utc)
+            
+            if time_range == "today":
+                start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            elif time_range == "week":
+                start_date = now - timedelta(days=7)
+            elif time_range == "month":
+                start_date = now - timedelta(days=30)
+            else:
+                start_date = now - timedelta(days=365)
+            
+            time_filter = {"created_at": {"$gte": start_date.isoformat()}}
+        
+        # Aggregation pipeline
+        match_stage = {"$match": time_filter} if time_filter else {"$match": {}}
+        
+        if sort_by == "order_count":
+            pipeline = [
+                match_stage,
+                {"$unwind": "$items"},
+                {"$group": {
+                    "_id": "$items.product_id",
+                    "name": {"$first": "$items.product_name"}, 
+                    "order_count": {"$sum": "$items.quantity"},
+                    "business_name": {"$first": "$business_name"},
+                    "total_revenue": {"$sum": "$items.subtotal"}
+                }},
+                {"$sort": {"order_count": -1}},
+                {"$limit": limit}
+            ]
+        elif sort_by == "revenue":
+            pipeline = [
+                match_stage,
+                {"$unwind": "$items"},
+                {"$group": {
+                    "_id": "$items.product_id",
+                    "name": {"$first": "$items.product_name"}, 
+                    "order_count": {"$sum": "$items.quantity"},
+                    "business_name": {"$first": "$business_name"},
+                    "total_revenue": {"$sum": "$items.subtotal"}
+                }},
+                {"$sort": {"total_revenue": -1}},
+                {"$limit": limit}
+            ]
+        elif sort_by == "recent":
+            pipeline = [
+                match_stage,
+                {"$unwind": "$items"},
+                {"$sort": {"created_at": -1}},
+                {"$group": {
+                    "_id": "$items.product_id",
+                    "name": {"$first": "$items.product_name"}, 
+                    "order_count": {"$sum": "$items.quantity"},
+                    "business_name": {"$first": "$business_name"},
+                    "last_ordered": {"$first": "$created_at"}
+                }},
+                {"$limit": limit}
+            ]
+        else:  # Default to order_count
+            pipeline = [
+                match_stage,
+                {"$unwind": "$items"},
+                {"$group": {
+                    "_id": "$items.product_id",
+                    "name": {"$first": "$items.product_name"}, 
+                    "order_count": {"$sum": "$items.quantity"},
+                    "business_name": {"$first": "$business_name"}
+                }},
+                {"$sort": {"order_count": -1}},
+                {"$limit": limit}
+            ]
         
         products = await db.orders.aggregate(pipeline).to_list(length=None)
         
-        # If no data, return mock products for demo
+        # If no real data, return demo products
         if not products:
-            products = [
-                {"_id": "1", "name": "Margherita Pizza", "order_count": 45, "business_name": "Pizza Palace"},
-                {"_id": "2", "name": "Cheeseburger", "order_count": 38, "business_name": "Burger House"},
-                {"_id": "3", "name": "Chicken Döner", "order_count": 32, "business_name": "Döner King"},
-                {"_id": "4", "name": "Sushi Set", "order_count": 28, "business_name": "Tokyo Sushi"},
-            ][:limit]
+            demo_products = [
+                {"_id": "demo-1", "name": "Margherita Pizza", "order_count": 45, "business_name": "Pizza Palace", "total_revenue": 675},
+                {"_id": "demo-2", "name": "Cheeseburger", "order_count": 38, "business_name": "Burger House", "total_revenue": 532},
+                {"_id": "demo-3", "name": "Chicken Döner", "order_count": 32, "business_name": "Döner King", "total_revenue": 448},
+                {"_id": "demo-4", "name": "Sushi Set", "order_count": 28, "business_name": "Tokyo Sushi", "total_revenue": 980},
+                {"_id": "demo-5", "name": "Fish & Chips", "order_count": 25, "business_name": "Ocean Grill", "total_revenue": 400},
+                {"_id": "demo-6", "name": "Chicken Wings", "order_count": 22, "business_name": "Wing Stop", "total_revenue": 330},
+                {"_id": "demo-7", "name": "Pasta Carbonara", "order_count": 20, "business_name": "Italian Corner", "total_revenue": 380},
+                {"_id": "demo-8", "name": "Beef Burger", "order_count": 18, "business_name": "Gourmet Burgers", "total_revenue": 396}
+            ]
+            
+            # Apply sorting to demo data
+            if sort_by == "revenue":
+                demo_products.sort(key=lambda x: x["total_revenue"], reverse=True)
+            elif sort_by == "order_count":
+                demo_products.sort(key=lambda x: x["order_count"], reverse=True)
+            
+            products = demo_products[:limit]
         
         return products
     except Exception as e:
