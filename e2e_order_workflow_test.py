@@ -225,7 +225,12 @@ class E2EOrderWorkflowTester:
                 self.log_test("Customer Order Creation", False, "Failed to get products", products_response.text)
                 return False
             
-            products = products_response.json().get("products", [])
+            products_data = products_response.json()
+            # Handle both list and dict responses
+            if isinstance(products_data, list):
+                products = products_data
+            else:
+                products = products_data.get("products", [])
             if not products:
                 self.log_test("Customer Order Creation", False, "No products available", "")
                 return False
