@@ -43,15 +43,6 @@ console.log('Frontend connecting to:', API);
 
 // Import Auth Context
 import { AuthContext, useAuth } from "./contexts/AuthContext";
-  }, [isMounted]);
-
-const useAuth = () => {
-  const context = React.useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-};
 
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
