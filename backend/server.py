@@ -539,7 +539,7 @@ if not cors_origins:
         "http://localhost:3000",
         "http://localhost:5173", 
         "https://*.vercel.app",
-        "https://delivery-platform-10.preview.emergentagent.com"
+        "https://db-driven-kuryecini.preview.emergentagent.com"
     ]
 
 app.add_middleware(

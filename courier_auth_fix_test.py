@@ -24,7 +24,7 @@ import bcrypt
 from datetime import datetime, timezone
 
 # Configuration from frontend/.env
-BACKEND_URL = "https://delivery-platform-10.preview.emergentagent.com/api"
+BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com/api"
 
 # Test credentials from review request (corrected business email)
 TEST_CREDENTIALS = {

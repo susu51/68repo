@@ -8,7 +8,7 @@ import aiohttp
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://delivery-platform-10.preview.emergentagent.com/api"
+BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com/api"
 
 async def test_business_registration_city_normalization():
     """Test business registration with various city spellings"""
