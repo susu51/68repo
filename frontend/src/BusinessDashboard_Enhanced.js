@@ -429,15 +429,14 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         photo_url: productForm.image_url,
       };
 
-      const token = localStorage.getItem('token');
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        return;
+      }
 
       if (editingProduct) {
         // Update existing product
-        const response = await axios.patch(`${API}/business/menu/${editingProduct.id}`, productData, { headers });
+        const response = await apiClient.patch(`/business/menu/${editingProduct.id}`, productData);
         
         if (response.data) {
           setProducts(prev => prev.map(p => p.id === editingProduct.id ? response.data : p));
@@ -445,7 +444,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         }
       } else {
         // Add new product
-        const response = await axios.post(`${API}/business/menu`, productData, { headers });
+        const response = await apiClient.post('/business/menu', productData);
         
         if (response.data) {
           setProducts(prev => [...prev, response.data]);
