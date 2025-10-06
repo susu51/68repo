@@ -371,6 +371,21 @@ const ContentEditor = () => {
   };
 
   const AdminDashboardPreview = ({ sections }) => {
+    const [popularProducts, setPopularProducts] = useState([]);
+    
+    // Load popular products for preview
+    useEffect(() => {
+      const loadPopularProducts = async () => {
+        try {
+          const response = await apiClient.get('/content/popular-products?limit=4');
+          setPopularProducts(response.data || []);
+        } catch (error) {
+          console.error('Error loading popular products:', error);
+        }
+      };
+      loadPopularProducts();
+    }, []);
+    
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {sections.map((section, index) => (
@@ -392,9 +407,24 @@ const ContentEditor = () => {
                 </div>
               )}
               {section.type === 'popular_products' && (
-                <div className="text-center p-4 bg-blue-50 rounded">
-                  <div className="font-medium">{section.title}</div>
-                  <div className="text-sm text-gray-600">Limit: {section.limit}</div>
+                <div className="space-y-2">
+                  <div className="font-medium text-center mb-2">{section.title}</div>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {popularProducts.slice(0, section.limit || 8).map((product, i) => (
+                      <div key={i} className="flex justify-between items-center p-2 bg-blue-50 rounded text-xs">
+                        <div>
+                          <div className="font-medium">{product.name}</div>
+                          <div className="text-gray-600">{product.business_name || 'Restaurant'}</div>
+                        </div>
+                        <div className="text-blue-600 font-bold">
+                          {product.order_count} sipariş
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-xs text-gray-500 text-center">
+                    Toplam {section.limit || 8} ürün gösteriliyor
+                  </div>
                 </div>
               )}
               {section.type === 'ad_boards' && (
