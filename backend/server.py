@@ -5600,4 +5600,199 @@ async def get_reviews(target_id: str, target_type: str = "business"):
         print(f"❌ Error getting reviews: {e}")
         return {"reviews": [], "average_rating": 4.5, "total_reviews": 0}
 
+# Customer Address Management Endpoints
+@api_router.get("/customer/addresses")
+async def get_customer_addresses(current_user: dict = Depends(get_customer_user)):
+    """Get customer's saved addresses"""
+    try:
+        from server import db
+        
+        addresses = await db.customer_addresses.find({
+            "customer_id": current_user["id"]
+        }).sort("created_at", -1).to_list(length=None)
+        
+        formatted_addresses = []
+        for addr in addresses:
+            formatted_addresses.append({
+                "id": addr.get("_id", str(addr.get("id", ""))),
+                "title": addr.get("title", ""),
+                "full_address": addr.get("full_address", ""),
+                "district": addr.get("district", ""),
+                "city": addr.get("city", ""),
+                "building_no": addr.get("building_no", ""),
+                "apartment_no": addr.get("apartment_no", ""),
+                "floor": addr.get("floor", ""),
+                "instructions": addr.get("instructions", ""),
+                "phone": addr.get("phone", ""),
+                "lat": addr.get("lat"),
+                "lng": addr.get("lng"),
+                "is_default": addr.get("is_default", False),
+                "created_at": addr.get("created_at", "").isoformat() if hasattr(addr.get("created_at", ""), 'isoformat') else str(addr.get("created_at", ""))
+            })
+        
+        return formatted_addresses
+        
+    except Exception as e:
+        print(f"❌ Error getting customer addresses: {e}")
+        return []
+
+@api_router.post("/customer/addresses")
+async def create_customer_address(
+    address_data: dict,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Create new customer address"""
+    try:
+        from server import db
+        
+        # If this is set as default, unset others
+        if address_data.get("is_default", False):
+            await db.customer_addresses.update_many(
+                {"customer_id": current_user["id"]},
+                {"$set": {"is_default": False}}
+            )
+        
+        # Create new address
+        address = {
+            "_id": str(uuid.uuid4()),
+            "customer_id": current_user["id"],
+            "title": address_data.get("title", "Ev"),
+            "full_address": address_data.get("full_address", ""),
+            "district": address_data.get("district", ""),
+            "city": address_data.get("city", ""),
+            "building_no": address_data.get("building_no", ""),
+            "apartment_no": address_data.get("apartment_no", ""),
+            "floor": address_data.get("floor", ""),
+            "instructions": address_data.get("instructions", ""),
+            "phone": address_data.get("phone", ""),
+            "lat": float(address_data.get("lat", 0)) if address_data.get("lat") else None,
+            "lng": float(address_data.get("lng", 0)) if address_data.get("lng") else None,
+            "is_default": address_data.get("is_default", False),
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.customer_addresses.insert_one(address)
+        
+        return {
+            "success": True,
+            "message": "Address created successfully",
+            "address_id": address["_id"]
+        }
+        
+    except Exception as e:
+        print(f"❌ Error creating customer address: {e}")
+        raise HTTPException(status_code=500, detail=f"Address creation failed: {str(e)}")
+
+@api_router.put("/customer/addresses/{address_id}")
+async def update_customer_address(
+    address_id: str,
+    address_data: dict,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Update customer address"""
+    try:
+        from server import db
+        
+        # If this is set as default, unset others
+        if address_data.get("is_default", False):
+            await db.customer_addresses.update_many(
+                {"customer_id": current_user["id"], "_id": {"$ne": address_id}},
+                {"$set": {"is_default": False}}
+            )
+        
+        # Update address
+        update_data = {}
+        for field in ["title", "full_address", "district", "city", "building_no", "apartment_no", "floor", "instructions", "phone", "is_default"]:
+            if field in address_data:
+                update_data[field] = address_data[field]
+        
+        if "lat" in address_data and address_data["lat"]:
+            update_data["lat"] = float(address_data["lat"])
+        if "lng" in address_data and address_data["lng"]:
+            update_data["lng"] = float(address_data["lng"])
+            
+        update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        result = await db.customer_addresses.update_one(
+            {"_id": address_id, "customer_id": current_user["id"]},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Address not found or no changes made")
+        
+        return {
+            "success": True,
+            "message": "Address updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error updating customer address: {e}")
+        raise HTTPException(status_code=500, detail=f"Address update failed: {str(e)}")
+
+@api_router.delete("/customer/addresses/{address_id}")
+async def delete_customer_address(
+    address_id: str,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Delete customer address"""
+    try:
+        from server import db
+        
+        result = await db.customer_addresses.delete_one({
+            "_id": address_id,
+            "customer_id": current_user["id"]
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Address not found")
+        
+        return {
+            "success": True,
+            "message": "Address deleted successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error deleting customer address: {e}")
+        raise HTTPException(status_code=500, detail=f"Address deletion failed: {str(e)}")
+
+@api_router.patch("/customer/addresses/{address_id}/default")
+async def set_default_address(
+    address_id: str,
+    current_user: dict = Depends(get_customer_user)
+):
+    """Set address as default"""
+    try:
+        from server import db
+        
+        # Unset all other defaults
+        await db.customer_addresses.update_many(
+            {"customer_id": current_user["id"]},
+            {"$set": {"is_default": False}}
+        )
+        
+        # Set this as default
+        result = await db.customer_addresses.update_one(
+            {"_id": address_id, "customer_id": current_user["id"]},
+            {"$set": {"is_default": True}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Address not found")
+        
+        return {
+            "success": True,
+            "message": "Default address updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error setting default address: {e}")
+        raise HTTPException(status_code=500, detail=f"Default address update failed: {str(e)}")
+
 app.include_router(api_router)
