@@ -41,64 +41,8 @@ const API = `${BACKEND_URL}/api`;
 // Console log for debugging
 console.log('Frontend connecting to:', API);
 
-// Auth Context
-const AuthContext = React.createContext({
-  user: null,
-  login: () => {},
-  logout: () => {},
-  loading: true
-});
-
-const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(true);
-
-  useEffect(() => {
-    setIsMounted(true);
-    
-    try {
-      const token = localStorage.getItem('kuryecini_access_token');
-      const userData = localStorage.getItem('kuryecini_user');
-      
-      if (token && userData && isMounted) {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        // Set axios default authorization header
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      }
-    } catch (error) {
-      console.error('Auth initialization error:', error);
-      // Clear corrupted data
-      localStorage.removeItem('kuryecini_access_token');
-      localStorage.removeItem('kuryecini_user');
-    }
-    
-    if (isMounted) {
-      setLoading(false);
-    }
-
-    // Cleanup
-    return () => {
-      setIsMounted(false);
-    };
-  }, []);
-
-  const login = React.useCallback((authData) => {
-    if (!isMounted) return;
-    
-    try {
-      localStorage.setItem('kuryecini_access_token', authData.access_token);
-      // Backend returns 'user' not 'user_data'
-      const userData = authData.user || authData.user_data;
-      localStorage.setItem('kuryecini_user', JSON.stringify(userData));
-      setUser(userData);
-      
-      // Set axios default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${authData.access_token}`;
-    } catch (error) {
-      console.error('Login error:', error);
-    }
+// Import Auth Context
+import { AuthContext, useAuth } from "./contexts/AuthContext";
   }, [isMounted]);
 
   const logout = React.useCallback(() => {
