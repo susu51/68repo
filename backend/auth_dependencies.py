@@ -88,6 +88,24 @@ async def get_business_user(current_user: dict = Depends(get_current_user)):
         )
     return current_user
 
+async def get_approved_business_user(current_user: dict = Depends(get_current_user)):
+    """Get current user and verify business role + KYC approval"""
+    if current_user.get("role") != UserRole.BUSINESS.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Business access required"
+        )
+    
+    # Check KYC status
+    kyc_status = current_user.get("kyc_status", "pending")
+    if kyc_status != "approved":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"KYC approval required. Current status: {kyc_status}. Please wait for admin approval."
+        )
+    
+    return current_user
+
 async def get_customer_user(current_user: dict = Depends(get_current_user)):
     """Require customer role"""
     if current_user.get("role") != UserRole.CUSTOMER.value:
