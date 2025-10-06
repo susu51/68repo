@@ -5134,7 +5134,7 @@ async def get_all_businesses_admin(
         result = []
         for business in businesses:
             business_data = {
-                "id": str(business.get("_id", "")),
+                "id": business.get("id", str(business.get("_id", ""))),
                 "business_name": business.get("business_name", ""),
                 "business_category": business.get("business_category", ""),
                 "email": business.get("email", ""),
