@@ -671,13 +671,13 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     try {
       setLoading(true);
       
-      // Gerçek API çağrısı - Phase 2 Business Menu CRUD
-      const response = await axios.get(`${API}/business/menu`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmadan menü yükleyemezsiniz');
+        return;
+      }
+      
+      // Gerçek API çağrısı - Phase 2 Business Menu CRUD (yeni auth sistemi)
+      const response = await apiClient.get('/business/menu');
       
       if (response.data) {
         setProducts(response.data);
