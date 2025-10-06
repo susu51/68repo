@@ -113,6 +113,7 @@ class E2EOrderWorkflowTester:
             response = self.session.get(
                 f"{BACKEND_URL}/nearby/businesses",
                 params={"lat": lat, "lng": lng},
+                headers=self.get_auth_headers("customer"),
                 timeout=10
             )
             
