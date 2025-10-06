@@ -55,43 +55,58 @@ class ContentMediaTester:
         print()
 
     def authenticate_admin(self):
-        """Authenticate all test users and get JWT tokens"""
-        print("🔐 AUTHENTICATING TEST USERS...")
+        """Authenticate as admin user"""
+        print("🔐 AUTHENTICATING ADMIN USER...")
         
-        for role, credentials in TEST_CREDENTIALS.items():
+        # Try primary admin credentials
+        try:
+            login_data = {
+                "email": ADMIN_EMAIL,
+                "password": ADMIN_PASSWORD
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.admin_token = data.get("access_token")
+                if self.admin_token:
+                    self.session.headers.update({
+                        "Authorization": f"Bearer {self.admin_token}"
+                    })
+                    self.log_test("Admin Authentication", True, 
+                                f"Successfully authenticated admin user, token length: {len(self.admin_token)}")
+                    return True
+                else:
+                    self.log_test("Admin Authentication", False, "No access token in response")
+            else:
+                self.log_test("Admin Authentication", False, 
+                            f"Login failed with status {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_test("Admin Authentication", False, f"Authentication error: {str(e)}")
+        
+        # Try alternative credentials
+        for creds in ALTERNATIVE_ADMIN_CREDENTIALS:
             try:
-                response = requests.post(
-                    f"{BACKEND_URL}/auth/login",
-                    json=credentials,
-                    timeout=10
-                )
+                response = self.session.post(f"{BACKEND_URL}/auth/login", json=creds)
                 
                 if response.status_code == 200:
                     data = response.json()
-                    self.tokens[role] = data["access_token"]
-                    
-                    # Store courier ID for testing
-                    if role == "courier":
-                        self.test_courier_id = data["user"]["id"]
-                    
-                    self.log_test(
-                        f"Authentication - {role.title()}",
-                        True,
-                        f"Token length: {len(data['access_token'])} chars, User ID: {data['user']['id']}"
-                    )
-                else:
-                    self.log_test(
-                        f"Authentication - {role.title()}",
-                        False,
-                        f"Status: {response.status_code}",
-                        response.text
-                    )
+                    self.admin_token = data.get("access_token")
+                    if self.admin_token:
+                        self.session.headers.update({
+                            "Authorization": f"Bearer {self.admin_token}"
+                        })
+                        self.log_test(f"Alternative Admin Auth ({creds['email']})", True, 
+                                    f"Successfully authenticated, token length: {len(self.admin_token)}")
+                        return True
+                        
             except Exception as e:
-                self.log_test(
-                    f"Authentication - {role.title()}",
-                    False,
-                    error=str(e)
-                )
+                self.log_test(f"Alternative Admin Auth ({creds['email']})", False, 
+                            f"Authentication error: {str(e)}")
+        
+        return False
 
     def create_test_order(self):
         """Create a test order for location tracking testing"""
