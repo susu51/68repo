@@ -275,10 +275,12 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   // Professional Business Functions
   const acceptOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        return;
+      }
       
-      const response = await axios.patch(
-        `${API}/business/orders/${orderId}/status`,
+      const response = await apiClient.patch(`/business/orders/${orderId}/status`,
         { status: 'confirmed' },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
