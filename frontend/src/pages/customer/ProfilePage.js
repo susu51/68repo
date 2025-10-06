@@ -902,13 +902,27 @@ const ProfilePage = ({ user, onLogout }) => {
                   📍
                 </div>
                 <div>
-                  <p className="font-semibold">{address.label}</p>
-                  <p className="text-sm text-gray-600">{address.description}</p>
-                  <p className="text-xs text-gray-500">{address.city}</p>
-                  {address.is_default && (
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                      Varsayılan
-                    </span>
+                  <div className="flex items-center space-x-2">
+                    <p className="font-semibold">{address.title}</p>
+                    {address.is_default && (
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                        Varsayılan
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600">{address.full_address}</p>
+                  <p className="text-xs text-gray-500">
+                    {address.district && `${address.district}, `}{address.city}
+                  </p>
+                  {address.building_no && (
+                    <p className="text-xs text-gray-400">
+                      Bina: {address.building_no} 
+                      {address.apartment_no && `, Daire: ${address.apartment_no}`}
+                      {address.floor && `, Kat: ${address.floor}`}
+                    </p>
+                  )}
+                  {address.phone && (
+                    <p className="text-xs text-gray-400">Tel: {address.phone}</p>
                   )}
                 </div>
               </div>
