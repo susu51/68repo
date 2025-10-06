@@ -3354,6 +3354,7 @@ async def update_courier_status_admin(
             raise HTTPException(status_code=400, detail="No changes made")
         
         return {
+            "success": True,
             "message": "Courier status updated successfully",
             "courier_id": courier_id,
             "updates": update_data
