@@ -47,6 +47,138 @@ const ContentEditor = () => {
     }
   };
 
+  const PopularProductsEditor = ({ section, onUpdate }) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+      loadPopularProducts();
+    }, []);
+
+    const loadPopularProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/content/popular-products?limit=20');
+        setProducts(response.data || []);
+      } catch (error) {
+        console.error('Error loading popular products:', error);
+        toast.error('Popüler ürünler yüklenirken hata oluştu');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handleChange = (field, value) => {
+      onUpdate({ ...section, [field]: value });
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Başlık</Label>
+            <Input
+              value={section.title || ''}
+              onChange={(e) => handleChange('title', e.target.value)}
+              placeholder="Popüler Ürünler"
+            />
+          </div>
+          <div>
+            <Label>Gösterilecek Ürün Sayısı</Label>
+            <Select 
+              value={(section.limit || 8).toString()} 
+              onValueChange={(value) => handleChange('limit', parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seçin" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="4">4 Ürün</SelectItem>
+                <SelectItem value="6">6 Ürün</SelectItem>
+                <SelectItem value="8">8 Ürün</SelectItem>
+                <SelectItem value="10">10 Ürün</SelectItem>
+                <SelectItem value="12">12 Ürün</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div>
+          <Label>Sıralama Kriteri</Label>
+          <Select 
+            value={section.sort_by || 'order_count'} 
+            onValueChange={(value) => handleChange('sort_by', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Sıralama" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="order_count">Sipariş Sayısına Göre</SelectItem>
+              <SelectItem value="recent">En Yeni Siparişler</SelectItem>
+              <SelectItem value="revenue">Gelire Göre</SelectItem>
+              <SelectItem value="rating">Puana Göre</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Zaman Aralığı</Label>
+          <Select 
+            value={section.time_range || 'all_time'} 
+            onValueChange={(value) => handleChange('time_range', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Zaman" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Bugün</SelectItem>
+              <SelectItem value="week">Bu Hafta</SelectItem>
+              <SelectItem value="month">Bu Ay</SelectItem>
+              <SelectItem value="all_time">Tüm Zamanlar</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Live Preview */}
+        <div className="border-t pt-4">
+          <Label className="text-lg font-medium">🔍 Canlı Önizleme</Label>
+          <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin w-6 h-6 border-2 border-orange-600 border-t-transparent rounded-full mx-auto"></div>
+                <div className="mt-2 text-sm text-gray-600">Ürünler yükleniyor...</div>
+              </div>
+            ) : (
+              <div>
+                <div className="font-medium mb-3 text-center">{section.title || 'Popüler Ürünler'}</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {products.slice(0, section.limit || 8).map((product, i) => (
+                    <div key={i} className="flex justify-between items-center p-2 bg-white rounded border text-sm">
+                      <div>
+                        <div className="font-medium text-gray-900">{product.name}</div>
+                        <div className="text-xs text-gray-600">{product.business_name || 'Restaurant'}</div>
+                      </div>
+                      <div className="text-orange-600 font-bold text-xs">
+                        #{i + 1}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs text-gray-500 text-center mt-2">
+                  {section.limit || 8} ürün • {section.sort_by?.replace('_', ' ') || 'sipariş sayısı'} • {section.time_range?.replace('_', ' ') || 'tüm zamanlar'}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <Button onClick={loadPopularProducts} variant="outline" size="sm">
+          🔄 Verileri Yenile
+        </Button>
+      </div>
+    );
+  };
+
   const AdminDashboardEditor = ({ block }) => {
     const [sections, setSections] = useState(block?.sections || []);
 
