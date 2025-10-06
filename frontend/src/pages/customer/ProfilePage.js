@@ -1247,34 +1247,39 @@ const ProfilePage = ({ user, onLogout }) => {
                 📍 {editingAddress ? 'Adres Düzenle' : 'Yeni Adres Ekle'}
               </h3>
               
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-96 overflow-y-auto">
                 <div>
                   <Label>Adres Etiketi</Label>
-                  <Input
-                    type="text"
-                    value={newAddress.label}
-                    onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
-                    placeholder="Ev, İş, Diğer..."
-                  />
+                  <select
+                    value={newAddress.title}
+                    onChange={(e) => setNewAddress({...newAddress, title: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg p-2"
+                  >
+                    <option value="Ev">🏠 Ev</option>
+                    <option value="İş">🏢 İş</option>
+                    <option value="Diğer">📍 Diğer</option>
+                  </select>
                 </div>
                 
                 <div>
-                  <Label>Adres Tarifi</Label>
+                  <Label>Tam Adres *</Label>
                   <textarea
-                    value={newAddress.description}
-                    onChange={(e) => setNewAddress({...newAddress, description: e.target.value})}
-                    placeholder="Cadde, sokak, bina no, kat, daire..."
+                    value={newAddress.full_address}
+                    onChange={(e) => setNewAddress({...newAddress, full_address: e.target.value})}
+                    placeholder="Mahalle, cadde, sokak adı..."
                     className="w-full border border-gray-300 rounded-lg p-3 text-sm h-20"
+                    required
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Şehir</Label>
+                    <Label>Şehir *</Label>
                     <select
                       value={newAddress.city}
                       onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
                       className="w-full border border-gray-300 rounded-lg p-2"
+                      required
                     >
                       <option value="">Şehir Seçin</option>
                       <option value="İstanbul">İstanbul</option>
@@ -1291,14 +1296,75 @@ const ProfilePage = ({ user, onLogout }) => {
                       type="text"
                       value={newAddress.district}
                       onChange={(e) => setNewAddress({...newAddress, district: e.target.value})}
-                      placeholder="İlçe"
+                      placeholder="İlçe adı"
                     />
                   </div>
                 </div>
                 
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label>Bina No</Label>
+                    <Input
+                      type="text"
+                      value={newAddress.building_no}
+                      onChange={(e) => setNewAddress({...newAddress, building_no: e.target.value})}
+                      placeholder="123"
+                    />
+                  </div>
+                  <div>
+                    <Label>Daire No</Label>
+                    <Input
+                      type="text"
+                      value={newAddress.apartment_no}
+                      onChange={(e) => setNewAddress({...newAddress, apartment_no: e.target.value})}
+                      placeholder="5"
+                    />
+                  </div>
+                  <div>
+                    <Label>Kat</Label>
+                    <Input
+                      type="text"
+                      value={newAddress.floor}
+                      onChange={(e) => setNewAddress({...newAddress, floor: e.target.value})}
+                      placeholder="2"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label>Telefon</Label>
+                  <Input
+                    type="tel"
+                    value={newAddress.phone}
+                    onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
+                    placeholder="0532 123 45 67"
+                  />
+                </div>
+                
+                <div>
+                  <Label>Teslimat Talimatları</Label>
+                  <textarea
+                    value={newAddress.instructions}
+                    onChange={(e) => setNewAddress({...newAddress, instructions: e.target.value})}
+                    placeholder="Zil çalın, kapıya bırakın vb..."
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm h-16"
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="default_address"
+                    checked={newAddress.is_default}
+                    onChange={(e) => setNewAddress({...newAddress, is_default: e.target.checked})}
+                    className="rounded"
+                  />
+                  <Label htmlFor="default_address" className="text-sm">Varsayılan adres olarak ayarla</Label>
+                </div>
+                
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-blue-700 text-sm">
-                    📍 Konum bilgisi isteğe bağlıdır. Daha hızlı teslimat için konum paylaşabilirsiniz.
+                    📍 Konum bilgisi otomatik olarak belirlenecektir.
                   </p>
                 </div>
               </div>
