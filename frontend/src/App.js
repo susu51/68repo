@@ -22,6 +22,7 @@ import { CourierDashboard } from "./CourierDashboard";
 import { BusinessDashboard as EnhancedBusinessDashboard } from "./BusinessDashboard_Enhanced";
 import AdminPanel from "./AdminPanel";
 import { CartProvider } from "./contexts/CartContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 // Components
 import { Button } from "./components/ui/button";
