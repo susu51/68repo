@@ -282,8 +282,9 @@ class E2EOrderWorkflowTester:
                     True,
                     f"Order created successfully. Order ID: {order_id}, Total: ₺{order_data['total_amount']}"
                 )
-                print(f"   Business: {business.get('business_name')}")
-                print(f"   Product: {product.get('name')} x2")
+                business_name = business.get('business_name') or business.get('name', 'Unknown Business')
+                print(f"   Business: {business_name}")
+                print(f"   Product: {product_name} x2")
                 return True
             else:
                 self.log_test(
