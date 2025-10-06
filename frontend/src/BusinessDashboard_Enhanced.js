@@ -339,12 +339,13 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   const startPreparingOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        return;
+      }
       
-      const response = await axios.patch(
-        `${API}/business/orders/${orderId}/status`,
-        { status: 'preparing' },
-        { headers: { 'Authorization': `Bearer ${token}` } }
+      const response = await apiClient.patch(`/business/orders/${orderId}/status`,
+        { status: 'preparing' }
       );
 
       if (response.data) {
