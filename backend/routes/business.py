@@ -53,9 +53,10 @@ async def create_menu_item(
         business_user_id = current_user["id"]
         
         # Create menu item document
+        menu_item_id = str(uuid.uuid4())
         menu_item_doc = {
-            "_id": str(uuid.uuid4()),
-            "business_id": str(business["_id"]),
+            "_id": menu_item_id,
+            "business_id": business_user_id,
             "title": item_data.title,
             "description": item_data.description,
             "price": float(item_data.price),
