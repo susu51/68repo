@@ -5365,6 +5365,9 @@ api_router.include_router(admin_settings_router)
 # Phase 3.5 - localStorage → DB Migration
 api_router.include_router(customer_cart_router)
 
+# Phase 2 - Content & Media Management
+api_router.include_router(content_router)
+
 # Debug routes (temporary)
 api_router.include_router(debug_router)
 
