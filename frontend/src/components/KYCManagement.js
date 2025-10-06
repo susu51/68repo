@@ -42,20 +42,17 @@ const KYCManagement = ({ user }) => {
   const fetchCouriers = async (status = 'pending') => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token') || localStorage.getItem('token');
       
-      const response = await fetch(`${API_BASE}/api/admin/couriers?kyc_status=${status}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCouriers(data);
-        console.log(`✅ Loaded ${data.length} couriers with status: ${status}`);
-      } else {
-        console.error(`❌ Failed to fetch couriers: ${response.status}`);
-        setCouriers([]);
+      if (!isAuthenticated) {
+        toast.error('Admin girişi gereklidir');
+        return;
       }
+      
+      const response = await apiClient.get(`/admin/couriers?kyc_status=${status}`);
+      const data = response.data;
+      
+      setCouriers(data);
+      console.log(`✅ Loaded ${data.length} couriers with status: ${status}`);
     } catch (error) {
       console.error('❌ Fetch couriers error:', error);
       setCouriers([]);
