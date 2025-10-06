@@ -65,23 +65,20 @@ const KYCManagement = ({ user }) => {
   const approveKYC = async (type, id) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token') || localStorage.getItem('token');
+      
+      if (!isAuthenticated) {
+        toast.error('Admin girişi gereklidir');
+        return;
+      }
       
       const endpoint = type === 'business' 
-        ? `${API_BASE}/api/admin/businesses/${id}/status`
-        : `${API_BASE}/api/admin/couriers/${id}/status`;
+        ? `/admin/businesses/${id}/status`
+        : `/admin/couriers/${id}/status`;
 
-      const response = await fetch(endpoint, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ kyc_status: 'approved' })
-      });
-
-      if (response.ok) {
-        alert(`✅ ${type === 'business' ? 'İşletme' : 'Kurye'} KYC başarıyla onaylandı!`);
+      const response = await apiClient.patch(endpoint, { kyc_status: 'approved' });
+      
+      if (response.data.success) {
+        toast.success(`✅ ${type === 'business' ? 'İşletme' : 'Kurye'} KYC başarıyla onaylandı!`);
         
         // Refresh both pending and approved lists
         await Promise.all([
@@ -91,8 +88,7 @@ const KYCManagement = ({ user }) => {
           fetchCouriers('approved')
         ]);
       } else {
-        const error = await response.json();
-        alert(`❌ Onaylama başarısız: ${error.detail || 'Bilinmeyen hata'}`);
+        toast.error(`❌ Onaylama başarısız: ${response.data.message || 'Bilinmeyen hata'}`);
       }
     } catch (error) {
       console.error('❌ Approval error:', error);
