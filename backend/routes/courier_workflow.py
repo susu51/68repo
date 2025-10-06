@@ -48,7 +48,7 @@ def calculate_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> fl
     
     return R * c
 
-@router.get("/available", response_model=List[AvailableOrderResponse])
+@router.get("/orders/available", response_model=List[AvailableOrderResponse])
 async def get_available_orders(
     lat: float = Query(..., description="Courier current latitude"),
     lng: float = Query(..., description="Courier current longitude"),
