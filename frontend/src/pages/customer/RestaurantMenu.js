@@ -19,14 +19,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
     }
   }, [restaurant, setRestaurant]);
 
-  // Fetch menu items from API
-  useEffect(() => {
-    if (restaurant && restaurant.id) {
-      fetchMenuItems();
-    }
-  }, [restaurant]);
-
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = useCallback(async () => {
     try {
       setLoading(true);
       console.log(`Loading menu for business ID: ${restaurant.id}`);
