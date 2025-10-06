@@ -95,7 +95,7 @@ async def create_menu_item(
 
 @router.get("/menu", response_model=List[MenuItemResponse])
 async def get_my_menu(
-    current_user: dict = Depends(get_business_user)
+    current_user: dict = Depends(get_approved_business_user)
 ):
     """Get business's own menu items only"""
     try:
