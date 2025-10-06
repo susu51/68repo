@@ -259,7 +259,7 @@ async def delete_menu_item(
         if not business:
             raise HTTPException(status_code=404, detail="Business not found")
         
-        # Check ownership and delete
+        # Check ownership and delete from both collections
         result = await db.menu_items.delete_one({
             "_id": item_id,
             "business_id": str(business["_id"])
@@ -270,6 +270,9 @@ async def delete_menu_item(
                 status_code=404,
                 detail="Menu item not found or access denied"
             )
+        
+        # Also delete from products collection
+        await db.products.delete_one({"_id": item_id})
         
         return {"success": True, "message": "Menu item deleted"}
         
