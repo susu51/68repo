@@ -72,7 +72,11 @@ def test_kyc_response_format():
             print("✅ Test business created successfully")
             # Re-fetch pending businesses
             businesses_response = requests.get(f"{BACKEND_URL}/admin/businesses?kyc_status=pending", headers=headers)
-            businesses = businesses_response.json().get("businesses", [])
+            businesses_data = businesses_response.json()
+            if isinstance(businesses_data, list):
+                businesses = businesses_data
+            else:
+                businesses = businesses_data.get("businesses", [])
         else:
             print(f"❌ Failed to create test business: {create_response.status_code}")
             return False
