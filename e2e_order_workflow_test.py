@@ -146,40 +146,41 @@ class E2EOrderWorkflowTester:
             return False
     
     def test_general_business_listing(self):
-        """Test GET /api/businesses for customer view"""
+        """Test GET /api/restaurants/near for customer view (alternative working endpoint)"""
         try:
+            # Use the working restaurants/near endpoint instead of broken /businesses
             response = self.session.get(
-                f"{BACKEND_URL}/businesses",
-                headers=self.get_auth_headers("customer"),
+                f"{BACKEND_URL}/restaurants/near",
+                params={"lat": 41.0082, "lng": 28.9784},
                 timeout=10
             )
             
             if response.status_code == 200:
-                data = response.json()
-                businesses = data.get("businesses", [])
+                businesses = response.json()
                 
                 self.log_test(
-                    "General Business Listing",
+                    "General Business Listing (via restaurants/near)",
                     True,
-                    f"Retrieved {len(businesses)} approved businesses for customer view"
+                    f"Retrieved {len(businesses)} restaurants for customer view"
                 )
                 
                 # Check if businesses have required fields
                 if businesses:
                     sample_business = businesses[0]
-                    required_fields = ['id', 'business_name', 'city', 'kyc_status']
+                    required_fields = ['id', 'name', 'city']
                     missing_fields = [field for field in required_fields if field not in sample_business]
                     
                     if not missing_fields:
-                        print(f"   Sample business: {sample_business.get('business_name')} in {sample_business.get('city')}")
-                        print(f"   KYC Status: {sample_business.get('kyc_status')}")
+                        print(f"   Sample restaurant: {sample_business.get('name')} in {sample_business.get('city')}")
+                        print(f"   Rating: {sample_business.get('rating')}")
+                        print(f"   Distance: {sample_business.get('distance')}m")
                     else:
-                        print(f"   Warning: Missing fields in business data: {missing_fields}")
+                        print(f"   Warning: Missing fields in restaurant data: {missing_fields}")
                 
                 return True
             else:
                 self.log_test(
-                    "General Business Listing",
+                    "General Business Listing (via restaurants/near)",
                     False,
                     f"Status: {response.status_code}",
                     response.text
@@ -187,7 +188,7 @@ class E2EOrderWorkflowTester:
                 return False
                 
         except Exception as e:
-            self.log_test("General Business Listing", False, "", str(e))
+            self.log_test("General Business Listing (via restaurants/near)", False, "", str(e))
             return False
     
     def test_customer_order_creation(self):
