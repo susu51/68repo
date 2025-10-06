@@ -403,6 +403,7 @@ const AdminPanel = ({ user, onLogout }) => {
           <div className="flex space-x-8">
             {[
               { id: 'dashboard', label: '📊 Dashboard' },
+              { id: 'content-editor', label: '📝 İçerik Editörü' },
               { id: 'orders', label: '📦 Siparişler' },
               { id: 'businesses', label: '🏪 İşletmeler' },
               { id: 'business-kyc', label: '✅ İşletme KYC' },
