@@ -150,6 +150,7 @@ class E2EOrderWorkflowTester:
         try:
             response = self.session.get(
                 f"{BACKEND_URL}/businesses",
+                headers=self.get_auth_headers("customer"),
                 timeout=10
             )
             
