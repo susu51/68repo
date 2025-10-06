@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { apiClient } from '../../utils/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 
 const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
   const [orders, setOrders] = useState([]);
