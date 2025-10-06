@@ -92,7 +92,7 @@ const KYCManagement = ({ user }) => {
       }
     } catch (error) {
       console.error('❌ Approval error:', error);
-      alert('❌ Ağ hatası oluştu!');
+      toast.error('❌ Ağ hatası oluştu! Lütfen tekrar deneyin.');
     } finally {
       setLoading(false);
     }
