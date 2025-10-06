@@ -119,7 +119,11 @@ class E2EOrderWorkflowTester:
             
             if response.status_code == 200:
                 data = response.json()
-                businesses = data.get("businesses", [])
+                # Handle both list and dict responses
+                if isinstance(data, list):
+                    businesses = data
+                else:
+                    businesses = data.get("businesses", [])
                 
                 self.log_test(
                     "Location-based Business Discovery",
@@ -129,7 +133,9 @@ class E2EOrderWorkflowTester:
                 
                 # Log some business details
                 for i, business in enumerate(businesses[:3]):  # Show first 3
-                    print(f"   Business {i+1}: {business.get('business_name', 'N/A')} - {business.get('city', 'N/A')}")
+                    name = business.get('business_name') or business.get('name', 'N/A')
+                    city = business.get('city', 'N/A')
+                    print(f"   Business {i+1}: {name} - {city}")
                 
                 return True
             else:
