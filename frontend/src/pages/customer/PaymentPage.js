@@ -153,22 +153,8 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
         card_details: selectedPaymentMethod === 'online' ? cardDetails : null
       };
 
-      const response = await fetch(`${BACKEND_URL}/api/payments/mock`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(paymentData)
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Payment processing failed: ${error}`);
-      }
-
-      const paymentResult = await response.json();
-      return paymentResult;
+      const response = await apiClient.post('/payments/mock', paymentData);
+      return response.data;
 
     } catch (error) {
       console.error('Payment processing error:', error);
