@@ -45,6 +45,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
                 "last_name": "Business",
                 "role": "business", 
                 "business_name": "Test Restaurant",
+                "kyc_status": "approved",
                 "is_active": True
             }
         }
