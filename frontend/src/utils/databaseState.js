@@ -174,7 +174,7 @@ export const stateManager = new DatabaseStateManager();
 export class AddressManager {
   static async getAddresses() {
     try {
-      const addresses = await apiClient.get('/api/addresses');
+      const addresses = await apiClient.get('/user/addresses');
       stateManager.notify('addresses', addresses);
       return addresses;
     } catch (error) {
