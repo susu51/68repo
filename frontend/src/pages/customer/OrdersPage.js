@@ -7,6 +7,7 @@ import { apiClient } from '../../utils/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
 
 const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
+  const { isAuthenticated } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
