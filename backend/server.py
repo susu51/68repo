@@ -5228,18 +5228,11 @@ async def update_business_status_admin(
             if kyc_status == "rejected":
                 update_data["rejection_reason"] = status_data.get("rejection_reason", "No reason provided")
         
-        # Update business
-        from bson import ObjectId
-        try:
-            result = await db.businesses.update_one(
-                {"_id": ObjectId(business_id)},
-                {"$set": update_data}
-            )
-        except:
-            result = await db.businesses.update_one(
-                {"id": business_id},
-                {"$set": update_data}
-            )
+        # Update business in users collection
+        result = await db.users.update_one(
+            {"id": business_id, "role": "business"},
+            {"$set": update_data}
+        )
         
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Business not found")
