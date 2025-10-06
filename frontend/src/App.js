@@ -45,34 +45,6 @@ console.log('Frontend connecting to:', API);
 import { AuthContext, useAuth } from "./contexts/AuthContext";
   }, [isMounted]);
 
-  const logout = React.useCallback(() => {
-    if (!isMounted) return;
-    
-    try {
-      localStorage.removeItem('kuryecini_access_token');
-      localStorage.removeItem('kuryecini_user');
-      setUser(null);
-      delete axios.defaults.headers.common['Authorization'];
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  }, [isMounted]);
-
-  // Memoize context value to prevent unnecessary re-renders
-  const contextValue = React.useMemo(() => ({
-    user,
-    login,
-    logout,
-    loading
-  }), [user, login, logout, loading]);
-
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
 const useAuth = () => {
   const context = React.useContext(AuthContext);
   if (!context) {
