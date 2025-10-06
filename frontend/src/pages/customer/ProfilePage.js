@@ -73,6 +73,105 @@ const ProfilePage = ({ user, onLogout }) => {
 
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
+  // Address management functions
+  const handleSaveAddress = async () => {
+    try {
+      setLoading(true);
+      
+      const addressData = {
+        ...newAddress,
+        lat: newAddress.lat ? parseFloat(newAddress.lat) : null,
+        lng: newAddress.lng ? parseFloat(newAddress.lng) : null
+      };
+      
+      if (editingAddress) {
+        // Update existing address
+        await apiClient.put(`/customer/addresses/${editingAddress.id}`, addressData);
+        toast.success('Adres başarıyla güncellendi');
+      } else {
+        // Create new address
+        await apiClient.post('/customer/addresses', addressData);
+        toast.success('Adres başarıyla eklendi');
+      }
+      
+      // Reset form and reload addresses
+      setNewAddress({
+        title: 'Ev',
+        full_address: '',
+        district: '',
+        city: '',
+        building_no: '',
+        apartment_no: '',
+        floor: '',
+        instructions: '',
+        phone: '',
+        lat: null,
+        lng: null,
+        is_default: false
+      });
+      setEditingAddress(null);
+      setShowAddressModal(false);
+      
+      // Reload addresses
+      loadTabData('addresses');
+      
+    } catch (error) {
+      console.error('Address save error:', error);
+      toast.error(editingAddress ? 'Adres güncellenirken hata oluştu' : 'Adres eklenirken hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditAddress = (address) => {
+    setEditingAddress(address);
+    setNewAddress({
+      title: address.title || 'Ev',
+      full_address: address.full_address || '',
+      district: address.district || '',
+      city: address.city || '',
+      building_no: address.building_no || '',
+      apartment_no: address.apartment_no || '',
+      floor: address.floor || '',
+      instructions: address.instructions || '',
+      phone: address.phone || '',
+      lat: address.lat || null,
+      lng: address.lng || null,
+      is_default: address.is_default || false
+    });
+    setShowAddressModal(true);
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!confirm('Bu adresi silmek istediğinizden emin misiniz?')) return;
+    
+    try {
+      setLoading(true);
+      await apiClient.delete(`/customer/addresses/${addressId}`);
+      toast.success('Adres başarıyla silindi');
+      loadTabData('addresses');
+    } catch (error) {
+      console.error('Address delete error:', error);
+      toast.error('Adres silinirken hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetDefaultAddress = async (addressId) => {
+    try {
+      setLoading(true);
+      await apiClient.patch(`/customer/addresses/${addressId}/default`);
+      toast.success('Varsayılan adres güncellendi');
+      loadTabData('addresses');
+    } catch (error) {
+      console.error('Default address error:', error);
+      toast.error('Varsayılan adres güncellenirken hata oluştu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const tabs = [
     { id: 'profile', name: 'Bilgilerim', icon: '👤' },
     { id: 'addresses', name: 'Adreslerim', icon: '📍' },
