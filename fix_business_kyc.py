@@ -16,6 +16,10 @@ async def fix_business_kyc():
     db = client.kuryecini
     
     try:
+        # Check business-001 first
+        business = await db.users.find_one({"id": "business-001"})
+        print(f"Found business: {business}")
+        
         # Update business-001 with KYC approved status
         result = await db.users.update_one(
             {"id": "business-001"},
