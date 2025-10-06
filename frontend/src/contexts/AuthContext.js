@@ -65,8 +65,9 @@ export function AuthProvider({ children }) {
       setToken(userToken);
       setUser(userData);
       
-      // Set axios default authorization header
+      // Set axios default authorization header and apiClient token
       axios.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+      apiClient.setToken(userToken);
       
       console.log('✅ User logged in via Context API');
     } catch (error) {
