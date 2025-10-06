@@ -4363,22 +4363,22 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
             return []
         
         print(f"DEBUG: Getting addresses for user_id: {user_id} (email: {user_email})")
-        addresses = await db.addresses.find({"userId": user_id}).to_list(length=None)
+        addresses = await db.addresses.find({"user_id": user_id}).to_list(length=None)
         print(f"DEBUG: Found {len(addresses)} addresses for user_id: {user_id}")
         
         address_list = []
         for addr in addresses:
             print(f"DEBUG: Processing address: {addr.get('label', 'NO LABEL')}")
-            location = addr.get("location") or {}
-            coords = location.get("coordinates", [None, None]) or [None, None]
             
             address_data = {
-                "id": addr.get("id", addr.get("_id", "")),
+                "id": addr.get("_id", str(addr.get("_id"))),
                 "label": addr.get("label", ""),
-                "city": addr.get("city_original", addr.get("city", "")),
+                "city": addr.get("city", ""),
+                "district": addr.get("district", ""),
+                "full_address": addr.get("full_address", ""),
                 "description": addr.get("description", ""),
-                "lat": coords[1] if coords and len(coords) > 1 and coords[1] else None,
-                "lng": coords[0] if coords and len(coords) > 0 and coords[0] else None,
+                "lat": addr.get("lat"),
+                "lng": addr.get("lng"),
                 "is_default": addr.get("is_default", False)
             }
             address_list.append(address_data)
