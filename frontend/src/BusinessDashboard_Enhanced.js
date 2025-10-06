@@ -537,15 +537,13 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.patch(`${API}/business/menu/${productId}`, 
-        { price: parseFloat(newPrice) }, 
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+      if (!isAuthenticated) {
+        toast.error('Giriş yapmalısınız');
+        return;
+      }
+      
+      const response = await apiClient.patch(`/business/menu/${productId}`, 
+        { price: parseFloat(newPrice) }
       );
 
       if (response.data) {
