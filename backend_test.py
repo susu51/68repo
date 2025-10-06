@@ -207,7 +207,7 @@ class ContentMediaTester:
         except Exception as e:
             self.log_test("GET /api/content/media-assets/courier_gallery", False, f"Request error: {str(e)}")
 
-    def test_courier_location_update(self):
+    def test_admin_stats_endpoint(self):
         """Test POST /api/courier/location - Real-time location updates"""
         print("📍 TESTING COURIER LOCATION UPDATES...")
         
