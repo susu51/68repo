@@ -387,11 +387,8 @@ const ProfilePage = ({ user, onLogout }) => {
   const handleSetDefaultAddress = async (addressId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
 
-      await axios.post(`${API}/api/user/addresses/${addressId}/set-default`, {}, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await apiClient.post(`/user/addresses/${addressId}/set-default`, {});
 
       toast.success('Varsayılan adres başarıyla güncellendi!');
       
