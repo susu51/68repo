@@ -4554,7 +4554,7 @@ const AuthPage = ({ onBack }) => {
 
 // Main App Component
 function App() {
-  const [showAuth, setShowAuth] = useState(false);
+  // showAuth state removed - directly show AuthPage when not authenticated
   
   return (
     <AuthProvider>
