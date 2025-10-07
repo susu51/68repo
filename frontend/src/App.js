@@ -4255,7 +4255,7 @@ function App() {
       <CartProvider>
         <div className="App">
           <BrowserRouter>
-            <AuthRouter showAuth={showAuth} setShowAuth={setShowAuth} />
+            <AuthRouter />
           </BrowserRouter>
         <Toaster 
           position="top-right"
