@@ -153,7 +153,7 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
         card_details: selectedPaymentMethod === 'online' ? cardDetails : null
       };
 
-      const response = await apiClient.post('/payments/mock', paymentData);
+      const response = await apiClient.post('/payments/process', paymentData);
       return response.data;
 
     } catch (error) {
