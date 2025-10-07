@@ -4042,7 +4042,304 @@ const CustomerDashboard = ({ user }) => {
   );
 };
 
-// HomePage removed - Using direct AuthPage for clean login experience
+// Main Pages
+const HomePage = ({ onAuthStart }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50">
+      {/* Marketing Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Navigation */}
+        <nav className="relative z-20 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-orange-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-lg">K</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                    Kuryecini
+                  </h1>
+                  <p className="text-xs text-gray-500">Hızlı • Güvenilir</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                {/* Sadece Modern Giriş Butonu */}
+                <Button 
+                  onClick={onAuthStart}
+                  size="sm"
+                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  ✨ Modern Giriş
+                </Button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Hero Content */}
+        <div className="relative px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+          {/* Background Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-orange-400/20 to-red-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-blue-400/20 to-purple-400/20 rounded-full blur-2xl"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left Content */}
+              <div className="relative z-10 text-center lg:text-left">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-6">
+                  <span className="w-2 h-2 bg-orange-500 rounded-full mr-2 animate-pulse"></span>
+                  Türkiye'nin En Hızlı Teslimat Platformu
+                </div>
+                
+                <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                  Yemeğin
+                  <span className="block bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                    15 Dakikada
+                  </span>
+                  Kapında!
+                </h2>
+                
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                  En sevdiğin restoranlardan lezzetli yemekler, süpermarketlerden günlük ihtiyaçlar 
+                  ve daha fazlası... Hepsi birkaç dokunuşla, hızlı ve güvenilir teslimatla.
+                </p>
+                
+                {/* Search Bar */}
+                <div className="relative mb-8 max-w-md mx-auto lg:mx-0">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.914a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Konumunu gir (örn: Kadıköy, İstanbul)"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 text-gray-900 placeholder-gray-500 transition-all duration-300 text-lg shadow-lg"
+                  />
+                </div>
+                
+                {/* CTA Buttons - Sadece Modern Giriş */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <Button 
+                    onClick={onAuthStart}
+                    size="lg"
+                    className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-8 py-4 text-xl font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                    data-testid="cta-button"
+                  >
+                    ✨ Modern Giriş Yap
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right Visual */}
+              <div className="relative lg:block hidden">
+                <div className="relative">
+                  {/* Main Phone Mockup */}
+                  <div className="relative z-10 bg-white rounded-3xl shadow-2xl p-2 transform rotate-6">
+                    <div className="bg-gray-900 rounded-2xl overflow-hidden">
+                      <div className="bg-gradient-to-br from-orange-500 to-red-600 p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                          <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                          <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                        </div>
+                        <h3 className="text-white font-bold text-lg mb-2">Kuryecini</h3>
+                        <p className="text-white/80 text-sm">En yakın restoranlar</p>
+                      </div>
+                      <div className="bg-white p-4 space-y-3">
+                        {/* Restaurant Cards */}
+                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg"></div>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">McDonald's</p>
+                            <p className="text-xs text-gray-500">⭐ 4.8 • 15-20 dk</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-pink-500 rounded-lg"></div>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">Domino's Pizza</p>
+                            <p className="text-xs text-gray-500">⭐ 4.6 • 20-25 dk</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg"></div>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">Starbucks</p>
+                            <p className="text-xs text-gray-500">⭐ 4.9 • 10-15 dk</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Floating Elements */}
+                  <div className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg p-3 transform -rotate-12">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-xs font-medium">Kurye yolda</span>
+                    </div>
+                  </div>
+                  
+                  <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-lg p-4 transform rotate-12">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-600">4.9</div>
+                      <div className="text-xs text-gray-500">⭐⭐⭐⭐⭐</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">50K+</div>
+              <div className="text-gray-600 font-medium">Mutlu Müşteri</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">1000+</div>
+              <div className="text-gray-600 font-medium">Restoran Partner</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">500+</div>
+              <div className="text-gray-600 font-medium">Kurye Ekibi</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600">15 dk</div>
+              <div className="text-gray-600 font-medium">Ortalama Teslimat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="bg-gradient-to-br from-gray-50 to-white py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Neden Kuryecini?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Teknoloji ve deneyimimizle, yemek siparişi vermeyi çok daha kolay ve keyifli hale getiriyoruz.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="relative group">
+              <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 p-8 border border-gray-100">
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Hızlı Teslimat</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Gelişmiş algoritma ve kurye ağımızla ortalama 15 dakikada siparişiniz elinizde.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="relative group">
+              <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 p-8 border border-gray-100">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Güvenilir Hizmet</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  7/24 müşteri desteği ve sigortalı teslimat ile gönül rahatlığı içinde sipariş verin.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="relative group">
+              <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 p-8 border border-gray-100">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Uygun Fiyat</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Şeffaf fiyatlandırma, gizli ücret yok. İlk siparişte %20 indirim fırsatı!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Hemen Başlayın!
+            </h2>
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Modern giriş sistemiyle kolayca hesap açın ve siparişe başlayın!
+            </p>
+            
+            <Button 
+              onClick={onAuthStart}
+              size="lg"
+              className="bg-white text-orange-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              ✨ Modern Giriş Yap
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#ffffff',
+            color: '#374151',
+            borderRadius: '12px',
+            border: '1px solid #e5e7eb',
+            padding: '16px',
+            fontSize: '14px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          },
+          success: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#10b981',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ff6b6b',
+            },
+          },
+        }}
+      />
+    </div>
+  );
+}
 
 const ResetPasswordPage = () => {
   const ResetPassword = React.lazy(() => import('./pages/Auth/ResetPassword'));
