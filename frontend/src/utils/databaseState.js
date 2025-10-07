@@ -433,11 +433,7 @@ export class LocalStorageMigration {
         }
       }
 
-      // Only migrate if we have data
-      if (Object.keys(migrationData).length === 0) {
-        sessionStorage.setItem(migrationKey, 'no_data');
-        return { skipped: true, reason: 'No data to migrate' };
-      }
+      // Migration disabled - no sessionStorage usage allowed
 
       // Migration system disabled for CI Gate 0 compliance
       console.log('LocalStorage migration disabled - using MongoDB only');
