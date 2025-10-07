@@ -4285,7 +4285,7 @@ function App() {
   );
 }
 
-const AuthRouter = ({ showAuth, setShowAuth }) => {
+const AuthRouter = () => {
   const { user, loading, logout } = useAuth();
 
   if (loading) {
