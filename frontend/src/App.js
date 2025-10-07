@@ -4295,6 +4295,9 @@ const HomePage = ({ onAuthStart }) => {
       <div className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <KuryeciniLogo size="large" className="filter brightness-0 invert" />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Hemen Başlayın!
             </h2>
