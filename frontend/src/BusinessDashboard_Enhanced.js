@@ -101,10 +101,10 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     try {
       setLoading(true);
       await Promise.all([
-        loadMockOrders(),
+        loadRealOrders(),
         fetchProducts(),  // Gerçek API'den ürünleri yükle
-        loadMockStats(),
-        loadMockFinancials()
+        loadRealStats(),
+        loadRealFinancials()
       ]);
     } catch (error) {
       console.error('Initialization error:', error);
