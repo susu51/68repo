@@ -4150,7 +4150,12 @@ const HomePage = ({ onAuthStart }) => {
                           <div className="w-3 h-3 bg-white/30 rounded-full"></div>
                           <div className="w-3 h-3 bg-white/30 rounded-full"></div>
                         </div>
-                        <h3 className="text-white font-bold text-lg mb-2">Kuryecini</h3>
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-6 h-6">
+                            <KuryeciniLogo size="small" />
+                          </div>
+                          <h3 className="text-white font-bold text-lg">Kuryecini</h3>
+                        </div>
                         <p className="text-white/80 text-sm">En yakın restoranlar</p>
                       </div>
                       <div className="bg-white p-4 space-y-3">
