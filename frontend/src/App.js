@@ -4545,8 +4545,6 @@ const AuthPage = ({ onBack }) => {
 
 // Main App Component
 function App() {
-  const [showAuth, setShowAuth] = useState(false);
-  
   return (
     <AuthProvider>
       <CartProvider>
