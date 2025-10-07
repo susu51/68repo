@@ -387,10 +387,8 @@ export class LocalStorageMigration {
   static async migrateToDatabase() {
     try {
       // Check if migration already completed
-      const migrationKey = 'kuryecini_migrated';
-      if (sessionStorage.getItem(migrationKey)) {
-        return { skipped: true, reason: 'Already migrated this session' };
-      }
+      // Migration system disabled - using real MongoDB only
+      return { skipped: true, reason: 'SessionStorage migration disabled for CI Gate 0 compliance' };
 
       // Collect all localStorage data
       const migrationData = {};
