@@ -229,18 +229,32 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     }
   };
 
-  const loadMockFinancials = () => {
-    setFinancials({
-      dailyRevenue: [
-        { date: '2024-01-01', revenue: 1247.50 },
-        { date: '2024-01-02', revenue: 1456.25 },
-        { date: '2024-01-03', revenue: 987.75 }
-      ],
-      monthlyRevenue: 42315.75,
-      pendingPayouts: 3567.25,
-      commission: 0.15,
-      totalEarnings: 35968.50
-    });
+  const loadRealFinancials = async () => {
+    try {
+      // Get real financial data from API
+      const response = await apiClient.get('/business/financials');
+      const financialData = response.data || {};
+      
+      setFinancials({
+        dailyRevenue: Array.isArray(financialData.dailyRevenue) ? financialData.dailyRevenue : [],
+        monthlyRevenue: financialData.monthlyRevenue || 0,
+        pendingPayouts: financialData.pendingPayouts || 0,
+        commission: financialData.commission || 0.15,
+        totalEarnings: financialData.totalEarnings || 0
+      });
+      
+      console.log('✅ Real financial data loaded');
+    } catch (error) {
+      console.error('❌ Error loading real financials:', error);
+      // Set empty/zero financials instead of mock data
+      setFinancials({
+        dailyRevenue: [],
+        monthlyRevenue: 0,
+        pendingPayouts: 0,
+        commission: 0.15,
+        totalEarnings: 0
+      });
+    }
   };
 
   const fetchLiveData = async () => {
