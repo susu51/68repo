@@ -4620,15 +4620,12 @@ const AuthRouter = ({ showAuth, setShowAuth }) => {
     );
   }
 
-  // Not authenticated
-  if (showAuth) {
-    return <AuthPage onBack={() => setShowAuth(false)} />;
-  }
-
+  // Not authenticated - Show modern login/register screen directly
   return (
     <Routes>
-      <Route path="/" element={<HomePage onAuthStart={() => setShowAuth(true)} />} />
-      <Route path="/login" element={<AuthPage onBack={() => setShowAuth(false)} />} />
+      <Route path="/" element={<AuthPage />} />
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/register" element={<AuthPage />} />
       <Route path="/customer" element={<CustomerApp user={{id: 'customer-001', role: 'customer', email: 'testcustomer@example.com'}} onLogout={() => window.location.href = '/'} />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="*" element={<Navigate to="/" />} />
