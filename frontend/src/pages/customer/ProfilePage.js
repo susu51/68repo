@@ -231,23 +231,7 @@ const ProfilePage = ({ user, onLogout }) => {
     }
   };
 
-  const loadMockData = (tab) => {
-    switch (tab) {
-      case 'coupons':
-        setCoupons(mockCoupons);
-        break;
-      case 'discounts':
-        setDiscounts(mockDiscounts);
-        break;
-      case 'campaigns':
-        setCampaigns(mockCampaigns);
-        break;
-      case 'payment_methods':
-        setPaymentMethods(mockPaymentMethods);
-        break;
-    }
-    setLoading(false);
-  };
+  // loadMockData function removed - using real API only
 
   const handleSaveProfile = async () => {
     try {
