@@ -4582,6 +4582,7 @@ function App() {
 
 const AuthRouter = () => {
   const { user, loading, logout } = useAuth();
+  const [showAuth, setShowAuth] = useState(false);
 
   if (loading) {
     return (
