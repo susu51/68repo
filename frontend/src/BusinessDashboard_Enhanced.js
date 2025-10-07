@@ -258,15 +258,8 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   };
 
   const fetchLiveData = async () => {
-    // Simulate live data updates
-    setStats(prev => ({
-      ...prev,
-      today: {
-        ...prev.today,
-        orders: prev.today.orders + Math.floor(Math.random() * 2),
-        revenue: prev.today.revenue + (Math.random() * 100)
-      }
-    }));
+    // Reload real statistics for live updates
+    await loadRealStats();
   };
 
   // Professional Business Functions
