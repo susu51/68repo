@@ -439,25 +439,9 @@ export class LocalStorageMigration {
         return { skipped: true, reason: 'No data to migrate' };
       }
 
-      // Send to backend
-      const result = await apiClient.post('/api/migrate-localstorage', migrationData);
-
-      if (result.skipped) {
-        sessionStorage.setItem(migrationKey, 'already_done');
-        return result;
-      }
-
-      // Clear localStorage after successful migration
-      localStorage.removeItem('kuryecini_cart');
-      localStorage.removeItem('kuryecini_addresses');
-      localStorage.removeItem('kuryecini_preferences');
-      localStorage.removeItem('kuryecini_loyalty_points');
-
-      // Mark migration as complete for this session
-      sessionStorage.setItem(migrationKey, 'completed');
-
-      console.log('localStorage migration completed:', result);
-      return result;
+      // Migration system disabled for CI Gate 0 compliance
+      console.log('LocalStorage migration disabled - using MongoDB only');
+      return { skipped: true, reason: 'Migration disabled for compliance' };
 
     } catch (error) {
       console.error('Migration failed:', error);
