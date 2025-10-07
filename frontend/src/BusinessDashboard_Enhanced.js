@@ -186,36 +186,47 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     ]);
   };
 
-  const loadMockStats = () => {
-    setStats({
-      today: {
-        orders: 23,
-        revenue: 1247.50,
-        avgOrderValue: 54.24,
-        completionRate: 96.5
-      },
-      week: {
-        orders: 187,
-        revenue: 9876.25,
-        growth: 12.5
-      },
-      month: {
-        orders: 756,
-        revenue: 42315.75,
-        growth: 18.7
-      },
-      topProducts: [
-        { name: 'Chicken Burger', sales: 245, revenue: 11025.00 },
-        { name: 'Margarita Pizza', sales: 189, revenue: 12285.00 },
-        { name: 'Adana Kebap', sales: 156, revenue: 8580.00 }
-      ],
-      peakHours: [
-        { hour: '12:00-13:00', orders: 15 },
-        { hour: '19:00-20:00', orders: 22 },
-        { hour: '20:00-21:00', orders: 18 }
-      ],
-      customerSatisfaction: 4.6
-    });
+  const loadRealStats = async () => {
+    try {
+      // Get real statistics from API
+      const response = await apiClient.get('/business/stats');
+      const statsData = response.data || {};
+      
+      setStats({
+        today: {
+          orders: statsData.today?.orders || 0,
+          revenue: statsData.today?.revenue || 0,
+          avgOrderValue: statsData.today?.avgOrderValue || 0,
+          completionRate: statsData.today?.completionRate || 0
+        },
+        week: {
+          orders: statsData.week?.orders || 0,
+          revenue: statsData.week?.revenue || 0,
+          growth: statsData.week?.growth || 0
+        },
+        month: {
+          orders: statsData.month?.orders || 0,
+          revenue: statsData.month?.revenue || 0,
+          growth: statsData.month?.growth || 0
+        },
+        topProducts: Array.isArray(statsData.topProducts) ? statsData.topProducts : [],
+        peakHours: Array.isArray(statsData.peakHours) ? statsData.peakHours : [],
+        customerSatisfaction: statsData.customerSatisfaction || 0
+      });
+      
+      console.log('✅ Real business statistics loaded');
+    } catch (error) {
+      console.error('❌ Error loading real statistics:', error);
+      // Set empty/zero stats instead of mock data
+      setStats({
+        today: { orders: 0, revenue: 0, avgOrderValue: 0, completionRate: 0 },
+        week: { orders: 0, revenue: 0, growth: 0 },
+        month: { orders: 0, revenue: 0, growth: 0 },
+        topProducts: [],
+        peakHours: [],
+        customerSatisfaction: 0
+      });
+    }
   };
 
   const loadMockFinancials = () => {
