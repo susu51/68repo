@@ -114,57 +114,29 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     }
   };
 
-  const loadMockOrders = () => {
-    // Incoming orders
-    setIncomingOrders([
-      {
-        id: 'ORD-001',
-        customer_name: 'Ahmet Yılmaz',
-        customer_phone: '+90 532 123 4567',
-        items: [
-          { name: 'Chicken Burger', quantity: 2, price: 45.00 },
-          { name: 'Patates Kızartması', quantity: 1, price: 15.00 }
-        ],
-        total_amount: 105.00,
-        pickup_address: 'Beşiktaş Merkez',
-        delivery_address: { address: 'Kadıköy, Moda Cad. No:15', lat: 40.9876, lng: 29.0234 },
-        order_date: new Date(),
-        status: 'pending',
-        payment_method: 'card',
-        notes: 'Acılı sos ekle lütfen'
-      },
-      {
-        id: 'ORD-002', 
-        customer_name: 'Zeynep Kaya',
-        customer_phone: '+90 533 987 6543',
-        items: [
-          { name: 'Margarita Pizza', quantity: 1, price: 65.00 },
-          { name: 'Cola', quantity: 2, price: 10.00 }
-        ],
-        total_amount: 85.00,
-        pickup_address: 'Beşiktaş Merkez',
-        delivery_address: { address: 'Şişli, Nişantaşı Cad. No:42', lat: 41.0567, lng: 28.9876 },
-        order_date: new Date(Date.now() - 10000),
-        status: 'pending',
-        payment_method: 'cash',
-        notes: 'İnce hamur'
-      }
-    ]);
-
-    // Active orders  
-    setActiveOrders([
-      {
-        id: 'ORD-003',
-        customer_name: 'Mehmet Demir',
-        items: [{ name: 'Adana Kebap', quantity: 1, price: 55.00 }],
-        total_amount: 55.00,
-        status: 'preparing',
-        accepted_at: new Date(Date.now() - 600000), // 10 minutes ago
-        preparation_time: 20
-      }
-    ]);
-
-    setUnprocessedCount(2);
+  const loadRealOrders = async () => {
+    try {
+      // Get incoming orders from real API
+      const incomingResponse = await apiClient.get('/business/orders/incoming');
+      const incomingOrders = Array.isArray(incomingResponse.data) ? incomingResponse.data : [];
+      setIncomingOrders(incomingOrders);
+      
+      // Get active orders from real API
+      const activeResponse = await apiClient.get('/business/orders/active');
+      const activeOrders = Array.isArray(activeResponse.data) ? activeResponse.data : [];
+      setActiveOrders(activeOrders);
+      
+      // Set unprocessed count
+      setUnprocessedCount(incomingOrders.length);
+      
+      console.log(`✅ Loaded ${incomingOrders.length} incoming orders, ${activeOrders.length} active orders`);
+    } catch (error) {
+      console.error('❌ Error loading real orders:', error);
+      // Set empty arrays instead of mock data
+      setIncomingOrders([]);
+      setActiveOrders([]);
+      setUnprocessedCount(0);
+    }
   };
 
   const loadMockProducts = () => {
