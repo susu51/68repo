@@ -88,6 +88,24 @@ except ImportError:
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Initialize Sentry for error monitoring
+sentry_dsn = os.getenv('SENTRY_DSN')
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        integrations=[
+            FastApiIntegration(auto_enabling_integrations=True),
+            StarletteIntegration(transaction_style="endpoint"),
+        ],
+        traces_sample_rate=0.1,  # Capture 10% of transactions for performance monitoring
+        profiles_sample_rate=0.1,  # Capture 10% of profiles for performance insights
+        environment=os.getenv('ENVIRONMENT', 'development'),
+        release=os.getenv('APP_VERSION', '1.0.0'),
+    )
+    print("🔍 Sentry monitoring initialized")
+else:
+    print("ℹ️  Sentry DSN not provided - running without error monitoring")
+
 # MongoDB connection with error handling - Real Database Only
 mongo_url = os.getenv('MONGO_URL')
 if mongo_url:
