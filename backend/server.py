@@ -5795,4 +5795,98 @@ async def set_default_address(
         print(f"❌ Error setting default address: {e}")
         raise HTTPException(status_code=500, detail=f"Default address update failed: {str(e)}")
 
+# Business Orders Management Endpoints
+@api_router.get("/business/orders/incoming")
+async def get_business_incoming_orders(current_user: dict = Depends(get_approved_business_user)):
+    """Get incoming/pending orders for business"""
+    try:
+        business_id = current_user["id"]
+        
+        # Get orders with status 'pending' or 'placed' assigned to this business
+        orders = await db.orders.find({
+            "business_id": business_id,
+            "status": {"$in": ["pending", "placed"]}
+        }).sort("created_at", -1).to_list(length=50)
+        
+        formatted_orders = []
+        for order in orders:
+            # Get customer details
+            customer = await db.users.find_one({"_id": order.get("customer_id")})
+            customer_name = "Unknown Customer"
+            customer_phone = ""
+            
+            if customer:
+                customer_name = f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip()
+                customer_phone = customer.get("phone", "")
+            
+            formatted_order = {
+                "id": order.get("_id", str(order.get("id", ""))),
+                "customer_name": customer_name,
+                "customer_phone": customer_phone,
+                "items": order.get("items", []),
+                "total_amount": float(order.get("total_amount", 0)),
+                "pickup_address": order.get("business_address", ""),
+                "delivery_address": {
+                    "address": order.get("delivery_address", ""),
+                    "lat": order.get("delivery_lat"),
+                    "lng": order.get("delivery_lng")
+                },
+                "order_date": order.get("created_at", ""),
+                "status": order.get("status", "pending"),
+                "payment_method": order.get("payment_method", "unknown"),
+                "notes": order.get("special_instructions", "")
+            }
+            formatted_orders.append(formatted_order)
+        
+        return formatted_orders
+        
+    except Exception as e:
+        print(f"❌ Error getting incoming orders: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get incoming orders: {str(e)}")
+
+@api_router.get("/business/orders/active")
+async def get_business_active_orders(current_user: dict = Depends(get_approved_business_user)):
+    """Get active orders (preparing, ready) for business"""
+    try:
+        business_id = current_user["id"]
+        
+        # Get orders with active statuses
+        orders = await db.orders.find({
+            "business_id": business_id,
+            "status": {"$in": ["confirmed", "preparing", "ready"]}
+        }).sort("created_at", -1).to_list(length=50)
+        
+        formatted_orders = []
+        for order in orders:
+            # Get customer details
+            customer = await db.users.find_one({"_id": order.get("customer_id")})
+            customer_name = "Unknown Customer"
+            
+            if customer:
+                customer_name = f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip()
+            
+            # Calculate preparation time elapsed
+            preparation_time = 0
+            if order.get("confirmed_at") or order.get("accepted_at"):
+                confirmed_time = order.get("confirmed_at") or order.get("accepted_at")
+                if hasattr(confirmed_time, 'timestamp'):
+                    preparation_time = int((datetime.now(timezone.utc).timestamp() - confirmed_time.timestamp()) / 60)
+            
+            formatted_order = {
+                "id": order.get("_id", str(order.get("id", ""))),
+                "customer_name": customer_name,
+                "items": order.get("items", []),
+                "total_amount": float(order.get("total_amount", 0)),
+                "status": order.get("status", "confirmed"),
+                "accepted_at": order.get("confirmed_at") or order.get("accepted_at"),
+                "preparation_time": preparation_time
+            }
+            formatted_orders.append(formatted_order)
+        
+        return formatted_orders
+        
+    except Exception as e:
+        print(f"❌ Error getting active orders: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get active orders: {str(e)}")
+
 app.include_router(api_router)
