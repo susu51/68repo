@@ -5452,12 +5452,11 @@ async def get_businesses(lat: float = None, lng: float = None, radius: int = 500
         
         formatted_businesses = []
         for business in businesses:
-            # Handle ObjectId properly
+            # Handle business ID properly - use _id field
             business_id = business.get("_id")
-            if hasattr(business_id, '__str__'):
-                business_id = str(business_id)
-            else:
+            if business_id is None:
                 business_id = business.get("id", "unknown")
+            business_id = str(business_id)
                 
             formatted_business = {
                 "id": business_id,
