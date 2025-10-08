@@ -4145,10 +4145,14 @@ async def get_public_businesses(
                 }
             }
         
-        businesses = await db.businesses.find(query_filter).to_list(length=None)
+        # Use users collection instead of businesses collection
+        businesses = await db.users.find(query_filter).to_list(length=None)
         
         business_list = []
         for business in businesses:
+            # Get business ID properly
+            business_id = str(business.get("_id", business.get("id", "unknown")))
+            
             # Add location data (Istanbul districts for demo)
             istanbul_districts = [
                 {"name": "Sultanahmet", "lat": 41.0082, "lng": 28.9784},
@@ -4162,21 +4166,21 @@ async def get_public_businesses(
             ]
             
             # Assign location based on business ID
-            district = istanbul_districts[hash(business["id"]) % len(istanbul_districts)]
+            district = istanbul_districts[hash(business_id) % len(istanbul_districts)]
             
             business_data = {
-                "id": business.get("id"),
+                "id": business_id,
                 "name": business.get("business_name", "İsimsiz İşletme"),
                 "category": business.get("business_category", "gida"),
                 "description": business.get("description", "Lezzetli yemekler sizi bekliyor..."),
-                "rating": round(4.0 + (hash(business["id"]) % 15) / 10, 1),
-                "delivery_time": f"{20 + (hash(business['id']) % 20)}-{35 + (hash(business['id']) % 15)}",
-                "min_order": 50 + (hash(business["id"]) % 50),
+                "rating": round(4.0 + (hash(business_id) % 15) / 10, 1),
+                "delivery_time": f"{20 + (hash(business_id) % 20)}-{35 + (hash(business_id) % 15)}",
+                "min_order": 50 + (hash(business_id) % 50),
                 "location": district,
                 "is_open": True,
                 "phone": business.get("phone"),
                 "address": f"{district['name']}, İstanbul",
-                "image_url": f"/api/placeholder/restaurant-{hash(business['id']) % 10}.jpg"
+                "image_url": f"/api/placeholder/restaurant-{hash(business_id) % 10}.jpg"
             }
             business_list.append(business_data)
         
