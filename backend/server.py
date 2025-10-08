@@ -5995,4 +5995,77 @@ async def get_business_statistics(current_user: dict = Depends(get_approved_busi
         print(f"❌ Error getting business statistics: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get statistics: {str(e)}")
 
+@api_router.get("/business/financials")
+async def get_business_financials(current_user: dict = Depends(get_approved_business_user)):
+    """Get real business financial data"""
+    try:
+        business_id = current_user["id"]
+        now = datetime.now(timezone.utc)
+        
+        # Commission rate (platform fee)
+        commission_rate = 0.15  # 15% platform commission
+        
+        # Get delivered orders for financial calculations
+        delivered_orders = await db.orders.find({
+            "business_id": business_id,
+            "status": "delivered"
+        }).to_list(length=None)
+        
+        # Calculate daily revenue for the last 30 days
+        daily_revenue = {}
+        total_revenue = 0
+        
+        for order in delivered_orders:
+            delivered_at = order.get("delivered_at")
+            if delivered_at:
+                if hasattr(delivered_at, 'date'):
+                    date_key = delivered_at.date().isoformat()
+                else:
+                    date_key = str(delivered_at)[:10]  # Fallback for string dates
+                
+                order_amount = float(order.get("total_amount", 0))
+                total_revenue += order_amount
+                
+                if date_key not in daily_revenue:
+                    daily_revenue[date_key] = 0
+                daily_revenue[date_key] += order_amount
+        
+        # Format daily revenue for last 30 days
+        daily_revenue_list = []
+        for i in range(30):
+            date = (now - timedelta(days=i)).date().isoformat()
+            revenue = daily_revenue.get(date, 0)
+            if revenue > 0:  # Only include days with revenue
+                daily_revenue_list.append({"date": date, "revenue": round(revenue, 2)})
+        
+        # Sort by date
+        daily_revenue_list.sort(key=lambda x: x["date"])
+        
+        # Calculate current month revenue
+        month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        month_orders = [o for o in delivered_orders if o.get("delivered_at") and o.get("delivered_at") >= month_start]
+        monthly_revenue = sum(float(order.get("total_amount", 0)) for order in month_orders)
+        
+        # Calculate commission and earnings
+        platform_commission = total_revenue * commission_rate
+        business_earnings = total_revenue - platform_commission
+        
+        # Calculate pending payouts (last 7 days earnings not yet paid)
+        week_start = now - timedelta(days=7)
+        pending_orders = [o for o in delivered_orders if o.get("delivered_at") and o.get("delivered_at") >= week_start]
+        pending_revenue = sum(float(order.get("total_amount", 0)) for order in pending_orders)
+        pending_payouts = pending_revenue * (1 - commission_rate)
+        
+        return {
+            "dailyRevenue": daily_revenue_list[-7:],  # Last 7 days
+            "monthlyRevenue": round(monthly_revenue, 2),
+            "pendingPayouts": round(pending_payouts, 2),
+            "commission": commission_rate,
+            "totalEarnings": round(business_earnings, 2)
+        }
+        
+    except Exception as e:
+        print(f"❌ Error getting business financials: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get financials: {str(e)}")
+
 app.include_router(api_router)
