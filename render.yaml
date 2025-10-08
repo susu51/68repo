@@ -1,0 +1,54 @@
+# Render.com Deployment Configuration for Kuryecini Backend
+
+services:
+  - type: web
+    name: kuryecini-backend
+    env: python
+    region: frankfurt  # Change to your preferred region
+    plan: starter      # Change to paid plan for production
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.server:app --host 0.0.0.0 --port $PORT
+    
+    # Environment Variables
+    envVars:
+      - key: MONGO_URL
+        sync: false  # Set manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRATION_HOURS
+        value: "24"
+      - key: NEARBY_RADIUS_M
+        value: "5000"
+      - key: COURIER_RATE_PER_PACKAGE
+        value: "20"
+      - key: BUSINESS_COMMISSION_PCT
+        value: "5"
+      - key: COURIER_UPDATE_SEC
+        value: "5"
+      - key: COURIER_TIMEOUT_SEC
+        value: "10"
+      - key: EMAIL_FROM
+        value: no-reply@kuryecini.com
+      - key: EMAIL_PROVIDER
+        value: console
+      - key: ENVIRONMENT
+        value: production
+      - key: APP_VERSION
+        value: "1.0.0"
+      - key: SENTRY_DSN
+        sync: false  # Set manually in Render dashboard
+      - key: CORS_ORIGINS
+        value: https://your-frontend.vercel.app,https://kuryecini.com
+      - key: FRONTEND_URL
+        value: https://your-frontend.vercel.app
+
+    # Health check
+    healthCheckPath: /api/health
+
+databases:
+  # Optional: If you want to use Render's PostgreSQL instead of MongoDB Atlas
+  # - name: kuryecini-db
+  #   databaseName: kuryecini
+  #   user: kuryecini_user
