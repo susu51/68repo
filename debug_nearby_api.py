@@ -6,7 +6,7 @@ Debug Nearby Businesses API Response
 import requests
 import json
 
-BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com/api"
+BACKEND_URL = "https://mockless-api.preview.emergentagent.com/api"
 
 # Login as customer
 login_response = requests.post(

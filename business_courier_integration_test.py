@@ -28,7 +28,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com/api"
+BACKEND_URL = "https://mockless-api.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_CREDENTIALS = {

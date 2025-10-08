@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 
 def test_courier_panel_apis():
-    base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://db-driven-kuryecini.preview.emergentagent.com')
+    base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://mockless-api.preview.emergentagent.com')
     if not base_url.endswith('/api'):
         base_url = f"{base_url}/api"
     

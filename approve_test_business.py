@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com/api"
+BACKEND_URL = "https://mockless-api.preview.emergentagent.com/api"
 ADMIN_CREDENTIALS = {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}
 
 def approve_test_business():

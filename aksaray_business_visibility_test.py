@@ -20,7 +20,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com/api"
+BACKEND_URL = "https://mockless-api.preview.emergentagent.com/api"
 ADMIN_PASSWORD = "6851"
 TEST_BUSINESS_EMAIL = f"aksaray-test-{int(time.time())}@example.com"
 TEST_BUSINESS_PASSWORD = "test123"

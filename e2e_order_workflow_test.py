@@ -30,7 +30,7 @@ import random
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com/api"
+BACKEND_URL = "https://mockless-api.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_CREDENTIALS = {

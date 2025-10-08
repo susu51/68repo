@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://db-driven-kuryecini.preview.emergentagent.com"
+BACKEND_URL = "https://mockless-api.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 class CustomerAuthAddressTest:
