@@ -4119,6 +4119,7 @@ async def get_public_businesses(
     try:
         # Build query filter
         query_filter = {
+            "role": "business",  # Only businesses
             "kyc_status": "approved"  # Only show approved businesses
         }
         
