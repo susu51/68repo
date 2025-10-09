@@ -149,6 +149,7 @@ async def login(body: LoginRequest, response: Response):
     }
     
     # Check test users first
+    user_id = None
     if body.email in test_users:
         test_user = test_users[body.email]
         if body.password == test_user["password"]:
@@ -168,7 +169,6 @@ async def login(body: LoginRequest, response: Response):
         user_id = user["id"]
     
     # Generate tokens
-    user_id = user["id"]
     access_token = make_token(user_id, ACCESS_TTL)
     refresh_token = make_token(user_id, REFRESH_TTL)
     
