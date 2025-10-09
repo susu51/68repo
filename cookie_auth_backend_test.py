@@ -598,13 +598,20 @@ class CookieAuthTestRunner:
     async def test_backend_integration(self):
         """Test 10: Verify auth_cookie router is properly mounted and database integration"""
         try:
-            # Test that auth router is mounted correctly
-            async with self.session.get(f"{AUTH_BASE_URL}/me") as response:
+            # Test that auth router is mounted correctly using fresh session
+            fresh_session = aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=30),
+                headers={'Content-Type': 'application/json'}
+            )
+            
+            async with fresh_session.get(f"{AUTH_BASE_URL}/me") as response:
                 # Should return 401 since we're not authenticated
                 if response.status == 401:
                     router_mounted = True
                 else:
                     router_mounted = False
+            
+            await fresh_session.close()
             
             # Test database integration by logging in and checking user data
             login_data = TEST_CREDENTIALS["business"]
