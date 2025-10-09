@@ -69,6 +69,10 @@ export function AuthProvider({ children }) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
       apiClient.setToken(userToken);
       
+      // Save to localStorage for persistence (temporary solution for deployment)
+      localStorage.setItem('kuryecini_access_token', userToken);
+      localStorage.setItem('kuryecini_user', JSON.stringify(userData));
+      
       console.log('✅ User logged in via Context API');
     } catch (error) {
       console.error('Login error:', error);
