@@ -67,11 +67,11 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         //   console.log(`Filtering restaurants by city: ${selectedAddress.city}`);
         // }
         
-        const businesses = await apiClient.get('/businesses', params);
-        setRestaurants(businesses || []);
+        const response = await apiClient.get('/businesses', { params });
+        setRestaurants(response.data || []);
         
-        console.log(`Found ${businesses?.length || 0} total restaurants`);
-        console.log('Restaurant data:', businesses);
+        console.log(`Found ${response.data?.length || 0} total restaurants`);
+        console.log('Restaurant data:', response.data);
       }
       
     } catch (error) {
