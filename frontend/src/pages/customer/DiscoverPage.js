@@ -96,10 +96,11 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
       let restaurantsData = response.data || [];
       
       console.log(`📍 Loaded ${restaurantsData.length} restaurants`);
-      console.log('🔍 Sort mode:', sortMode, 'User location:', userLocation);
+      console.log('🔍 Sort mode:', sortMode, 'Selected address:', selectedAddress);
+      console.log('🌍 User location:', userLocation);
       
       if (sortMode === 'location' && userLocation) {
-        // Calculate distance and sort by proximity
+        // Distance-based sorting (GPS location)
         restaurantsData = restaurantsData.map(restaurant => {
           const distance = calculateDistance(
             userLocation.lat,
@@ -120,15 +121,55 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         // Sort by distance (closest first)
         restaurantsData.sort((a, b) => a.distance - b.distance);
         
-        console.log(`🎯 Sorted ${restaurantsData.length} restaurants by distance`);
+        console.log(`🎯 Sorted ${restaurantsData.length} restaurants by GPS distance`);
         console.log('📊 Closest restaurants:', restaurantsData.slice(0, 3).map(r => 
-          `${r.name}: ${r.distanceText}`
+          `${r.business_name || r.name}: ${r.distanceText}`
         ));
         
         toast.success(`${restaurantsData.length} restoran mesafeye göre sıralandı`);
+      } else if (selectedAddress && selectedAddress.city) {
+        // Address-based smart sorting: District → City → All
+        console.log('🏘️ Implementing smart city/district-based sorting...');
+        console.log('📍 Customer address:', selectedAddress.city, selectedAddress.district);
+        
+        // Categorize restaurants by location relevance
+        const sameDistrict = [];
+        const sameCity = [];
+        const others = [];
+        
+        restaurantsData.forEach(restaurant => {
+          const restaurantCity = restaurant.city?.toLowerCase();
+          const restaurantDistrict = restaurant.district?.toLowerCase();
+          const customerCity = selectedAddress.city?.toLowerCase();
+          const customerDistrict = selectedAddress.district?.toLowerCase();
+          
+          if (restaurantCity === customerCity && restaurantDistrict === customerDistrict) {
+            sameDistrict.push(restaurant);
+          } else if (restaurantCity === customerCity) {
+            sameCity.push(restaurant);
+          } else {
+            others.push(restaurant);
+          }
+        });
+        
+        // Combine in priority order: District → City → Others
+        restaurantsData = [...sameDistrict, ...sameCity, ...others];
+        
+        console.log(`📊 Smart sorting results:`);
+        console.log(`  🎯 Same district (${selectedAddress.district}): ${sameDistrict.length}`);
+        console.log(`  🏙️ Same city (${selectedAddress.city}): ${sameCity.length}`);
+        console.log(`  🌍 Other locations: ${others.length}`);
+        
+        if (sameDistrict.length > 0) {
+          toast.success(`${sameDistrict.length} restoran ${selectedAddress.district} ilçesinde bulundu`);
+        } else if (sameCity.length > 0) {
+          toast.success(`${sameCity.length} restoran ${selectedAddress.city} şehrinde bulundu`);
+        } else {
+          toast.info('Yakın restoran bulunamadı, tüm restoranlar gösteriliyor');
+        }
       } else {
-        // City-wide listing - show ALL restaurants  
-        console.log(`📋 Showing all ${restaurantsData.length} restaurants`);
+        // Fallback: Show all active restaurants
+        console.log(`📋 Showing all ${restaurantsData.length} restaurants (no address filter)`);
       }
       
       setRestaurants(restaurantsData);
