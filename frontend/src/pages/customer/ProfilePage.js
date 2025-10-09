@@ -382,12 +382,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       
       // Notify parent component about new address
       if (onAddressAdded) {
-        onAddressAdded(response.data);
-      }
-      
-      // Notify parent component about new address
-      if (onAddressAdded) {
-        onAddressAdded(response.data);
+        onAddressAdded(response);
       }
     } catch (error) {
       console.error('Error adding address:', error);
