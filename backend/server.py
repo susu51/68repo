@@ -111,6 +111,8 @@ else:
 
 # MongoDB connection with error handling - Real Database Only
 mongo_url = os.getenv('MONGO_URL')
+client = None  # Global client for auth system
+
 if mongo_url:
     try:
         print(f"🔗 Connecting to MongoDB Atlas...")
