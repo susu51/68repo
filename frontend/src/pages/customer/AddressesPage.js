@@ -52,18 +52,13 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
     
     try {
       if (isMounted) setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
-      console.log('Loading addresses - Token debug:', token ? `Token exists (${token.length} chars)` : 'No token found');
+      console.log('Loading addresses via apiClient...');
       
-      const response = await axios.get(`${API}/user/addresses`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await apiClient.get('/user/addresses');
       
-      console.log('Load addresses response:', response.data);
+      console.log('Load addresses response:', response);
       if (isMounted) {
-        setAddresses(response.data || []);
+        setAddresses(response || []);
       }
     } catch (error) {
       console.error('Error loading addresses:', error);
