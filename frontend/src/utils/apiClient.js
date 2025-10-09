@@ -112,7 +112,7 @@ class APIClient {
         ...options,
         headers: { ...headers, ...options.headers }
       });
-      return response;
+      return response.data;
     } catch (error) {
       if (error.response?.status === 401) {
         throw new Error('Session expired. Please login again.');
