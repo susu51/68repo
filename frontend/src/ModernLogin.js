@@ -17,16 +17,16 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
   });
   const [theme, setTheme] = useState('light');
 
-  // Theme toggle
+  // Theme toggle (no localStorage - use system default)
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    localStorage.setItem('kuryecini_theme', newTheme);
   };
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('kuryecini_theme') || 'light';
-    setTheme(savedTheme);
+    // Use system preference instead of localStorage
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(prefersDark ? 'dark' : 'light');
   }, []);
 
   // Handle email/password login
