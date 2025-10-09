@@ -4452,11 +4452,14 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
         
         new_address = {
             "id": str(uuid.uuid4()),
-            "userId": user_id,
+            "user_id": user_id,  # Fixed: use user_id instead of userId
             "label": address_data.get("label", ""),
+            "city": city_original,  # Fixed: use city instead of city_original
             "city_original": city_original,
             "city_normalized": city_normalized,
             "description": address_data.get("description", ""),
+            "lat": lat,  # Fixed: add lat/lng fields directly
+            "lng": lng,
             "location": location,
             "created_at": datetime.now(timezone.utc)
         }
