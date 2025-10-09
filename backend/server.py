@@ -4597,13 +4597,13 @@ async def set_default_address(
         
         # Remove default from all addresses
         await db.addresses.update_many(
-            {"userId": user_id},
+            {"user_id": user_id},
             {"$set": {"is_default": False}}
         )
         
         # Set this address as default
         await db.addresses.update_one(
-            {"id": address_id, "userId": user_id},
+            {"id": address_id, "user_id": user_id},
             {"$set": {"is_default": True}}
         )
         
