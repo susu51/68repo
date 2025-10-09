@@ -86,11 +86,11 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       
       if (editingAddress) {
         // Update existing address
-        await apiClient.put(`/customer/addresses/${editingAddress.id}`, addressData);
+        await apiClient.put(`/user/addresses/${editingAddress.id}`, addressData);
         toast.success('Adres başarıyla güncellendi');
       } else {
         // Create new address
-        await apiClient.post('/customer/addresses', addressData);
+        await apiClient.post('/user/addresses', addressData);
         toast.success('Adres başarıyla eklendi');
       }
       
