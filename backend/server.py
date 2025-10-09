@@ -4562,7 +4562,7 @@ async def delete_user_address(
         
         result = await db.addresses.delete_one({
             "id": address_id,
-            "userId": user_id
+            "user_id": user_id
         })
         
         if result.deleted_count == 0:
