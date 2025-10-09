@@ -267,42 +267,12 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
     setShowAddForm(false);
   };
 
-  const getCurrentLocation = () => {
-    // Async Operation Protection
-    if (!isMounted) return;
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          if (isMounted) {
-            setNewAddress({
-              ...newAddress,
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            });
-            toast.success('Konum başarıyla alındı!');
-          }
-        },
-        (error) => {
-          console.error('Geolocation error:', error);
-          if (isMounted) {
-            toast.error('Konum alınamadı. Lütfen el ile girin.');
-          }
-        }
-      );
-    } else {
-      if (isMounted) {
-        toast.error('Tarayıcınız konum servisini desteklemiyor.');
-      }
-    }
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Adresler yükleniyor...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-2"></div>
+          <p className="text-gray-600">Adresleriniz yükleniyor...</p>
         </div>
       </div>
     );
