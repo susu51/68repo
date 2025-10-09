@@ -1167,6 +1167,7 @@ frontend:
 
 test_plan:
   current_focus:
+    - "URGENT - Frontend Address Integration Authentication Fix"
     - "Phase 3 - Order Status Flow Management"
     - "Phase 3 - Courier Workflow System"
     - "Phase 3 - Real-time Location Tracking"
