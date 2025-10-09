@@ -373,14 +373,12 @@ class CityStrictAddressTest:
         """Test that address endpoints require authentication"""
         print("\n🔒 AUTHENTICATION SECURITY TEST")
         
-        # Remove auth header temporarily
-        original_headers = self.session.headers.copy()
-        if "Authorization" in self.session.headers:
-            del self.session.headers["Authorization"]
+        # Create a new session without cookies for unauthenticated tests
+        unauth_session = requests.Session()
         
         try:
             # Test GET addresses without auth
-            response = self.session.get(f"{API_BASE}/me/addresses")
+            response = unauth_session.get(f"{API_BASE}/me/addresses")
             
             success = response.status_code in [401, 403]  # Should be unauthorized
             self.log_test(
@@ -399,7 +397,7 @@ class CityStrictAddressTest:
                 "lng": 28.97
             }
             
-            response = self.session.post(
+            response = unauth_session.post(
                 f"{API_BASE}/me/addresses",
                 json=address_data,
                 headers={"Content-Type": "application/json"}
@@ -414,9 +412,6 @@ class CityStrictAddressTest:
             
         except Exception as e:
             self.log_test("Authentication Security Test", False, f"Exception: {str(e)}")
-        finally:
-            # Restore auth headers
-            self.session.headers.update(original_headers)
     
     def test_database_schema_verification(self):
         """Verify address documents have required fields and GeoJSON location"""
