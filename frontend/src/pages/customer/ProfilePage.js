@@ -364,6 +364,11 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       
       // Refresh addresses
       loadTabData('addresses');
+      
+      // Notify parent component about new address
+      if (onAddressAdded) {
+        onAddressAdded(response.data);
+      }
     } catch (error) {
       console.error('Error adding address:', error);
       if (error.response?.data?.detail) {
