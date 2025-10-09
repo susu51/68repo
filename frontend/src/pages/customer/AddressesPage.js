@@ -109,7 +109,7 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
 
       if (isMounted) {
         toast.success('Adres başarıyla eklendi!');
-        setAddresses([...addresses, response]);
+        setAddresses([...addresses, response.data]);
         setShowAddForm(false);
         setNewAddress({
           label: '',
