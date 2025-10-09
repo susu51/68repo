@@ -38,9 +38,8 @@ export function AuthProvider({ children }) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${existingToken}`;
           apiClient.setToken(existingToken);
           
-          // CLEAN UP localStorage after migration
-          localStorage.removeItem('kuryecini_access_token');
-          localStorage.removeItem('kuryecini_user');
+          // Keep token in localStorage for now (production deployment compatibility)
+          // TODO: Migrate to secure HTTP-only cookies in production
           
           console.log('✅ Auth migrated from localStorage to Context API');
         }
