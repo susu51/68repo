@@ -256,10 +256,10 @@ class CookieAuthTestRunner:
                     cookies_cleared = True
                     remaining_cookies = {}
                     
-                    for cookie in response.cookies:
-                        if cookie.key in ["access_token", "refresh_token"]:
-                            remaining_cookies[cookie.key] = cookie.value
-                            if cookie.value:  # If cookie still has a value, it's not properly cleared
+                    for cookie_name, cookie_value in response.cookies.items():
+                        if cookie_name in ["access_token", "refresh_token"]:
+                            remaining_cookies[cookie_name] = str(cookie_value)
+                            if str(cookie_value):  # If cookie still has a value, it's not properly cleared
                                 cookies_cleared = False
                     
                     if success_field and message == "Logged out":
