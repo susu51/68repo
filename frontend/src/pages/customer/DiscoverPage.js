@@ -420,14 +420,14 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
             }}
             className="flex-1"
           >
-            📍 En Yakın Konum
+            📍 GPS Konum
           </Button>
           <Button
             variant={sortMode === 'city' ? 'default' : 'outline'}
             onClick={() => setSortMode('city')}
             className="flex-1"
           >
-            🏙️ Şehir Geneli
+            🎯 Akıllı Sıralama
           </Button>
         </div>
       </div>
