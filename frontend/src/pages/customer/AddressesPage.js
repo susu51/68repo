@@ -523,6 +523,4 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
   );
 };
 
-// Memoize component to reduce re-renders that might cause DOM manipulation issues
-export const AddressesPage = React.memo(AddressesPageComponent);
-export default AddressesPage;
+export default AddressesPageComponent;
