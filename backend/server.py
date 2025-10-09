@@ -49,6 +49,8 @@ from auth_dependencies import get_current_user, get_business_user, get_approved_
 
 # Import cookie-based auth system
 from auth_cookie import auth_router, get_current_user_from_cookie, set_db_client
+# Address router db setup
+from routes.addresses import set_db_client as set_addresses_db_client
 
 # Import phone validation function
 try:
