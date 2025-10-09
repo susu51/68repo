@@ -1292,6 +1292,21 @@ agent_communication:
           agent: "testing"
           comment: "🎯 CONTENTEDITOR BACKEND TESTING COMPLETE: Comprehensive validation of all ContentEditor backend endpoints shows EXCELLENT results (90% success rate, 9/10 tests passed). ✅ ALL CRITICAL ENDPOINTS VERIFIED: 1) GET /api/content/blocks - Successfully retrieved 5 content blocks with proper structure (_id, title, sections, updated_at fields). 2) GET /api/content/blocks/{block_id} - Successfully retrieved specific content block (home_admin) with all required fields. 3) PUT /api/content/blocks/{block_id} - Successfully updated existing content block with admin authentication, proper success response returned. 4) GET /api/content/popular-products - Successfully retrieved 4 popular products with required fields (_id, name, order_count, business_name, total_revenue). 5) GET /api/content/media-assets - Successfully retrieved 5 media assets with proper structure (_id, title, description, images, updated_at). ✅ AUTHENTICATION & SECURITY VERIFIED: Admin authentication working perfectly with admin@kuryecini.com/KuryeciniAdmin2024! (JWT token: 184 chars), admin RBAC protection confirmed (unauthorized access blocked with 403), all protected endpoints properly secured. ✅ DATA STRUCTURE VALIDATION: All API responses match ContentEditor frontend expectations, content blocks have proper sections array structure, popular products include business_name and name fields as required, media assets have images array with correct paths, no mock data detected. ✅ CONTENT_BLOCKS COLLECTION SEEDED: Database contains 5 active content blocks ready for ContentEditor use, all blocks have proper _id fields for frontend integration. ⚠️ MINOR ISSUE: Update test with non-existent block ID returned 404 (expected behavior). 📝 CONCLUSION: ContentEditor backend is PRODUCTION-READY and fully functional. All Phase 1 ContentEditor implementation requirements met, backend API structure matches frontend expectations, admin authentication secure, content management system ready for production use."
 
+  - task: "URGENT - Frontend Address Integration Authentication Fix"
+    implemented: false
+    working: false
+    file: "CustomerApp.js, DiscoverPage.js, apiClient.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "USER REPORTED URGENT ISSUE: 'addresses added in profile don't show in discovery' - Backend confirmed working perfectly (32 addresses exist for testcustomer@example.com), but frontend discovery page not showing addresses."
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL FRONTEND AUTHENTICATION ISSUE IDENTIFIED: Comprehensive testing reveals the root cause - JWT authentication token not properly passed to apiClient in customer app context. ✅ BACKEND CONFIRMED WORKING: All address APIs functional, 32 addresses exist for testcustomer@example.com. ❌ FRONTEND AUTHENTICATION FAILURE: Debug messages show: '🔑 DISCOVER PAGE - apiClient token status: undefined...', '🔑 DISCOVER PAGE - apiClient authenticated: false', '❌ No token available - user needs to login'. API calls fail with 403 Forbidden: 'Failed to load resource: /api/user/addresses', 'Error details: {detail: Not authenticated}'. Address selector shows 'Henüz kayıtlı adresiniz yok' despite 32 addresses in backend. 🎯 ROOT CAUSE: User object exists ({id: customer-001, role: customer, email: testcustomer@example.com}) but JWT token not set in apiClient. The authentication context is not properly integrated with apiClient in customer app components. URGENT FIX REQUIRED: Main agent must fix JWT token passing to apiClient in customer app authentication flow."
+
   - task: "PHASE 3 - İşletme Durum Akışı & Kurye Sistemi"
     implemented: false
     working: false
