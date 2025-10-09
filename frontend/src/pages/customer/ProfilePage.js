@@ -340,8 +340,8 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       console.log('  - apiClient authenticated:', apiClient.isAuthenticated());
       console.log('  - New address data:', newAddress);
 
-      if (!newAddress.label || !newAddress.description || !newAddress.city) {
-        toast.error('Lütfen tüm zorunlu alanları doldurun');
+      if (!newAddress.label || !newAddress.city) {
+        toast.error('Lütfen adres adı ve şehir alanlarını doldurun');
         return;
       }
 
