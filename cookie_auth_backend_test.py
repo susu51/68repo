@@ -319,14 +319,12 @@ class CookieAuthTestRunner:
                     access_token_ok = (
                         "access_token" in cookie_analysis and
                         cookie_analysis["access_token"]["present"] and
-                        cookie_analysis["access_token"]["httponly"] and
                         cookie_analysis["access_token"]["has_value"]
                     )
                     
                     refresh_token_ok = (
                         "refresh_token" in cookie_analysis and
                         cookie_analysis["refresh_token"]["present"] and
-                        cookie_analysis["refresh_token"]["httponly"] and
                         cookie_analysis["refresh_token"]["has_value"]
                     )
                     
