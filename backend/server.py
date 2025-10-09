@@ -5311,6 +5311,9 @@ from routes.customer_cart import router as customer_cart_router
 # City-Strict Address Management
 from routes.addresses import router as addresses_router
 
+# City-Strict Business Catalog
+from routes.city_catalog import router as city_catalog_router
+
 # Phase 2 - Content & Media Management
 from routes.content import router as content_router
 
