@@ -349,12 +349,14 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
 
       setLoading(true);
 
-      // Add default coordinates if not provided (Istanbul center)
+      // Map frontend fields to backend expected format
       const addressData = {
-        ...newAddress,
+        label: newAddress.title || 'Adres', // title → label
+        city: newAddress.city,
+        district: newAddress.district,
+        description: newAddress.full_address || `${newAddress.city} - ${newAddress.district || 'Merkez'} adres`, // full_address → description
         lat: newAddress.lat || 41.0082,
-        lng: newAddress.lng || 28.9784,
-        description: newAddress.description || `${newAddress.city} - ${newAddress.district || 'Merkez'} adres`
+        lng: newAddress.lng || 28.9784
       };
 
       console.log('📤 Making POST request to /user/addresses...');
