@@ -22,6 +22,14 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     loadRestaurants();
   }, []);
 
+  // Reload restaurants when location or sort mode changes
+  useEffect(() => {
+    if (sortMode === 'location' && userLocation) {
+      console.log('🎯 User location changed, reloading restaurants with location sorting...');
+      loadRestaurants();
+    }
+  }, [userLocation, sortMode]);
+
   // Load user's saved addresses when component mounts or user changes
   useEffect(() => {
     if (user) {
