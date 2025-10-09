@@ -9,6 +9,7 @@ import jwt
 import time
 import os
 import bcrypt
+import uuid
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime, timezone, timedelta
 from typing import Optional
