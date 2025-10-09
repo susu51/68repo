@@ -22,7 +22,7 @@ import { CourierDashboard } from "./CourierDashboard";
 import { BusinessDashboard as EnhancedBusinessDashboard } from "./BusinessDashboard_Enhanced";
 import AdminPanel from "./AdminPanel";
 import { CartProvider } from "./contexts/CartContext";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { CookieAuthProvider, useCookieAuth } from "./contexts/CookieAuthContext";
 
 // Components
 import { Button } from "./components/ui/button";
