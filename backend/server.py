@@ -1134,26 +1134,27 @@ async def old_refresh_disabled(request: RefreshTokenRequest):
         "token_type": "bearer"
     }
 
-@api_router.post("/auth/logout",
-    tags=["Authentication"],
-    summary="User Logout",
-    description="Logout user and invalidate tokens.",
-    response_description="Logout confirmation"
-)
-async def logout(current_user: dict = Depends(get_current_user)):
-    """
-    **User Logout**
-    
-    Logout the current user. In a production environment, this would
-    invalidate the refresh token in the database.
-    
-    **Note:** Currently returns success without token invalidation.
-    In production, implement token blacklisting or database cleanup.
-    """
-    return {
-        "message": "Successfully logged out",
-        "user_id": current_user.get("id")
-    }
+# DISABLED - Conflicting with cookie-based auth logout endpoint
+# @api_router.post("/auth/logout",
+#     tags=["Authentication"],
+#     summary="User Logout",
+#     description="Logout user and invalidate tokens.",
+#     response_description="Logout confirmation"
+# )
+# async def logout(current_user: dict = Depends(get_current_user)):
+#     """
+#     **User Logout**
+#     
+#     Logout the current user. In a production environment, this would
+#     invalidate the refresh token in the database.
+#     
+#     **Note:** Currently returns success without token invalidation.
+#     In production, implement token blacklisting or database cleanup.
+#     """
+#     return {
+#         "message": "Successfully logged out",
+#         "user_id": current_user.get("id")
+#     }
 @api_router.post("/register/courier")
 async def register_courier(courier_data: CourierRegistration):
     """Register a new courier"""
