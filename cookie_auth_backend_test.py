@@ -200,12 +200,11 @@ class CookieAuthTestRunner:
                     
                     # Check for new access token cookie
                     cookies_info = {}
-                    for cookie in response.cookies:
-                        if cookie.key == "access_token":
-                            cookies_info[cookie.key] = {
-                                "value": cookie.value[:20] + "..." if len(cookie.value) > 20 else cookie.value,
-                                "httponly": cookie.get("httponly", False),
-                                "max_age": cookie.get("max-age", "")
+                    for cookie_name, cookie_value in response.cookies.items():
+                        if cookie_name == "access_token":
+                            cookies_info[cookie_name] = {
+                                "value": str(cookie_value)[:20] + "..." if len(str(cookie_value)) > 20 else str(cookie_value),
+                                "present": True
                             }
                     
                     if success_field and message == "Token refreshed":
