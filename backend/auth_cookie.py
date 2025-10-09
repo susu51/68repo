@@ -162,9 +162,18 @@ async def login(body: LoginRequest, response: Response):
         if not user:
             raise HTTPException(401, "Invalid credentials")
         
-        # Verify password
-        if not verify_password(body.password, user.get("password", "")):
-            raise HTTPException(401, "Invalid credentials")
+        # Verify password (handle both plain text and bcrypt)
+        user_password = user.get("password", "") or user.get("password_hash", "")
+        
+        # Check if it's a bcrypt hash (starts with $2b$)
+        if user_password.startswith("$2b$"):
+            # Use bcrypt verification
+            if not verify_password(body.password, user_password):
+                raise HTTPException(401, "Invalid credentials")
+        else:
+            # Plain text comparison (for existing users)
+            if body.password != user_password:
+                raise HTTPException(401, "Invalid credentials")
         
         user_id = user["id"]
     
