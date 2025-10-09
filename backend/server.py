@@ -213,6 +213,7 @@ if mongo_url:
             
             # Initialize cookie auth system
             set_db_client(client)
+            set_addresses_db_client(db)
             print("🍪 Cookie auth system initialized")
             
         except Exception as e2:
