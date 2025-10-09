@@ -20,64 +20,106 @@ TEST_CUSTOMER = {
     "password": "test123"
 }
 
-class AddressTestRunner:
+class CookieAuthTester:
     def __init__(self):
-        self.session = None
-        self.auth_token = None
+        self.session = requests.Session()
         self.test_results = []
-        self.created_address_ids = []
+        self.cookies_received = {}
         
-    async def setup_session(self):
-        """Initialize HTTP session"""
-        self.session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30),
-            headers={'Content-Type': 'application/json'}
-        )
-        
-    async def cleanup_session(self):
-        """Cleanup HTTP session"""
-        if self.session:
-            await self.session.close()
-            
-    def log_test(self, test_name, success, details="", response_data=None):
-        """Log test result"""
+    def log_test(self, test_name, success, details="", error=""):
+        """Log test results"""
         status = "✅ PASS" if success else "❌ FAIL"
-        result = {
+        print(f"{status} {test_name}")
+        if details:
+            print(f"   📝 {details}")
+        if error:
+            print(f"   🚨 {error}")
+        
+        self.test_results.append({
             "test": test_name,
-            "status": status,
             "success": success,
             "details": details,
+            "error": error,
             "timestamp": datetime.now().isoformat()
-        }
-        if response_data:
-            result["response_data"] = response_data
-        self.test_results.append(result)
-        print(f"{status}: {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        if not success and response_data:
-            print(f"   Response: {json.dumps(response_data, indent=2)}")
-        print()
+        })
         
-    async def test_customer_authentication(self):
-        """Test 1: Verify customer login with testcustomer@example.com/test123"""
+    def test_backend_cookie_configuration(self):
+        """Test 1: Backend Cookie Configuration Testing"""
+        print("\n🔧 TEST 1: Backend Cookie Configuration Testing")
+        
         try:
+            # Test login with testcustomer@example.com/test123
             login_data = {
-                "email": TEST_CUSTOMER_EMAIL,
-                "password": TEST_CUSTOMER_PASSWORD
+                "email": TEST_CUSTOMER["email"],
+                "password": TEST_CUSTOMER["password"]
             }
             
-            async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as response:
-                response_data = await response.json()
+            response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                # Check if cookies are set
+                cookies = response.cookies
+                cookie_headers = response.headers.get('Set-Cookie', '')
                 
-                if response.status == 200:
-                    self.auth_token = response_data.get("access_token")
-                    user_data = response_data.get("user", {})
+                # Verify access_token and refresh_token cookies are created
+                has_access_token = 'access_token' in cookies
+                has_refresh_token = 'refresh_token' in cookies
+                
+                if has_access_token and has_refresh_token:
+                    # Store cookies for later tests
+                    self.cookies_received = {
+                        'access_token': cookies.get('access_token'),
+                        'refresh_token': cookies.get('refresh_token')
+                    }
                     
-                    if self.auth_token and user_data.get("role") == "customer":
-                        self.log_test(
-                            "Customer Authentication",
-                            True,
+                    # Check cookie attributes in response headers
+                    cookie_details = []
+                    if 'SameSite=none' in cookie_headers or 'SameSite=None' in cookie_headers:
+                        cookie_details.append("SameSite=none ✅")
+                    else:
+                        cookie_details.append("SameSite=none ❌")
+                        
+                    if 'Path=/' in cookie_headers:
+                        cookie_details.append("Path=/ ✅")
+                    else:
+                        cookie_details.append("Path=/ ❌")
+                        
+                    # Check if HttpOnly is NOT set (should be non-HttpOnly)
+                    if 'HttpOnly' not in cookie_headers:
+                        cookie_details.append("Non-HttpOnly ✅")
+                    else:
+                        cookie_details.append("Non-HttpOnly ❌ (HttpOnly still set)")
+                    
+                    self.log_test(
+                        "Login with cookie setting",
+                        True,
+                        f"Cookies set: access_token, refresh_token. Attributes: {', '.join(cookie_details)}"
+                    )
+                else:
+                    missing = []
+                    if not has_access_token:
+                        missing.append("access_token")
+                    if not has_refresh_token:
+                        missing.append("refresh_token")
+                    
+                    self.log_test(
+                        "Login with cookie setting",
+                        False,
+                        error=f"Missing cookies: {', '.join(missing)}"
+                    )
+            else:
+                self.log_test(
+                    "Login with cookie setting",
+                    False,
+                    error=f"Login failed with status {response.status_code}: {response.text}"
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "Login with cookie setting",
+                False,
+                error=f"Exception during login: {str(e)}"
+            )
                             f"Login successful. Token length: {len(self.auth_token)} chars, User ID: {user_data.get('id')}, Role: {user_data.get('role')}"
                         )
                         
