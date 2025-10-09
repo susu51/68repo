@@ -19,10 +19,10 @@ JWT_SECRET = os.environ.get("JWT_SECRET", "your-secret-key-here")
 ACCESS_TTL = 15 * 60        # 15 minutes
 REFRESH_TTL = 7 * 24*60*60  # 7 days
 
-# Cookie configuration
+# Cookie configuration  
 COOKIE_CONFIG = {
     "httponly": True,
-    "secure": True,  # HTTPS only in production
+    "secure": False,  # Set to True in production with HTTPS
     "samesite": "lax"
 }
 
