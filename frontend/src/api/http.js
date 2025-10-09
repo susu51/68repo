@@ -21,19 +21,23 @@ export const api = async (path, init = {}) => {
     if (!res.ok) {
       // Handle auth errors
       if (res.status === 401) {
-        // Try refresh token
-        try {
-          await refreshAuth();
-          // Retry original request
-          const retryRes = await fetch(url, config);
-          if (!retryRes.ok) {
-            throw new Error(`${retryRes.status} ${retryRes.statusText}`);
+        // Only try refresh if we're not already on an auth endpoint
+        if (!path.includes('/auth/')) {
+          try {
+            await refreshAuth();
+            // Retry original request
+            const retryRes = await fetch(url, config);
+            if (!retryRes.ok) {
+              throw new Error(`${retryRes.status} ${retryRes.statusText}`);
+            }
+            return retryRes;
+          } catch (refreshError) {
+            // Refresh failed, just throw error without redirecting
+            throw new Error('Authentication expired');
           }
-          return retryRes;
-        } catch (refreshError) {
-          // Refresh failed, redirect to login
-          window.location.href = '/';
-          throw new Error('Authentication expired');
+        } else {
+          // For auth endpoints, just throw the error without trying to refresh
+          throw new Error(`${res.status} ${res.statusText}`);
         }
       }
       throw new Error(`${res.status} ${res.statusText}`);
