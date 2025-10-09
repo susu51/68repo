@@ -274,9 +274,9 @@ backend:
 
   - task: "MongoDB Geolocation Setup"
     implemented: true
-    working: true
+    working: false
     file: "setup_indexes.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -325,6 +325,12 @@ backend:
         -working: true
         -agent: "testing"
         -comment: "🎉 PHASE 1 ADDRESS MANAGEMENT BACKEND TESTING COMPLETE: Comprehensive testing shows EXCELLENT results (88.2% success rate, 15/17 tests passed). ✅ CUSTOMER AUTHENTICATION VERIFIED: Login with testcustomer@example.com/test123 working perfectly - JWT token generated (195 chars), user ID customer-001 authenticated successfully. ✅ JWT TOKEN VALIDATION WORKING: Token validation via /api/me endpoint successful, proper user data returned (ID: customer-001, Email: testcustomer@example.com, Role: customer). ✅ ALL ADDRESS CRUD OPERATIONS WORKING: GET /api/user/addresses retrieved 17 addresses successfully, POST /api/user/addresses created 2 test addresses with proper ID generation, PUT /api/user/addresses/{address_id} updated address successfully, DELETE /api/user/addresses/{address_id} deleted address successfully, POST /api/user/addresses/{address_id}/set-default set default address successfully. ✅ DATA VALIDATION WORKING: Missing fields handled properly (Status: 200), city normalization test successful (ISTANBUL normalized correctly). ✅ AUTHENTICATION REQUIREMENTS ENFORCED: All 5 address endpoints properly reject unauthorized requests with 403 Forbidden status. ⚠️ MINOR ISSUES: Error handling returns 500 instead of 404 for invalid address IDs (2 failed tests), but core functionality working perfectly. 📝 CONCLUSION: Address management backend is robust and production-ready with 88.2% success rate. All critical CRUD operations, authentication, and data validation working correctly."
+        -working: false
+        -agent: "user"
+        -comment: "USER REPORTED: 'Adres eklenirken hata oluştu' (Error while adding address) - Customer address creation failing in production customer app"
+        -working: false
+        -agent: "testing"
+        -comment: "❌ CRITICAL AUTHENTICATION ISSUE IDENTIFIED: Comprehensive frontend testing reveals customer address creation is failing due to authentication problems. 🔍 ROOT CAUSE ANALYSIS: 1) Console shows 'Failed to load resource: 403 Forbidden' for /api/user/addresses - user not properly authenticated in frontend. 2) Console shows 'No authentication token - showing empty data' indicating JWT token not available in frontend context. 3) User appears to be on ProfilePage.js component (different address form) rather than AddressesPage.js with extensive debugging. 4) Form submission not triggering expected debug patterns (🔄, ✅, 📝, 💾) from AddressesPage.js. 5) No address-related API calls detected during form submission. ❌ CRITICAL ISSUES FOUND: Authentication token not properly passed to frontend components, User accessing wrong address management component (ProfilePage vs AddressesPage), Form submission not triggering API calls due to auth failure, Expected debugging console messages not appearing. 📝 CONCLUSION: The user-reported error 'Adres eklenirken hata oluştu' is caused by frontend authentication issues preventing API calls from being made. Backend API is working correctly, but frontend cannot authenticate properly to make address creation requests."
 
   - task: "Business Registration with City Normalization"
     implemented: true
