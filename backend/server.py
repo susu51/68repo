@@ -4478,6 +4478,7 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
             "id": new_address["id"],
             "label": new_address["label"],
             "city": city_original,
+            "district": address_data.get("district", ""),  # FIXED: Return district field
             "description": new_address["description"],
             "lat": lat,
             "lng": lng
