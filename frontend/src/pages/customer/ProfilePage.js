@@ -361,7 +361,11 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       console.log('✅ Address creation response:', response);
 
       toast.success('Adres başarıyla eklendi!');
+      
+      // Close modal first
       setShowAddressModal(false);
+      
+      // Reset form
       setNewAddress({
         label: '',
         description: '',
@@ -371,8 +375,13 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
         lng: 0
       });
       
-      // Refresh addresses
-      loadTabData('addresses');
+      // Refresh addresses to show new address
+      await loadTabData('addresses');
+      
+      // Notify parent component about new address
+      if (onAddressAdded) {
+        onAddressAdded(response.data);
+      }
       
       // Notify parent component about new address
       if (onAddressAdded) {
