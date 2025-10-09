@@ -10,7 +10,7 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortMode, setSortMode] = useState('city'); // 'location' | 'city'
+  const [sortMode, setSortMode] = useState('city'); // 'city' (smart address-based) or 'location' (GPS-based)
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [restaurantProducts, setRestaurantProducts] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
