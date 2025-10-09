@@ -70,22 +70,29 @@ class CityRegistrationTester:
                 headers={"Content-Type": "application/json"}
             )
             
-            if response.status_code == 201:
+            if response.status_code == 200:  # Business registration returns 200, not 201
                 response_data = response.json()
                 business_id = response_data.get("user_data", {}).get("id")
+                saved_city = response_data.get("user_data", {}).get("city")
+                saved_city_normalized = response_data.get("user_data", {}).get("city_normalized")
                 
                 # Store for later verification
                 self.registered_businesses.append({
                     "id": business_id,
                     "email": business_data["email"],
                     "city": city_name,
+                    "saved_city": saved_city,
+                    "saved_city_normalized": saved_city_normalized,
                     "business_name": business_data["business_name"]
                 })
                 
+                # Check if city was saved correctly
+                city_correct = saved_city == city_name
+                
                 self.log_test(
                     f"Business Registration - {city_name}",
-                    True,
-                    f"Business registered successfully with ID: {business_id}"
+                    city_correct,
+                    f"Business ID: {business_id}, Requested: '{city_name}', Saved: '{saved_city}', Normalized: '{saved_city_normalized}'"
                 )
                 return business_id, response_data
             else:
