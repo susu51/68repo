@@ -2038,17 +2038,18 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
             />
           </div>
           
+          <div>
+            <Label>Vergi Numarası</Label>
+            <Input
+              placeholder="Vergi numarası"
+              value={formData.tax_number}
+              onChange={(e) => setFormData({...formData, tax_number: e.target.value})}
+              required
+              data-testid="business-tax-number"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Vergi Numarası</Label>
-              <Input
-                placeholder="Vergi numarası"
-                value={formData.tax_number}
-                onChange={(e) => setFormData({...formData, tax_number: e.target.value})}
-                required
-                data-testid="business-tax-number"
-              />
-            </div>
             <div>
               <Label>Şehir *</Label>
               <Select 
