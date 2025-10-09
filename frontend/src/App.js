@@ -1974,6 +1974,7 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
     tax_number: '',
     address: '',
     city: '',
+    district: '',  // Required for location-based filtering
     business_category: '',
     description: ''
   });
