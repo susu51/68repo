@@ -161,7 +161,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleSetDefaultAddress = async (addressId) => {
     try {
       setLoading(true);
-      await apiClient.patch(`/customer/addresses/${addressId}/default`);
+      await apiClient.post(`/user/addresses/${addressId}/set-default`);
       toast.success('Varsayılan adres güncellendi');
       loadTabData('addresses');
     } catch (error) {
