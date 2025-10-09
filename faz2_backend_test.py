@@ -23,7 +23,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://deliver-yemek.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
 TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
 TEST_CUSTOMER_PASSWORD = "test123"
 

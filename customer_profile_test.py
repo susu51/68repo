@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 # Configuration
-BASE_URL = "https://deliver-yemek.preview.emergentagent.com/api"
+BASE_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class CustomerProfileTester:

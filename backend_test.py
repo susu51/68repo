@@ -18,7 +18,7 @@ from datetime import datetime
 import traceback
 
 # Test Configuration
-BASE_URL = "https://deliver-yemek.preview.emergentagent.com/api"
+BASE_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
 TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
 TEST_CUSTOMER_PASSWORD = "test123"
 

@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 import uuid
 
 # Configuration
-BACKEND_URL = "https://deliver-yemek.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@kuryecini.com"
 ADMIN_PASSWORD = "KuryeciniAdmin2024!"
 

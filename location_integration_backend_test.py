@@ -25,7 +25,7 @@ import sys
 import os
 
 # Backend URL from environment
-BACKEND_URL = "https://deliver-yemek.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
 
 class LocationIntegrationTester:
     def __init__(self):
