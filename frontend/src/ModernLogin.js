@@ -6,10 +6,7 @@ import { Badge } from "./components/ui/badge";
 import { KuryeciniLogo, KuryeciniTextLogo } from "./components/KuryeciniLogo";
 import PhoneAuth from "./PhoneAuth";
 import toast from 'react-hot-toast';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-const API = `${BACKEND_URL}/api`;
+import { api } from './api/http';  // Use cookie-aware API client
 
 export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
   const [loginMethod, setLoginMethod] = useState('email');
