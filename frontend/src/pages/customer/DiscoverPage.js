@@ -165,7 +165,7 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         } else if (sameCity.length > 0) {
           toast.success(`${sameCity.length} restoran ${selectedAddress.city} şehrinde bulundu`);
         } else {
-          toast.info('Yakın restoran bulunamadı, tüm restoranlar gösteriliyor');
+          toast.success('Yakın restoran bulunamadı, tüm restoranlar gösteriliyor');
         }
       } else {
         // Fallback: Show all active restaurants
