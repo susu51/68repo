@@ -459,23 +459,7 @@ class LoyaltyTransaction(BaseModel):
     class Config:
         populate_by_name = True
 
-# Migration models for localStorage data
-class MigrationData(BaseModel):
-    """Model for localStorage migration data"""
-    cart: Optional[List[Dict[str, Any]]] = None
-    addresses: Optional[List[Dict[str, Any]]] = None
-    preferences: Optional[Dict[str, Any]] = None
-    loyalty_points: Optional[int] = None
-
-class MigrationStatus(BaseModel):
-    """Track migration status per user"""
-    id: str = Field(default_factory=generate_id, alias="_id")
-    user_id: str
-    migrated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    data_types: List[str] = []  # ["cart", "addresses", "preferences"]
-    
-    class Config:
-        populate_by_name = True
+# PRODUCTION DATA MODELS - NO localStorage MIGRATION
 
 # MongoDB collection names
 COLLECTION_NAMES = {
