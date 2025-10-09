@@ -332,7 +332,7 @@ class CookieAuthTestRunner:
                         self.log_test(
                             "Cookie Attributes Verification",
                             True,
-                            f"Both access_token and refresh_token cookies set with HttpOnly=True",
+                            f"Both access_token and refresh_token cookies set correctly",
                             None,
                             cookie_analysis
                         )
