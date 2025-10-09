@@ -87,16 +87,21 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
         
         try {
           // Process session with backend
-          const response = await axios.post(`${API}/auth/google/session`, {
-            session_id: sessionId
+          const response = await api("/auth/google/session", {
+            method: "POST",
+            body: JSON.stringify({ session_id: sessionId })
           });
           
-          if (response.data.access_token) {
-            // Clear URL fragment
-            window.history.replaceState({}, document.title, window.location.pathname);
-            
-            onLogin(response.data);
-            toast.success('Google ile giriş başarılı!');
+          if (response.ok) {
+            const result = await response.json();
+            if (result.access_token) {
+              // Clear URL fragment
+              window.history.replaceState({}, document.title, window.location.pathname);
+              
+              onLogin && onLogin(result);
+              onClose && onClose();
+              toast.success('Google ile giriş başarılı!');
+            }
           }
         } catch (error) {
           console.error('Google OAuth error:', error);
