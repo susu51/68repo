@@ -1088,13 +1088,14 @@ async def old_login_disabled(request: Request, login_data: LoginRequest):
         "user": user
     }
 
-@api_router.post("/auth/refresh",
-    tags=["Authentication"],
-    summary="Refresh Access Token",
-    description="Generate a new access token using a valid refresh token.",
-    response_description="New JWT access token"
-)
-async def refresh_access_token(request: RefreshTokenRequest):
+# DISABLED - USE COOKIE AUTH INSTEAD  
+# @api_router.post("/auth/refresh",
+#     tags=["Authentication"],
+#     summary="Refresh Access Token", 
+#     description="Generate a new access token using a valid refresh token.",
+#     response_description="New JWT access token"
+# )
+async def old_refresh_disabled(request: RefreshTokenRequest):
     """
     **Refresh Access Token**
     
