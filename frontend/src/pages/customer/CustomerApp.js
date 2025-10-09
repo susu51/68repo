@@ -25,9 +25,18 @@ export const CustomerApp = ({ user, onLogout }) => {
 
   // Set authentication token for API calls
   useEffect(() => {
-    console.log('🔑 Setting API token for CustomerApp:', token ? 'Token available' : 'No token');
+    console.log('🔑 CustomerApp Authentication Debug:');
+    console.log('  - Token exists:', !!token);
+    console.log('  - Token length:', token?.length);
+    console.log('  - User:', user?.email);
+    console.log('  - apiClient token before:', apiClient.getToken()?.substring(0, 20) + '...');
+    
     if (token) {
       apiClient.setToken(token);
+      console.log('  ✅ Token set to apiClient');
+      console.log('  - apiClient token after:', apiClient.getToken()?.substring(0, 20) + '...');
+    } else {
+      console.log('  ❌ No token available - user needs to login');
     }
   }, [token]);
 
