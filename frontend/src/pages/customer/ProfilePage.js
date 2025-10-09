@@ -335,6 +335,11 @@ const ProfilePage = ({ user, onLogout }) => {
 
   const handleAddAddress = async () => {
     try {
+      console.log('🔄 ProfilePage Address Save Debug:');
+      console.log('  - apiClient token:', apiClient.getToken()?.substring(0, 20) + '...');
+      console.log('  - apiClient authenticated:', apiClient.isAuthenticated());
+      console.log('  - New address data:', newAddress);
+
       if (!newAddress.label || !newAddress.description || !newAddress.city) {
         toast.error('Lütfen tüm zorunlu alanları doldurun');
         return;
@@ -342,7 +347,9 @@ const ProfilePage = ({ user, onLogout }) => {
 
       setLoading(true);
 
-      await apiClient.post('/user/addresses', newAddress);
+      console.log('📤 Making POST request to /user/addresses...');
+      const response = await apiClient.post('/user/addresses', newAddress);
+      console.log('✅ Address creation response:', response);
 
       toast.success('Adres başarıyla eklendi!');
       setShowAddressModal(false);
