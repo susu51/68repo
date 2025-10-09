@@ -5339,6 +5339,9 @@ api_router.include_router(customer_cart_router)
 # City-Strict Address Management
 api_router.include_router(addresses_router)
 
+# City-Strict Business Catalog
+api_router.include_router(city_catalog_router)
+
 # Phase 2 - Content & Media Management
 api_router.include_router(content_router)
 
