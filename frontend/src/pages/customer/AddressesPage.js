@@ -103,13 +103,21 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
 
       console.log('Address data to send:', addressData);
 
+      console.log('🔄 Sending address creation request...');
+      console.log('📝 Address data:', addressData);
+      
       const response = await apiClient.post('/user/addresses', addressData);
 
-      console.log('Add address response:', response);
+      console.log('✅ Add address response received:', response);
+      console.log('📄 Response data:', response.data);
+      console.log('📊 Response status:', response.status);
 
       if (isMounted) {
+        const newAddress = response.data;
+        console.log('💾 Adding to addresses list:', newAddress);
+        
         toast.success('Adres başarıyla eklendi!');
-        setAddresses([...addresses, response.data]);
+        setAddresses([...addresses, newAddress]);
         setShowAddForm(false);
         setNewAddress({
           label: '',
