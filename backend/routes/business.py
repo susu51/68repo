@@ -15,7 +15,7 @@ router = APIRouter(prefix="/business", tags=["business"])
 # Request/Response Models
 class MenuItemCreate(BaseModel):
     title: str
-    description: str
+    description: Optional[str] = ""  # Allow empty description
     price: float
     photo_url: Optional[str] = None
     category: Optional[str] = "Ana Yemek"
