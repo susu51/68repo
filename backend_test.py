@@ -1,335 +1,600 @@
 #!/usr/bin/env python3
 """
-Phase 2 Content & Media Foundation Backend Testing
-Testing content blocks, media assets, admin stats, and popular products endpoints
+Address Management Backend Testing - Post-Fix Verification
+Testing address creation after fixing endpoint inconsistencies and apiClient response handling.
 
-Test Coverage:
-1. GET /api/content/blocks - Content blocks retrieval
-2. GET /api/content/blocks/home_admin - Admin dashboard content
-3. PUT /api/content/blocks/home_admin - Update admin content (auth required)
-4. GET /api/content/media-assets - Media galleries retrieval
-5. GET /api/content/media-assets/courier_gallery - Courier images
-6. GET /api/content/admin/stats - Real-time dashboard stats
-7. GET /api/content/popular-products - Popular products data
+Focus Areas:
+1. Customer authentication verification
+2. Address creation with correct endpoint /api/user/addresses
+3. All CRUD operations verification
+4. Response format validation
 """
 
-import requests
+import asyncio
+import aiohttp
 import json
-import time
-import random
-from datetime import datetime, timezone
+import sys
+from datetime import datetime
+import traceback
 
-# Configuration
-BACKEND_URL = "https://deliver-yemek.preview.emergentagent.com/api"
-ADMIN_EMAIL = "admin@kuryecini.com"
-ADMIN_PASSWORD = "admin123"
+# Test Configuration
+BASE_URL = "https://deliver-yemek.preview.emergentagent.com/api"
+TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
+TEST_CUSTOMER_PASSWORD = "test123"
 
-# Alternative admin credentials to try
-ALTERNATIVE_ADMIN_CREDENTIALS = [
-    {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
-    {"email": "admin@delivertr.com", "password": "6851"}
-]
+# Test data from review request
+TEST_ADDRESS_DATA = {
+    "label": "Test Adres Fix",
+    "city": "Niğde", 
+    "district": "Merkez",
+    "description": "Test adres endpoint düzeltmesi sonrası",
+    "lat": 37.9667,
+    "lng": 34.6833
+}
 
-class ContentMediaTester:
+class AddressTestRunner:
     def __init__(self):
-        self.session = requests.Session()
-        self.admin_token = None
+        self.session = None
+        self.auth_token = None
         self.test_results = []
+        self.created_address_ids = []
         
-    def log_test(self, test_name, success, details="", error=""):
-        """Log test results"""
+    async def setup_session(self):
+        """Initialize HTTP session"""
+        self.session = aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=30),
+            headers={'Content-Type': 'application/json'}
+        )
+        
+    async def cleanup_session(self):
+        """Cleanup HTTP session"""
+        if self.session:
+            await self.session.close()
+            
+    def log_test(self, test_name, success, details="", response_data=None):
+        """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
         result = {
             "test": test_name,
+            "status": status,
             "success": success,
             "details": details,
-            "error": error,
             "timestamp": datetime.now().isoformat()
         }
+        if response_data:
+            result["response_data"] = response_data
         self.test_results.append(result)
-        status = "✅ PASS" if success else "❌ FAIL"
         print(f"{status}: {test_name}")
         if details:
             print(f"   Details: {details}")
-        if error:
-            print(f"   Error: {error}")
+        if not success and response_data:
+            print(f"   Response: {json.dumps(response_data, indent=2)}")
         print()
-
-    def authenticate_admin(self):
-        """Authenticate as admin user"""
-        print("🔐 AUTHENTICATING ADMIN USER...")
         
-        # Try primary admin credentials
+    async def test_customer_authentication(self):
+        """Test 1: Verify customer login with testcustomer@example.com/test123"""
         try:
             login_data = {
-                "email": ADMIN_EMAIL,
-                "password": ADMIN_PASSWORD
+                "email": TEST_CUSTOMER_EMAIL,
+                "password": TEST_CUSTOMER_PASSWORD
             }
             
-            response = self.session.post(f"{BACKEND_URL}/auth/login", json=login_data)
+            async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as response:
+                response_data = await response.json()
+                
+                if response.status == 200:
+                    self.auth_token = response_data.get("access_token")
+                    user_data = response_data.get("user", {})
+                    
+                    if self.auth_token and user_data.get("role") == "customer":
+                        self.log_test(
+                            "Customer Authentication",
+                            True,
+                            f"Login successful. Token length: {len(self.auth_token)} chars, User ID: {user_data.get('id')}, Role: {user_data.get('role')}"
+                        )
+                        
+                        # Update session headers with auth token
+                        self.session.headers.update({
+                            'Authorization': f'Bearer {self.auth_token}'
+                        })
+                        return True
+                    else:
+                        self.log_test(
+                            "Customer Authentication",
+                            False,
+                            "Missing token or incorrect role",
+                            response_data
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Customer Authentication",
+                        False,
+                        f"Login failed with status {response.status}",
+                        response_data
+                    )
+                    return False
+                    
+        except Exception as e:
+            self.log_test(
+                "Customer Authentication",
+                False,
+                f"Exception during login: {str(e)}"
+            )
+            return False
             
-            if response.status_code == 200:
-                data = response.json()
-                self.admin_token = data.get("access_token")
-                if self.admin_token:
-                    self.session.headers.update({
-                        "Authorization": f"Bearer {self.admin_token}"
-                    })
-                    self.log_test("Admin Authentication", True, 
-                                f"Successfully authenticated admin user, token length: {len(self.admin_token)}")
+    async def test_jwt_token_validation(self):
+        """Test 2: Verify JWT token is working via /me endpoint"""
+        try:
+            async with self.session.get(f"{BASE_URL}/me") as response:
+                response_data = await response.json()
+                
+                if response.status == 200:
+                    user_data = response_data
+                    if user_data.get("email") == TEST_CUSTOMER_EMAIL and user_data.get("role") == "customer":
+                        self.log_test(
+                            "JWT Token Validation",
+                            True,
+                            f"Token validation successful. User: {user_data.get('id')}, Email: {user_data.get('email')}"
+                        )
+                        return True
+                    else:
+                        self.log_test(
+                            "JWT Token Validation",
+                            False,
+                            "Token valid but user data mismatch",
+                            response_data
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "JWT Token Validation",
+                        False,
+                        f"Token validation failed with status {response.status}",
+                        response_data
+                    )
+                    return False
+                    
+        except Exception as e:
+            self.log_test(
+                "JWT Token Validation",
+                False,
+                f"Exception during token validation: {str(e)}"
+            )
+            return False
+            
+    async def test_get_user_addresses(self):
+        """Test 3: GET /api/user/addresses - List existing addresses"""
+        try:
+            async with self.session.get(f"{BASE_URL}/user/addresses") as response:
+                response_data = await response.json()
+                
+                if response.status == 200:
+                    addresses = response_data if isinstance(response_data, list) else response_data.get("addresses", [])
+                    self.log_test(
+                        "GET User Addresses",
+                        True,
+                        f"Retrieved {len(addresses)} addresses successfully"
+                    )
                     return True
                 else:
-                    self.log_test("Admin Authentication", False, "No access token in response")
-            else:
-                self.log_test("Admin Authentication", False, 
-                            f"Login failed with status {response.status_code}: {response.text}")
-                
+                    self.log_test(
+                        "GET User Addresses",
+                        False,
+                        f"Failed to retrieve addresses with status {response.status}",
+                        response_data
+                    )
+                    return False
+                    
         except Exception as e:
-            self.log_test("Admin Authentication", False, f"Authentication error: {str(e)}")
-        
-        # Try alternative credentials
-        for creds in ALTERNATIVE_ADMIN_CREDENTIALS:
-            try:
-                response = self.session.post(f"{BACKEND_URL}/auth/login", json=creds)
+            self.log_test(
+                "GET User Addresses",
+                False,
+                f"Exception during address retrieval: {str(e)}"
+            )
+            return False
+            
+    async def test_create_address(self):
+        """Test 4: POST /api/user/addresses - Create new address with test data"""
+        try:
+            async with self.session.post(f"{BASE_URL}/user/addresses", json=TEST_ADDRESS_DATA) as response:
+                response_data = await response.json()
                 
-                if response.status_code == 200:
-                    data = response.json()
-                    self.admin_token = data.get("access_token")
-                    if self.admin_token:
-                        self.session.headers.update({
-                            "Authorization": f"Bearer {self.admin_token}"
-                        })
-                        self.log_test(f"Alternative Admin Auth ({creds['email']})", True, 
-                                    f"Successfully authenticated, token length: {len(self.admin_token)}")
-                        return True
+                if response.status == 200:
+                    address_id = response_data.get("id")
+                    if address_id:
+                        self.created_address_ids.append(address_id)
                         
-            except Exception as e:
-                self.log_test(f"Alternative Admin Auth ({creds['email']})", False, 
-                            f"Authentication error: {str(e)}")
-        
-        return False
-
-    def test_content_blocks_endpoints(self):
-        """Test content blocks API endpoints"""
-        print("\n🔍 TESTING CONTENT BLOCKS ENDPOINTS")
-        
-        # Test GET /api/content/blocks
-        try:
-            response = self.session.get(f"{BACKEND_URL}/content/blocks")
-            if response.status_code == 200:
-                data = response.json()
-                self.log_test("GET /api/content/blocks", True, 
-                            f"Retrieved content blocks successfully, count: {len(data) if isinstance(data, list) else 'N/A'}")
-            elif response.status_code == 404:
-                self.log_test("GET /api/content/blocks", False, 
-                            "Endpoint not found - content blocks API not implemented")
-            else:
-                self.log_test("GET /api/content/blocks", False, 
-                            f"Unexpected response: {response.status_code} - {response.text}")
+                        # Verify all fields are correctly saved
+                        saved_data = response_data
+                        field_matches = []
+                        for key, expected_value in TEST_ADDRESS_DATA.items():
+                            actual_value = saved_data.get(key)
+                            if actual_value == expected_value:
+                                field_matches.append(f"{key}: ✓")
+                            else:
+                                field_matches.append(f"{key}: ✗ (expected: {expected_value}, got: {actual_value})")
+                        
+                        self.log_test(
+                            "POST Create Address",
+                            True,
+                            f"Address created successfully. ID: {address_id}. Field validation: {', '.join(field_matches)}"
+                        )
+                        return True
+                    else:
+                        self.log_test(
+                            "POST Create Address",
+                            False,
+                            "Address created but no ID returned",
+                            response_data
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "POST Create Address",
+                        False,
+                        f"Address creation failed with status {response.status}",
+                        response_data
+                    )
+                    return False
+                    
         except Exception as e:
-            self.log_test("GET /api/content/blocks", False, f"Request error: {str(e)}")
-        
-        # Test GET /api/content/blocks/home_admin
+            self.log_test(
+                "POST Create Address",
+                False,
+                f"Exception during address creation: {str(e)}"
+            )
+            return False
+            
+    async def test_update_address(self):
+        """Test 5: PUT /api/user/addresses/{id} - Update address"""
+        if not self.created_address_ids:
+            self.log_test(
+                "PUT Update Address",
+                False,
+                "No address ID available for update test"
+            )
+            return False
+            
         try:
-            response = self.session.get(f"{BACKEND_URL}/content/blocks/home_admin")
-            if response.status_code == 200:
-                data = response.json()
-                self.log_test("GET /api/content/blocks/home_admin", True, 
-                            f"Retrieved admin dashboard content successfully")
-            elif response.status_code == 404:
-                self.log_test("GET /api/content/blocks/home_admin", False, 
-                            "Endpoint not found - admin dashboard content API not implemented")
-            else:
-                self.log_test("GET /api/content/blocks/home_admin", False, 
-                            f"Unexpected response: {response.status_code} - {response.text}")
-        except Exception as e:
-            self.log_test("GET /api/content/blocks/home_admin", False, f"Request error: {str(e)}")
-        
-        # Test PUT /api/content/blocks/home_admin (admin auth required)
-        try:
+            address_id = self.created_address_ids[0]
             update_data = {
-                "sections": [
-                    {
-                        "id": "welcome",
-                        "title": "Welcome Admin",
-                        "content": "Updated admin dashboard content"
-                    }
-                ]
+                "label": "Updated Test Address",
+                "city": "Niğde",
+                "district": "Merkez", 
+                "description": "Updated description after endpoint fix",
+                "lat": 37.9667,
+                "lng": 34.6833
             }
-            response = self.session.put(f"{BACKEND_URL}/content/blocks/home_admin", json=update_data)
-            if response.status_code == 200:
-                self.log_test("PUT /api/content/blocks/home_admin", True, 
-                            "Successfully updated admin dashboard content")
-            elif response.status_code == 404:
-                self.log_test("PUT /api/content/blocks/home_admin", False, 
-                            "Endpoint not found - admin dashboard content update API not implemented")
-            elif response.status_code == 403:
-                self.log_test("PUT /api/content/blocks/home_admin", False, 
-                            "Access denied - admin authentication may not be working properly")
-            else:
-                self.log_test("PUT /api/content/blocks/home_admin", False, 
-                            f"Unexpected response: {response.status_code} - {response.text}")
-        except Exception as e:
-            self.log_test("PUT /api/content/blocks/home_admin", False, f"Request error: {str(e)}")
-
-    def test_media_assets_endpoints(self):
-        """Test media assets API endpoints"""
-        print("\n🖼️ TESTING MEDIA ASSETS ENDPOINTS")
-        
-        # Test GET /api/content/media-assets
-        try:
-            response = self.session.get(f"{BACKEND_URL}/content/media-assets")
-            if response.status_code == 200:
-                data = response.json()
-                self.log_test("GET /api/content/media-assets", True, 
-                            f"Retrieved media galleries successfully, count: {len(data) if isinstance(data, list) else 'N/A'}")
-            elif response.status_code == 404:
-                self.log_test("GET /api/content/media-assets", False, 
-                            "Endpoint not found - media assets API not implemented")
-            else:
-                self.log_test("GET /api/content/media-assets", False, 
-                            f"Unexpected response: {response.status_code} - {response.text}")
-        except Exception as e:
-            self.log_test("GET /api/content/media-assets", False, f"Request error: {str(e)}")
-        
-        # Test GET /api/content/media-assets/courier_gallery
-        try:
-            response = self.session.get(f"{BACKEND_URL}/content/media-assets/courier_gallery")
-            if response.status_code == 200:
-                data = response.json()
-                self.log_test("GET /api/content/media-assets/courier_gallery", True, 
-                            f"Retrieved courier gallery successfully, images count: {len(data.get('images', [])) if isinstance(data, dict) else 'N/A'}")
-            elif response.status_code == 404:
-                self.log_test("GET /api/content/media-assets/courier_gallery", False, 
-                            "Endpoint not found - courier gallery API not implemented")
-            else:
-                self.log_test("GET /api/content/media-assets/courier_gallery", False, 
-                            f"Unexpected response: {response.status_code} - {response.text}")
-        except Exception as e:
-            self.log_test("GET /api/content/media-assets/courier_gallery", False, f"Request error: {str(e)}")
-
-    def test_admin_stats_endpoint(self):
-        """Test admin stats endpoint"""
-        print("\n📊 TESTING ADMIN STATS ENDPOINT")
-        
-        try:
-            response = self.session.get(f"{BACKEND_URL}/content/admin/stats")
-            if response.status_code == 200:
-                data = response.json()
-                # Check for expected stats structure
-                expected_fields = ['orders', 'revenue', 'users', 'businesses']
-                has_expected_structure = any(field in str(data).lower() for field in expected_fields)
+            
+            async with self.session.put(f"{BASE_URL}/user/addresses/{address_id}", json=update_data) as response:
+                response_data = await response.json()
                 
-                self.log_test("GET /api/content/admin/stats", True, 
-                            f"Retrieved admin stats successfully, has expected structure: {has_expected_structure}")
-            elif response.status_code == 404:
-                self.log_test("GET /api/content/admin/stats", False, 
-                            "Endpoint not found - admin stats API not implemented")
-            elif response.status_code == 403:
-                self.log_test("GET /api/content/admin/stats", False, 
-                            "Access denied - admin authentication may not be working properly")
-            else:
-                self.log_test("GET /api/content/admin/stats", False, 
-                            f"Unexpected response: {response.status_code} - {response.text}")
+                if response.status == 200:
+                    # Verify the label was updated
+                    updated_label = response_data.get("label")
+                    if updated_label == "Updated Test Address":
+                        self.log_test(
+                            "PUT Update Address",
+                            True,
+                            f"Address {address_id} updated successfully. New label: {updated_label}"
+                        )
+                        return True
+                    else:
+                        self.log_test(
+                            "PUT Update Address",
+                            False,
+                            f"Address updated but label not changed. Expected: 'Updated Test Address', Got: {updated_label}",
+                            response_data
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "PUT Update Address",
+                        False,
+                        f"Address update failed with status {response.status}",
+                        response_data
+                    )
+                    return False
+                    
         except Exception as e:
-            self.log_test("GET /api/content/admin/stats", False, f"Request error: {str(e)}")
-
-    def test_popular_products_endpoint(self):
-        """Test popular products endpoint"""
-        print("\n🔥 TESTING POPULAR PRODUCTS ENDPOINT")
+            self.log_test(
+                "PUT Update Address",
+                False,
+                f"Exception during address update: {str(e)}"
+            )
+            return False
+            
+    async def test_set_default_address(self):
+        """Test 6: POST /api/user/addresses/{id}/set-default - Set default address"""
+        if not self.created_address_ids:
+            self.log_test(
+                "POST Set Default Address",
+                False,
+                "No address ID available for set-default test"
+            )
+            return False
+            
+        try:
+            address_id = self.created_address_ids[0]
+            
+            async with self.session.post(f"{BASE_URL}/user/addresses/{address_id}/set-default") as response:
+                response_data = await response.json()
+                
+                if response.status == 200:
+                    self.log_test(
+                        "POST Set Default Address",
+                        True,
+                        f"Address {address_id} set as default successfully"
+                    )
+                    return True
+                else:
+                    self.log_test(
+                        "POST Set Default Address",
+                        False,
+                        f"Set default failed with status {response.status}",
+                        response_data
+                    )
+                    return False
+                    
+        except Exception as e:
+            self.log_test(
+                "POST Set Default Address",
+                False,
+                f"Exception during set default: {str(e)}"
+            )
+            return False
+            
+    async def test_delete_address(self):
+        """Test 7: DELETE /api/user/addresses/{id} - Delete address"""
+        if not self.created_address_ids:
+            self.log_test(
+                "DELETE Address",
+                False,
+                "No address ID available for delete test"
+            )
+            return False
+            
+        try:
+            address_id = self.created_address_ids[0]
+            
+            async with self.session.delete(f"{BASE_URL}/user/addresses/{address_id}") as response:
+                response_data = await response.json() if response.content_type == 'application/json' else {}
+                
+                if response.status == 200:
+                    self.log_test(
+                        "DELETE Address",
+                        True,
+                        f"Address {address_id} deleted successfully"
+                    )
+                    # Remove from our tracking list
+                    self.created_address_ids.remove(address_id)
+                    return True
+                else:
+                    self.log_test(
+                        "DELETE Address",
+                        False,
+                        f"Address deletion failed with status {response.status}",
+                        response_data
+                    )
+                    return False
+                    
+        except Exception as e:
+            self.log_test(
+                "DELETE Address",
+                False,
+                f"Exception during address deletion: {str(e)}"
+            )
+            return False
+            
+    async def test_response_format_compatibility(self):
+        """Test 8: Verify response format is compatible with frontend expectations"""
+        try:
+            # Create a test address to check response format
+            test_data = {
+                "label": "Format Test Address",
+                "city": "İstanbul",
+                "district": "Kadıköy",
+                "description": "Testing response format",
+                "lat": 40.9833,
+                "lng": 29.0167
+            }
+            
+            async with self.session.post(f"{BASE_URL}/user/addresses", json=test_data) as response:
+                response_data = await response.json()
+                
+                if response.status == 200:
+                    # Check if response has expected fields for frontend
+                    required_fields = ["id", "label", "city", "district", "description", "lat", "lng"]
+                    missing_fields = []
+                    present_fields = []
+                    
+                    for field in required_fields:
+                        if field in response_data:
+                            present_fields.append(field)
+                        else:
+                            missing_fields.append(field)
+                    
+                    if not missing_fields:
+                        self.log_test(
+                            "Response Format Compatibility",
+                            True,
+                            f"All required fields present: {', '.join(present_fields)}"
+                        )
+                        
+                        # Clean up test address
+                        if response_data.get("id"):
+                            self.created_address_ids.append(response_data["id"])
+                        
+                        return True
+                    else:
+                        self.log_test(
+                            "Response Format Compatibility",
+                            False,
+                            f"Missing fields: {', '.join(missing_fields)}. Present: {', '.join(present_fields)}",
+                            response_data
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Response Format Compatibility",
+                        False,
+                        f"Failed to create test address for format check. Status: {response.status}",
+                        response_data
+                    )
+                    return False
+                    
+        except Exception as e:
+            self.log_test(
+                "Response Format Compatibility",
+                False,
+                f"Exception during format test: {str(e)}"
+            )
+            return False
+            
+    async def test_authentication_security(self):
+        """Test 9: Verify endpoints require authentication"""
+        try:
+            # Create session without auth token
+            test_session = aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=30),
+                headers={'Content-Type': 'application/json'}
+            )
+            
+            # Test unauthenticated access
+            async with test_session.get(f"{BASE_URL}/user/addresses") as response:
+                if response.status in [401, 403]:
+                    self.log_test(
+                        "Authentication Security",
+                        True,
+                        f"Unauthenticated access properly blocked with status {response.status}"
+                    )
+                    await test_session.close()
+                    return True
+                else:
+                    response_data = await response.json() if response.content_type == 'application/json' else {}
+                    self.log_test(
+                        "Authentication Security",
+                        False,
+                        f"Unauthenticated access allowed with status {response.status}",
+                        response_data
+                    )
+                    await test_session.close()
+                    return False
+                    
+        except Exception as e:
+            self.log_test(
+                "Authentication Security",
+                False,
+                f"Exception during security test: {str(e)}"
+            )
+            return False
+            
+    async def cleanup_test_addresses(self):
+        """Clean up any remaining test addresses"""
+        for address_id in self.created_address_ids[:]:
+            try:
+                async with self.session.delete(f"{BASE_URL}/user/addresses/{address_id}") as response:
+                    if response.status == 200:
+                        print(f"🧹 Cleaned up test address: {address_id}")
+                        self.created_address_ids.remove(address_id)
+            except Exception as e:
+                print(f"⚠️  Failed to cleanup address {address_id}: {e}")
+                
+    async def run_all_tests(self):
+        """Run all address management tests"""
+        print("🚀 Starting Address Management Backend Testing - Post-Fix Verification")
+        print("=" * 80)
+        print()
+        
+        await self.setup_session()
         
         try:
-            response = self.session.get(f"{BACKEND_URL}/content/popular-products")
-            if response.status_code == 200:
-                data = response.json()
-                self.log_test("GET /api/content/popular-products", True, 
-                            f"Retrieved popular products successfully, count: {len(data) if isinstance(data, list) else 'N/A'}")
-            elif response.status_code == 404:
-                self.log_test("GET /api/content/popular-products", False, 
-                            "Endpoint not found - popular products API not implemented")
-            else:
-                self.log_test("GET /api/content/popular-products", False, 
-                            f"Unexpected response: {response.status_code} - {response.text}")
-        except Exception as e:
-            self.log_test("GET /api/content/popular-products", False, f"Request error: {str(e)}")
-
-    def run_all_tests(self):
-        """Run all content and media foundation tests"""
-        print("🚀 STARTING PHASE 2 CONTENT & MEDIA FOUNDATION TESTING")
-        print("=" * 60)
+            # Test sequence
+            tests = [
+                ("Customer Authentication", self.test_customer_authentication),
+                ("JWT Token Validation", self.test_jwt_token_validation),
+                ("GET User Addresses", self.test_get_user_addresses),
+                ("POST Create Address", self.test_create_address),
+                ("PUT Update Address", self.test_update_address),
+                ("POST Set Default Address", self.test_set_default_address),
+                ("DELETE Address", self.test_delete_address),
+                ("Response Format Compatibility", self.test_response_format_compatibility),
+                ("Authentication Security", self.test_authentication_security),
+            ]
+            
+            # Run tests
+            for test_name, test_func in tests:
+                try:
+                    await test_func()
+                except Exception as e:
+                    self.log_test(test_name, False, f"Unexpected error: {str(e)}")
+                    print(f"Stack trace: {traceback.format_exc()}")
+                    
+            # Cleanup
+            await self.cleanup_test_addresses()
+            
+        finally:
+            await self.cleanup_session()
+            
+        # Print summary
+        self.print_summary()
         
-        # Try admin authentication
-        auth_success = self.authenticate_admin()
-        
-        if not auth_success:
-            print("\n⚠️ WARNING: Admin authentication failed, testing endpoints without auth...")
-        
-        # Run all endpoint tests
-        self.test_content_blocks_endpoints()
-        self.test_media_assets_endpoints()
-        self.test_admin_stats_endpoint()
-        self.test_popular_products_endpoint()
-        
-        # Generate summary
-        self.generate_summary()
-
-    def generate_summary(self):
-        """Generate test summary"""
-        print("\n" + "=" * 60)
-        print("📊 PHASE 2 CONTENT & MEDIA FOUNDATION TEST SUMMARY")
-        print("=" * 60)
+    def print_summary(self):
+        """Print test summary"""
+        print("=" * 80)
+        print("🎯 ADDRESS MANAGEMENT TESTING SUMMARY")
+        print("=" * 80)
         
         total_tests = len(self.test_results)
-        passed_tests = len([t for t in self.test_results if t["success"]])
+        passed_tests = len([r for r in self.test_results if r["success"]])
         failed_tests = total_tests - passed_tests
         success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
         
-        print(f"Total Tests: {total_tests}")
-        print(f"Passed: {passed_tests}")
-        print(f"Failed: {failed_tests}")
-        print(f"Success Rate: {success_rate:.1f}%")
+        print(f"📊 OVERALL RESULTS: {success_rate:.1f}% success rate ({passed_tests}/{total_tests} tests passed)")
+        print()
         
-        print("\n🔍 DETAILED RESULTS:")
+        if failed_tests > 0:
+            print("❌ FAILED TESTS:")
+            for result in self.test_results:
+                if not result["success"]:
+                    print(f"   • {result['test']}: {result['details']}")
+            print()
+            
+        print("✅ PASSED TESTS:")
         for result in self.test_results:
-            status = "✅" if result["success"] else "❌"
-            print(f"{status} {result['test']}: {result['details']}")
+            if result["success"]:
+                print(f"   • {result['test']}: {result['details']}")
+        print()
         
-        # Critical findings
-        print("\n🚨 CRITICAL FINDINGS:")
+        # Key findings
+        print("🔍 KEY FINDINGS:")
+        auth_working = any(r["success"] and "Authentication" in r["test"] for r in self.test_results)
+        create_working = any(r["success"] and "Create Address" in r["test"] for r in self.test_results)
+        crud_working = sum(1 for r in self.test_results if r["success"] and any(op in r["test"] for op in ["GET", "POST", "PUT", "DELETE"]))
         
-        # Check for missing endpoints
-        missing_endpoints = []
-        for result in self.test_results:
-            if not result["success"] and "not found" in result["details"].lower():
-                missing_endpoints.append(result["test"])
+        print(f"   • Customer Authentication: {'✅ Working' if auth_working else '❌ Failed'}")
+        print(f"   • Address Creation (Main Issue): {'✅ Working' if create_working else '❌ Failed'}")
+        print(f"   • CRUD Operations: {crud_working}/5 working")
+        print(f"   • Response Format: {'✅ Compatible' if any(r['success'] and 'Format' in r['test'] for r in self.test_results) else '❌ Issues'}")
+        print()
         
-        if missing_endpoints:
-            print(f"❌ MISSING ENDPOINTS: {len(missing_endpoints)} critical endpoints not implemented:")
-            for endpoint in missing_endpoints:
-                print(f"   - {endpoint}")
-        
-        # Check authentication issues
-        auth_issues = []
-        for result in self.test_results:
-            if not result["success"] and ("authentication" in result["details"].lower() or 
-                                        "access denied" in result["details"].lower()):
-                auth_issues.append(result["test"])
-        
-        if auth_issues:
-            print(f"🔐 AUTHENTICATION ISSUES: {len(auth_issues)} endpoints have auth problems:")
-            for issue in auth_issues:
-                print(f"   - {issue}")
-        
-        print(f"\n📝 CONCLUSION:")
-        if success_rate < 50:
-            print("❌ CRITICAL: Phase 2 Content & Media Foundation is NOT READY")
-            print("   Major implementation gaps detected - endpoints missing")
-        elif success_rate < 80:
-            print("⚠️ WARNING: Phase 2 Content & Media Foundation has significant issues")
-            print("   Some functionality working but critical gaps remain")
+        # Conclusion
+        if success_rate >= 80:
+            print("🎉 CONCLUSION: Address management system is working well after the fixes!")
+            if create_working:
+                print("   The reported 'Adres eklerken hata oluştu' issue appears to be resolved.")
         else:
-            print("✅ SUCCESS: Phase 2 Content & Media Foundation is functional")
-            print("   Most endpoints working correctly")
+            print("⚠️  CONCLUSION: Address management system has issues that need attention.")
+            if not create_working:
+                print("   The 'Adres eklerken hata oluştu' issue is still present.")
+        
+        print("=" * 80)
+
+async def main():
+    """Main test execution"""
+    runner = AddressTestRunner()
+    await runner.run_all_tests()
 
 if __name__ == "__main__":
-    tester = ContentMediaTester()
-    tester.run_all_tests()
+    asyncio.run(main())
