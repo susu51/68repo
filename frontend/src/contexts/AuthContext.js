@@ -90,6 +90,10 @@ export function AuthProvider({ children }) {
       delete axios.defaults.headers.common['Authorization'];
       apiClient.setToken(null);
       
+      // Clear localStorage
+      localStorage.removeItem('kuryecini_access_token');
+      localStorage.removeItem('kuryecini_user');
+      
       console.log('✅ User logged out via Context API');
     } catch (error) {
       console.error('Logout error:', error);
