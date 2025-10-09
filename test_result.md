@@ -1280,13 +1280,12 @@ frontend:
 
 test_plan:
   current_focus:
-    - "URGENT - Frontend Address Integration Authentication Fix"
-    - "Phase 3 - Order Status Flow Management"
-    - "Phase 3 - Courier Workflow System"
-    - "Phase 3 - Real-time Location Tracking"
-    - "Phase 3 - Admin Settings & Earnings"
+    - "CRITICAL - Business Registration City Issue Investigation"
+    - "CRITICAL - Menu Visibility Issue Investigation"
+    - "CRITICAL - Address Registration Issue Investigation"
+    - "CRITICAL - Discovery Filtering Issue Investigation"
   stuck_tasks:
-    - "Phase 3 - CAS Status Transitions"
+    - "Address Registration Issue - District Field Bug (FIXED)"
   test_all: false
   test_priority: "critical_first"
 
