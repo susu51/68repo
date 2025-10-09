@@ -91,13 +91,10 @@ class CookieAuthTestRunner:
                     
                     # Extract cookies from response
                     cookies_info = {}
-                    for cookie in response.cookies:
-                        cookies_info[cookie.key] = {
-                            "value": cookie.value[:20] + "..." if len(cookie.value) > 20 else cookie.value,
-                            "httponly": cookie.get("httponly", False),
-                            "samesite": cookie.get("samesite", ""),
-                            "max_age": cookie.get("max-age", ""),
-                            "secure": cookie.get("secure", False)
+                    for cookie_name, cookie_value in response.cookies.items():
+                        cookies_info[cookie_name] = {
+                            "value": str(cookie_value)[:20] + "..." if len(str(cookie_value)) > 20 else str(cookie_value),
+                            "present": True
                         }
                     
                     if success_field and message == "Login successful":
