@@ -61,7 +61,7 @@ async def debug_cookie_auth():
         print("\n3. Checking session cookies...")
         print(f"   Session cookies: {len(session.cookie_jar)}")
         for cookie in session.cookie_jar:
-            print(f"   Session cookie: {cookie.key} = {cookie.value[:20]}...")
+            print(f"   Session cookie: {cookie.key} = {str(cookie.value)[:20]}...")
         
         # Test 4: Try /me with cookies
         print("\n4. Testing /me with cookies...")
