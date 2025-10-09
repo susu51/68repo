@@ -144,11 +144,13 @@ async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
         # Handle coordinates - check both GeoJSON and direct lat/lng fields
         if addr.get("location") and addr["location"].get("coordinates"):
             coords = addr["location"]["coordinates"]
-            lng_val = float(coords[0]) if len(coords) > 0 else 0.0
-            lat_val = float(coords[1]) if len(coords) > 1 else 0.0
+            lng_val = float(coords[0]) if len(coords) > 0 and coords[0] is not None else 0.0
+            lat_val = float(coords[1]) if len(coords) > 1 and coords[1] is not None else 0.0
         else:
-            lat_val = float(addr.get("lat", 0))
-            lng_val = float(addr.get("lng", 0))
+            lat_raw = addr.get("lat", 0)
+            lng_raw = addr.get("lng", 0)
+            lat_val = float(lat_raw) if lat_raw is not None else 0.0
+            lng_val = float(lng_raw) if lng_raw is not None else 0.0
         
         result.append(AddressResponse(
             id=addr_id,
