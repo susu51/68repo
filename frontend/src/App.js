@@ -35,7 +35,7 @@ import { Textarea } from "./components/ui/textarea";
 import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.VITE_API_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
 // Console log for debugging
