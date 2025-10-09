@@ -106,7 +106,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "PRODUCTION DEPLOYMENT READY: Complete Kuryecini platform deployment preparation - all systems tested and ready for production deployment with 95.2% backend success rate. Platform includes comprehensive admin panel, business management, customer ordering, courier operations with proper authentication and MongoDB integration."
+user_problem_statement: "CRITICAL SYSTEM ANALYSIS - Multiple Location & Integration Issues: User reports 4 critical problems: 1) Business Registration City Issue - cities defaulting to İstanbul, 2) Menu Visibility Issue - restaurant menus not showing to customers, 3) Address Registration Issue - city/district saving incorrectly, 4) Discovery Filtering Issue - location-based restaurant filtering not working"
 
 backend:
   - task: "FAZ 1 - Admin Order Management API"
