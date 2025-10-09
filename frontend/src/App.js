@@ -178,7 +178,7 @@ const CitySelector = ({ value, onChange, required = false }) => {
 
 // Admin Dashboard - Simple Working Version with Theme
 const AdminDashboard = ({ user }) => {
-  const { logout } = useAuth();
+  const { logout } = useCookieAuth();
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
@@ -2416,7 +2416,7 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
 
 // Business Dashboard - Enhanced with Product Management
 const BusinessDashboard = ({ user }) => {
-  const { logout } = useAuth();
+  const { logout } = useCookieAuth();
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -2914,7 +2914,7 @@ const BusinessDashboard = ({ user }) => {
 
 // Customer Dashboard - Modern Tech Design
 const CustomerDashboard = ({ user }) => {
-  const { logout } = useAuth();
+  const { logout } = useCookieAuth();
   const [activeTab, setActiveTab] = useState('products'); // Start with Keşfet (discover) tab
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
