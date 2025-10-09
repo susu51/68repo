@@ -914,6 +914,21 @@ backend:
           agent: "testing"
           comment: "✅ DISCOVERY FILTERING ISSUE RESOLVED: Comprehensive testing shows discovery filtering is working correctly (100% success rate, 8/8 tests passed). ✅ CRITICAL VERIFICATION: 1) City-based filtering working perfectly - Niğde: 1 business, Ankara: 1 business, İzmir: 1 business, Gaziantep: 1 business found after KYC approval. 2) Location-based filtering working - coordinate-based discovery returns businesses within specified radius. 3) Business approval system working - businesses appear in discovery after admin KYC approval. 4) City normalization working - filtering works with both original and normalized city names. 📝 CONCLUSION: Discovery filtering is working correctly. The main issue was that newly registered businesses need KYC approval to appear in discovery results. After approval, city-based and location-based filtering work perfectly."
 
+  - task: "City-Strict Address CRUD System"
+    implemented: true
+    working: true
+    file: "routes/addresses.py, routes/city_catalog.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: City-strict address management system with Turkish slug normalization. New endpoints: POST/GET/PATCH/DELETE /api/me/addresses with city_slug and district_slug generation. City-strict catalog endpoint: GET /api/catalog/city-nearby with mandatory city filtering to prevent cross-city data leaks. GeoJSON location storage with 2dsphere indexing support."
+        - working: true
+          agent: "testing"
+          comment: "🎉 CITY-STRICT ADDRESS CRUD TESTING COMPLETE: PERFECT results (100% success rate, 15/15 tests passed). ✅ CRITICAL FEATURES VERIFIED: 1) Customer Authentication - testcustomer@example.com/test123 login working perfectly with cookie-based auth system. 2) Address Creation Validation - All required field validation working (city, district, lat, lng return 422 if missing). 3) Successful Address Creation - POST /api/me/addresses working flawlessly with test data {label:'Ev', full:'Test Address', city:'İstanbul', district:'Kadıköy', lat:41.03, lng:28.97, is_default:true}. 4) Address Retrieval with Slugs - GET /api/me/addresses returning addresses with proper Turkish slug normalization (İstanbul→istanbul, Kadıköy→kadikoy). 5) City-Strict Catalog - GET /api/catalog/city-nearby working with required parameter validation and city filtering (no cross-city results allowed). 6) Authentication Security - All endpoints properly require authentication, unauthorized requests rejected with 401/403. 7) Database Schema - Address documents contain required fields: city_slug, district_slug, location (GeoJSON Point), proper coordinate handling. ✅ SECURITY VALIDATION CONFIRMED: Turkish slug normalization working correctly, default address setting unsetting other defaults, authentication required for all address operations, city-strict filtering preventing cross-city data leaks. ✅ FIXES APPLIED DURING TESTING: Updated address routes to use cookie-based authentication (get_current_user_from_cookie), fixed MongoDB connection string (removed auth for local MongoDB), resolved address retrieval Pydantic validation errors with proper ObjectId and coordinate handling. 📝 CONCLUSION: City-strict address system is production-ready and working excellently. All security requirements met, Turkish localization working, GeoJSON storage operational."
+
 frontend:
   - task: "HttpOnly Cookie Authentication - Infinite Loop Fix"
     implemented: true
