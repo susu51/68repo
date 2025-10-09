@@ -92,6 +92,16 @@ except ImportError:
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# CITY_STRICT security check - fail fast if not enabled
+CITY_STRICT = os.environ.get('CITY_STRICT', 'false').lower() == 'true'
+if not CITY_STRICT:
+    print("❌ CRITICAL: CITY_STRICT=true is required for production safety")
+    print("Set CITY_STRICT=true in environment variables to prevent cross-city data leaks")
+    sys.exit(1)
+
+print("✅ CITY_STRICT mode enabled - city filtering enforced")
+NEARBY_RADIUS_M = int(os.environ.get('NEARBY_RADIUS_M', '5000'))
+
 # Initialize Sentry for error monitoring
 sentry_dsn = os.getenv('SENTRY_DSN')
 if sentry_dsn:
