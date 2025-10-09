@@ -4156,20 +4156,22 @@ async def get_public_businesses(
             # Get business ID properly
             business_id = str(business.get("_id", business.get("id", "unknown")))
             
-            # Add location data (Istanbul districts for demo)
-            istanbul_districts = [
-                {"name": "Sultanahmet", "lat": 41.0082, "lng": 28.9784},
-                {"name": "Beyoğlu", "lat": 41.0369, "lng": 28.9850},
-                {"name": "Şişli", "lat": 41.0498, "lng": 28.9662},
-                {"name": "Beşiktaş", "lat": 41.0766, "lng": 28.9688},
-                {"name": "Kadıköy", "lat": 41.0058, "lng": 29.0281},
-                {"name": "Ataşehir", "lat": 40.9969, "lng": 29.0833},
-                {"name": "Üsküdar", "lat": 41.0431, "lng": 29.0088},
-                {"name": "Sarıyer", "lat": 41.1058, "lng": 29.0074},
-            ]
+            # Use real business location data
+            business_city = business.get("city", "İstanbul")  # Use actual city from business
+            business_district = business.get("district", "Merkez")  # Use actual district from business
             
-            # Assign location based on business ID
-            district = istanbul_districts[hash(business_id) % len(istanbul_districts)]
+            # Create location object with real coordinates or fallback
+            # For now use fallback coordinates, later can be enhanced with real geolocation
+            fallback_coordinates = {
+                "lat": 41.0082 + (hash(business_id) % 100) / 10000,  # Small variation around Istanbul
+                "lng": 28.9784 + (hash(business_id) % 100) / 10000
+            }
+            
+            location_data = {
+                "name": business_district,
+                "lat": fallback_coordinates["lat"],
+                "lng": fallback_coordinates["lng"]
+            }
             
             business_data = {
                 "id": business_id,
@@ -4179,11 +4181,14 @@ async def get_public_businesses(
                 "rating": round(4.0 + (hash(business_id) % 15) / 10, 1),
                 "delivery_time": f"{20 + (hash(business_id) % 20)}-{35 + (hash(business_id) % 15)}",
                 "min_order": 50 + (hash(business_id) % 50),
-                "location": district,
+                "location": location_data,
                 "is_open": True,
                 "phone": business.get("phone"),
-                "address": f"{district['name']}, İstanbul",
-                "image_url": f"/api/placeholder/restaurant-{hash(business_id) % 10}.jpg"
+                "address": f"{business_district}, {business_city}",  # Use real city and district
+                "image_url": f"/api/placeholder/restaurant-{hash(business_id) % 10}.jpg",
+                # Add city and district fields for frontend smart sorting
+                "city": business_city,
+                "district": business_district
             }
             business_list.append(business_data)
         
