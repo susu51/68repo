@@ -4508,7 +4508,7 @@ async def update_user_address(
         # Check if address belongs to user
         existing_address = await db.addresses.find_one({
             "id": address_id,
-            "userId": user_id
+            "user_id": user_id
         })
         
         if not existing_address:
