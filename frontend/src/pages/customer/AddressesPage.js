@@ -25,18 +25,24 @@ const turkishCities = [
   'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
 ];
 
-const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
+const initialAddressForm = {
+  label: '',
+  city: '',
+  district: '',
+  description: '',
+  lat: null,
+  lng: null
+};
+
+const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [isMounted, setIsMounted] = useState(true);
-  const [newAddress, setNewAddress] = useState({
-    label: '',
-    city: '',
-    description: '',
-    lat: null,
-    lng: null
-  });
+  const [editingAddress, setEditingAddress] = useState(null);
+  const [addressForm, setAddressForm] = useState(initialAddressForm);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
 
   // Enhanced Component Lifecycle Management
   useEffect(() => {
