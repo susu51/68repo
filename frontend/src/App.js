@@ -2145,6 +2145,19 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label>İlçe *</Label>
+              <Input
+                placeholder="İlçe adı girin"
+                value={formData.district}
+                onChange={(e) => setFormData({...formData, district: e.target.value})}
+                required
+                data-testid="business-district"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Müşterilerin yakın restoranları bulması için gerekli
+              </p>
+            </div>
           </div>
           
           <div>
