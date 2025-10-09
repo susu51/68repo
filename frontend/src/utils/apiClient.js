@@ -1,127 +1,56 @@
-import axios from 'axios';
+// DEPRECATED - Use /api/http.js instead
+// Cookie-based authentication with credentials: 'include'
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-export const API_BASE = `${BACKEND_URL}/api`;
 
-// API client utility with auth token management
-class APIClient {
+console.warn('❌ DEPRECATED: apiClient.js is deprecated. Use /api/http.js with cookie authentication instead.');
+
+// Compatibility wrapper - redirects to cookie-based API
+class DeprecatedAPIClient {
   constructor() {
-    this.token = null;
+    console.warn('⚠️ APIClient is deprecated. Migrate to cookie-based authentication.');
   }
 
-  // Set token (called by AuthContext)
   setToken(token) {
-    this.token = token;
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
+    console.warn('❌ setToken() is deprecated. Cookies handle authentication automatically.');
   }
 
-  // Get token (no localStorage fallback)
   getToken() {
-    return this.token;
+    console.warn('❌ getToken() is deprecated. Use cookie authentication instead.');
+    return null;
   }
 
-  // Get auth headers
-  getAuthHeaders() {
-    if (!this.token) {
-      throw new Error('Authentication token not available. Please login.');
-    }
-    return {
-      'Authorization': `Bearer ${this.token}`,
-      'Content-Type': 'application/json'
-    };
-  }
-
-  // Check if authenticated
   isAuthenticated() {
-    return !!this.token;
+    console.warn('❌ isAuthenticated() is deprecated. Check auth status via /auth/me endpoint.');
+    return false;
   }
 
-  // Generic API calls with automatic auth headers
   async get(endpoint, options = {}) {
-    try {
-      const headers = this.isAuthenticated() ? this.getAuthHeaders() : {};
-      const response = await axios.get(`${API_BASE}${endpoint}`, {
-        ...options,
-        headers: { ...headers, ...options.headers }
-      });
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error('Session expired. Please login again.');
-      }
-      throw error;
-    }
+    console.warn('❌ apiClient.get() is deprecated. Use /api/http.js get() function instead.');
+    throw new Error('Deprecated API client. Use cookie-based http.js');
   }
 
   async post(endpoint, data = {}, options = {}) {
-    try {
-      const headers = this.isAuthenticated() ? this.getAuthHeaders() : {};
-      const response = await axios.post(`${API_BASE}${endpoint}`, data, {
-        ...options,
-        headers: { ...headers, ...options.headers }
-      });
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error('Session expired. Please login again.');
-      }
-      throw error;
-    }
-  }
-
-  async patch(endpoint, data = {}, options = {}) {
-    try {
-      const headers = this.isAuthenticated() ? this.getAuthHeaders() : {};
-      const response = await axios.patch(`${API_BASE}${endpoint}`, data, {
-        ...options,
-        headers: { ...headers, ...options.headers }
-      });
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error('Session expired. Please login again.');
-      }
-      throw error;
-    }
+    console.warn('❌ apiClient.post() is deprecated. Use /api/http.js post() function instead.');
+    throw new Error('Deprecated API client. Use cookie-based http.js');
   }
 
   async put(endpoint, data = {}, options = {}) {
-    try {
-      const headers = this.isAuthenticated() ? this.getAuthHeaders() : {};
-      const response = await axios.put(`${API_BASE}${endpoint}`, data, {
-        ...options,
-        headers: { ...headers, ...options.headers }
-      });
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error('Session expired. Please login again.');
-      }
-      throw error;
-    }
+    console.warn('❌ apiClient.put() is deprecated. Use /api/http.js put() function instead.');
+    throw new Error('Deprecated API client. Use cookie-based http.js');
+  }
+
+  async patch(endpoint, data = {}, options = {}) {
+    console.warn('❌ apiClient.patch() is deprecated. Use /api/http.js patch() function instead.');
+    throw new Error('Deprecated API client. Use cookie-based http.js');
   }
 
   async delete(endpoint, options = {}) {
-    try {
-      const headers = this.isAuthenticated() ? this.getAuthHeaders() : {};
-      const response = await axios.delete(`${API_BASE}${endpoint}`, {
-        ...options,
-        headers: { ...headers, ...options.headers }
-      });
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error('Session expired. Please login again.');
-      }
-      throw error;
-    }
+    console.warn('❌ apiClient.delete() is deprecated. Use /api/http.js del() function instead.');
+    throw new Error('Deprecated API client. Use cookie-based http.js');
   }
 }
 
-// Export singleton instance
-export const apiClient = new APIClient();
+// Export deprecated instance for compatibility
+export const apiClient = new DeprecatedAPIClient();
 export default apiClient;
