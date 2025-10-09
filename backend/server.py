@@ -173,6 +173,10 @@ if mongo_url:
             db = client[db_name]
             print(f"✅ Fallback MongoDB connection successful: {db_name}")
             
+            # Initialize cookie auth system
+            set_db_client(client)
+            print("🍪 Cookie auth system initialized")
+            
         except Exception as e2:
             print(f"❌ Fallback connection also failed: {e2}")
             db = None
