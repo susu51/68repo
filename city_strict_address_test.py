@@ -44,7 +44,7 @@ class CityStrictAddressTest:
         })
         
     def authenticate_customer(self):
-        """Authenticate test customer"""
+        """Authenticate test customer using cookie-based auth"""
         print("\n🔐 CUSTOMER AUTHENTICATION")
         
         try:
@@ -57,21 +57,38 @@ class CityStrictAddressTest:
             
             if response.status_code == 200:
                 data = response.json()
-                self.auth_token = data.get("access_token")
-                user_data = data.get("user", {})
                 
-                self.log_test(
-                    "Customer Authentication", 
-                    True,
-                    f"Login successful - Token: {len(self.auth_token)} chars, User ID: {user_data.get('id')}"
-                )
-                
-                # Set authorization header for future requests
-                self.session.headers.update({
-                    "Authorization": f"Bearer {self.auth_token}"
-                })
-                
-                return True
+                # Cookie-based auth sets cookies automatically in session
+                # Check if we got the success response
+                if data.get("success"):
+                    # Verify authentication by calling /me endpoint
+                    me_response = self.session.get(f"{API_BASE}/auth/me")
+                    
+                    if me_response.status_code == 200:
+                        user_data = me_response.json()
+                        
+                        self.log_test(
+                            "Customer Authentication", 
+                            True,
+                            f"Login successful - User ID: {user_data.get('id')}, Email: {user_data.get('email')}"
+                        )
+                        return True
+                    else:
+                        self.log_test(
+                            "Customer Authentication",
+                            False,
+                            f"Authentication verification failed - Status: {me_response.status_code}",
+                            me_response.text
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Customer Authentication",
+                        False,
+                        f"Login response invalid - Success: {data.get('success')}",
+                        data
+                    )
+                    return False
             else:
                 self.log_test(
                     "Customer Authentication",
