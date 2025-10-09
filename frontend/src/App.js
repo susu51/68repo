@@ -4597,7 +4597,7 @@ function App() {
         />
         </div>
       </CartProvider>
-    </AuthProvider>
+    </CookieAuthProvider>
   );
 }
 
