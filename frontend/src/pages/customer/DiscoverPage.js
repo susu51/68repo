@@ -32,8 +32,15 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
 
   // Load user's saved addresses when component mounts or user changes
   useEffect(() => {
+    console.log('🚀 DISCOVER PAGE - useEffect for address loading triggered');
+    console.log('👤 DISCOVER PAGE - User object:', user);
+    console.log('🔑 DISCOVER PAGE - User email:', user?.email);
+    
     if (user) {
+      console.log('✅ DISCOVER PAGE - User exists, calling loadUserAddresses...');
       loadUserAddresses();
+    } else {
+      console.log('❌ DISCOVER PAGE - No user, skipping address loading');
     }
   }, [user]);
 
