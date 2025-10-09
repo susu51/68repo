@@ -76,32 +76,47 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     try {
       setLoading(true);
       
+      // Get all restaurants first
+      const response = await apiClient.get('/businesses');
+      let restaurantsData = response.data || [];
+      
+      console.log(`📍 Loaded ${restaurantsData.length} restaurants`);
+      console.log('🔍 Sort mode:', sortMode, 'User location:', userLocation);
+      
       if (sortMode === 'location' && userLocation) {
-        // Location-based sorting (50km radius)
-        const response = await apiClient.get('/businesses', {
-          params: {
-            lat: userLocation.lat,
-            lng: userLocation.lng,
-            radius: 50000 // 50km in meters
-          }
+        // Calculate distance and sort by proximity
+        restaurantsData = restaurantsData.map(restaurant => {
+          const distance = calculateDistance(
+            userLocation.lat,
+            userLocation.lng,
+            restaurant.lat || 0,
+            restaurant.lng || 0
+          );
+          
+          return {
+            ...restaurant,
+            distance: distance,
+            distanceText: distance < 1 ? 
+              `${Math.round(distance * 1000)}m` : 
+              `${distance.toFixed(1)}km`
+          };
         });
-        setRestaurants(response.data || []);
+        
+        // Sort by distance (closest first)
+        restaurantsData.sort((a, b) => a.distance - b.distance);
+        
+        console.log(`🎯 Sorted ${restaurantsData.length} restaurants by distance`);
+        console.log('📊 Closest restaurants:', restaurantsData.slice(0, 3).map(r => 
+          `${r.name}: ${r.distanceText}`
+        ));
+        
+        toast.success(`${restaurantsData.length} restoran mesafeye göre sıralandı`);
       } else {
-        // City-wide listing - show ALL restaurants for now (no city filter)
-        let params = {};
-        
-        // TEMPORARY: Remove city filter to show all approved restaurants
-        // if (selectedAddress && selectedAddress.city) {
-        //   params.city = selectedAddress.city;
-        //   console.log(`Filtering restaurants by city: ${selectedAddress.city}`);
-        // }
-        
-        const response = await apiClient.get('/businesses', { params });
-        setRestaurants(response.data || []);
-        
-        console.log(`Found ${response.data?.length || 0} total restaurants`);
-        console.log('Restaurant data:', response.data);
+        // City-wide listing - show ALL restaurants  
+        console.log(`📋 Showing all ${restaurantsData.length} restaurants`);
       }
+      
+      setRestaurants(restaurantsData);
       
     } catch (error) {
       console.error('Error loading restaurants:', error);
