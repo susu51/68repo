@@ -51,17 +51,14 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
       
       if (sortMode === 'location' && userLocation) {
         // Location-based sorting (50km radius)
-        const response = await axios.get(`${API}/api/restaurants/near`, {
-          params: {
-            lat: userLocation.lat,
-            lng: userLocation.lng,
-            radius: 50000 // 50km in meters
-          }
+        const businesses = await apiClient.get('/businesses', {
+          lat: userLocation.lat,
+          lng: userLocation.lng,
+          radius: 50000 // 50km in meters
         });
-        setRestaurants(response.data || []);
+        setRestaurants(businesses || []);
       } else {
         // City-wide listing - show ALL restaurants for now (no city filter)
-        let endpoint = `${API}/api/restaurants`;  // Changed to /restaurants endpoint
         let params = {};
         
         // TEMPORARY: Remove city filter to show all approved restaurants
@@ -70,11 +67,11 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         //   console.log(`Filtering restaurants by city: ${selectedAddress.city}`);
         // }
         
-        const response = await axios.get(endpoint, { params });
-        setRestaurants(response.data || []);
+        const businesses = await apiClient.get('/businesses', params);
+        setRestaurants(businesses || []);
         
-        console.log(`Found ${response.data?.length || 0} total restaurants`);
-        console.log('Restaurant data:', response.data);
+        console.log(`Found ${businesses?.length || 0} total restaurants`);
+        console.log('Restaurant data:', businesses);
       }
       
     } catch (error) {
