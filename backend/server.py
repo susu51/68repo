@@ -153,6 +153,10 @@ if mongo_url:
         db = client[db_name]
         print(f"✅ MongoDB client created for Atlas: {db_name}")
         print(f"📍 Database URL: {mongo_url[:50]}...[HIDDEN]")
+        
+        # Initialize cookie auth system
+        set_db_client(client)
+        print("🍪 Cookie auth system initialized")
     except Exception as e:
         print(f"❌ MongoDB connection error: {e}")
         print(f"🔍 Trying fallback connection method...")
