@@ -47,8 +47,8 @@ async def debug_cookie_auth():
                 
                 # Check cookies
                 print(f"   Cookies received: {len(response.cookies)}")
-                for cookie in response.cookies:
-                    print(f"   Cookie: {cookie.key} = {cookie.value[:20]}...")
+                for cookie_name, cookie_value in response.cookies.items():
+                    print(f"   Cookie: {cookie_name} = {str(cookie_value)[:20]}...")
                     
             else:
                 try:
