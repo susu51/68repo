@@ -1,0 +1,163 @@
+[
+  {
+    "test": "User Authentication",
+    "success": true,
+    "details": "Login successful - JWT token: 195 chars, User ID: customer-001, Role: customer",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.532847"
+  },
+  {
+    "test": "JWT Token Validation",
+    "success": true,
+    "details": "Token valid - User: testcustomer@example.com, ID: customer-001, Role: customer",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.546444"
+  },
+  {
+    "test": "Address Retrieval",
+    "success": true,
+    "details": "Retrieved 35 existing addresses successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.565804"
+  },
+  {
+    "test": "Address Creation - Complete Data",
+    "success": true,
+    "details": "Address created successfully - Status: 200",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.583877"
+  },
+  {
+    "test": "Field Validation - Missing Label",
+    "success": true,
+    "details": "Field is optional - Address created successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.598165"
+  },
+  {
+    "test": "Field Validation - Missing City",
+    "success": true,
+    "details": "Field is optional - Address created successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.607907"
+  },
+  {
+    "test": "Field Validation - Missing District",
+    "success": true,
+    "details": "Field is optional - Address created successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.621941"
+  },
+  {
+    "test": "Field Validation - Missing Description",
+    "success": true,
+    "details": "Field is optional - Address created successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.636685"
+  },
+  {
+    "test": "Field Validation - Missing Coordinates",
+    "success": true,
+    "details": "Field is optional - Address created successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.650615"
+  },
+  {
+    "test": "Field Validation - Missing Lat Only",
+    "success": true,
+    "details": "Field is optional - Address created successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.660124"
+  },
+  {
+    "test": "Field Validation - Missing Lng Only",
+    "success": true,
+    "details": "Field is optional - Address created successfully",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.669280"
+  },
+  {
+    "test": "Coordinate Validation - Valid Istanbul Coordinates",
+    "success": true,
+    "details": "Valid coordinates accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.681973"
+  },
+  {
+    "test": "Coordinate Validation - Valid Kadıköy Coordinates",
+    "success": true,
+    "details": "Valid coordinates accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.692411"
+  },
+  {
+    "test": "Coordinate Validation - Invalid Lat (Out of Range)",
+    "success": false,
+    "details": "Invalid coordinates not rejected - Status: 200",
+    "error": "{\"id\":\"97b0b93d-cddb-4da5-b18b-5938f6da8cb5\",\"label\":\"Coordinate Test - Invalid Lat (Out of Range)\",\"city\":\"İstanbul\",\"description\":\"Coordinate validation test\",\"lat\":91.0,\"lng\":29.0209}",
+    "timestamp": "2025-10-09T13:35:21.701770"
+  },
+  {
+    "test": "Coordinate Validation - Invalid Lng (Out of Range)",
+    "success": false,
+    "details": "Invalid coordinates not rejected - Status: 200",
+    "error": "{\"id\":\"cbabc664-4403-40c1-8ba1-7fa252ea35eb\",\"label\":\"Coordinate Test - Invalid Lng (Out of Range)\",\"city\":\"İstanbul\",\"description\":\"Coordinate validation test\",\"lat\":40.9903,\"lng\":181.0}",
+    "timestamp": "2025-10-09T13:35:21.711072"
+  },
+  {
+    "test": "Coordinate Validation - Zero Coordinates",
+    "success": true,
+    "details": "Valid coordinates accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.721365"
+  },
+  {
+    "test": "Coordinate Validation - Negative Coordinates",
+    "success": true,
+    "details": "Valid coordinates accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.731641"
+  },
+  {
+    "test": "City Validation - İstanbul/Kadıköy",
+    "success": true,
+    "details": "City/district accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.741569"
+  },
+  {
+    "test": "City Validation - Ankara/Çankaya",
+    "success": true,
+    "details": "City/district accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.751755"
+  },
+  {
+    "test": "City Validation - İzmir/Konak",
+    "success": true,
+    "details": "City/district accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.761528"
+  },
+  {
+    "test": "City Validation - InvalidCity/InvalidDistrict",
+    "success": true,
+    "details": "City/district accepted",
+    "error": null,
+    "timestamp": "2025-10-09T13:35:21.773739"
+  },
+  {
+    "test": "City Validation - /Kadıköy",
+    "success": false,
+    "details": "Invalid city/district not rejected - Status: 200",
+    "error": "{\"id\":\"5e851991-f9b3-428a-84a6-fd2b773e0082\",\"label\":\"City Test - /Kadıköy\",\"city\":\"\",\"description\":\"City validation test\",\"lat\":40.9903,\"lng\":29.0209}",
+    "timestamp": "2025-10-09T13:35:21.782897"
+  },
+  {
+    "test": "City Validation - İstanbul/",
+    "success": false,
+    "details": "Invalid city/district not rejected - Status: 200",
+    "error": "{\"id\":\"16387685-f2cd-4f1d-a1fa-276b88290d1c\",\"label\":\"City Test - İstanbul/\",\"city\":\"İstanbul\",\"description\":\"City validation test\",\"lat\":40.9903,\"lng\":29.0209}",
+    "timestamp": "2025-10-09T13:35:21.792363"
+  }
+]
