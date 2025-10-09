@@ -347,8 +347,17 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
 
       setLoading(true);
 
+      // Add default coordinates if not provided (Istanbul center)
+      const addressData = {
+        ...newAddress,
+        lat: newAddress.lat || 41.0082,
+        lng: newAddress.lng || 28.9784,
+        description: newAddress.description || `${newAddress.city} - ${newAddress.district || 'Merkez'} adres`
+      };
+
       console.log('📤 Making POST request to /user/addresses...');
-      const response = await apiClient.post('/user/addresses', newAddress);
+      console.log('📋 Final address data:', addressData);
+      const response = await apiClient.post('/user/addresses', addressData);
       console.log('✅ Address creation response:', response);
 
       toast.success('Adres başarıyla eklendi!');
