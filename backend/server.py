@@ -5304,6 +5304,9 @@ from routes.websocket_routes import router as websocket_router
 # Phase 3.5 - localStorage → DB Migration
 from routes.customer_cart import router as customer_cart_router
 
+# City-Strict Address Management
+from routes.addresses import router as addresses_router
+
 # Phase 2 - Content & Media Management
 from routes.content import router as content_router
 
