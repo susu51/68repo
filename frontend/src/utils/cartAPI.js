@@ -9,7 +9,7 @@ class CartAPI {
   // Sepeti backend'den yükle
   static async loadCart() {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('kuryecini_access_token');
+      // Token management via cookie authentication - no localStorage
       if (!token) {
         console.log('🛒 No token, returning empty cart');
         return { items: [], restaurant: null };
@@ -43,7 +43,7 @@ class CartAPI {
   // Sepeti backend'e kaydet
   static async saveCart(cartData) {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('kuryecini_access_token');
+      // Token management via cookie authentication - no localStorage
       if (!token) {
         console.log('⚠️ No token, cannot save cart to DB');
         return false;
@@ -74,7 +74,7 @@ class CartAPI {
   // Sepeti temizle
   static async clearCart() {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('kuryecini_access_token');
+      // Token management via cookie authentication - no localStorage
       if (!token) {
         console.log('⚠️ No token, cannot clear cart from DB');
         return true;
@@ -99,7 +99,7 @@ class CartAPI {
   // Ürün sepete ekle (optimistic update)
   static async addToCart(product, quantity = 1) {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('kuryecini_access_token');
+      // Token management via cookie authentication - no localStorage
       if (!token) {
         console.log('⚠️ No token, cannot add to cart');
         return false;
