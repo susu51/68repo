@@ -147,7 +147,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
     
     try {
       setLoading(true);
-      await apiClient.delete(`/customer/addresses/${addressId}`);
+      await apiClient.delete(`/user/addresses/${addressId}`);
       toast.success('Adres başarıyla silindi');
       loadTabData('addresses');
     } catch (error) {
