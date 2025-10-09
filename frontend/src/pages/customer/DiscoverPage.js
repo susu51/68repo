@@ -283,7 +283,7 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-sm text-gray-600 cursor-pointer" onClick={() => onNavigateToProfile('addresses')}>
+                    <div className="text-sm text-gray-600 cursor-pointer" onClick={() => onTabChange('profile')}>
                       <span className="text-blue-600 underline">Teslimat adresi seçin</span> 
                       <span className="text-xs block text-gray-500">Adres eklemek için tıklayın</span>
                     </div>
