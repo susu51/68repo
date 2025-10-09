@@ -1,35 +1,23 @@
 #!/usr/bin/env python3
 """
-Address Management Backend Testing - Post-Fix Verification
-Testing address creation after fixing endpoint inconsistencies and apiClient response handling.
-
-Focus Areas:
-1. Customer authentication verification
-2. Address creation with correct endpoint /api/user/addresses
-3. All CRUD operations verification
-4. Response format validation
+Cross-Origin Cookie Authentication Testing
+Testing the modified non-HttpOnly cookie authentication system to resolve cross-origin issues
 """
 
-import asyncio
-import aiohttp
+import requests
 import json
+import time
 import sys
 from datetime import datetime
-import traceback
 
-# Test Configuration
-BASE_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
-TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
-TEST_CUSTOMER_PASSWORD = "test123"
+# Configuration
+BACKEND_URL = "http://localhost:8001"
+API_BASE = f"{BACKEND_URL}/api"
 
-# Test data from review request
-TEST_ADDRESS_DATA = {
-    "label": "Test Adres Fix",
-    "city": "Niğde", 
-    "district": "Merkez",
-    "description": "Test adres endpoint düzeltmesi sonrası",
-    "lat": 37.9667,
-    "lng": 34.6833
+# Test credentials
+TEST_CUSTOMER = {
+    "email": "testcustomer@example.com",
+    "password": "test123"
 }
 
 class AddressTestRunner:
