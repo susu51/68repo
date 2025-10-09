@@ -5273,7 +5273,7 @@ from routes.content import router as content_router
 # Debug routes (temporary for Atlas testing)
 from routes.debug import router as debug_router
 
-# Cookie-based authentication router
+# Cookie-based authentication router (PRIORITY - include first)
 api_router.include_router(auth_router)
 
 api_router.include_router(business_router)
