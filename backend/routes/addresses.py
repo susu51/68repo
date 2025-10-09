@@ -75,7 +75,7 @@ def set_db_client(database):
 @router.post("/addresses", response_model=dict, status_code=201)
 async def create_address(
     address_data: AddressCreate,
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user_from_cookie)
 ):
     """Create new address with city-strict validation"""
     
@@ -156,7 +156,7 @@ async def get_addresses(current_user = Depends(get_current_user)):
 async def update_address(
     address_id: str,
     address_data: AddressUpdate,
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user_from_cookie)
 ):
     """Update address with validation"""
     
@@ -212,7 +212,7 @@ async def update_address(
 @router.delete("/addresses/{address_id}")
 async def delete_address(
     address_id: str,
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user_from_cookie)
 ):
     """Delete user address"""
     
