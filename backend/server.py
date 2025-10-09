@@ -1222,6 +1222,7 @@ async def register_business(business_data: BusinessRegister):
         "address": business_data.address,
         "city": city_original,  # Keep original for reference
         "city_normalized": city_normalized,  # Normalized for searching
+        "district": business_data.district,  # Required for location-based filtering
         "business_category": business_data.business_category,
         "description": business_data.description,
         "is_active": True,
