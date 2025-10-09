@@ -1469,10 +1469,10 @@ agent_communication:
 
   - task: "HttpOnly Cookie-Based Authentication System"
     implemented: true
-    working: true
+    working: false
     file: "auth_cookie.py, server.py"
-    stuck_count: 0
-    priority: "high"
+    stuck_count: 1
+    priority: "critical"
     needs_retesting: false
     status_history:
         - working: "NA"
@@ -1481,6 +1481,9 @@ agent_communication:
         - working: true
           agent: "testing"
           comment: "🍪 HTTPONLY COOKIE AUTHENTICATION TESTING COMPLETE: PERFECT results (100% success rate, 11/11 tests passed). ✅ ALL CRITICAL FEATURES VERIFIED: 1) POST /api/auth/login - Login successful with proper cookie setting for all user types (customer, courier, business, admin). 2) GET /api/auth/me - User data retrieval working perfectly with cookie authentication. 3) POST /api/auth/refresh - Token refresh mechanism working correctly with new access token cookie generation. 4) POST /api/auth/logout - Logout successful with proper cookie clearing (Max-Age=0, empty values). 5) Cookie Attributes - Both access_token and refresh_token cookies set correctly with proper values. 6) CORS Configuration - Properly configured with Allow-Credentials: true for cookie transmission. 7) Complete Authentication Flow - Full login → auth check → logout → access denied flow working perfectly. 8) Token Expiration Handling - Refresh mechanism operational for token renewal. 9) Authentication Failure Scenarios - All failure cases handled correctly (invalid credentials, no cookies, no refresh token). 10) Backend Integration - Auth router properly mounted and database integration working. 11) Multiple User Types - All user types (customer, courier, business, admin) authenticate successfully. ✅ CRITICAL FIXES APPLIED: 1) Resolved conflicting logout endpoints - disabled JWT-based logout in server.py to prevent override of cookie-based logout. 2) Added test user handling to get_current_user_from_cookie function to match login behavior. 3) Verified HttpOnly cookie security attributes and CORS credentials support. ✅ SECURITY FEATURES CONFIRMED: HttpOnly cookies prevent XSS attacks, SameSite=lax prevents CSRF, proper token expiration (15min access, 7day refresh), secure cookie clearing on logout. 📝 CONCLUSION: HttpOnly cookie authentication system is production-ready and fully functional. All authentication endpoints working perfectly with proper security measures in place."
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL DOMAIN MISMATCH ISSUE IDENTIFIED - USER REPORTED 422 ERROR: Comprehensive login testing reveals HttpOnly cookie authentication is BROKEN due to domain mismatch. ❌ ROOT CAUSE: Backend correctly sets cookies for localhost:8001 but frontend runs on localhost:3000. Browser security prevents cross-domain cookie access. ✅ BACKEND VERIFICATION: Login API returns 200 OK, cookies properly generated (verified via curl), authentication endpoints functional when tested directly. ❌ FRONTEND INTEGRATION FAILURE: No authentication cookies visible in browser after login, authentication state not maintained, /auth/me calls return 401 Unauthorized, user remains unauthenticated despite successful login. 🔍 DETAILED FINDINGS: No 422 errors found (user report incorrect), but authentication completely broken. Network monitoring shows no Set-Cookie headers in browser responses. Console shows 'No valid auth cookie found' messages. 🎯 CRITICAL FIX REQUIRED: COOKIE_CONFIG missing domain parameter causes cookies to default to exact domain (localhost:8001) making them inaccessible to frontend (localhost:3000). URGENT: Add domain configuration to auth_cookie.py COOKIE_CONFIG or deploy both services on same domain."
 
   - task: "URGENT - Frontend Address Integration Authentication Fix"
     implemented: false
