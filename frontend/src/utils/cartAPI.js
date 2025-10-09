@@ -9,11 +9,8 @@ class CartAPI {
   // Sepeti backend'den yükle
   static async loadCart() {
     try {
-      // Token management via cookie authentication - no localStorage
-      if (!token) {
-        console.log('🛒 No token, returning empty cart');
-        return { items: [], restaurant: null };
-      }
+      // Using cookie authentication - no token check needed
+      console.log('🛒 Loading cart from database...');
 
       const response = await fetch(`${API}/customer/cart`, {
         headers: {
