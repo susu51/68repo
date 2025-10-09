@@ -203,7 +203,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
 
       switch (tab) {
         case 'addresses':
-          const addressesRes = await apiClient.get('/customer/addresses');
+          const addressesRes = await apiClient.get('/user/addresses');
           setUserAddresses(addressesRes.data || []);
           break;
         case 'coupons':
