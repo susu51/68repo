@@ -5,7 +5,11 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
-from ..auth_dependencies import get_current_user
+# Import auth dependency (adjust path as needed)
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from auth_dependencies import get_current_user
 
 # Turkish slug normalization
 def normalize_turkish_slug(text):
