@@ -22,10 +22,12 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     loadRestaurants();
   }, []);
 
-  // Load user's saved addresses
+  // Load user's saved addresses when component mounts or user changes
   useEffect(() => {
-    loadUserAddresses();
-  }, []);
+    if (user) {
+      loadUserAddresses();
+    }
+  }, [user]);
 
   const loadUserAddresses = async () => {
     try {
