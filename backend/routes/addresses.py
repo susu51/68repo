@@ -139,14 +139,14 @@ async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
     return [
         AddressResponse(
             id=addr["_id"],
-            label=addr["label"],
-            full=addr["full"],
-            city=addr["city"],
-            district=addr["district"],
+            label=addr.get("label", ""),
+            full=addr.get("full", addr.get("full_address", "")),  # Handle both field names
+            city=addr.get("city", ""),
+            district=addr.get("district", ""),
             city_slug=addr.get("city_slug", ""),
             district_slug=addr.get("district_slug", ""),
-            lat=addr["location"]["coordinates"][1],  # lat is second
-            lng=addr["location"]["coordinates"][0],  # lng is first
+            lat=addr.get("location", {}).get("coordinates", [0, 0])[1] if addr.get("location") else addr.get("lat", 0),
+            lng=addr.get("location", {}).get("coordinates", [0, 0])[0] if addr.get("location") else addr.get("lng", 0),
             is_default=addr.get("is_default", False)
         )
         for addr in addresses
