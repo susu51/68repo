@@ -17,8 +17,6 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
   const [userAddresses, setUserAddresses] = useState([]);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
 
-  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-
   // Load restaurants on component mount
   useEffect(() => {
     loadRestaurants();
