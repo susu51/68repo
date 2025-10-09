@@ -35,18 +35,28 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/auth/login`, formData, {
-        withCredentials: true  // Enable cookies
+      const response = await api("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(formData)
       });
       
-      if (response.data.success) {
-        // Cookies are automatically set by backend
-        // Call parent component's onLogin with success data
-        onLogin({ success: true });
-        toast.success('Başarıyla giriş yaptınız!');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Cookies are automatically set by backend
+          // Call parent component's onLogin with success data
+          onLogin && onLogin({ success: true });
+          // Close the modal
+          onClose && onClose();
+          toast.success('Başarıyla giriş yaptınız!');
+        }
+      } else {
+        const error = await response.json();
+        throw new Error(error.detail || 'Giriş başarısız');
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Giriş başarısız');
+      console.error('Login error:', error);
+      toast.error(error.message || 'Giriş başarısız');
     }
     setLoading(false);
   };
