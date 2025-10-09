@@ -128,9 +128,13 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
         });
       }
     } catch (error) {
-      console.error('Error adding address:', error);
+      console.error('❌ Error adding address:', error);
+      console.error('❌ Error details:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      
       if (isMounted) {
-        toast.error('Adres eklenirken hata oluştu');
+        const errorMessage = error.response?.data?.detail || error.message || 'Adres eklenirken hata oluştu';
+        toast.error(`Hata: ${errorMessage}`);
       }
     }
   };
