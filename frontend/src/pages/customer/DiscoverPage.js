@@ -31,9 +31,7 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
 
   const loadUserAddresses = async () => {
     try {
-      console.log('🔍 Loading user addresses...');
-      console.log('Authentication status:', apiClient.isAuthenticated());
-      console.log('Token exists:', !!apiClient.getToken());
+      console.log('🔍 Loading user addresses for user:', user?.email);
       
       const response = await apiClient.get('/user/addresses');
       const addresses = response.data || response || [];
