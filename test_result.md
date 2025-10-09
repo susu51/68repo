@@ -675,6 +675,21 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ DIRECT CUSTOMER ACCESS TESTING COMPLETE: Perfect functionality (100% success rate). ✅ CRITICAL FEATURES VERIFIED: 1) Direct /customer route access working perfectly - URL https://mockless-api.preview.emergentagent.com/customer loads customer app successfully. 2) Homepage test button '🧪 Test Customer App' found and functional - successfully redirects to customer app. 3) Customer app interface loads correctly with all navigation tabs (Keşfet, Sepet, Siparişler, Profil). 4) Frontend routing infrastructure working properly. 5) Customer app component structure ready for complete workflow. The direct customer access functionality is production-ready and working as expected."
+
+  - task: "CRITICAL - Address System Frontend Integration"
+    implemented: true
+    working: false
+    file: "AddressesPage.js, ProfilePage.js, DiscoverPage.js, CartPage.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "user"
+          comment: "USER REPORTED CRITICAL ISSUES: 1) 'Adres yönetimine adres kayıt edemiyorum' (Cannot add address in address management), 2) 'Sepette kayıtlı adreslerim gözükmüyor' (Saved addresses not showing in cart), 3) 'Keşfette adresler gözükmüyor' (Addresses not showing in discovery). Backend confirmed 100% functional with 35 addresses for testcustomer@example.com."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ADDRESS SYSTEM BREAKDOWN CONFIRMED: Comprehensive testing reveals MAJOR frontend integration issues despite backend working perfectly (35 addresses confirmed for testcustomer@example.com). 🔍 CRITICAL FINDINGS: 1) ADDRESS CREATION PARTIALLY BROKEN: Form shows success message 'Adres başarıyla eklendi' but modal stays open, indicating frontend state management issue. Backend API working correctly. 2) DISCOVERY PAGE ADDRESSES WORKING: Successfully loads 68 addresses from backend, sets default address correctly, authentication working perfectly. 3) FRONTEND-BACKEND DISCONNECT: ProfilePage uses different address endpoints (/customer/addresses) than DiscoverPage (/user/addresses), causing inconsistency. 4) AUTHENTICATION CONFIRMED: JWT tokens working correctly (195+ chars), apiClient authenticated properly. ❌ ROOT CAUSES IDENTIFIED: Frontend form validation/state management bug in address creation modal, inconsistent API endpoint usage across components, possible React lifecycle issues preventing proper modal closure after successful API calls. 💡 URGENT FIXES NEEDED: Fix address creation modal state management, standardize address API endpoints across all components, ensure proper form reset after successful address creation."
     priority: "critical"
     needs_retesting: false
     status_history:
