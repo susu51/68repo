@@ -479,9 +479,14 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
                         <h3 className="font-bold text-gray-800 mb-1">
                           {restaurant.business_name || restaurant.name || 'İsimsiz Restoran'}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-sm text-gray-600 mb-1">
                           {restaurant.business_category || restaurant.category || 'Restoran'}
                         </p>
+                        {(restaurant.city || restaurant.district || restaurant.address) && (
+                          <p className="text-xs text-blue-600 mb-2 font-medium">
+                            📍 {restaurant.address || `${restaurant.district || ''}, ${restaurant.city || ''}`}
+                          </p>
+                        )}
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
                           <span>⭐ 4.8</span>
                           <span>🕒 25-35 dk</span>
