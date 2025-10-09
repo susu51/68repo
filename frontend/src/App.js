@@ -43,10 +43,17 @@ console.log('Frontend connecting to:', API);
 
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
-  const { login } = useCookieAuth();
+  const { checkAuthStatus } = useCookieAuth();
+  
+  const handleLogin = async (loginData) => {
+    // ModernLogin already handled the login request
+    // We just need to refresh the auth state
+    await checkAuthStatus();
+  };
+
   return (
     <ModernLogin 
-      onLogin={login}
+      onLogin={handleLogin}
       onRegisterClick={onRegisterClick}
     />
   );
