@@ -46,6 +46,9 @@ import time
 # Import authentication dependencies
 from auth_dependencies import get_current_user, get_business_user, get_approved_business_user
 
+# Import cookie-based auth system
+from auth_cookie import auth_router, get_current_user_from_cookie, set_db_client
+
 # Import phone validation function
 try:
     from models import ForgotPasswordRequest, ResetPasswordRequest
