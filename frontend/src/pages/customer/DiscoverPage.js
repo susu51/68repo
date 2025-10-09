@@ -436,7 +436,11 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
                       
                       <div className="text-right">
                         <div className="text-xs text-gray-500">
-                          {sortMode === 'location' && '2.1 km'}
+                          {sortMode === 'location' && restaurant.distanceText && (
+                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                              📍 {restaurant.distanceText}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
