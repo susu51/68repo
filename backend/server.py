@@ -4403,7 +4403,7 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
             print(f"DEBUG: Processing address: {addr.get('label', 'NO LABEL')}")
             
             address_data = {
-                "id": addr.get("_id", str(addr.get("_id"))),
+                "id": addr.get("id", str(addr.get("_id", ""))),  # Fixed: use id field first, then _id
                 "label": addr.get("label", ""),
                 "city": addr.get("city", ""),
                 "district": addr.get("district", ""),
