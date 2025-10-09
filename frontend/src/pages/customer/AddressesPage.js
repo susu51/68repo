@@ -94,9 +94,6 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
       
       console.log('✅ Validation passed, proceeding with API call...');
 
-      const token = localStorage.getItem('kuryecini_access_token');
-      console.log('Token debug:', token ? `Token exists (${token.length} chars)` : 'No token found');
-
       const addressData = {
         ...newAddress,
         // Normalize city name on the frontend as well
@@ -106,18 +103,13 @@ const AddressesPageComponent = ({ onSelectAddress, onBack }) => {
 
       console.log('Address data to send:', addressData);
 
-      const response = await axios.post(`${API}/user/addresses`, addressData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await apiClient.post('/user/addresses', addressData);
 
-      console.log('Add address response:', response.data);
+      console.log('Add address response:', response);
 
       if (isMounted) {
         toast.success('Adres başarıyla eklendi!');
-        setAddresses([...addresses, response.data]);
+        setAddresses([...addresses, response]);
         setShowAddForm(false);
         setNewAddress({
           label: '',
