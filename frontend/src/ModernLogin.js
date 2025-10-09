@@ -38,7 +38,9 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/auth/login`, formData);
+      const response = await axios.post(`${API}/auth/login`, formData, {
+        withCredentials: true  // Enable cookies
+      });
       
       if (response.data.access_token) {
         onLogin(response.data);
