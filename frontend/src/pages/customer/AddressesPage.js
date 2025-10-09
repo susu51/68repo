@@ -279,224 +279,129 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50 to-red-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header Card */}
-        <Card className="mb-8 border-0 shadow-xl rounded-3xl bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white overflow-hidden">
-          <CardContent className="p-8 relative">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 bg-white/10 opacity-40">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-white/20 rounded-full -mr-24 -mt-24"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/15 rounded-full -ml-16 -mb-16"></div>
+    <div className="max-w-4xl mx-auto p-4">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-orange-500" />
+              Adres Yönetimi
+            </CardTitle>
+            <p className="text-sm text-gray-500 mt-1">
+              Teslimat adreslerinizi yönetin ve düzenleyin
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={openAddForm} className="bg-orange-500 hover:bg-orange-600">
+              <Plus className="w-4 h-4 mr-2" />
+              Yeni Adres
+            </Button>
+            {onBack && (
+              <Button variant="outline" onClick={onBack}>
+                ← Geri Dön
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        
+        <CardContent>
+          {addresses.length === 0 ? (
+            <div className="text-center py-12">
+              <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Henüz kayıtlı adresiniz yok
+              </h3>
+              <p className="text-gray-500 mb-4">
+                Sipariş vermek için bir teslimat adresi eklemeniz gerekiyor
+              </p>
+              <Button onClick={openAddForm} className="bg-orange-500 hover:bg-orange-600">
+                <Plus className="w-4 h-4 mr-2" />
+                İlk Adresini Ekle
+              </Button>
             </div>
-            
-            <div className="relative flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-16 h-16 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-6 shadow-lg">
-                  <span className="text-3xl">📍</span>
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold mb-2">Kayıtlı Adreslerim</h1>
-                  <p className="text-white/90 text-lg">
-                    Restoran araması için bir adres seçin. Şehrinize göre en yakın restoranları bulacağız.
-                  </p>
-                </div>
-              </div>
-              
-              {onBack && (
-                <Button 
-                  variant="outline" 
-                  onClick={onBack}
-                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl backdrop-blur-sm"
-                >
-                  ← Geri
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {addresses.length === 0 ? (
-          // Empty state - Enhanced Card Design
-          <Card className="text-center py-16 border-0 shadow-2xl rounded-3xl bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-200 rounded-full -mr-32 -mt-32"></div>
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-pink-200 rounded-full -ml-24 -mb-24"></div>
-              <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-red-200 rounded-full -ml-16 -mt-16"></div>
-            </div>
-            
-            <CardContent className="relative z-10">
-              <div className="mb-8">
-                {/* Animated Icon Container */}
-                <div className="w-32 h-32 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-pulse">
-                  <span className="text-6xl">📍</span>
-                </div>
-                
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                  Henüz kayıtlı adresiniz yok
-                </h3>
-                <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
-                  🍽️ Restoran araması yapmak ve sipariş verebilmek için önce bir adres eklemelisiniz.
-                </p>
-                
-                {/* Feature highlights */}
-                <div className="grid md:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
-                  <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg">
-                    <div className="text-2xl mb-2">🏠</div>
-                    <p className="text-sm font-medium text-gray-700">Ev, iş, okul adreslerinizi kaydedin</p>
-                  </div>
-                  <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg">
-                    <div className="text-2xl mb-2">📍</div>
-                    <p className="text-sm font-medium text-gray-700">Konum bazlı restoran önerisi</p>
-                  </div>
-                  <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg">
-                    <div className="text-2xl mb-2">⚡</div>
-                    <p className="text-sm font-medium text-gray-700">Hızlı teslimat süresi</p>
-                  </div>
-                </div>
-                
-                <Button 
-                  onClick={() => {
-                    if (isMounted) {
-                      setShowAddForm(true);
-                    }
-                  }}
-                  className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-                >
-                  ➕ İlk Adresimi Ekle
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          // Address list
-          <div className="space-y-6">
-            {/* Address Count & Add Button Card */}
-            <Card className="border-0 shadow-lg rounded-2xl bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mr-4">
-                      <span className="text-white font-bold">{addresses.length}</span>
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-800">Kayıtlı Adresleriniz</h2>
-                      <p className="text-sm text-gray-600">Toplam {addresses.length} adet adres</p>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={() => {
-                      if (isMounted) {
-                        setShowAddForm(true);
-                      }
-                    }}
-                    className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    ➕ Yeni Adres Ekle
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {addresses.map((address, index) => (
-                <Card key={`address-card-${address.id || index}`} className="group hover:shadow-2xl hover:scale-105 transition-all duration-500 border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
-                  <CardContent className="p-0">
-                    {/* Card Header with Icon */}
-                    <div className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 p-6 text-white relative overflow-hidden">
-                      {/* Background Pattern */}
-                      <div className="absolute inset-0 bg-white/10 opacity-20">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16"></div>
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/15 rounded-full -ml-12 -mb-12"></div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {addresses.map((address) => (
+                <Card key={address.id} className="relative border-gray-200 hover:border-orange-200 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium text-gray-900">
+                          {address.label}
+                        </h3>
+                        {address.is_default && (
+                          <Badge className="bg-orange-100 text-orange-800 text-xs">
+                            <Star className="w-3 h-3 mr-1" />
+                            Varsayılan
+                          </Badge>
+                        )}
                       </div>
-                      
-                      <div className="relative flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="w-14 h-14 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 shadow-lg">
-                            <span className="text-2xl">📍</span>
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-bold mb-1">
-                              {address.label || 'Adres'}
-                            </h3>
-                            <p className="text-white/90 text-sm font-medium">
-                              Kayıtlı Adres
-                            </p>
-                          </div>
-                        </div>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(address)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(address.id)}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                     
-                    {/* Card Body */}
-                    <div className="p-6">
-                      <div className="space-y-4">
-                        {/* City */}
-                        <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-100 shadow-sm">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                            <span className="text-blue-600">🏙️</span>
-                          </div>
-                          <div>
-                            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wider">Şehir</p>
-                            <p className="font-bold text-gray-800 text-lg">
-                              {address.city || 'Şehir bilgisi yok'}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Address Description */}
-                        <div className="flex items-start p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100 shadow-sm">
-                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3 mt-1">
-                            <span className="text-purple-600">🏠</span>
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-xs text-purple-600 font-semibold uppercase tracking-wider mb-1">Adres Detayı</p>
-                            <p className="text-sm text-gray-800 leading-relaxed font-medium">
-                              {address.description || 'Açıklama yok'}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Location Info */}
-                        {address.lat && address.lng ? (
-                          <div className="flex items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 shadow-sm">
-                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                              <span className="text-green-600">✅</span>
-                            </div>
-                            <div>
-                              <p className="text-xs text-green-600 font-bold uppercase tracking-wider">Konum Mevcut</p>
-                              <p className="text-xs text-green-700 font-mono">
-                                {address.lat.toFixed(4)}, {address.lng.toFixed(4)}
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex items-center p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-yellow-200 shadow-sm">
-                            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                              <span className="text-yellow-600">⚠️</span>
-                            </div>
-                            <div>
-                              <p className="text-xs text-yellow-600 font-bold uppercase tracking-wider">Konum Yok</p>
-                              <p className="text-xs text-yellow-700">Manuel adres</p>
-                            </div>
-                          </div>
-                        )}
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-gray-400" />
+                        <span>{address.city}, {address.district}</span>
                       </div>
-                      
-                      {/* Action Button */}
-                      <Button 
-                        onClick={() => handleSelectAddress(address)}
-                        className="w-full mt-6 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-                      >
-                        🍽️ Bu Adrese Göre Restoran Ara
-                      </Button>
+                      <p className="text-xs leading-relaxed">
+                        {address.description}
+                      </p>
+                      {address.lat && address.lng && (
+                        <div className="text-xs text-gray-400">
+                          📍 {address.lat.toFixed(6)}, {address.lng.toFixed(6)}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex gap-2 mt-4">
+                      {onSelectAddress && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSelectAddress(address)}
+                          className="flex-1"
+                        >
+                          <Check className="w-4 h-4 mr-2" />
+                          Seç
+                        </Button>
+                      )}
+                      {!address.is_default && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDefaultAddress(address.id)}
+                          className="text-orange-600 hover:text-orange-700"
+                        >
+                          <Star className="w-4 h-4 mr-1" />
+                          Varsayılan Yap
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </CardContent>
+      </Card>
 
         {/* Add Address Dialog - Enhanced Card Design with Portal Safety */}
         {showAddForm && (
