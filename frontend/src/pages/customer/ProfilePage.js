@@ -369,14 +369,20 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       // Close modal first
       setShowAddressModal(false);
       
-      // Reset form
+      // Reset form  
       setNewAddress({
-        label: '',
-        description: '',
-        city: '',
+        title: 'Ev',
+        full_address: '',
         district: '',
-        lat: 0,
-        lng: 0
+        city: '',
+        building_no: '',
+        apartment_no: '',
+        floor: '',
+        instructions: '',
+        phone: '',
+        lat: null,
+        lng: null,
+        is_default: false
       });
       
       // Refresh addresses to show new address
