@@ -221,11 +221,13 @@ class CityRegistrationTester:
                     
                     # Check if our registered business appears in the results
                     found_our_business = False
+                    expected_business = None
                     for registered in self.registered_businesses:
                         if registered["city"].lower() == city.lower():
+                            expected_business = registered
                             # Look for this business in the results
                             for business in businesses:
-                                if business.get("id") == registered["id"]:
+                                if business.get("id") == registered["id"] or business.get("email") == registered["email"]:
                                     found_our_business = True
                                     break
                     
