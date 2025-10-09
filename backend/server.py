@@ -5385,6 +5385,9 @@ from routes.content import router as content_router
 # Debug routes (temporary for Atlas testing)
 from routes.debug import router as debug_router
 
+# Cookie-based authentication router
+api_router.include_router(auth_router)
+
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
 api_router.include_router(orders_router)
