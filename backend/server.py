@@ -102,6 +102,30 @@ if not CITY_STRICT:
 print("✅ CITY_STRICT mode enabled - city filtering enforced")
 NEARBY_RADIUS_M = int(os.environ.get('NEARBY_RADIUS_M', '5000'))
 
+# Turkish slug normalization
+def normalize_turkish_slug(text):
+    """Convert Turkish text to URL-safe slug"""
+    if not text:
+        return ""
+    
+    # Turkish character mapping
+    char_map = {
+        'ç': 'c', 'Ç': 'c',
+        'ğ': 'g', 'Ğ': 'g', 
+        'ı': 'i', 'İ': 'i',
+        'ö': 'o', 'Ö': 'o',
+        'ş': 's', 'Ş': 's',
+        'ü': 'u', 'Ü': 'u'
+    }
+    
+    # Replace Turkish characters
+    result = ""
+    for char in text:
+        result += char_map.get(char, char)
+    
+    # Convert to lowercase and replace spaces with dashes
+    return result.lower().replace(' ', '-')
+
 # Initialize Sentry for error monitoring
 sentry_dsn = os.getenv('SENTRY_DSN')
 if sentry_dsn:
