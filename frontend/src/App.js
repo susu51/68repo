@@ -4602,7 +4602,7 @@ function App() {
 }
 
 const AuthRouter = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout } = useCookieAuth();
   const [showAuth, setShowAuth] = useState(false);
 
   if (loading) {
