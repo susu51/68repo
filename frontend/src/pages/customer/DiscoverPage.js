@@ -33,12 +33,12 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     try {
       if (!apiClient.isAuthenticated()) return;
 
-      const response = await apiClient.get('/user/addresses');
+      const addresses = await apiClient.get('/user/addresses');
       
-      setUserAddresses(response.data || []);
-      if (response.data && response.data.length > 0) {
+      setUserAddresses(addresses || []);
+      if (addresses && addresses.length > 0) {
         // Use first address as default
-        setSelectedAddress(response.data[0]);
+        setSelectedAddress(addresses[0]);
       }
     } catch (error) {
       console.log('Address loading error:', error);
