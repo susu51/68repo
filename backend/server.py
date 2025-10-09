@@ -4589,7 +4589,7 @@ async def set_default_address(
         # Check if address exists and belongs to user
         existing_address = await db.addresses.find_one({
             "id": address_id,
-            "userId": user_id
+            "user_id": user_id
         })
         
         if not existing_address:
