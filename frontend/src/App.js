@@ -4567,7 +4567,7 @@ const AuthPage = ({ onBack }) => {
 // Main App Component
 function App() {
   return (
-    <AuthProvider>
+    <CookieAuthProvider>
       <CartProvider>
         <div className="App">
           <BrowserRouter>
