@@ -231,10 +231,15 @@ class CityRegistrationTester:
                                     found_our_business = True
                                     break
                     
+                    details = f"Found {len(businesses)} businesses"
+                    if expected_business:
+                        details += f", Expected business: {expected_business['business_name']} (ID: {expected_business['id']})"
+                    details += f", Our business found: {found_our_business}"
+                    
                     self.log_test(
                         f"City Filtering - {city}",
                         found_our_business,
-                        f"Found {len(businesses)} businesses, Our business found: {found_our_business}"
+                        details
                     )
                 else:
                     self.log_test(
