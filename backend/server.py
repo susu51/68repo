@@ -611,6 +611,7 @@ class BusinessRegister(BaseModel):
     tax_number: str
     address: str
     city: str
+    district: str  # Required for location-based filtering
     business_category: str
     description: Optional[str] = None
 
