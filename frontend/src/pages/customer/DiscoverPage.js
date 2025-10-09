@@ -31,9 +31,10 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     try {
       if (!apiClient.isAuthenticated()) return;
 
-      const addresses = await apiClient.get('/user/addresses');
+      const response = await apiClient.get('/user/addresses');
+      const addresses = response.data || response || [];
       
-      setUserAddresses(addresses || []);
+      setUserAddresses(addresses);
       if (addresses && addresses.length > 0) {
         // Use first address as default
         setSelectedAddress(addresses[0]);
