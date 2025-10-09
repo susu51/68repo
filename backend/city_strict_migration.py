@@ -33,8 +33,8 @@ def normalize_turkish_slug(text):
     return result.lower().replace(' ', '-')
 
 async def run_migration():
-    # MongoDB connection
-    MONGO_URL = os.getenv('MONGO_URL')
+    # MongoDB connection (simplified for local development)
+    MONGO_URL = "mongodb://localhost:27017/kuryecini"
     client = AsyncIOMotorClient(MONGO_URL)
     db = client.kuryecini
     
