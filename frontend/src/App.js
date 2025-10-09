@@ -43,7 +43,7 @@ console.log('Frontend connecting to:', API);
 
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
-  const { login } = useAuth();
+  const { login } = useCookieAuth();
   return (
     <ModernLogin 
       onLogin={login}
@@ -54,7 +54,7 @@ const LoginForm = ({ onRegisterClick }) => {
 
 // Simple Login Component for backward compatibility
 const SimpleLoginForm = ({ onRegisterClick }) => {
-  const { login } = useAuth();
+  const { login } = useCookieAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -4380,7 +4380,7 @@ const ResetPasswordPage = () => {
 };
 
 const AuthPage = ({ onBack }) => {
-  const { login } = useAuth();
+  const { login } = useCookieAuth();
   const [step, setStep] = useState('login'); // login, register, user_type_selection, registration_form
   const [userType, setUserType] = useState('');
   const [showModernLogin, setShowModernLogin] = useState(false);
