@@ -44,44 +44,42 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
   const [currentLocation, setCurrentLocation] = useState(null);
   const [gettingLocation, setGettingLocation] = useState(false);
 
-  // Enhanced Component Lifecycle Management
-  useEffect(() => {
-    setIsMounted(true);
-    loadAddresses();
-    
-    // Cleanup function to prevent DOM manipulation errors
-    return () => {
-      setIsMounted(false);
-    };
+  const resetForm = useCallback(() => {
+    setAddressForm(initialAddressForm);
+    setEditingAddress(null);
+    setCurrentLocation(null);
   }, []);
 
-  const loadAddresses = async () => {
-    // Async Operation Protection - prevent state updates after unmount
-    if (!isMounted) return;
-    
+  const loadAddresses = useCallback(async () => {
+    setLoading(true);
     try {
-      if (isMounted) setLoading(true);
-      console.log('Loading addresses via apiClient...');
-      
+      console.log('🔄 Loading addresses...');
       const response = await apiClient.get('/user/addresses');
       
-      console.log('Load addresses response:', response);
-      if (isMounted) {
-        setAddresses(response || []);
+      if (response && Array.isArray(response)) {
+        setAddresses(response);
+        console.log(`✅ Loaded ${response.length} addresses`);
+      } else {
+        setAddresses([]);
+        console.log('ℹ️ No addresses found or invalid response format');
       }
     } catch (error) {
-      console.error('Error loading addresses:', error);
-      console.log('Error details:', error.response?.data);
-      // If no addresses or error, show empty state
-      if (isMounted) {
-        setAddresses([]);
+      console.error('❌ Error loading addresses:', error);
+      setAddresses([]);
+      
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+      } else {
+        toast.error('Adresler yüklenirken hata oluştu');
       }
     } finally {
-      if (isMounted) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadAddresses();
+  }, [loadAddresses]);
 
   const handleAddAddress = async () => {
     // Async Operation Protection - prevent state updates after unmount
