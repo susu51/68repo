@@ -182,6 +182,7 @@ export const CustomerApp = ({ user, onLogout }) => {
             onTabChange={handleTabChange}
             onAddressChange={setSelectedAddress}
             selectedAddress={selectedAddress}
+            onAddressAdded={handleAddressAdded}
           />
         );
 
