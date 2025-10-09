@@ -9,7 +9,7 @@ import uuid
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from auth_dependencies import get_current_user
+from auth_cookie import get_current_user_from_cookie
 
 # Turkish slug normalization
 def normalize_turkish_slug(text):
