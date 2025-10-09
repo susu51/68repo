@@ -136,21 +136,34 @@ async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
         {"user_id": current_user["id"]}
     ).sort("is_default", -1).to_list(length=None)
     
-    return [
-        AddressResponse(
-            id=addr["_id"],
+    result = []
+    for addr in addresses:
+        # Handle ObjectId conversion
+        addr_id = str(addr.get("_id", addr.get("id", "")))
+        
+        # Handle coordinates - check both GeoJSON and direct lat/lng fields
+        if addr.get("location") and addr["location"].get("coordinates"):
+            coords = addr["location"]["coordinates"]
+            lng_val = float(coords[0]) if len(coords) > 0 else 0.0
+            lat_val = float(coords[1]) if len(coords) > 1 else 0.0
+        else:
+            lat_val = float(addr.get("lat", 0))
+            lng_val = float(addr.get("lng", 0))
+        
+        result.append(AddressResponse(
+            id=addr_id,
             label=addr.get("label", ""),
-            full=addr.get("full", addr.get("full_address", "")),  # Handle both field names
+            full=addr.get("full", addr.get("full_address", "")),
             city=addr.get("city", ""),
             district=addr.get("district", ""),
             city_slug=addr.get("city_slug", ""),
             district_slug=addr.get("district_slug", ""),
-            lat=addr.get("location", {}).get("coordinates", [0, 0])[1] if addr.get("location") else addr.get("lat", 0),
-            lng=addr.get("location", {}).get("coordinates", [0, 0])[0] if addr.get("location") else addr.get("lng", 0),
+            lat=lat_val,
+            lng=lng_val,
             is_default=addr.get("is_default", False)
-        )
-        for addr in addresses
-    ]
+        ))
+    
+    return result
 
 @router.patch("/addresses/{address_id}")
 async def update_address(
