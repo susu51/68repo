@@ -6,7 +6,7 @@ import { Label } from '../../components/ui/label';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '../../utils/apiClient';
 
-const ProfilePage = ({ user, onLogout }) => {
+const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAddress, onAddressAdded }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
