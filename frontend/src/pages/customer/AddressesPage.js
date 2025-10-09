@@ -403,204 +403,122 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
         </CardContent>
       </Card>
 
-        {/* Add Address Dialog - Enhanced Card Design with Portal Safety */}
-        {showAddForm && (
-          <Dialog 
-            key="add-address-dialog" 
-            open={showAddForm} 
-            onOpenChange={(open) => {
-              if (isMounted) {
-                setShowAddForm(open);
-              }
-            }}
-            modal={true}
-            container={document.body}
-          >
-            <DialogContent key="dialog-content" className="sm:max-w-[700px] p-0 border-0 shadow-2xl rounded-3xl overflow-hidden">
-            {/* Header Card */}
-            <div className="bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500 p-8 text-white relative overflow-hidden">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 bg-white/10 opacity-30">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full -mr-20 -mt-20"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/15 rounded-full -ml-16 -mb-16"></div>
-              </div>
-              
-              <DialogHeader className="relative">
-                <div className="flex items-center">
-                  <div className="w-16 h-16 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4 shadow-lg">
-                    <span className="text-3xl">📍</span>
-                  </div>
-                  <div>
-                    <DialogTitle className="text-2xl font-bold mb-1">Yeni Adres Ekle</DialogTitle>
-                    <p className="text-white/90 text-sm">Restoranları bulmak için adres bilgilerinizi girin</p>
-                  </div>
-                </div>
-              </DialogHeader>
+      {/* Address Form Dialog */}
+      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingAddress ? 'Adres Düzenle' : 'Yeni Adres Ekle'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="label">Adres Adı *</Label>
+              <Input
+                id="label"
+                value={addressForm.label}
+                onChange={(e) => setAddressForm(prev => ({ ...prev, label: e.target.value }))}
+                placeholder="Ev, İş, vs."
+                required
+              />
             </div>
             
-            {/* Form Card */}
-            <div className="p-8 bg-white">
-              <div className="space-y-6">
-                {/* Address Name & City Card */}
-                <Card className="border border-gray-100 shadow-md rounded-2xl">
-                  <CardHeader className="pb-4">
-                    <h4 className="font-semibold text-gray-800 flex items-center">
-                      <span className="mr-2">🏷️</span>
-                      Temel Bilgiler
-                    </h4>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-semibold text-gray-700">Adres Adı *</Label>
-                        <Input
-                          className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12"
-                          placeholder="Ev, İş, Okul vb."
-                          value={newAddress.label}
-                          onChange={(e) => {
-                            if (isMounted) {
-                              setNewAddress({...newAddress, label: e.target.value});
-                            }
-                          }}
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label className="text-sm font-semibold text-gray-700">Şehir *</Label>
-                        <select 
-                          className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12 w-full px-3 py-2 bg-white border-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                          value={newAddress.city}
-                          onChange={(e) => {
-                            console.log('🏙️ Native select changed:', e.target.value);
-                            if (isMounted) {
-                              setNewAddress({...newAddress, city: e.target.value});
-                              console.log('🏙️ City state updated to:', e.target.value);
-                            }
-                          }}
-                        >
-                          <option value="">Şehir Seçin</option>
-                          {turkishCities.map(city => (
-                            <option key={city} value={city}>{city}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Address Description Card */}
-                <Card className="border border-gray-100 shadow-md rounded-2xl">
-                  <CardHeader className="pb-4">
-                    <h4 className="font-semibold text-gray-800 flex items-center">
-                      <span className="mr-2">🏠</span>
-                      Adres Detayı
-                    </h4>
-                  </CardHeader>
-                  <CardContent>
-                    <Label className="text-sm font-semibold text-gray-700">Adres Açıklaması *</Label>
-                    <Input
-                      className="mt-2 rounded-xl border-gray-200 focus:border-orange-500 h-12"
-                      placeholder="Mahalle, sokak, bina no, daire no vb."
-                      value={newAddress.description}
-                      onChange={(e) => {
-                        if (isMounted) {
-                          setNewAddress({...newAddress, description: e.target.value});
-                        }
-                      }}
-                    />
-                  </CardContent>
-                </Card>
-                
-                {/* Location Card */}
-                <Card className="border border-gray-100 shadow-md rounded-2xl">
-                  <CardHeader className="pb-4">
-                    <h4 className="font-semibold text-gray-800 flex items-center">
-                      <span className="mr-2">🗺️</span>
-                      Konum Bilgisi (Opsiyonel)
-                    </h4>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={getCurrentLocation}
-                      className="w-full rounded-xl border-2 border-dashed border-blue-300 hover:border-blue-500 h-12 text-blue-600 font-medium"
-                    >
-                      📍 Mevcut Konumu Otomatik Al
-                    </Button>
-                    
-                    <div className="text-center text-sm text-gray-500 font-medium">veya manuel girin</div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-xs font-semibold text-gray-600">Enlem (Latitude)</Label>
-                        <Input
-                          className="mt-1 rounded-xl border-gray-200 h-10"
-                          placeholder="41.0082"
-                          type="number"
-                          step="any"
-                          value={newAddress.lat || ''}
-                          onChange={(e) => {
-                            if (isMounted) {
-                              setNewAddress({...newAddress, lat: parseFloat(e.target.value) || null});
-                            }
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs font-semibold text-gray-600">Boylam (Longitude)</Label>
-                        <Input
-                          className="mt-1 rounded-xl border-gray-200 h-10"
-                          placeholder="28.9784"
-                          type="number"
-                          step="any"
-                          value={newAddress.lng || ''}
-                          onChange={(e) => {
-                            if (isMounted) {
-                              setNewAddress({...newAddress, lng: parseFloat(e.target.value) || null});
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                    
-                    {newAddress.lat && newAddress.lng && (
-                      <div className="p-3 bg-green-50 border border-green-200 rounded-xl">
-                        <p className="text-sm text-green-700 font-medium flex items-center">
-                          <span className="mr-2">✅</span>
-                          Konum başarıyla alındı: {newAddress.lat.toFixed(4)}, {newAddress.lng.toFixed(4)}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-                
-                {/* Action Buttons */}
-                <div className="flex gap-4 pt-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      if (isMounted) {
-                        setShowAddForm(false);
-                      }
-                    }}
-                    className="flex-1 h-12 rounded-xl border-gray-300 hover:bg-gray-50"
-                  >
-                    ❌ İptal Et
-                  </Button>
-                  <Button 
-                    onClick={handleAddAddress}
-                    className="flex-1 h-12 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    ✅ Adresi Kaydet
-                  </Button>
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="city">Şehir *</Label>
+                <Select
+                  value={addressForm.city}
+                  onValueChange={(value) => setAddressForm(prev => ({ ...prev, city: value }))}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Şehir seçin" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60 overflow-y-auto">
+                    {turkishCities.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="district">İlçe *</Label>
+                <Input
+                  id="district"
+                  value={addressForm.district}
+                  onChange={(e) => setAddressForm(prev => ({ ...prev, district: e.target.value }))}
+                  placeholder="İlçe adı"
+                  required
+                />
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-        )}
-      </div>
+            
+            <div>
+              <Label htmlFor="description">Adres Açıklaması *</Label>
+              <Textarea
+                id="description"
+                value={addressForm.description}
+                onChange={(e) => setAddressForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Sokak, cadde, bina no, daire no..."
+                rows={3}
+                required
+              />
+            </div>
+            
+            <div>
+              <Label className="flex items-center justify-between">
+                <span>Konum (Opsiyonel)</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={getCurrentLocation}
+                  disabled={gettingLocation}
+                  className="text-orange-600 hover:text-orange-700"
+                >
+                  <Navigation className="w-4 h-4 mr-1" />
+                  {gettingLocation ? 'Alınıyor...' : 'Mevcut Konum'}
+                </Button>
+              </Label>
+              {(addressForm.lat && addressForm.lng) && (
+                <div className="text-sm text-gray-500 mt-1">
+                  📍 {addressForm.lat.toFixed(6)}, {addressForm.lng.toFixed(6)}
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={closeForm}
+                className="flex-1"
+                disabled={isSubmitting}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-orange-500 hover:bg-orange-600"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Kaydediliyor...
+                  </div>
+                ) : (
+                  editingAddress ? 'Güncelle' : 'Kaydet'
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
