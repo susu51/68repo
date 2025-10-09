@@ -40,6 +40,16 @@ export const CustomerApp = ({ user, onLogout }) => {
     }
   }, [token]);
 
+  // Handle address refresh when user adds new address
+  const handleAddressAdded = (newAddress) => {
+    console.log('📍 New address added:', newAddress);
+    // DiscoverPage will be notified via re-render
+    if (activeView === 'profile') {
+      // Switch back to discover after adding address
+      setActiveView('discover');
+    }
+  };
+
   // Navigation handlers for the customer journey
   const handleRestaurantSelect = (restaurant) => {
     setSelectedRestaurant(restaurant);
