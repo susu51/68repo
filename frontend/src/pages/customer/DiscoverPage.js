@@ -52,23 +52,31 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
 
   const loadUserAddresses = async () => {
     try {
-      console.log('🔍 Loading user addresses for user:', user?.email);
+      console.log('🔍 DISCOVER PAGE - Loading user addresses for user:', user?.email);
+      console.log('🔑 DISCOVER PAGE - apiClient token status:', apiClient.getToken()?.substring(0, 20) + '...');
+      console.log('🔑 DISCOVER PAGE - apiClient authenticated:', apiClient.isAuthenticated());
       
       const response = await apiClient.get('/user/addresses');
+      console.log('📡 DISCOVER PAGE - Raw API response:', response);
+      console.log('📊 DISCOVER PAGE - Response status:', response.status);
+      console.log('📄 DISCOVER PAGE - Response data:', response.data);
+      
       const addresses = response.data || response || [];
       
-      console.log('✅ Addresses loaded:', addresses.length, addresses);
+      console.log('✅ DISCOVER PAGE - Processed addresses:', addresses.length, addresses);
       
       setUserAddresses(addresses);
       if (addresses && addresses.length > 0) {
         // Use first address as default
         setSelectedAddress(addresses[0]);
-        console.log('✅ Default address set:', addresses[0]);
+        console.log('✅ DISCOVER PAGE - Default address set:', addresses[0]);
       } else {
-        console.log('❌ No addresses found');
+        console.log('❌ DISCOVER PAGE - No addresses found - userAddresses will be empty array');
       }
     } catch (error) {
-      console.error('❌ Address loading error:', error);
+      console.error('❌ DISCOVER PAGE - Address loading error:', error);
+      console.error('❌ DISCOVER PAGE - Error details:', error.response?.data);
+      console.error('❌ DISCOVER PAGE - Error status:', error.response?.status);
     }
   };
 
