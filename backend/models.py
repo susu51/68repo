@@ -39,6 +39,8 @@ class Business(BaseModel):
     owner_user_id: str
     name: str
     address: str
+    city: str  # Required for location-based filtering
+    district: str  # Required for location-based filtering
     location: BusinessLocation
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)
