@@ -129,7 +129,7 @@ async def create_address(
     }
 
 @router.get("/addresses", response_model=List[AddressResponse])
-async def get_addresses(current_user = Depends(get_current_user)):
+async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
     """Get user addresses, default first"""
     
     addresses = await db.addresses.find(
