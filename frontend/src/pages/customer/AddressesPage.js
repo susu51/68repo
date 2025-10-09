@@ -81,6 +81,52 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
     loadAddresses();
   }, [loadAddresses]);
 
+  const getCurrentLocation = () => {
+    setGettingLocation(true);
+    
+    if (!navigator.geolocation) {
+      toast.error('Tarayıcınız konum özelliğini desteklemiyor');
+      setGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCurrentLocation({ lat: latitude, lng: longitude });
+        setAddressForm(prev => ({
+          ...prev,
+          lat: latitude,
+          lng: longitude
+        }));
+        toast.success('Mevcut konumunuz alındı!');
+        setGettingLocation(false);
+      },
+      (error) => {
+        console.error('Konum alınamadı:', error);
+        toast.error('Konum erişimi reddedildi veya alınamadı');
+        setGettingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const validateForm = () => {
+    const errors = [];
+    
+    if (!addressForm.label?.trim()) errors.push('Adres adı');
+    if (!addressForm.city?.trim()) errors.push('Şehir');
+    if (!addressForm.district?.trim()) errors.push('İlçe');
+    if (!addressForm.description?.trim()) errors.push('Adres açıklaması');
+    
+    if (errors.length > 0) {
+      toast.error(`Lütfen şu alanları doldurun: ${errors.join(', ')}`);
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleAddAddress = async () => {
     // Async Operation Protection - prevent state updates after unmount
     if (!isMounted) return;
