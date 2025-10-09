@@ -42,8 +42,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
         withCredentials: true  // Enable cookies
       });
       
-      if (response.data.access_token) {
-        onLogin(response.data);
+      if (response.data.success) {
+        // Cookies are automatically set by backend
+        // Call parent component's onLogin with success data
+        onLogin({ success: true });
         toast.success('Başarıyla giriş yaptınız!');
       }
     } catch (error) {
