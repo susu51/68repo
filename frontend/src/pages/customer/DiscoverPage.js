@@ -29,18 +29,25 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
 
   const loadUserAddresses = async () => {
     try {
-      if (!apiClient.isAuthenticated()) return;
-
+      console.log('🔍 Loading user addresses...');
+      console.log('Authentication status:', apiClient.isAuthenticated());
+      console.log('Token exists:', !!apiClient.getToken());
+      
       const response = await apiClient.get('/user/addresses');
       const addresses = response.data || response || [];
+      
+      console.log('✅ Addresses loaded:', addresses.length, addresses);
       
       setUserAddresses(addresses);
       if (addresses && addresses.length > 0) {
         // Use first address as default
         setSelectedAddress(addresses[0]);
+        console.log('✅ Default address set:', addresses[0]);
+      } else {
+        console.log('❌ No addresses found');
       }
     } catch (error) {
-      console.log('Address loading error:', error);
+      console.error('❌ Address loading error:', error);
     }
   };
 
