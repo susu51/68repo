@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/button';
 import { useCart } from '../../contexts/CartContext';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || import.meta.env.VITE_REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
 const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
   const { cart, addToCart, getItemQuantity, setRestaurant, getCartSummary } = useCart();
