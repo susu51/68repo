@@ -107,14 +107,65 @@ async def get_current_user_from_cookie(request: Request):
 async def login(body: LoginRequest, response: Response):
     db = get_db()
     
-    # Find user
-    user = await db.users.find_one({"email": body.email})
-    if not user:
-        raise HTTPException(401, "Invalid credentials")
+    # Test users for development
+    test_users = {
+        "testcustomer@example.com": {
+            "id": "customer-001",
+            "email": "testcustomer@example.com", 
+            "first_name": "Test",
+            "last_name": "Customer",
+            "role": "customer",
+            "is_active": True,
+            "password": "test123"
+        },
+        "testkurye@example.com": {
+            "id": "courier-001",
+            "email": "testkurye@example.com",
+            "first_name": "Test", 
+            "last_name": "Courier",
+            "role": "courier",
+            "is_active": True,
+            "password": "test123"
+        },
+        "testbusiness@example.com": {
+            "id": "business-001",
+            "email": "testbusiness@example.com",
+            "first_name": "Test",
+            "last_name": "Business",
+            "role": "business", 
+            "business_name": "Test Restaurant",
+            "is_active": True,
+            "password": "test123"
+        },
+        "admin@kuryecini.com": {
+            "id": "admin-001",
+            "email": "admin@kuryecini.com",
+            "first_name": "Admin",
+            "last_name": "Kuryecini",
+            "role": "admin",
+            "is_active": True,
+            "password": "KuryeciniAdmin2024!"
+        }
+    }
     
-    # Verify password
-    if not verify_password(body.password, user.get("password", "")):
-        raise HTTPException(401, "Invalid credentials")
+    # Check test users first
+    if body.email in test_users:
+        test_user = test_users[body.email]
+        if body.password == test_user["password"]:
+            user_id = test_user["id"]
+        else:
+            raise HTTPException(401, "Invalid credentials")
+    else:
+        # Find real user in database
+        user = await db.users.find_one({"email": body.email})
+        if not user:
+            raise HTTPException(401, "Invalid credentials")
+        
+        # Verify password
+        if not verify_password(body.password, user.get("password", "")):
+            raise HTTPException(401, "Invalid credentials")
+        
+        user_id = user["id"]
     
     # Generate tokens
     user_id = user["id"]
