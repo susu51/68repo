@@ -26,19 +26,34 @@ export const CustomerApp = ({ user, onLogout }) => {
   // Set authentication token for API calls
   useEffect(() => {
     console.log('🔑 CustomerApp Authentication Debug:');
-    console.log('  - Token exists:', !!token);
-    console.log('  - Token length:', token?.length);
+    console.log('  - Auth context token exists:', !!token);
+    console.log('  - Auth context token length:', token?.length);
     console.log('  - User:', user?.email);
     console.log('  - apiClient token before:', apiClient.getToken()?.substring(0, 20) + '...');
     
-    if (token) {
-      apiClient.setToken(token);
+    // Try to get token from multiple sources
+    let workingToken = token;
+    
+    // Fallback to localStorage if context token not available
+    if (!workingToken) {
+      const localStorageToken = localStorage.getItem('kuryecini_access_token');
+      if (localStorageToken) {
+        workingToken = localStorageToken;
+        console.log('  🔄 Using localStorage token as fallback');
+      }
+    }
+    
+    if (workingToken) {
+      apiClient.setToken(workingToken);
       console.log('  ✅ Token set to apiClient');
       console.log('  - apiClient token after:', apiClient.getToken()?.substring(0, 20) + '...');
+      console.log('  - Working token source:', token ? 'AuthContext' : 'localStorage');
     } else {
-      console.log('  ❌ No token available - user needs to login');
+      console.log('  ❌ No token available from any source - user needs to login');
+      console.log('  - AuthContext token:', !!token);
+      console.log('  - localStorage token:', !!localStorage.getItem('kuryecini_access_token'));
     }
-  }, [token]);
+  }, [token, user]);
 
   // Handle address refresh when user adds new address
   const handleAddressAdded = (newAddress) => {
