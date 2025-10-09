@@ -252,12 +252,19 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
   };
 
   const handleSelectAddress = (address) => {
-    // Async Operation Protection
-    if (!isMounted) return;
-    
     if (onSelectAddress) {
       onSelectAddress(address);
     }
+  };
+
+  const openAddForm = () => {
+    resetForm();
+    setShowAddForm(true);
+  };
+
+  const closeForm = () => {
+    resetForm();
+    setShowAddForm(false);
   };
 
   const getCurrentLocation = () => {
