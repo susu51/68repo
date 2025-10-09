@@ -7,6 +7,8 @@ import ProfilePage from './ProfilePage';
 import PaymentPage from './PaymentPage';
 import OrderTrackingPage from './OrderTrackingPage';
 import { useCart } from '../../contexts/CartContext';
+import { apiClient } from '../../utils/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 
 // FAZ 2 - Customer App with complete cart & payment flow
 export const CustomerApp = ({ user, onLogout }) => {
