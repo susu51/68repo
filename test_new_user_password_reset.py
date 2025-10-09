@@ -10,7 +10,7 @@ import json
 import time
 
 async def test_new_user():
-    base_url = "https://mockless-api.preview.emergentagent.com/api"
+    base_url = "https://deliver-yemek.preview.emergentagent.com/api"
     test_email = f"testuser{int(time.time())}@example.com"  # Unique email
     test_password = "TestPassword123!"
     new_password = "NewTestPassword456!"

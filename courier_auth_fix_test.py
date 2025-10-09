@@ -24,7 +24,7 @@ import bcrypt
 from datetime import datetime, timezone
 
 # Configuration from frontend/.env
-BACKEND_URL = "https://mockless-api.preview.emergentagent.com/api"
+BACKEND_URL = "https://deliver-yemek.preview.emergentagent.com/api"
 
 # Test credentials from review request (corrected business email)
 TEST_CREDENTIALS = {

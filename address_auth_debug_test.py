@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://mockless-api.preview.emergentagent.com/api"
+BACKEND_URL = "https://deliver-yemek.preview.emergentagent.com/api"
 
 class AddressAuthDebugTester:
     def __init__(self):

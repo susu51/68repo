@@ -43,7 +43,7 @@ import time
 import uuid
 
 class KuryeciniComprehensiveTest:
-    def __init__(self, base_url="https://mockless-api.preview.emergentagent.com"):
+    def __init__(self, base_url="https://deliver-yemek.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0

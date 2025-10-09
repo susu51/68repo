@@ -1,40 +1,29 @@
 <analysis>
-The AI engineer has significantly evolved the Kuryecini application, transforming it from a mock-data-driven MVP to a more robust, database-backed, and authenticated system. The journey began with a focus on migrating away from  and mock data, establishing a JWT-based RBAC, and setting up core functionalities. Key challenges included persistent frontend compilation errors, database schema mismatches (e.g.,  vs uid=0(root) gid=0(root) groups=0(root),  vs  collections), and authentication issues, particularly around KYC enforcement.
-
-The trajectory shows meticulous debugging and refactoring across both frontend (React) and backend (FastAPI, MongoDB). Major accomplishments include implementing a Content Editor, fixing business menu persistence, establishing a basic customer address management system, and updating the application's visual identity with a new logo. The AI engineer is currently in Phase 2C, focusing on integrating third-party services like Sentry, having successfully eliminated most mock data and integrated real MongoDB endpoints. The ongoing work is to integrate Sentry based on a provided playbook.
+The AI engineer's work on the Kuryecini application has involved a significant architectural pivot, transitioning from an initial MongoDB/localStorage-based MVP to a database-backed, JWT-authenticated system. A critical turning point was the user's detailed production prompt (Chat Message 5), which implicitly mandated a shift to PostgreSQL and HttpOnly cookies, though the subsequent debugging phases continued addressing MongoDB-related issues. The trajectory highlights a systematic approach to fixing numerous frontend and backend bugs, particularly around customer address management, location-based restaurant discovery and sorting, city normalization for business registrations, and menu visibility. Despite iterative fixes and successful backend tests, user feedback indicates recurring problems, necessitating continuous debugging efforts. The engineer consistently verified backend API functionality before addressing frontend integration issues, demonstrating a meticulous but challenging development cycle focused on core features.
 </analysis>
 
 <product_requirements>
-Kuryecini is a full-stack food/package delivery platform for the Turkish market, supporting Customer, Courier, Business, and Admin roles using React, FastAPI, and MongoDB. The core functionality includes real MongoDB, JWT-based RBAC, real-time communication, and OpenStreetMap.
+Kuryecini is a full-stack food/package delivery platform for the Turkish market, supporting Customer, Courier, Business, and Admin roles. It requires a robust, DB-backed web application without . The current goal is deployment readiness.
 
-Recent strict CI Gate 0 requirements demand:
-- Elimination of all mock data/ usage.
-- Strict JWT-based RBAC.
-- TR localization via .
-- Redesigned Admin Panel with dynamic , ,  widgets from .
-- Visual enhancements for Register pages using  (, , ).
-- Specific API contracts for business menu, nearby businesses, admin settings, and auth.
-- Mandatory Playwright E2E tests.
-- Specific implementation order for features (Content & Media seed, ContentEditor/Admin Dashboard, Register pages, Customer Landing/Nearby, Settings/Courier/Earn integration, Playwright tests).
-
-Additional functional requests from the user:
-- Business menus should be visible to nearby customers, with a city-wide fallback.
-- Current Location option for customer address selection.
-- Automated order flow: Customer orders -> payment -> approval -> business sees Ready, awaiting courier -> order drops to courier -> courier accepts, sees route -> courier delivers -> earnings record created.
-- A modern login screen should be the primary entry point, with the old homepage available but only featuring the modern login option.
-- A professionally designed Kuryecini logo should be integrated across the application.
-- Integrate Sentry (error/log monitoring), Email/SMS provider stub (notification tests), and OSRM_URL route engine.
+Key requirements from the user's comprehensive production prompt (Chat Message 5):
+-   **Architecture**: React/Next.js (Frontend), TailwindCSS/shadcn/ui (UI), Leaflet/OpenStreetMap (Map), FastAPI (Backend), PostgreSQL (Database), SQLAlchemy/Alembic (ORM), MinIO/S3 (File uploads - signed URLs), HttpOnly cookie (JWT) for authentication (no ), RBAC, Sentry, Docker, Playwright (E2E tests).
+-   **Features by Role**:
+    -   **Courier**: Registration (vehicle docs), KYC (admin approval), job flow, earnings.
+    -   **Restaurant**: Menu (categories, items, prices, images), order management, working hours.
+    -   **Freight**: Job creation/management.
+    -   **Customer**: Address management (map pin, reverse geocode), location-based restaurant discovery (prioritize same district/city), order/job tracking.
+    -   **Admin**: User/KYC approvals, commission settings.
+-   **Critical Rules**: No , HttpOnly JWT, refresh tokens in DB, bcrypt passwords, RBAC on all endpoints.
+-   **Specific UX Improvements**: Current Location for customer addresses, smart location-based restaurant sorting (same district, then same city, then city-wide fallback), and all business menus to be visible.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frameworks**: React.js (Frontend), FastAPI (Backend)
-- **Database**: MongoDB (UUIDs for IDs,  index for location)
-- **State Management**: React Context (, ), 
-- **Authentication**: JWT with Role-Based Access Control (RBAC)
-- **Real-time**: WebSocket/Server-Sent Events (SSE)
-- **Mapping**: OpenStreetMap, OSRM for routing (planned)
-- **Data Handling**:  for centralized API calls, Pydantic models.
-- **Security**: KYC (Know Your Customer) enforcement for businesses/couriers.
+-   **Frameworks**: React.js (Frontend), FastAPI (Backend)
+-   **Database**: MongoDB (UUIDs for IDs,  index - current implementation), PostgreSQL (user-requested target)
+-   **Authentication**: JWT with Role-Based Access Control (RBAC),  (currently used for token persistence, but  is the strict requirement)
+-   **Mapping**: OpenStreetMap, Nominatim (reverse geocoding)
+-   **Data Handling**:  for authenticated API calls, Pydantic models, city normalization
+-   **Integrations**: Sentry (error/log monitoring)
 </key_technical_concepts>
 
 <code_architecture>
@@ -42,51 +31,45 @@ The application uses a monolithic repository with  (React) and  (FastAPI).
 
 
 
--   ****: Central API logic. Refactored to integrate new route modules, remove mock data, and handle KYC. Authentication logic adjusted. New endpoints added for business orders, stats, financials, payments, customer addresses, and general business listing. Fixed duplicate product listing endpoint. KYC approval backend responses updated.
--   ****: Centralizes authentication.  added for KYC. Test user data updated with  to enable business operations.
--   ****: Business-related routes. Fixed collection mismatch for business menu (now saves to both  and  collections) and business lookup (uses  collection).
--   ****: Geospatial queries for businesses. Added a general  endpoint.
--   ****: Provides API endpoints for  CRUD operations.
--   ****: Script to seed initial content, including , ,  blocks.
--   ****: Updated router prefix from  to  to align with frontend expectations.
--   ** (NEW)**: Created to manage dependencies for third-party integrations, currently for Sentry.
--   ****: Root component. Heavily refactored for  and .  initially removed, then restored with only the Modern Login button. Fixed  prop missing in .
--   ****: Admin interface.  integrated into navigation.
--   ****: Business interface. Refactored to remove all  usage, replacing mock data calls (, , ) with  for real API endpoints.
--   ****: Centralized JWT token management.
--   ****: Admin component for managing .
--   ****: KYC approval/rejection logic. Refactored to use  and .
--   ** (NEW)**: Component to display the new Kuryecini logo.
--   ****: Centralized utility for authenticated API requests.
--   ****: Refactored to fetch menu items from real backend API () instead of mock data. Fixed a  infinite loop using .
--   ****: Replaced  endpoint with .
--   ****: Refactored for customer address management. Replaced mock data. Updated API calls from  to . Added address CRUD functions and updated UI (render, modal) to match new schema. Fixed multiple duplicate function definitions (, ).
--   ****: Removed  and  migration logic for compliance.
--   ** (NEW)**: Documents compliance status regarding mock data, , , and 3rd party integrations.
--   ** (NEW)**: Documents the removal of mock data and .
--   ** (NEW)**: Documents the implementation and testing of new backend MongoDB endpoints.
--   ** (NEW)**: Documents progress on 3rd party integrations.
--   **Temporary Python Scripts**: , , ,  were created for debugging and data manipulation during development.
+-   ****: Central API logic. Sentry integration added. Hard-coded Istanbul location assignment removed from  endpoint.  model updated to include  for business registration.  to uid=0(root) gid=0(root) groups=0(root) mappings for MongoDB were previously handled.
+-   ****: Defines Pydantic models.  model updated to include  and  fields for location-based sorting.  description field made optional to resolve 422 errors.
+-   ****: Business-related routes.  description field requirement updated to optional.
+-   ****: (NEW) Created to manage dependencies for third-party integrations;  was added.
+-   ****: Updated to include  and its dependencies during Sentry integration.
+-   ****:  environment variable was added.
+-   ****: Utility for city normalization. Confirmed to be functioning correctly during debugging.
+-   ****: Root component. Modified for Sentry setup. The business registration form was updated to include the  field.  related logic was touched.
+-   ****: Centralized JWT token management. Modified to explicitly store tokens in  on login and prevent their removal on refresh, deviating from the HttpOnly cookie requirement to address authentication persistence.
+-   ****: Refactored to use  instead of  and eliminate  usage. Fixed  vs  issue for address creation. Removed client-side validation for  and added default  values for new addresses.
+-   ****: Modified to correctly initialize  with the user's token from . Implemented  and  callbacks to facilitate address data synchronization between  and . Debug logs were added.
+-   ****: Refactored to use , corrected API endpoints, and handled  consistently. Implemented location-based restaurant sorting (by distance, then by city/district prioritization). Updated sort buttons and enhanced restaurant card display with city/district information. Address redirection logic to Profile page was added if no address is selected. Debug logs were added.
+-   ****: API endpoint for fetching addresses was standardized to  to ensure consistency with .  callback was integrated. Client-side validation for  was removed, and default  for new addresses added. Debug logs were added.
+-   ****: Investigated for menu item display issues and form validation problems. Confirmed  mapping to  was correct, and modal z-index was properly set. The backend  field being required was the actual issue.
+-   ****: (NEW) Created to containerize the application for deployment.
+-   ****: (NEW) Created for local development and deployment orchestration.
+-   ****: (NEW) Created to hold production environment variables, including .
+-   ****: (NEW) Created for Render deployment configurations.
+-   ****: (NEW) Created as a guide for final deployment steps.
 </code_architecture>
 
 <pending_tasks>
-- Integrate Customer Landing and Nearby businesses with dynamic content.
-- Implement Settings reading and Courier/Earn integration (specifically, earnings record creation after courier delivery).
-- Write and pass Playwright E2E tests for all new features.
-- Integrate remaining 3rd party services: Email/SMS provider stub, OSRM_URL route engine.
-- Implement Current Location option for customer address selection.
-- Complete the automated order workflow from customer order to courier delivery and review.
-- Address any further  or  usages if they are re-introduced or missed.
+-   **Backend Migration**: Transition from MongoDB to PostgreSQL as explicitly requested in the production prompt (Chat 5).
+-   **Authentication Refinement**: Implement HttpOnly cookie-based JWT authentication strictly, removing current  usage.
+-   **Order Workflow Completion**: Integrate the full automated order flow (business approval, courier assignment, delivery, earnings, customer review).
+-   **3rd Party Integrations**: Integrate Email/SMS provider stub and OSRM_URL route engine.
+-   **Playwright E2E Tests**: Write and pass E2E tests for all new features.
+-   **Business Registration City/District Bug**: Frontend form submission issue where city/district always saves as Istanbul despite user input (Chat 722).
+-   **Restaurant Menus Visibility (Business Side)**: Business accounts still cannot see their own menus (Chat 585, 618). This contradicts customer-side fix.
+-   **Address Registration Errors**: User still reports issues with saving addresses, including incorrect/empty city/district + lat/lng coordinates (Chat 722).
+-   **Discover Screen Address Display**: Addresses not showing up or not filtering restaurants correctly based on user's city/district in the Discover screen (Chat 722).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was continuing with **Phase 2C: 3rd Party Integrations**. This phase focuses on integrating external services as per user requirements (Sentry, Email/SMS Provider stub, OSRM_URL).
+Immediately before this summary request, the AI engineer was addressing a recurring critical issue reported by the user: İşletme kayıtlarında sorun var. Her yeni kayıt edilen restoran şehir/il kısmına ne yazarsam yazayım İstanbul olarak kaydediliyor. Default olarak hep İstanbul gidiyor. (There is an issue with business registrations. Every new restaurant registered, regardless of what I write for city/province, is saved as Istanbul. It defaults to Istanbul. I want to enter different provinces (e.g., Niğde, Ankara, İzmir etc.) but it doesn't work.)
 
-The specific task being worked on is the **integration of Sentry** for error and log monitoring in the backend. The AI engineer successfully requested and received a detailed Sentry integration playbook from the  sub-agent. Following this, a new file, , was created. The current action is to proceed with installing Sentry dependencies in the backend according to the playbook.
-
-The application has a modern login screen and a functional homepage, with a newly designed Kuryecini logo integrated. Business menu creation is persistent and visible to customers. Customer address management (CRUD operations) is also functional. KYC approval for businesses and basic order creation are working, but the full end-to-end order workflow (business approval, courier assignment, delivery, earnings, customer review) still requires complete integration and testing.
+The AI engineer performed a deep investigation, starting with backend analysis, which confirmed that the backend's city normalization and business registration API endpoints were functioning correctly (Chat 725). The focus then shifted to the frontend business registration form. The engineer was examining  to understand how  for business registration is handled and to verify the city selection input. The last action was checking if Niğde (a specific city mentioned by the user) is an available option in the city dropdown within the business registration form to confirm frontend form structure.
 </current_work>
 
 <optional_next_step>
-Install the Sentry dependencies in  as part of Phase 2C: 3rd Party Integrations.
+Verify the frontend business registration form's city and district input fields for correct data binding and submission.
 </optional_next_step>
