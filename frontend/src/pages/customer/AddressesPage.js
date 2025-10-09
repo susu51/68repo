@@ -127,68 +127,127 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
     return true;
   };
 
-  const handleAddAddress = async () => {
-    // Async Operation Protection - prevent state updates after unmount
-    if (!isMounted) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
     
     try {
-      console.log('🚀 handleAddAddress called with:', newAddress);
-      
-      if (!newAddress.label || !newAddress.city || !newAddress.description) {
-        let missingFields = [];
-        if (!newAddress.label) missingFields.push('Adres Adı');
-        if (!newAddress.city) missingFields.push('Şehir');
-        if (!newAddress.description) missingFields.push('Adres Açıklaması');
-        
-        console.log('❌ Validation failed. Missing fields:', missingFields);
-        toast.error(`Lütfen şu alanları doldurun: ${missingFields.join(', ')}`);
-        return;
-      }
-      
-      console.log('✅ Validation passed, proceeding with API call...');
-
       const addressData = {
-        ...newAddress,
-        // Normalize city name on the frontend as well
-        city_original: newAddress.city,
-        city_normalized: newAddress.city.toLowerCase().replace('ı', 'i')
+        ...addressForm,
+        lat: addressForm.lat || 40.7831, // Default Istanbul coordinates if no location
+        lng: addressForm.lng || 29.0441
       };
 
-      console.log('Address data to send:', addressData);
-
-      console.log('🔄 Sending address creation request...');
-      console.log('📝 Address data:', addressData);
-      
-      const response = await apiClient.post('/user/addresses', addressData);
-
-      console.log('✅ Add address response received:', response);
-      console.log('📄 Response data:', response.data);
-      console.log('📊 Response status:', response.status);
-
-      if (isMounted) {
-        const newAddress = response.data;
-        console.log('💾 Adding to addresses list:', newAddress);
+      let response;
+      if (editingAddress) {
+        // Update existing address
+        console.log('🔄 Updating address:', editingAddress.id);
+        response = await apiClient.put(`/user/addresses/${editingAddress.id}`, addressData);
         
+        setAddresses(prev => 
+          prev.map(addr => addr.id === editingAddress.id ? response : addr)
+        );
+        toast.success('Adres başarıyla güncellendi!');
+      } else {
+        // Create new address
+        console.log('🔄 Creating new address');
+        response = await apiClient.post('/user/addresses', addressData);
+        
+        setAddresses(prev => [...prev, response]);
         toast.success('Adres başarıyla eklendi!');
-        setAddresses([...addresses, newAddress]);
-        setShowAddForm(false);
-        setNewAddress({
-          label: '',
-          city: '',
-          description: '',
-          lat: null,
-          lng: null
-        });
+        
+        // Notify parent component
+        if (onAddressAdded) {
+          onAddressAdded(response);
+        }
       }
-    } catch (error) {
-      console.error('❌ Error adding address:', error);
-      console.error('❌ Error details:', error.response?.data);
-      console.error('❌ Error status:', error.response?.status);
+
+      // Reset form and close modal
+      resetForm();
+      setShowAddForm(false);
       
-      if (isMounted) {
-        const errorMessage = error.response?.data?.detail || error.message || 'Adres eklenirken hata oluştu';
-        toast.error(`Hata: ${errorMessage}`);
+    } catch (error) {
+      console.error('❌ Error saving address:', error);
+      
+      if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+      } else if (error.response?.status === 422) {
+        const detail = error.response?.data?.detail;
+        if (typeof detail === 'string') {
+          toast.error(`Doğrulama hatası: ${detail}`);
+        } else {
+          toast.error('Adres bilgileri geçersiz. Lütfen kontrol edin.');
+        }
+      } else {
+        const errorMsg = editingAddress ? 'Adres güncellenirken hata oluştu' : 'Adres eklenirken hata oluştu';
+        toast.error(errorMsg);
       }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEdit = (address) => {
+    setEditingAddress(address);
+    setAddressForm({
+      label: address.label || '',
+      city: address.city || '',
+      district: address.district || '',
+      description: address.description || '',
+      lat: address.lat || null,
+      lng: address.lng || null
+    });
+    setShowAddForm(true);
+  };
+
+  const handleDelete = async (addressId) => {
+    if (!window.confirm('Bu adresi silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+
+    try {
+      console.log('🗑️ Deleting address:', addressId);
+      await apiClient.delete(`/user/addresses/${addressId}`);
+      
+      setAddresses(prev => prev.filter(addr => addr.id !== addressId));
+      toast.success('Adres başarıyla silindi!');
+      
+    } catch (error) {
+      console.error('❌ Error deleting address:', error);
+      
+      if (error.response?.status === 404) {
+        // Address already deleted, remove from UI
+        setAddresses(prev => prev.filter(addr => addr.id !== addressId));
+        toast.success('Adres silindi');
+      } else if (error.response?.status === 401) {
+        toast.error('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+      } else {
+        toast.error('Adres silinirken hata oluştu');
+      }
+    }
+  };
+
+  const setDefaultAddress = async (addressId) => {
+    try {
+      console.log('⭐ Setting default address:', addressId);
+      await apiClient.post(`/user/addresses/${addressId}/set-default`);
+      
+      // Update local state
+      setAddresses(prev => 
+        prev.map(addr => ({
+          ...addr,
+          is_default: addr.id === addressId
+        }))
+      );
+      
+      toast.success('Varsayılan adres ayarlandı!');
+      
+    } catch (error) {
+      console.error('❌ Error setting default address:', error);
+      toast.error('Varsayılan adres ayarlanırken hata oluştu');
     }
   };
 
