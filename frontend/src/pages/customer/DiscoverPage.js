@@ -49,12 +49,14 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
       
       if (sortMode === 'location' && userLocation) {
         // Location-based sorting (50km radius)
-        const businesses = await apiClient.get('/businesses', {
-          lat: userLocation.lat,
-          lng: userLocation.lng,
-          radius: 50000 // 50km in meters
+        const response = await apiClient.get('/businesses', {
+          params: {
+            lat: userLocation.lat,
+            lng: userLocation.lng,
+            radius: 50000 // 50km in meters
+          }
         });
-        setRestaurants(businesses || []);
+        setRestaurants(response.data || []);
       } else {
         // City-wide listing - show ALL restaurants for now (no city filter)
         let params = {};
