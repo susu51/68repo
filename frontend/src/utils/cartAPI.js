@@ -79,8 +79,8 @@ class CartAPI {
 
       const response = await fetch(`${API}/customer/cart`, {
         method: 'DELETE',
+        credentials: 'include',  // Include cookies
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
