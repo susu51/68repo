@@ -48,8 +48,8 @@ class CartAPI {
 
       const response = await fetch(`${API}/customer/cart`, {
         method: 'POST',
+        credentials: 'include',  // Include cookies
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(cartData)
