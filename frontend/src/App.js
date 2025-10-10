@@ -3983,15 +3983,6 @@ const CustomerDashboard = ({ user }) => {
 // Main Pages
 const HomePage = ({ onAuthStart }) => {
   const [locationInput, setLocationInput] = useState('');
-  const navigate = useNavigate ? useNavigate() : null;
-  
-  const handleAuthStart = () => {
-    if (navigate) {
-      navigate('/auth');
-    } else {
-      onAuthStart();
-    }
-  };
   
   return (
     <div className="min-h-screen bg-white">
