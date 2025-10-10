@@ -268,15 +268,18 @@ backend:
 
   - task: "Customer Authentication for New App"
     implemented: true
-    working: true
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
+    working: false
+    file: "ModernLogin.js"
+    stuck_count: 1
+    priority: "critical"
     needs_retesting: false
     status_history:
         - working: true
           agent: "testing"
           comment: "✅ CUSTOMER LOGIN WORKING - testcustomer@example.com/test123 authentication successful, JWT tokens generated correctly"
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL LOGIN FORM ISSUE IDENTIFIED: Frontend login form submission is NOT triggering the handleEmailLogin function. Network monitoring confirms NO POST /api/auth/login request is made when clicking login button. Backend API works correctly (confirmed via curl), but frontend form onSubmit handler is not executing. Root cause: Form submission is doing traditional HTML form submission instead of React event handling. The handleEmailLogin function with e.preventDefault() is never called. Modal stays open, no cookies set, no API calls made. This exactly matches the user-reported issue."
 
   - task: "MongoDB Geolocation Setup"
     implemented: true
