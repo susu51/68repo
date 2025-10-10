@@ -220,11 +220,31 @@ async def login(body: LoginRequest, response: Response):
         
         user_id = user["id"]
     
+    # Get user data for response
+    if body.email in test_users:
+        user_data = test_users[body.email]
+    else:
+        user_data = user
+    
     # Generate tokens
     access_token = make_token(user_id, ACCESS_TTL)
     refresh_token = make_token(user_id, REFRESH_TTL)
     
-    # Set HttpOnly cookies
+    # For development: also return token in response body
+    response_data = {
+        "success": True, 
+        "message": "Login successful",
+        "access_token": access_token,  # For dev fallback
+        "user": {
+            "id": user_data["id"],
+            "email": user_data["email"],
+            "role": user_data["role"],
+            "first_name": user_data.get("first_name", ""),
+            "last_name": user_data.get("last_name", "")
+        }
+    }
+    
+    # Set HttpOnly cookies (primary method)
     response.set_cookie(
         "access_token", 
         access_token, 
@@ -238,7 +258,7 @@ async def login(body: LoginRequest, response: Response):
         **COOKIE_CONFIG
     )
     
-    return {"success": True, "message": "Login successful"}
+    return response_data
 
 @auth_router.get("/me", response_model=UserResponse)
 async def me(user = Depends(get_current_user_from_cookie)):
