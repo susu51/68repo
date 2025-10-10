@@ -1,7 +1,8 @@
 // DEPRECATED - Use /api/http.js instead
 // Cookie-based authentication with credentials: 'include'
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+// HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES  
+const BACKEND_URL = 'http://localhost:8001';
 
 console.warn('❌ DEPRECATED: apiClient.js is deprecated. Use /api/http.js with cookie authentication instead.');
 
