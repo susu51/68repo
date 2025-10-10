@@ -4046,7 +4046,7 @@ const HomePage = ({ onAuthStart }) => {
             
             {/* CTA Button */}
             <Button
-              onClick={onAuthStart}
+              onClick={handleAuthStart}
               className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-gray-900 font-bold px-12 py-6 rounded-2xl text-2xl shadow-2xl transform transition-all duration-200 hover:scale-105 mb-12"
             >
               🚀 Hemen Sipariş Ver
