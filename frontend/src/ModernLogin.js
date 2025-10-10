@@ -31,8 +31,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
 
   // Handle email/password login
   const handleEmailLogin = async (e) => {
+    console.log('🔥 handleEmailLogin called!');
     e.preventDefault();
     setLoading(true);
+    console.log('🔥 Form data:', formData);
 
     try {
       const response = await api("/auth/login", {
