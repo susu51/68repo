@@ -79,7 +79,16 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
       }
     } catch (error) {
       console.error('❌ Login error:', error);
-      const errorMsg = error.message || 'Bağlantı hatası. Lütfen tekrar deneyin.';
+      
+      // Better error messages for common issues
+      let errorMsg = 'Bağlantı hatası. Lütfen tekrar deneyin.';
+      
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        errorMsg = 'Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.';
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
       setError(errorMsg);
       toast.error(`❌ ${errorMsg}`);
     }
