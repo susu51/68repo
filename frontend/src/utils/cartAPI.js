@@ -88,11 +88,7 @@ class CartAPI {
   // Ürün sepete ekle (optimistic update)
   static async addToCart(product, quantity = 1) {
     try {
-      // Token management via cookie authentication - no localStorage
-      if (!token) {
-        console.log('⚠️ No token, cannot add to cart');
-        return false;
-      }
+      // Cookie authentication - no token needed
 
       const response = await fetch(`${API}/customer/cart/add`, {
         method: 'POST',
