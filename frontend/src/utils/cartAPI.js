@@ -3,7 +3,8 @@
  * Müşteri sepeti backend'de tutulur, logout/login sonrası korunur
  */
 
-const API = process.env.REACT_APP_BACKEND_URL;
+// HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES
+const API = 'http://localhost:8001';
 
 class CartAPI {
   // Sepeti backend'den yükle
