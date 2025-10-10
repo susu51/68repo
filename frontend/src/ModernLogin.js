@@ -350,9 +350,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                 Hesabınız yok mu?{' '}
                 <button
                   onClick={onRegisterClick}
-                  className="text-orange-600 hover:text-orange-700 font-medium underline transition-colors"
+                  className="inline-flex items-center space-x-1 text-orange-600 hover:text-orange-700 font-medium underline transition-colors"
                 >
-                  Kayıt Ol
+                  <KuryeciniLogo size="small" className="opacity-80" />
+                  <span>Kuryecini'ye Kayıt Ol</span>
                 </button>
               </p>
             </div>
