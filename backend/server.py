@@ -5328,14 +5328,8 @@ from routes.content import router as content_router
 # Debug routes (temporary for Atlas testing)
 from routes.debug import router as debug_router
 
-# Emergent Auth (Google OAuth)
-from routes.emergent_auth import router as emergent_auth_router
-
 # Cookie-based authentication router (PRIORITY - include first)
 api_router.include_router(auth_router)
-
-# Emergent Auth router (Google OAuth)
-api_router.include_router(emergent_auth_router)
 
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
