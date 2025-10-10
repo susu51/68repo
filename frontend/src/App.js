@@ -4272,7 +4272,7 @@ const HomePage = ({ onAuthStart }) => {
                 siz sadece <span className="text-yellow-300 font-bold">kazancınıza odaklanıyorsunuz.</span>
               </p>
               <Button 
-                onClick={handleAuthStart}
+                onClick={onAuthStart}
                 className="bg-white text-blue-600 hover:bg-blue-50 px-10 py-6 text-xl font-bold rounded-2xl shadow-xl transform transition-all duration-200 hover:scale-105"
               >
                 🚀 Hemen Kurye Ol
