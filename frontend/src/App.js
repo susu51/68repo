@@ -4070,34 +4070,34 @@ const HomePage = ({ onAuthStart }) => {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center group">
-              <div className="bg-gradient-to-br from-orange-100 to-red-100 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
-                <div className="text-5xl mb-4">👥</div>
-                <div className="text-4xl font-bold text-orange-600 mb-2">50.000+</div>
-                <div className="text-gray-600 font-medium">Mutlu Müşteri</div>
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
+                <div className="text-6xl mb-4">👥</div>
+                <div className="text-5xl font-bold text-orange-600 mb-2">50.000+</div>
+                <div className="text-gray-700 font-medium text-lg">Mutlu Müşteri</div>
               </div>
             </div>
             
             <div className="text-center group">
-              <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
-                <div className="text-5xl mb-4">🏪</div>
-                <div className="text-4xl font-bold text-red-600 mb-2">1.000+</div>
-                <div className="text-gray-600 font-medium">Restoran Ortağı</div>
+              <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
+                <div className="text-6xl mb-4">🏪</div>
+                <div className="text-5xl font-bold text-red-600 mb-2">1.000+</div>
+                <div className="text-gray-700 font-medium text-lg">Restoran Ortağı</div>
               </div>
             </div>
             
             <div className="text-center group">
-              <div className="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
-                <div className="text-5xl mb-4">🏍️</div>
-                <div className="text-4xl font-bold text-yellow-600 mb-2">500+</div>
-                <div className="text-gray-600 font-medium">Kurye Ekibi</div>
+              <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
+                <div className="text-6xl mb-4">🚴</div>
+                <div className="text-5xl font-bold text-yellow-600 mb-2">500+</div>
+                <div className="text-gray-700 font-medium text-lg">Kurye Ekibi</div>
               </div>
             </div>
             
             <div className="text-center group">
-              <div className="bg-gradient-to-br from-green-100 to-teal-100 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
-                <div className="text-5xl mb-4">⚡</div>
-                <div className="text-4xl font-bold text-green-600 mb-2">15 dk</div>
-                <div className="text-gray-600 font-medium">Ortalama Teslimat</div>
+              <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-3xl p-8 mb-4 group-hover:shadow-xl transition-all duration-300">
+                <div className="text-6xl mb-4">⚡</div>
+                <div className="text-5xl font-bold text-green-600 mb-2">15 dk</div>
+                <div className="text-gray-700 font-medium text-lg">Ortalama Teslimat</div>
               </div>
             </div>
           </div>
