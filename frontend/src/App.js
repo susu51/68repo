@@ -3996,12 +3996,16 @@ const HomePage = ({ onAuthStart }) => {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center text-white">
-            {/* Logo - Removed large white box, using smaller inline logo */}
+            {/* Logo with Brand Name */}
+            <div className="flex items-center justify-center mb-8 space-x-3">
+              <KuryeciniLogo width={60} height={60} useRealLogo={true} />
+              <h2 className="text-4xl font-bold text-white">Kuryecini</h2>
+            </div>
             
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               Yemeğin <span className="text-yellow-300">15 Dakikada</span><br />
-              <span className="bg-gradient-to-r from-yellow-200 to-orange-200 bg-clip-text text-transparent">Kapında!</span>
+              <span className="text-white">Kapında!</span>
             </h1>
             
             {/* Subtitle */}
