@@ -24,7 +24,8 @@ COOKIE_CONFIG = {
     "httponly": True,   # Secure HttpOnly cookies
     "secure": False,    # Set to True in production with HTTPS
     "samesite": "lax",  # Lax for localhost cross-origin (none requires secure=True)
-    "path": "/"
+    "path": "/",
+    "domain": "localhost"  # Explicit domain for cross-port cookies
 }
 
 # Router
