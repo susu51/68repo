@@ -34,6 +34,7 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(''); // Clear previous errors
 
     try {
       // Direct fetch call - bypass API wrapper issues
@@ -62,17 +63,22 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
           }
           
           // Success actions
+          setError('');
           onLogin && onLogin({ success: true, ...result });
           onClose && onClose();
           toast.success('✅ Giriş başarılı!');
         }
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Giriş başarısız');
+        const errorMsg = errorData.detail || errorData.message || 'Giriş başarısız';
+        setError(errorMsg);
+        toast.error(`❌ ${errorMsg}`);
       }
     } catch (error) {
       console.error('❌ Login error:', error);
-      toast.error(`Giriş hatası: ${error.message}`);
+      const errorMsg = error.message || 'Bağlantı hatası. Lütfen tekrar deneyin.';
+      setError(errorMsg);
+      toast.error(`❌ ${errorMsg}`);
     }
     setLoading(false);
   };
