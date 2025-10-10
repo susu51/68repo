@@ -4392,7 +4392,7 @@ const AuthPage = ({ onBack }) => {
   const [step, setStep] = useState('login'); // login, register, user_type_selection, registration_form
   const [userType, setUserType] = useState('');
   const [showModernLogin, setShowModernLogin] = useState(false);
-  const [showSimpleLogin, setShowSimpleLogin] = useState(false);
+  // Simple login state removed
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleRegistrationComplete = (loginData) => {
