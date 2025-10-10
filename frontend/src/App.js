@@ -4440,17 +4440,13 @@ const AuthPage = ({ onBack }) => {
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50 flex items-center justify-center p-4">
         <div className="space-y-4">
           <SimpleLoginForm onRegisterClick={() => setStep('user_type_selection')} />
-          <div className="text-center space-y-2">
-            <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <button 
-                onClick={() => setShowModernLogin(true)}
-                className="text-orange-600 hover:text-orange-700 text-sm underline transition-colors"
-              >
-                ✨ Modern giriş ekranını dene
-              </button>
-              
-              {/* Basit test giriş butonu kaldırıldı */}
-            </div>
+          <div className="text-center">
+            <button 
+              onClick={() => setShowModernLogin(true)}
+              className="text-orange-600 hover:text-orange-700 text-sm underline transition-colors"
+            >
+              ✨ Modern giriş ekranını dene
+            </button>
           </div>
         </div>
       </div>
