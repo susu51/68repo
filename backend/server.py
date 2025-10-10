@@ -53,8 +53,6 @@ from auth_cookie import auth_router, get_current_user_from_cookie, set_db_client
 from routes.addresses import set_db_client as set_addresses_db_client
 # City catalog router db setup
 from routes.city_catalog import set_db_client as set_city_catalog_db_client
-# Emergent Auth router db setup
-from routes.emergent_auth import set_db_client as set_emergent_auth_db_client
 
 # Import phone validation function
 try:
