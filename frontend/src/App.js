@@ -415,16 +415,19 @@ const AdminDashboard = ({ user }) => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
             <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl">
-                <span className="text-white text-xl font-bold">🛡️</span>
+              <div className="flex items-center space-x-2">
+                <KuryeciniLogo size="medium" useRealLogo={true} />
+                <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg">
+                  <span className="text-white text-sm font-bold">🛡️</span>
+                </div>
               </div>
               <div>
                 <h1 className={`text-lg sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  <span className="hidden sm:inline">Admin Panel</span>
+                  <span className="hidden sm:inline">Kuryecini Admin</span>
                   <span className="sm:hidden">Admin</span>
                 </h1>
                 <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                  Kuryecini Yönetim Sistemi
+                  Yönetim Sistemi
                 </p>
               </div>
             </div>
