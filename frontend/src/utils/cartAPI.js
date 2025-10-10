@@ -40,11 +40,7 @@ class CartAPI {
   // Sepeti backend'e kaydet
   static async saveCart(cartData) {
     try {
-      // Token management via cookie authentication - no localStorage
-      if (!token) {
-        console.log('⚠️ No token, cannot save cart to DB');
-        return false;
-      }
+      // Cookie authentication - no token needed
 
       const response = await fetch(`${API}/customer/cart`, {
         method: 'POST',
