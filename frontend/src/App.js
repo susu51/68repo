@@ -3990,12 +3990,16 @@ const HomePage = ({ onAuthStart }) => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center space-x-3">
-                <KuryeciniLogo size="medium" />
+                {/* Real Logo + SVG Logo */}
+                <div className="flex items-center space-x-2">
+                  <KuryeciniLogo size="medium" useRealLogo={true} />
+                  <KuryeciniLogo size="small" />
+                </div>
                 <div>
                   <h1 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                     Kuryecini
                   </h1>
-                  <p className="text-xs text-gray-500">Hızlı • Güvenilir</p>
+                  <p className="text-xs text-gray-500">Hızlı • Güvenilir • Lezzetli</p>
                 </div>
               </div>
               
