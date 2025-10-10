@@ -37,8 +37,11 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setError(''); // Clear previous errors
 
     try {
+      // Get backend URL from environment
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      
       // Direct fetch call - bypass API wrapper issues
-      const response = await fetch('http://localhost:8001/api/auth/login', {
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
