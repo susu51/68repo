@@ -6,10 +6,14 @@ const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001
 export const api = async (path, init = {}) => {
   const url = `${API_BASE_URL}/api${path}`;
   
+  // Check for bearer token as fallback for development
+  const token = localStorage.getItem('access_token');
+  
   const config = {
     credentials: "include", // CRITICAL: Send cookies
     headers: { 
       "Content-Type": "application/json", 
+      ...(token && { "Authorization": `Bearer ${token}` }), // Bearer fallback
       ...(init.headers || {}) 
     },
     ...init,
