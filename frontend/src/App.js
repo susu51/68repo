@@ -3996,10 +3996,7 @@ const HomePage = ({ onAuthStart }) => {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center text-white">
-            {/* Logo */}
-            <div className="mb-8">
-              <KuryeciniLogo size="xl" useRealLogo={true} className="mx-auto mb-4" />
-            </div>
+            {/* Logo - Removed large white box, using smaller inline logo */}
             
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
