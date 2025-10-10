@@ -14,7 +14,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/auth/emergent", tags=["Emergent Auth"])
+router = APIRouter(prefix="/auth/emergent", tags=["Emergent Auth"])
 
 # Will be set from server.py
 db_client = None
