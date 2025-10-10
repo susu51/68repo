@@ -173,14 +173,14 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
       <Card className={`w-full max-w-md ${cardClass} shadow-2xl border relative z-10`}>
         <CardHeader className="text-center space-y-6">
           {/* Logo */}
-          <div className="flex justify-center items-center space-x-4">
-            <KuryeciniLogo size="xl" useRealLogo={true} />
+          <div className="flex flex-col items-center space-y-4">
             <div className="text-center">
               <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                 Kuryecini
               </h2>
-              <p className="text-sm text-gray-500">Türkiye'nin En Hızlı Teslimat Platformu</p>
+              <p className="text-sm text-gray-500 mb-4">Türkiye'nin En Hızlı Teslimat Platformu</p>
             </div>
+            <KuryeciniLogo size="xl" useRealLogo={true} />
           </div>
           
           <div>
