@@ -19,13 +19,13 @@ JWT_SECRET = os.environ.get("JWT_SECRET", "your-secret-key-here")
 ACCESS_TTL = 15 * 60        # 15 minutes
 REFRESH_TTL = 7 * 24*60*60  # 7 days
 
-# Cookie configuration - cross-origin localhost development
+# Cookie configuration - localhost cross-origin development
 COOKIE_CONFIG = {
-    "httponly": True,   # Secure HttpOnly cookies
-    "secure": False,    # Set to True in production with HTTPS
-    "samesite": "none", # None for cross-origin (normally requires secure=True, but localhost exception)
-    "path": "/"
-    # No domain restriction for cross-origin localhost
+    "httponly": True,
+    "secure": False,  # False for localhost development
+    "samesite": "lax",  # Lax is more permissive for localhost
+    "path": "/",
+    "domain": None  # No domain for cross-origin localhost
 }
 
 # Router
