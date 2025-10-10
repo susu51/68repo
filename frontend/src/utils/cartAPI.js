@@ -9,12 +9,12 @@ class CartAPI {
   // Sepeti backend'den yükle
   static async loadCart() {
     try {
-      // Using cookie authentication - no token check needed
+      // Using cookie authentication - no token needed
       console.log('🛒 Loading cart from database...');
 
       const response = await fetch(`${API}/customer/cart`, {
+        credentials: 'include',  // Include cookies
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
