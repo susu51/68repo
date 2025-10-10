@@ -3982,43 +3982,84 @@ const CustomerDashboard = ({ user }) => {
 
 // Main Pages
 const HomePage = ({ onAuthStart }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [locationInput, setLocationInput] = useState('');
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50">
-      {/* Marketing Hero Section */}
-      <div className="relative overflow-hidden">
-        {/* Navigation */}
-        <nav className="relative z-20 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-3">
-                {/* Real Logo + SVG Logo */}
-                <div className="flex items-center space-x-2">
-                  <KuryeciniLogo size="medium" useRealLogo={true} />
-                  <KuryeciniLogo size="small" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                    Kuryecini
-                  </h1>
-                  <p className="text-xs text-gray-500">Hızlı • Güvenilir • Lezzetli</p>
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 min-h-screen flex items-center">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center text-white">
+            {/* Logo */}
+            <div className="mb-8">
+              <KuryeciniLogo size="xl" useRealLogo={true} className="mx-auto mb-4" />
+            </div>
+            
+            {/* Main Headline */}
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              Yemeğin <span className="text-yellow-300">15 Dakikada</span><br />
+              <span className="bg-gradient-to-r from-yellow-200 to-orange-200 bg-clip-text text-transparent">Kapında!</span>
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="text-xl md:text-2xl mb-12 text-orange-100 max-w-3xl mx-auto leading-relaxed">
+              Lezzetli yemekler ve market ihtiyaçların <strong>dakikalar içinde kapında.</strong><br />
+              Türkiye'nin en hızlı teslimat ağı ile tanış!
+            </p>
+            
+            {/* Location Input */}
+            <div className="max-w-lg mx-auto mb-8">
+              <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl p-2 shadow-2xl">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 pl-4">
+                    <span className="text-2xl">📍</span>
+                  </div>
+                  <Input
+                    type="text"
+                    placeholder="Konumunu gir (örn: Kadıköy, İstanbul)"
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    className="flex-1 border-0 bg-transparent text-gray-900 placeholder-gray-500 text-lg py-4 px-4 focus:ring-0"
+                  />
+                  <Button className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg">
+                    🔍
+                  </Button>
                 </div>
               </div>
-              
-              <div className="flex items-center space-x-4">
-                {/* Sadece Modern Giriş Butonu */}
-                <Button 
-                  onClick={onAuthStart}
-                  size="sm"
-                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
-                >
-                  ✨ Modern Giriş
-                </Button>
+            </div>
+            
+            {/* CTA Button */}
+            <Button
+              onClick={onAuthStart}
+              className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-gray-900 font-bold px-12 py-6 rounded-2xl text-2xl shadow-2xl transform transition-all duration-200 hover:scale-105 mb-12"
+            >
+              🚀 Hemen Sipariş Ver
+            </Button>
+            
+            {/* Trust Badges */}
+            <div className="flex flex-wrap justify-center items-center space-x-8 text-orange-100">
+              <div className="flex items-center space-x-2">
+                <span className="text-green-400">✅</span>
+                <span>Ücretsiz Teslimat</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-green-400">✅</span>
+                <span>7/24 Canlı Destek</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-green-400">✅</span>
+                <span>Güvenli Ödeme</span>
               </div>
             </div>
           </div>
-        </nav>
+        </div>
+      </div>
 
         {/* Hero Content */}
         <div className="relative px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
