@@ -3988,47 +3988,43 @@ const HomePage = ({ onAuthStart }) => {
     <div className="min-h-screen bg-white">
       {/* Hero Section - Split Screen 50/50 */}
       <div className="relative overflow-hidden min-h-screen flex flex-col lg:flex-row">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center text-white">
-            {/* Logo with Brand Name */}
-            <div className="flex items-center justify-center mb-8 space-x-3">
-              <KuryeciniLogo width={60} height={60} useRealLogo={true} />
-              <h2 className="text-4xl font-bold text-white">Kuryecini</h2>
+        {/* Left Side - Customer/Order Side */}
+        <div className="relative w-full lg:w-1/2 bg-white flex items-center justify-center p-8 lg:p-16">
+          <div className="max-w-xl w-full">
+            {/* Logo */}
+            <div className="flex items-center mb-8">
+              <KuryeciniLogo width={50} height={50} useRealLogo={true} />
+              <span className="ml-3 text-2xl font-bold" style={{color: '#007bff'}}>Kuryecini</span>
             </div>
             
-            {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Yemeğin <span className="text-yellow-300">15 Dakikada</span><br />
-              <span className="text-white">Kapında!</span>
+            {/* Headline */}
+            <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{fontFamily: 'Poppins, sans-serif'}}>
+              Lezzetin Kapında: <br/>
+              Sadece <span style={{color: '#ff8800'}}>%5 Komisyonla</span><br/>
+              En Hızlı Lezzet!
             </h1>
             
             {/* Subtitle */}
-            <p className="text-xl md:text-2xl mb-12 text-orange-100 max-w-3xl mx-auto leading-relaxed">
-              Lezzetli yemekler ve market ihtiyaçların <strong>dakikalar içinde kapında.</strong><br />
-              Türkiye'nin en hızlı teslimat ağı ile tanış!
+            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+              Yüksek komisyonların fiyata yansımasına son verin. <strong>Daha uygun fiyatlarla</strong> sipariş verin.
             </p>
             
-            {/* Location Input */}
-            <div className="max-w-lg mx-auto mb-8">
-              <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl p-2 shadow-2xl">
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative bg-gray-50 rounded-xl p-2 shadow-lg border-2" style={{borderColor: '#007bff'}}>
                 <div className="flex items-center">
-                  <div className="flex-shrink-0 pl-4">
-                    <span className="text-2xl">📍</span>
-                  </div>
+                  <span className="text-2xl ml-3">📍</span>
                   <Input
                     type="text"
                     placeholder="Konumunu gir (örn: Kadıköy, İstanbul)"
                     value={locationInput}
                     onChange={(e) => setLocationInput(e.target.value)}
-                    className="flex-1 border-0 bg-transparent text-gray-900 placeholder-gray-500 text-lg py-4 px-4 focus:ring-0"
+                    className="flex-1 border-0 bg-transparent text-gray-900 placeholder-gray-500 text-base py-3 px-4 focus:ring-0"
                   />
-                  <Button className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg">
+                  <Button 
+                    className="text-white px-6 py-2 rounded-lg font-bold"
+                    style={{backgroundColor: '#007bff'}}
+                  >
                     🔍
                   </Button>
                 </div>
@@ -4038,25 +4034,74 @@ const HomePage = ({ onAuthStart }) => {
             {/* CTA Button */}
             <Button
               onClick={onAuthStart}
-              className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-gray-900 font-bold px-12 py-6 rounded-2xl text-2xl shadow-2xl transform transition-all duration-200 hover:scale-105 mb-12"
+              className="w-full text-white font-bold px-8 py-5 rounded-xl text-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              style={{backgroundColor: '#007bff'}}
             >
               🚀 Hemen Sipariş Ver
             </Button>
             
-            {/* Trust Badges */}
-            <div className="flex flex-wrap justify-center items-center space-x-8 text-orange-100">
-              <div className="flex items-center space-x-2">
-                <span className="text-green-400">✅</span>
-                <span>Ücretsiz Teslimat</span>
+            {/* Food Image Overlay (Optional - can be added later) */}
+            <div className="mt-8 text-center">
+              <img 
+                src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38" 
+                alt="Delicious food" 
+                className="rounded-2xl shadow-2xl w-full h-64 object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side - Courier Side */}
+        <div className="relative w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16" style={{backgroundColor: '#ff8800'}}>
+          <div className="max-w-xl w-full text-white">
+            {/* Headline */}
+            <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{fontFamily: 'Poppins, sans-serif'}}>
+              Taşıtın Ne Olursa Olsun,<br/>
+              Kuryecini'de <span className="bg-white text-orange-600 px-3 py-1 rounded-lg">Özgürce</span> Kazan!
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="text-xl text-white/90 mb-8 leading-relaxed">
+              <strong>Ekipman, yakıt veya fatura masrafı yok.</strong><br/>
+              Bisikletten arabaya, kendi saatlerinde çalış.
+            </p>
+            
+            {/* Benefits List */}
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start">
+                <span className="text-green-400 text-2xl mr-3">✅</span>
+                <span className="text-lg">Kendi araçınla çalış (Bisiklet, Scooter, Araba)</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-green-400">✅</span>
-                <span>7/24 Canlı Destek</span>
+              <div className="flex items-start">
+                <span className="text-green-400 text-2xl mr-3">✅</span>
+                <span className="text-lg">Sıfır ekipman ve yakıt masrafı</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-green-400">✅</span>
-                <span>Güvenli Ödeme</span>
+              <div className="flex items-start">
+                <span className="text-green-400 text-2xl mr-3">✅</span>
+                <span className="text-lg">Esnek çalışma saatleri</span>
               </div>
+              <div className="flex items-start">
+                <span className="text-green-400 text-2xl mr-3">✅</span>
+                <span className="text-lg">Yüksek kazanç potansiyeli</span>
+              </div>
+            </div>
+            
+            {/* CTA Button */}
+            <Button
+              onClick={onAuthStart}
+              className="w-full bg-white font-bold px-8 py-5 rounded-xl text-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              style={{color: '#ff8800'}}
+            >
+              🚀 Hemen Başvur
+            </Button>
+            
+            {/* Courier Image */}
+            <div className="mt-8 text-center">
+              <img 
+                src="https://images.unsplash.com/photo-1565089420718-8832a9a27d3b" 
+                alt="Happy courier" 
+                className="rounded-2xl shadow-2xl w-full h-64 object-cover"
+              />
             </div>
           </div>
         </div>
