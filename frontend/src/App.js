@@ -4578,14 +4578,17 @@ const AuthRouter = () => {
 
   // If user is authenticated, show appropriate dashboard
   if (user) {
+    const DashboardComponent = 
+      user.role === 'admin' ? <AdminPanel user={user} onLogout={logout} /> :
+      user.role === 'courier' ? <CourierDashboard user={user} onLogout={logout} /> :
+      user.role === 'business' ? <EnhancedBusinessDashboard user={user} onLogout={logout} /> :
+      <CustomerApp user={user} onLogout={logout} />;
+    
     return (
       <Routes>
-        <Route path="/" element={
-          user.role === 'admin' ? <AdminPanel user={user} onLogout={logout} /> :
-          user.role === 'courier' ? <CourierDashboard user={user} onLogout={logout} /> :
-          user.role === 'business' ? <EnhancedBusinessDashboard user={user} onLogout={logout} /> :
-          <CustomerApp user={user} onLogout={logout} />
-        } />
+        <Route path="/" element={DashboardComponent} />
+        <Route path="/dashboard" element={DashboardComponent} />
+        <Route path="/auth" element={<Navigate to="/dashboard" />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     );
