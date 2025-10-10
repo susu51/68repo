@@ -1,12 +1,28 @@
 import React from 'react';
 
-export const KuryeciniLogo = ({ size = 'medium', className = '' }) => {
+export const KuryeciniLogo = ({ size = 'medium', className = '', useRealLogo = false }) => {
   const sizeClasses = {
     small: 'w-8 h-8',
     medium: 'w-12 h-12', 
     large: 'w-20 h-20',
     xl: 'w-32 h-32'
   };
+
+  // Use real logo image if requested
+  if (useRealLogo) {
+    return (
+      <div className={`${sizeClasses[size]} ${className} relative`}>
+        <img 
+          src="/kuryecini-logo.jpg" 
+          alt="Kuryecini Logo" 
+          className="w-full h-full object-contain rounded-lg shadow-lg"
+          style={{
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={`${sizeClasses[size]} ${className} relative`}>
