@@ -271,8 +271,8 @@ backend:
   - task: "Customer Authentication for New App"
     implemented: true
     working: false
-    file: "ModernLogin.js"
-    stuck_count: 1
+    file: "ModernLogin.js, auth_cookie.py"
+    stuck_count: 2
     priority: "critical"
     needs_retesting: false
     status_history:
