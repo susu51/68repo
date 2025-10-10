@@ -159,7 +159,7 @@ async def get_current_user_from_cookie(request: Request):
 
 # Routes
 @auth_router.post("/login")
-async def login(body: LoginRequest, response: Response):
+async def login(request: Request, body: LoginRequest, response: Response):
     db = get_db()
     
     # Test users for development
