@@ -1,7 +1,8 @@
 // HTTP client utility with HttpOnly cookie support
 // NO localStorage - ALL auth via cookies
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+// HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES
+const API_BASE_URL = 'http://localhost:8001';
 
 export const api = async (path, init = {}) => {
   const url = `${API_BASE_URL}/api${path}`;
