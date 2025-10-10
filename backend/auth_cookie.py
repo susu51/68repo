@@ -161,8 +161,6 @@ async def get_current_user_from_cookie(request: Request):
 @auth_router.post("/login")
 async def login(body: LoginRequest, response: Response):
     print(f"🔍 Login attempt with email: {body.email}")
-    print(f"🔍 Request body: {await request.body()}")
-    print(f"🔍 Content-Type: {request.headers.get('content-type')}")
     db = get_db()
     
     # Test users for development
