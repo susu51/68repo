@@ -4158,6 +4158,159 @@ const HomePage = ({ onAuthStart }) => {
         </div>
       </div>
 
+      {/* Courier Recruitment Section */}
+      <div className="bg-gradient-to-br from-blue-50 via-white to-orange-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Bisiklet, Scooter veya Araba: <span className="text-orange-600">Seçim Senin!</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Kuryecini esnekliği sadece çalışma saatlerinizle sınırlamaz; 
+              <strong> hangi taşıtı kullanacağınıza da siz karar verirsiniz.</strong>
+            </p>
+          </div>
+
+          {/* Vehicle Options Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {/* Bicycle Option */}
+            <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 group">
+              <div className="relative h-64 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1620095639773-307ad7f234d6" 
+                  alt="Bisiklet ile teslimat" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+                  🚴 Bisiklet
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Klasik Bisiklet</h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span><strong>Çevreci ol</strong>, trafikte takılma</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span>Ek yakıt maliyetinden kurtul</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span><strong>Şehir merkezleri için ideal!</strong></span>
+                  </li>
+                </ul>
+              </div>
+            </Card>
+
+            {/* Scooter Option */}
+            <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 group border-2 border-orange-500 relative">
+              <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white text-center py-2 font-bold text-sm z-10">
+                ⚡ EN POPÜLER
+              </div>
+              <div className="relative h-64 overflow-hidden mt-8">
+                <img 
+                  src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc" 
+                  alt="Scooter ile teslimat" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute top-4 right-4 bg-orange-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+                  🛵 Scooter
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Elektrikli Bisiklet/Scooter</h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span><strong>Hız ve eforu dengele</strong></span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span>Daha uzun mesafelerde ideal</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span><strong>Düşük enerji maliyeti</strong></span>
+                  </li>
+                </ul>
+              </div>
+            </Card>
+
+            {/* Car Option */}
+            <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 group">
+              <div className="relative h-64 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1565089420718-8832a9a27d3b" 
+                  alt="Araba ile teslimat" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute top-4 right-4 bg-blue-800 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+                  🚗 Araba
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Kendi Arabanız</h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span><strong>Daha büyük siparişler</strong></span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span>Hava şartlarından bağımsız</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span><strong>Tam kontrol sende</strong></span>
+                  </li>
+                </ul>
+              </div>
+            </Card>
+          </div>
+
+          {/* Key Message Banner */}
+          <div className="bg-gradient-to-r from-blue-600 to-orange-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-2xl">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-5xl mb-6">🎉</div>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                Taşıtın Ne Olursa Olsun, İşin Hazır!
+              </h3>
+              <p className="text-xl mb-8 text-blue-50 leading-relaxed">
+                <strong>Unutmayın:</strong> Hangi taşıtı seçerseniz seçin, kurye masraflarını size yüklemiyoruz; 
+                siz sadece <span className="text-yellow-300 font-bold">kazancınıza odaklanıyorsunuz.</span>
+              </p>
+              <Button 
+                onClick={handleAuthStart}
+                className="bg-white text-blue-600 hover:bg-blue-50 px-10 py-6 text-xl font-bold rounded-2xl shadow-xl transform transition-all duration-200 hover:scale-105"
+              >
+                🚀 Hemen Kurye Ol
+              </Button>
+            </div>
+          </div>
+
+          {/* Benefits Footer */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div className="p-6">
+              <div className="text-4xl mb-3">⚡</div>
+              <h4 className="font-bold text-gray-900 text-lg mb-2">Esnek Çalışma</h4>
+              <p className="text-gray-600">Kendi programını kendin belirle</p>
+            </div>
+            <div className="p-6">
+              <div className="text-4xl mb-3">💰</div>
+              <h4 className="font-bold text-gray-900 text-lg mb-2">Yüksek Kazanç</h4>
+              <p className="text-gray-600">Sipariş başına rekabetçi ücret</p>
+            </div>
+            <div className="p-6">
+              <div className="text-4xl mb-3">📱</div>
+              <h4 className="font-bold text-gray-900 text-lg mb-2">Kolay Kullanım</h4>
+              <p className="text-gray-600">Kullanıcı dostu kurye uygulaması</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Testimonials Section */}
       <div className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
