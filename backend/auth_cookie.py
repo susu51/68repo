@@ -87,13 +87,25 @@ def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
 # Auth dependency
-async def get_current_user_from_cookie(request: Request):
+async def get_current_user_from_cookie_or_bearer(request: Request):
+    # Try cookie first (primary method)
     token = request.cookies.get("access_token")
+    
+    # Fallback to Bearer token for development
     if not token:
-        raise HTTPException(401, "No authentication cookie")
+        auth_header = request.headers.get("authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+    
+    if not token:
+        raise HTTPException(401, "No authentication cookie or token")
     
     payload = verify_token(token)
     user_id = payload["sub"]
+
+# Keep original function for backward compatibility
+async def get_current_user_from_cookie(request: Request):
+    return await get_current_user_from_cookie_or_bearer(request)
     
     # Handle test users first (same as in login)
     test_users = {
