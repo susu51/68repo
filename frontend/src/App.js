@@ -4754,11 +4754,9 @@ const AuthRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage onAuthStart={() => setShowAuth(true)} />} />
-      <Route path="/auth" element={<ModernAuthPage />} />
       <Route path="/login" element={<AuthPage onBack={() => setShowAuth(false)} />} />
       <Route path="/customer" element={<CustomerApp user={{id: 'customer-001', role: 'customer', email: 'testcustomer@example.com'}} onLogout={() => window.location.href = '/'} />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/dashboard" element={<Navigate to="/" />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
