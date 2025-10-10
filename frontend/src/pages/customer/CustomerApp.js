@@ -10,7 +10,7 @@ import { useCart } from '../../contexts/CartContext';
 import { apiClient } from '../../utils/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
-import { KuryeciniLogo } from '../../components/ui/KuryeciniLogo';
+import { KuryeciniLogo } from '../../components/KuryeciniLogo';
 
 // FAZ 2 - Customer App with complete cart & payment flow
 export const CustomerApp = ({ user, onLogout }) => {
