@@ -236,6 +236,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
           {!loading && loginMethod === 'email' && (
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div>
+                <div className="flex items-center space-x-2 mb-2">
+                  <KuryeciniLogo size="small" />
+                  <span className="text-sm font-medium text-gray-700">E-posta ile Giriş</span>
+                </div>
                 <Input
                   type="email"
                   placeholder="ornek@email.com"
