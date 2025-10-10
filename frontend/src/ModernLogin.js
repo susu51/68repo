@@ -242,6 +242,17 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
           {/* Email Login Form */}
           {!loading && loginMethod === 'email' && (
             <form onSubmit={handleEmailLogin} className="space-y-4">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start space-x-2">
+                  <span className="text-red-600 text-lg">⚠️</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-800">Giriş Hatası</p>
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                </div>
+              )}
+              
               <div>
                 <div className="flex items-center space-x-2 mb-2">
                   <KuryeciniLogo size="small" />
@@ -251,9 +262,12 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                   type="email"
                   placeholder="ornek@email.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) => {
+                    setFormData({...formData, email: e.target.value});
+                    setError(''); // Clear error on input change
+                  }}
                   required
-                  className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                  className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm ${error ? 'border-red-300' : ''}`}
                 />
               </div>
               <div>
@@ -261,9 +275,12 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                   type="password"
                   placeholder="Şifreniz"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) => {
+                    setFormData({...formData, password: e.target.value});
+                    setError(''); // Clear error on input change
+                  }}
                   required
-                  className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                  className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm ${error ? 'border-red-300' : ''}`}
                 />
               </div>
               
