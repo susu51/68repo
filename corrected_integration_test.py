@@ -17,7 +17,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
+BACKEND_URL = "https://address-manager-5.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 class CorrectedIntegrationTester:

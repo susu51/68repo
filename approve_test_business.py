@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BACKEND_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
+BACKEND_URL = "https://address-manager-5.preview.emergentagent.com/api"
 ADMIN_CREDENTIALS = {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}
 
 def approve_test_business():

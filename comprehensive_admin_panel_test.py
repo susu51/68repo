@@ -25,7 +25,7 @@ from datetime import datetime, timedelta
 import uuid
 
 # Configuration
-BASE_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
+BASE_URL = "https://address-manager-5.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@kuryecini.com"
 ADMIN_PASSWORD = "KuryeciniAdmin2024!"
 

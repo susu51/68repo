@@ -6,7 +6,7 @@ Debug Business ID Mismatch Issue
 import requests
 import json
 
-BACKEND_URL = "https://kuryecini-auth.preview.emergentagent.com/api"
+BACKEND_URL = "https://address-manager-5.preview.emergentagent.com/api"
 
 # Login as business
 business_response = requests.post(

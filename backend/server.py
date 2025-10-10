@@ -616,7 +616,7 @@ if not cors_origins:
         "http://localhost:3000",
         "http://localhost:5173", 
         "https://*.vercel.app",
-        "https://kuryecini-auth.preview.emergentagent.com"
+        "https://address-manager-5.preview.emergentagent.com"
     ]
 
 app.add_middleware(
