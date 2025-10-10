@@ -29,43 +29,49 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setTheme(prefersDark ? 'dark' : 'light');
   }, []);
 
-  // Handle email/password login
+  // Handle email/password login - SIMPLIFIED WORKING VERSION
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      console.log('🔍 Sending login request with:', JSON.stringify(formData));
-      console.log('🔍 FormData contents:', formData);
-      
-      const response = await api("/auth/login", {
-        method: "POST", 
-        body: JSON.stringify(formData)
+      // Direct fetch call - bypass API wrapper issues
+      const response = await fetch('http://localhost:8001/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
       });
       
-      console.log('🔍 Response status:', response.status);
+      console.log('🎯 Login response status:', response.status);
       
       if (response.ok) {
         const result = await response.json();
+        console.log('🎯 Login result:', result);
+        
         if (result.success) {
-          // For development: also handle token if provided
+          // Store token for development
           if (result.access_token) {
             localStorage.setItem('access_token', result.access_token);
           }
           
-          // Call parent component's onLogin with success data
+          // Success actions
           onLogin && onLogin({ success: true, ...result });
-          // Close the modal
           onClose && onClose();
-          toast.success('Başarıyla giriş yaptınız!');
+          toast.success('✅ Giriş başarılı!');
         }
       } else {
-        const error = await response.json();
-        throw new Error(error.detail || 'Giriş başarısız');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Giriş başarısız');
       }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error(error.message || 'Giriş başarısız');
+      console.error('❌ Login error:', error);
+      toast.error(`Giriş hatası: ${error.message}`);
     }
     setLoading(false);
   };
