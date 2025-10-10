@@ -224,11 +224,53 @@ export const CustomerApp = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Main Content */}
-      <div className="flex-1 pb-20"> {/* Bottom padding for tab bar */}
-        {renderCurrentView()}
+    <div className="min-h-screen bg-gray-50">
+      {/* Top Navigation Header */}
+      <div className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo and Brand */}
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <KuryeciniLogo size="medium" useRealLogo={true} />
+                <KuryeciniLogo size="small" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                  Kuryecini
+                </h1>
+                <p className="text-xs text-gray-500">Müşteri Paneli</p>
+              </div>
+            </div>
+            
+            {/* User Info and Logout */}
+            <div className="flex items-center space-x-4">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.first_name || user?.email || 'Kullanıcı'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {cartSummary.itemCount} ürün • ₺{cartSummary.total}
+                </p>
+              </div>
+              <Button
+                onClick={onLogout}
+                variant="ghost"
+                size="sm"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Çıkış
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div className="flex flex-col">
+        {/* Main Content */}
+        <div className="flex-1 pb-20"> {/* Bottom padding for tab bar */}
+          {renderCurrentView()}
+        </div>
 
       {/* Bottom Tab Navigation - Only show on main tabs, not on sub-pages */}
       {['discover', 'cart', 'orders', 'profile'].includes(activeView) && (
