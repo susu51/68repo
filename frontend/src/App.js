@@ -4449,12 +4449,7 @@ const AuthPage = ({ onBack }) => {
                 ✨ Modern giriş ekranını dene
               </button>
               
-              <button
-                onClick={() => setShowSimpleLogin(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-              >
-                🚀 Basit Test Giriş
-              </button>
+              {/* Basit test giriş butonu kaldırıldı */}
             </div>
           </div>
         </div>
