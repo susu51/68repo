@@ -11,6 +11,7 @@ import { api } from './api/http';  // Use cookie-aware API client
 export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
   const [loginMethod, setLoginMethod] = useState('email');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: ''
