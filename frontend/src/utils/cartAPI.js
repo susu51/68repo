@@ -67,11 +67,7 @@ class CartAPI {
   // Sepeti temizle
   static async clearCart() {
     try {
-      // Token management via cookie authentication - no localStorage
-      if (!token) {
-        console.log('⚠️ No token, cannot clear cart from DB');
-        return true;
-      }
+      // Cookie authentication - no token needed
 
       const response = await fetch(`${API}/customer/cart`, {
         method: 'DELETE',
