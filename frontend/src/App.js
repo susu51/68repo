@@ -3986,8 +3986,8 @@ const HomePage = ({ onAuthStart }) => {
   
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 min-h-screen flex items-center">
+      {/* Hero Section - Split Screen 50/50 */}
+      <div className="relative overflow-hidden min-h-screen flex flex-col lg:flex-row">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
