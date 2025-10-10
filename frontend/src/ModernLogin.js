@@ -43,9 +43,13 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          // Cookies are automatically set by backend
+          // For development: also handle token if provided
+          if (result.access_token) {
+            localStorage.setItem('access_token', result.access_token);
+          }
+          
           // Call parent component's onLogin with success data
-          onLogin && onLogin({ success: true });
+          onLogin && onLogin({ success: true, ...result });
           // Close the modal
           onClose && onClose();
           toast.success('Başarıyla giriş yaptınız!');
