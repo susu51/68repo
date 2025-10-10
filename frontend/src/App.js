@@ -15,6 +15,7 @@ import { CustomerProfile } from "./CustomerProfile";
 import { CustomerApp } from "./pages/customer/CustomerApp";
 import PhoneAuth from "./PhoneAuth";
 import { ModernLogin } from "./ModernLogin";
+import SimpleLogin from "./SimpleLogin";
 import { KuryeciniTextLogo, KuryeciniLogo } from "./components/KuryeciniLogo";
 import { AdCarousel } from "./components/AdCarousel";
 import { LocationControls } from "./components/LocationControls";
