@@ -240,6 +240,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
               <button 
                 type="submit" 
                 disabled={loading}
+                onClick={(e) => {
+                  console.log('🚨 Button clicked!');
+                  // Don't preventDefault here, let form submit
+                }}
                 className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 disabled:opacity-50"
               >
                 🚀 Giriş Yap
