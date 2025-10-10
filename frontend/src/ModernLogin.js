@@ -35,12 +35,15 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setLoading(true);
 
     try {
-      console.log('🔍 Sending login request with:', formData);
+      console.log('🔍 Sending login request with:', JSON.stringify(formData));
+      console.log('🔍 FormData contents:', formData);
+      
       const response = await api("/auth/login", {
-        method: "POST",
+        method: "POST", 
         body: JSON.stringify(formData)
       });
-      console.log('🔍 Login response status:', response.status);
+      
+      console.log('🔍 Response status:', response.status);
       
       if (response.ok) {
         const result = await response.json();
