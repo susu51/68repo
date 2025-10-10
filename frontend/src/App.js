@@ -4401,6 +4401,16 @@ const AuthPage = ({ onBack }) => {
   };
 
   if (step === 'login') {
+    if (showSimpleLogin) {
+      return (
+        <SimpleLogin 
+          onLogin={login}
+          onRegisterClick={() => setStep('user_type_selection')}
+          onClose={() => setShowSimpleLogin(false)}
+        />
+      );
+    }
+    
     if (showModernLogin) {
       // Expose forgot password function
       window.showForgotPassword = () => setShowForgotPassword(true);
