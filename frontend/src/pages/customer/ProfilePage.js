@@ -191,7 +191,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const loadTabData = async (tab) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
 
       if (!token) {
         // No token - show empty data
@@ -238,7 +238,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
 
       if (!token) {
         toast.success('Profil bilgileri kaydedildi!');
@@ -273,7 +273,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       }
 
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
 
       await axios.post(`${API}/api/auth/change-password`, {
         current_password: passwordData.currentPassword,
@@ -304,7 +304,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleAddPaymentMethod = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
 
       await axios.post(`${API}/api/payment-methods`, newPaymentMethod, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -406,7 +406,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
 
   const handleUpdateNotificationSettings = async (newSettings) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
 
       await axios.patch(`${API}/api/user/notification-settings`, newSettings, {
         headers: { 'Authorization': `Bearer ${token}` }
