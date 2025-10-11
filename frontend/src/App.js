@@ -4783,8 +4783,11 @@ function App() {
   };
 
   const handleLoginSuccess = (userData) => {
+    console.log('🎯 handleLoginSuccess called with:', userData);
+    console.log('🎯 About to call setShowLogin(false)');
     setShowLogin(false);
-    alert('✅ Giriş başarılı! Hoş geldin ' + userData.first_name);
+    console.log('🎯 setShowLogin(false) called');
+    alert('✅ Giriş başarılı! Hoş geldin ' + (userData.user?.first_name || userData.first_name || 'kullanıcı'));
     console.log('Login successful:', userData);
   };
 
