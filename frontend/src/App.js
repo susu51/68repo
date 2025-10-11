@@ -40,7 +40,7 @@ import toast, { Toaster } from 'react-hot-toast';
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 // Console log for debugging
-console.log('Frontend connecting to:', API);
+console.log('Frontend connecting to:', API_BASE);
 
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
