@@ -115,6 +115,20 @@
 user_problem_statement: "CRITICAL SYSTEM ANALYSIS - Multiple Location & Integration Issues: User reports 4 critical problems: 1) Business Registration City Issue - cities defaulting to İstanbul, 2) Menu Visibility Issue - restaurant menus not showing to customers, 3) Address Registration Issue - city/district saving incorrectly, 4) Discovery Filtering Issue - location-based restaurant filtering not working"
 
 backend:
+  - task: "Business Menu Product Creation Endpoint"
+    implemented: true
+    working: false
+    file: "routes/business.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "TESTING REQUEST: Test POST /business/menu endpoint with business@kuryecini.com/business123 credentials and payload: {'name': 'Test Pizza', 'description': 'Delicious test pizza', 'price': 50.00, 'category': 'food', 'preparation_time': 15, 'is_available': True}"
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL AUTHENTICATION MISMATCH IDENTIFIED: Business menu creation endpoint POST /business/menu is failing with 401 'Invalid token' despite successful business login. ROOT CAUSE: Authentication system mismatch between cookie-based auth (auth_cookie.py) used for login and JWT-based auth (auth_dependencies.py) used by business routes. Business login successful (business@kuryecini.com, ID: 3558f70b-8216-474a-aabe-4523b8f1dc05) but business routes cannot validate the cookie-based JWT tokens. The business routes use get_approved_business_user dependency which requires KYC approval, but business user has unknown KYC status. TECHNICAL DETAILS: 1) Login via /api/auth/login returns 200 OK with proper cookies, 2) POST /api/business/menu returns 401 'Invalid token', 3) Business user exists but has kyc_status: unknown, is_active: false, 4) Admin approval also failing with 403 Forbidden. SOLUTION NEEDED: Fix authentication system compatibility between cookie auth and business route dependencies, or approve business user KYC status manually."
   - task: "FAZ 1 - Admin Order Management API"
     implemented: true
     working: true
