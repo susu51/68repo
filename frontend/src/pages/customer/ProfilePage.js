@@ -279,7 +279,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
         current_password: passwordData.currentPassword,
         new_password: passwordData.newPassword
       }, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Şifre başarıyla değiştirildi!');
