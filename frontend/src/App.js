@@ -4789,18 +4789,35 @@ function App() {
   };
 
   return (
-    <CookieAuthProvider>
-      <div className="App">
-        <LandingPage onAuthStart={handleAuthStart} />
-        
-        {showLogin && (
-          <ModernLogin 
-            onClose={() => setShowLogin(false)}
-            onLoginSuccess={handleLoginSuccess}
-          />
-        )}
-      </div>
-    </CookieAuthProvider>
+    <div className="App">
+      <LandingPage onAuthStart={handleAuthStart} />
+      
+      {showLogin && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '10px',
+            minWidth: '400px'
+          }}>
+            <h2>Registration Coming Soon</h2>
+            <p>Backend API is ready, integrating with beautiful UI...</p>
+            <button onClick={() => setShowLogin(false)}>Close</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
