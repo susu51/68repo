@@ -86,11 +86,11 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       
       if (editingAddress) {
         // Update existing address
-        await apiClient.put(`/user/addresses/${editingAddress.id}`, addressData);
+        await api.put(`/user/addresses/${editingAddress.id}`, addressData);
         toast.success('Adres başarıyla güncellendi');
       } else {
         // Create new address
-        await apiClient.post('/user/addresses', addressData);
+        await api.post('/user/addresses', addressData);
         toast.success('Adres başarıyla eklendi');
       }
       
@@ -147,7 +147,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
     
     try {
       setLoading(true);
-      await apiClient.delete(`/user/addresses/${addressId}`);
+      await api.delete(`/user/addresses/${addressId}`);
       toast.success('Adres başarıyla silindi');
       loadTabData('addresses');
     } catch (error) {
@@ -161,7 +161,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleSetDefaultAddress = async (addressId) => {
     try {
       setLoading(true);
-      await apiClient.post(`/user/addresses/${addressId}/set-default`);
+      await api.post(`/user/addresses/${addressId}/set-default`);
       toast.success('Varsayılan adres güncellendi');
       loadTabData('addresses');
     } catch (error) {
@@ -202,7 +202,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       switch (tab) {
         case 'addresses':
           console.log('📡 ProfilePage: Loading addresses from /user/addresses...');
-          const addressesRes = await apiClient.get('/user/addresses');
+          const addressesRes = await api.get('/user/addresses');
           console.log('📊 ProfilePage: Addresses response:', addressesRes.data?.length || 0, 'addresses');
           setUserAddresses(addressesRes.data || []);
           break;
@@ -336,8 +336,8 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleAddAddress = async () => {
     try {
       console.log('🔄 ProfilePage Address Save Debug:');
-      console.log('  - apiClient token:', apiClient.getToken()?.substring(0, 20) + '...');
-      console.log('  - apiClient authenticated:', apiClient.isAuthenticated());
+      console.log('  - api token:', api.getToken()?.substring(0, 20) + '...');
+      console.log('  - api authenticated:', api.isAuthenticated());
       console.log('  - New address data:', newAddress);
 
       if (!newAddress.label || !newAddress.city) {
@@ -359,7 +359,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
 
       console.log('📤 Making POST request to /user/addresses...');
       console.log('📋 Final address data:', addressData);
-      const response = await apiClient.post('/user/addresses', addressData);
+      const response = await api.post('/user/addresses', addressData);
       console.log('✅ Address creation response:', response);
 
       toast.success('Adres başarıyla eklendi!');
