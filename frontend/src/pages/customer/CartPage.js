@@ -50,7 +50,7 @@ const CartPage = ({ onBack, onProceedToPayment, user }) => {
   };
 
   const handleApplyCoupon = () => {
-    // Mock coupon logic
+    // Demo coupon logic
     if (couponCode.toLowerCase() === 'indirim20') {
       const discountAmount = cartSummary.subtotal * 0.20;
       setAppliedCoupon({
