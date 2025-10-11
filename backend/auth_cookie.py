@@ -15,7 +15,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 # Environment configuration
-JWT_SECRET = os.environ.get("JWT_SECRET", "your-secret-key-here")
+JWT_SECRET = os.environ.get("JWT_SECRET", "kuryecini_secret_key_2024")
 ACCESS_TTL = 15 * 60        # 15 minutes
 REFRESH_TTL = 7 * 24*60*60  # 7 days
 
