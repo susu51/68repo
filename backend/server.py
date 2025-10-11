@@ -608,22 +608,15 @@ async def log_requests(request: Request, call_next):
     
     return response
 
-# Configure CORS from environment
-cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
-if not cors_origins:
-    # Fallback origins for development
-    cors_origins = [
-        "http://localhost:3000",
-        "http://localhost:5173", 
-        "https://*.vercel.app",
-        "https://quickcourier.preview.emergentagent.com"
-    ]
+    # CORS origins from environment
+    cors_origins_env = os.getenv("CORS_ORIGINS", "https://quickcourier.preview.emergentagent.com")
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
