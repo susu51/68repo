@@ -16,7 +16,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001'
 const API = `${BACKEND_URL}/api`;
 
 export const BusinessDashboard = ({ user, onLogout }) => {
-  const { isAuthenticated, token } = useAuth();
+  const { user: cookieUser } = useCookieAuth();  // Get user from cookie auth context
   // Navigation state
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(false);
