@@ -284,7 +284,7 @@ const AdminDashboard = ({ user }) => {
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
     setIsDarkMode(newTheme);
-    localStorage.setItem('admin_theme', newTheme ? 'dark' : 'light');
+    // CI GATE 0 COMPLIANCE - NO localStorage persistence
   };
 
   const getThemeClass = () => {
