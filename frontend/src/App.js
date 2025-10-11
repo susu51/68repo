@@ -4784,11 +4784,25 @@ function App() {
 
   const handleLoginSuccess = (userData) => {
     console.log('🎯 handleLoginSuccess called with:', userData);
-    console.log('🎯 About to call setShowLogin(false)');
+    
+    // Force close modal with multiple methods
     setShowLogin(false);
-    console.log('🎯 setShowLogin(false) called');
+    
+    // Force DOM removal as backup
+    setTimeout(() => {
+      const modalElement = document.querySelector('[style*="position: fixed"]');
+      if (modalElement) {
+        modalElement.remove();
+        console.log('🎯 Modal force-removed from DOM');
+      }
+    }, 500);
+    
     alert('✅ Giriş başarılı! Hoş geldin ' + (userData.user?.first_name || userData.first_name || 'kullanıcı'));
-    console.log('Login successful:', userData);
+    
+    // Optional: Refresh page to complete login state
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   return (
