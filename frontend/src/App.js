@@ -4790,16 +4790,18 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <LandingPage onAuthStart={handleAuthStart} />
-      
-      {showLogin && (
-        <ModernLogin 
-          onClose={() => setShowLogin(false)}
-          onLoginSuccess={handleLoginSuccess}
-        />
-      )}
-    </div>
+    <CookieAuthProvider>
+      <div className="App">
+        <LandingPage onAuthStart={handleAuthStart} />
+        
+        {showLogin && (
+          <ModernLogin 
+            onClose={() => setShowLogin(false)}
+            onLoginSuccess={handleLoginSuccess}
+          />
+        )}
+      </div>
+    </CookieAuthProvider>
   );
 }
 
