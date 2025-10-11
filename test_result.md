@@ -1387,14 +1387,10 @@ frontend:
 
 test_plan:
   current_focus:
-    - "CRITICAL - Business Registration City Issue Investigation"
-    - "CRITICAL - Menu Visibility Issue Investigation"
-    - "CRITICAL - Address Registration Issue Investigation"
-    - "CRITICAL - Discovery Filtering Issue Investigation"
-  stuck_tasks:
-    - "Address Registration Issue - District Field Bug (FIXED)"
+    - "Customer Registration Frontend Integration"
+  stuck_tasks: []
   test_all: false
-  test_priority: "critical_first"
+  test_priority: "high_first"
 
 agent_communication:
     -agent: "main"
