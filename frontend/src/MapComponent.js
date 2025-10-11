@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 
-// Simple Map Component (Mock için)
+// Simple Map Component (CI GATE 0 Compliant)
 const MapComponent = ({ 
   center = { lat: 41.0082, lng: 28.9784 }, // İstanbul default
   zoom = 12,
