@@ -82,8 +82,8 @@ class AuthenticationTester:
                 
         except Exception as e:
             self.log_test("POST /api/auth/register - New User Registration", False, f"Exception: {str(e)}")
-    
-    def test_cross_origin_cookie_verification(self):
+            
+    def test_auth_login(self):
         """Test 2: Cross-Origin Cookie Verification"""
         print("\n🌐 TEST 2: Cross-Origin Cookie Verification")
         
