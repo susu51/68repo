@@ -137,8 +137,8 @@ class AuthenticationTester:
                     
             except Exception as e:
                 self.log_test(f"POST /api/auth/login - {cred_name}", False, f"Exception: {str(e)}")
-    
-    def test_complete_authentication_flow(self):
+                
+    def test_auth_me(self):
         """Test 3: Complete Authentication Flow"""
         print("\n🔄 TEST 3: Complete Authentication Flow")
         
