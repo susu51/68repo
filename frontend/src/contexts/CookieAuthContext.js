@@ -48,7 +48,7 @@ export const CookieAuthProvider = ({ children }) => {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.detail || 'Login failed');
+        throw new Error(error.detail || error.message || 'Login failed');
       }
 
       // Get user data after successful login
@@ -61,7 +61,8 @@ export const CookieAuthProvider = ({ children }) => {
       return { success: true, user: userData };
     } catch (error) {
       console.error('❌ Login failed:', error);
-      throw error;
+      // Return error in a format that UI can handle
+      return { success: false, error: error.message || 'Login failed' };
     }
   };
 
