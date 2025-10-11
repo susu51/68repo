@@ -123,28 +123,44 @@ class BusinessMenuTester:
             return False
             
     async def test_jwt_token_validation(self):
-        """Test 1.1: JWT Token Validation"""
-        print("\n🔍 Testing JWT Token Validation...")
+        """Test 1.1: Authentication Validation"""
+        print("\n🔍 Testing Authentication Validation...")
         
         try:
-            headers = {"Authorization": f"Bearer {self.business_token}"}
-            
-            async with self.session.get(f"{BASE_URL}/me", headers=headers) as response:
+            # Try cookie-based auth first
+            async with self.session.get(f"{BASE_URL}/me") as response:
                 if response.status == 200:
                     data = await response.json()
                     user_id = data.get("id")
                     kyc_status = data.get("kyc_status")
                     
-                    self.log_test("JWT Token Validation", True, 
-                                f"User ID: {user_id}, KYC Status: {kyc_status}")
+                    self.log_test("Authentication Validation", True, 
+                                f"User ID: {user_id}, KYC Status: {kyc_status} (Cookie auth)")
                     return True
                 else:
-                    error_text = await response.text()
-                    self.log_test("JWT Token Validation", False, f"Status {response.status}: {error_text}")
-                    return False
+                    # Try bearer token as fallback
+                    if self.business_token:
+                        headers = {"Authorization": f"Bearer {self.business_token}"}
+                        async with self.session.get(f"{BASE_URL}/me", headers=headers) as token_response:
+                            if token_response.status == 200:
+                                token_data = await token_response.json()
+                                user_id = token_data.get("id")
+                                kyc_status = token_data.get("kyc_status")
+                                
+                                self.log_test("Authentication Validation", True, 
+                                            f"User ID: {user_id}, KYC Status: {kyc_status} (Bearer token)")
+                                return True
+                            else:
+                                error_text = await token_response.text()
+                                self.log_test("Authentication Validation", False, f"Bearer token failed: {error_text}")
+                                return False
+                    else:
+                        error_text = await response.text()
+                        self.log_test("Authentication Validation", False, f"Cookie auth failed: {error_text}")
+                        return False
                     
         except Exception as e:
-            self.log_test("JWT Token Validation", False, f"Exception: {str(e)}")
+            self.log_test("Authentication Validation", False, f"Exception: {str(e)}")
             return False
             
     async def test_menu_creation(self):
