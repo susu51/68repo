@@ -39,7 +39,11 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setError(''); // Clear previous errors
 
     try {
-      console.log('🎯 Attempting login via context...');
+      console.log('🎯 Attempting login via context...', { email: formData.email, contextLogin: !!contextLogin });
+      
+      if (!contextLogin) {
+        throw new Error('Context login function not available');
+      }
       
       // Use context's login method - this properly updates auth state
       const result = await contextLogin(formData.email, formData.password);
