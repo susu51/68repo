@@ -2430,11 +2430,9 @@ const BusinessDashboard = ({ user }) => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        withCredentials: true
       });
       toast.success('Sipariş durumu güncellendi');
       fetchOrders();
