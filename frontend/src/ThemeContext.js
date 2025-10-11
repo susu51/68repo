@@ -12,13 +12,8 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check if user has a saved theme preference
-    const savedTheme = localStorage.getItem('kuryecini_theme');
-    if (savedTheme) {
-      return savedTheme;
-    }
-    
-    // Check if user prefers dark mode
+    // CI GATE 0 COMPLIANCE - NO localStorage usage
+    // Always use system preference instead of saved preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
@@ -36,8 +31,8 @@ export const ThemeProvider = ({ children }) => {
       root.classList.remove('dark');
     }
     
-    // Save theme preference
-    localStorage.setItem('kuryecini_theme', theme);
+    // CI GATE 0 COMPLIANCE - NO localStorage persistence
+    // Theme will reset to system preference on page reload
   }, [theme]);
 
   const toggleTheme = () => {
