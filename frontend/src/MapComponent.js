@@ -40,13 +40,13 @@ const MapComponent = ({
   };
 
   const handleMapClick = (event) => {
-    // Mock map click - gerçek haritada bu event'den koordinat alınır
-    const mockLocation = {
+    // Simulate map click - in real implementation this gets coordinates from map event
+    const demoLocation = {
       lat: center.lat + (Math.random() - 0.5) * 0.01,
       lng: center.lng + (Math.random() - 0.5) * 0.01
     };
     
-    setSelectedLocation(mockLocation);
+    setSelectedLocation(demoLocation);
     if (onLocationSelect) {
       onLocationSelect(mockLocation);
     }
