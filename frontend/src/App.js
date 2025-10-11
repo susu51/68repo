@@ -4774,7 +4774,7 @@ const AuthPage = ({ onBack }) => {
   return null;
 };
 
-// Main App Component - Simplified for Original Landing Page
+// Main App Component - Modern Login Integration
 function App() {
   const [showLogin, setShowLogin] = useState(false);
 
@@ -4784,114 +4784,23 @@ function App() {
 
   const handleLoginSuccess = (userData) => {
     setShowLogin(false);
-    // Handle successful login
+    alert('✅ Giriş başarılı! Hoş geldin ' + userData.first_name);
     console.log('Login successful:', userData);
   };
 
   return (
-    <div className="App">
-      <LandingPage onAuthStart={handleAuthStart} />
-      
-      {showLogin && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '15px',
-            minWidth: '420px',
-            maxWidth: '500px',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-          }}>
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ color: '#333', marginBottom: '0.5rem', fontSize: '1.5rem' }}>🚀 Kuryecini'ye Kayıt Ol</h2>
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>Hızlı teslimat için ücretsiz hesap oluştur</p>
-            </div>
-            
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target);
-              const registrationData = {
-                email: formData.get('email'),
-                password: formData.get('password'),
-                first_name: formData.get('first_name'),
-                last_name: formData.get('last_name'),
-                role: 'customer'
-              };
-              
-              try {
-                const response = await fetch(`${API_BASE}/auth/register?role=customer`, {
-                  method: 'POST',
-                  credentials: 'include',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(registrationData)
-                });
-                
-                const result = await response.json();
-                if (response.ok) {
-                  alert('✅ Kayıt başarılı! Hoş geldin ' + registrationData.first_name);
-                  setShowLogin(false);
-                } else {
-                  alert('❌ Kayıt hatası: ' + result.detail);
-                }
-              } catch (error) {
-                alert('❌ Bağlantı hatası: ' + error.message);
-              }
-            }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              
-              <input name="email" type="email" placeholder="E-posta adresiniz" required style={{
-                padding: '12px 16px', border: '2px solid #e1e5e9', borderRadius: '8px',
-                fontSize: '16px', outline: 'none', transition: 'border-color 0.3s'
-              }} />
-              
-              <input name="password" type="password" placeholder="Şifreniz (min. 6 karakter)" required minLength={6} style={{
-                padding: '12px 16px', border: '2px solid #e1e5e9', borderRadius: '8px',
-                fontSize: '16px', outline: 'none'
-              }} />
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <input name="first_name" type="text" placeholder="Adınız" required style={{
-                  padding: '12px 16px', border: '2px solid #e1e5e9', borderRadius: '8px',
-                  fontSize: '16px', outline: 'none'
-                }} />
-                <input name="last_name" type="text" placeholder="Soyadınız" required style={{
-                  padding: '12px 16px', border: '2px solid #e1e5e9', borderRadius: '8px',
-                  fontSize: '16px', outline: 'none'
-                }} />
-              </div>
-              
-              <button type="submit" style={{
-                background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)',
-                color: 'white', border: 'none', padding: '14px 24px', borderRadius: '8px',
-                fontWeight: '600', fontSize: '16px', cursor: 'pointer',
-                transition: 'transform 0.2s ease'
-              }}>
-                🚀 Kayıt Ol
-              </button>
-            </form>
-            
-            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-              <button onClick={() => setShowLogin(false)} style={{
-                background: 'transparent', border: 'none', color: '#666',
-                cursor: 'pointer', fontSize: '14px'
-              }}>
-                Vazgeç
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <CookieAuthProvider>
+      <div className="App">
+        <LandingPage onAuthStart={handleAuthStart} />
+        
+        {showLogin && (
+          <ModernLogin 
+            onClose={() => setShowLogin(false)}
+            onLoginSuccess={handleLoginSuccess}
+          />
+        )}
+      </div>
+    </CookieAuthProvider>
   );
 }
 
