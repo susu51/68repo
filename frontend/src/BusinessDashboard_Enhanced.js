@@ -12,8 +12,8 @@ import { Label } from './components/ui/label';
 import { Textarea } from './components/ui/textarea';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-const API = `${BACKEND_URL}/api`;
+// Use new VITE environment variable
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export const BusinessDashboard = ({ user, onLogout }) => {
   const { user: cookieUser } = useCookieAuth();  // Get user from cookie auth context
