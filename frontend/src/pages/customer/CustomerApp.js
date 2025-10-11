@@ -31,7 +31,7 @@ export const CustomerApp = ({ user, onLogout }) => {
     console.log('  - Auth context token exists:', !!token);
     console.log('  - Auth context token length:', token?.length);
     console.log('  - User:', user?.email);
-    console.log('  - apiClient token before:', apiClient.getToken()?.substring(0, 20) + '...');
+    console.log('  - api token before:', api.getToken()?.substring(0, 20) + '...');
     
     // Try to get token from multiple sources
     let workingToken = token;
@@ -46,9 +46,9 @@ export const CustomerApp = ({ user, onLogout }) => {
     }
     
     if (workingToken) {
-      apiClient.setToken(workingToken);
-      console.log('  ✅ Token set to apiClient');
-      console.log('  - apiClient token after:', apiClient.getToken()?.substring(0, 20) + '...');
+      api.setToken(workingToken);
+      console.log('  ✅ Token set to api');
+      console.log('  - api token after:', api.getToken()?.substring(0, 20) + '...');
       console.log('  - Working token source:', token ? 'AuthContext' : 'localStorage');
     } else {
       console.log('  ❌ No token available from any source - user needs to login');
