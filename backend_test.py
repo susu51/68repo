@@ -90,60 +90,67 @@ class AuthenticationTester:
             
         return False
             
-    def test_auth_login(self):
-        """Test POST /api/auth/login endpoint with cookie validation"""
-        print("\n🔐 TESTING AUTHENTICATION LOGIN")
+    def test_customer_login(self):
+        """Test POST /api/auth/login with newly registered credentials"""
+        print("\n🔐 TESTING CUSTOMER LOGIN (POST /api/auth/login)")
         
-        # Test with existing customer credentials
-        for cred_name, credentials in TEST_CREDENTIALS.items():
-            try:
-                response = self.session.post(f"{API_BASE}/auth/login", json=credentials)
+        # Test login with the newly registered customer credentials
+        login_credentials = {
+            "email": TEST_CREDENTIALS["new_customer"]["email"],
+            "password": TEST_CREDENTIALS["new_customer"]["password"]
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/login", json=login_credentials)
+            
+            if response.status_code == 200:
+                data = response.json()
                 
-                if response.status_code == 200:
-                    data = response.json()
+                # Check response structure
+                if data.get("success") and data.get("user"):
+                    user_data = data["user"]
                     
-                    # Check response structure
-                    if data.get("success") and data.get("user"):
-                        user_data = data["user"]
+                    # Validate user data structure
+                    required_fields = ["id", "email", "role"]
+                    missing_fields = [field for field in required_fields if field not in user_data]
+                    
+                    if not missing_fields:
+                        # Check cookies
+                        cookies = response.cookies
+                        has_access_token = 'access_token' in cookies
+                        has_refresh_token = 'refresh_token' in cookies
                         
-                        # Validate user data structure
-                        required_fields = ["id", "email", "role"]
-                        missing_fields = [field for field in required_fields if field not in user_data]
+                        # Store cookies for subsequent tests
+                        if has_access_token:
+                            self.cookies['access_token'] = cookies['access_token']
+                        if has_refresh_token:
+                            self.cookies['refresh_token'] = cookies['refresh_token']
                         
-                        if not missing_fields:
-                            # Check cookies
-                            cookies = response.cookies
-                            has_access_token = 'access_token' in cookies
-                            has_refresh_token = 'refresh_token' in cookies
-                            
-                            # Store cookies for subsequent tests
-                            if has_access_token:
-                                self.cookies['access_token'] = cookies['access_token']
-                            if has_refresh_token:
-                                self.cookies['refresh_token'] = cookies['refresh_token']
-                            
-                            cookie_details = f"Cookies: access_token={has_access_token}, refresh_token={has_refresh_token}"
-                            user_details = f"User: {user_data['email']} (Role: {user_data['role']}, ID: {user_data['id']})"
-                            
-                            self.log_test(f"POST /api/auth/login - {cred_name}", True, 
-                                        f"{user_details}, {cookie_details}")
-                        else:
-                            self.log_test(f"POST /api/auth/login - {cred_name}", False, 
-                                        f"Missing user fields: {missing_fields}", data)
+                        cookie_details = f"Cookies: access_token={has_access_token}, refresh_token={has_refresh_token}"
+                        user_details = f"User: {user_data['email']} (Role: {user_data['role']}, ID: {user_data['id']})"
+                        
+                        self.log_test("POST /api/auth/login - New Customer Login", True, 
+                                    f"{user_details}, {cookie_details}")
+                        return True
                     else:
-                        self.log_test(f"POST /api/auth/login - {cred_name}", False, 
-                                    f"Invalid response structure: {data}", data)
-                        
-                elif response.status_code == 401:
-                    data = response.json()
-                    self.log_test(f"POST /api/auth/login - {cred_name}", False, 
-                                f"Authentication failed: {data.get('detail', 'Invalid credentials')}", data)
+                        self.log_test("POST /api/auth/login - New Customer Login", False, 
+                                    f"Missing user fields: {missing_fields}", data)
                 else:
-                    self.log_test(f"POST /api/auth/login - {cred_name}", False, 
-                                f"Unexpected status code: {response.status_code}", response.text)
+                    self.log_test("POST /api/auth/login - New Customer Login", False, 
+                                f"Invalid response structure: {data}", data)
                     
-            except Exception as e:
-                self.log_test(f"POST /api/auth/login - {cred_name}", False, f"Exception: {str(e)}")
+            elif response.status_code == 401:
+                data = response.json()
+                self.log_test("POST /api/auth/login - New Customer Login", False, 
+                            f"Authentication failed (PASSWORD FIELD MISMATCH ISSUE?): {data.get('detail', 'Invalid credentials')}", data)
+            else:
+                self.log_test("POST /api/auth/login - New Customer Login", False, 
+                            f"Unexpected status code: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_test("POST /api/auth/login - New Customer Login", False, f"Exception: {str(e)}")
+            
+        return False
                 
     def test_auth_me(self):
         """Test GET /api/auth/me endpoint"""
