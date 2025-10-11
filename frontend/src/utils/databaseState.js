@@ -226,7 +226,7 @@ export class AddressManager {
   }
 }
 
-// Cart Management (replaces localStorage)
+// Cart Management (API-based)
 export class CartManager {
   static async getCart() {
     try {
