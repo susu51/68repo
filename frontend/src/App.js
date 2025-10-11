@@ -4774,40 +4774,31 @@ const AuthPage = ({ onBack }) => {
   return null;
 };
 
-// Main App Component
+// Main App Component - Simplified for Original Landing Page
 function App() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  const handleAuthStart = () => {
+    setShowLogin(true);
+  };
+
+  const handleLoginSuccess = (userData) => {
+    setShowLogin(false);
+    // Handle successful login
+    console.log('Login successful:', userData);
+  };
+
   return (
-    <CookieAuthProvider>
-      <CartProvider>
-        <div className="App">
-          <BrowserRouter>
-            <AuthRouter />
-          </BrowserRouter>
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 4000,
-              iconTheme: {
-                primary: '#4aed88',
-              },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: '#ff6b6b',
-              },
-            },
-          }}
+    <div className="App">
+      <LandingPage onAuthStart={handleAuthStart} />
+      
+      {showLogin && (
+        <ModernLogin 
+          onClose={() => setShowLogin(false)}
+          onLoginSuccess={handleLoginSuccess}
         />
-        </div>
-      </CartProvider>
-    </CookieAuthProvider>
+      )}
+    </div>
   );
 }
 
