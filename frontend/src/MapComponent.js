@@ -68,7 +68,7 @@ const MapComponent = ({
               {showCurrentLocation ? 'Konumunuzu almak için tıklayın' : 'Konum seçmek için tıklayın'}
             </p>
             
-            {/* Mock markers display */}
+            {/* Markers display */}
             {markers.length > 0 && (
               <div className="mt-4">
                 <p className="text-sm font-medium">Yakındaki Noktalar:</p>
