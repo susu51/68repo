@@ -2,9 +2,54 @@
 
 **Tarama Zamanı:** 2024-12-26 GÜNCEL TARAMA  
 **Tarama Hedefi:** localStorage|sessionStorage|mock|msw|faker|__mocks__  
-**Sonuç:** ❌ BUILD FAIL - Yasaklı kalıplar tespit edildi  
+**Sonuç:** ❌ BUILD FAIL - Yasaklı kalıplar tespit edildi
 
-### ✅ MAJOR SUCCESSES:
+## TESPIT EDILEN YASAKLI KALIPLAR
+
+### 1. localStorage Kullanımları ❌
+**Toplam:** 127 tespit
+**Kritik Dosyalar:**
+- `/app/frontend/src/ThemeContext.js:16` - `localStorage.getItem('kuryecini_theme')`  
+- `/app/frontend/src/ThemeContext.js:40` - `localStorage.setItem('kuryecini_theme', theme)`
+- `/app/frontend/src/api/http.js:11` - `localStorage.getItem('access_token')`
+- `/app/frontend/src/utils/databaseState.js` - Birden fazla localStorage kullanımı
+
+### 2. mock Kullanımları ❌  
+**Toplam:** 34 tespit
+**Kritik Dosyalar:**
+- `/app/frontend/src/__tests__/App.test.js` - Jest mock kullanımları
+- `/app/frontend/src/BusinessDashboard_Enhanced.js` - Mock data yorumları  
+- `/app/frontend/src/pages/customer/Profile.js` - Mock API yorumları
+- `/app/frontend/src/MapComponent.js` - Mock map implementasyonu
+
+### 3. sessionStorage Kullanımları ❌
+**Tespit:** utils/databaseState.js içinde sessionStorage referansları
+
+## ZORUNLU DÜZELTMELER
+
+### Öncelik 1: localStorage Temizliği
+1. **ThemeContext.js** - localStorage theme storage kaldırılacak
+2. **api/http.js** - localStorage token references kaldırılacak
+3. **databaseState.js** - localStorage utilities kaldırılacak
+
+### Öncelik 2: Mock Temizliği  
+1. **Test dosyaları** - Jest mock'ları kaldırılacak veya CI'dan hariç tutulacak
+2. **Component mock comments** - Mock yorumları kaldırılacak
+3. **MapComponent.js** - Mock implementasyon gerçek implementasyona dönüştürülecak
+
+### Öncelik 3: sessionStorage Temizliği
+1. **databaseState.js** - sessionStorage referansları kaldırılacak
+
+## CI GATE 0 GEÇİŞ KRİTERLERİ
+
+✅ **Hedef:** 0 localStorage kullanımı
+✅ **Hedef:** 0 sessionStorage kullanımı  
+✅ **Hedef:** 0 mock/msw/faker/__mocks__ kalıbı (test dosyaları hariç)
+✅ **Hedef:** Tüm frontend isteklerde credentials:"include" kullanımı
+
+**Şu anki durum:** ❌ FAIL - Yukarıdaki kalıplar temizlenene kadar build geçemez
+
+### ✅ MAJOR SUCCESSES (Önceden tamamlanan):
 
 **HttpOnly Cookie Authentication System - FULLY FUNCTIONAL**
 - ✅ `/api/auth/login` - Sets HttpOnly cookies correctly
