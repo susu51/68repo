@@ -36,44 +36,9 @@ async def get_current_user(
         
         user_id = payload.get("sub")
         
-        # Handle test users (same as in main server.py)
-        test_users = {
-            "testcustomer@example.com": {
-                "id": "customer-001",
-                "email": "testcustomer@example.com", 
-                "first_name": "Test",
-                "last_name": "Customer",
-                "role": "customer",
-                "is_active": True
-            },
-            "testkurye@example.com": {
-                "id": "courier-001",
-                "email": "testkurye@example.com",
-                "first_name": "Test", 
-                "last_name": "Courier",
-                "role": "courier",
-                "is_active": True,
-                "kyc_status": "approved"
-            },
-            "testbusiness@example.com": {
-                "id": "business-001",
-                "email": "testbusiness@example.com",
-                "first_name": "Test",
-                "last_name": "Business",
-                "role": "business", 
-                "business_name": "Test Restaurant",
-                "kyc_status": "approved",
-                "is_active": True
-            }
-        }
-        
-        # Check if it's a test user
-        if user_email in test_users:
-            return test_users[user_email]
-        
-        # Import here to avoid circular imports
+        # Get user from database (no test users)
         from server import db
-        user = await db.users.find_one({"email": user_email})
+        user = await db.users.find_one({"id": user_id})
         
         if not user:
             raise HTTPException(
