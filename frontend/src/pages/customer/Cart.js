@@ -36,7 +36,7 @@ const Cart = ({ cartItems = [], onUpdateCart, onRemoveFromCart, onBack, selected
     setIsOrderProcessing(true);
 
     try {
-      // Mock API call - gerçek sipariş API'si
+      // Placeholder API call - gerçek sipariş API'si
       const orderData = {
         userId: user?.id,
         restaurantId: selectedRestaurant?.id,
