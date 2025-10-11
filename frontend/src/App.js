@@ -1935,7 +1935,7 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
 
     try {
       // CI GATE 0 COMPLIANCE - Use correct endpoint and cookie auth
-      const response = await axios.post(`${`${API_BASE}/}/auth/register?role=business`, formData, {
+      const response = await axios.post(`${API_BASE}/auth/register?role=business`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
