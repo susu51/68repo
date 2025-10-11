@@ -84,58 +84,59 @@ class AuthenticationTester:
             self.log_test("POST /api/auth/register - New User Registration", False, f"Exception: {str(e)}")
             
     def test_auth_login(self):
-        """Test 2: Cross-Origin Cookie Verification"""
-        print("\n🌐 TEST 2: Cross-Origin Cookie Verification")
+        """Test POST /api/auth/login endpoint with cookie validation"""
+        print("\n🔐 TESTING AUTHENTICATION LOGIN")
         
-        if not self.cookies_received:
-            self.log_test(
-                "Cross-origin cookie access",
-                False,
-                error="No cookies available from previous test"
-            )
-            return
-            
-        try:
-            # Test that cookies can be accessed from different localhost ports
-            # Simulate cross-origin request by manually setting cookies
-            
-            # Create a new session to simulate different origin
-            cross_origin_session = requests.Session()
-            
-            # Manually set cookies (simulating JavaScript access to non-HttpOnly cookies)
-            for cookie_name, cookie_value in self.cookies_received.items():
-                cross_origin_session.cookies.set(cookie_name, cookie_value)
-            
-            # Test GET /api/auth/me with cross-origin cookies
-            response = cross_origin_session.get(f"{API_BASE}/auth/me")
-            
-            if response.status_code == 200:
-                user_data = response.json()
-                if user_data.get('email') == TEST_CUSTOMER['email']:
-                    self.log_test(
-                        "Cross-origin cookie access",
-                        True,
-                        f"Successfully authenticated user: {user_data.get('email')} with role: {user_data.get('role')}"
-                    )
-                else:
-                    self.log_test(
-                        "Cross-origin cookie access",
-                        False,
-                        error=f"Wrong user data returned: {user_data}"
-                    )
-            else:
-                self.log_test(
-                    "Cross-origin cookie access",
-                    False,
-                    error=f"Auth verification failed with status {response.status_code}: {response.text}"
-                )
+        # Test with existing customer credentials
+        for cred_name, credentials in TEST_CREDENTIALS.items():
+            try:
+                response = self.session.post(f"{API_BASE}/auth/login", json=credentials)
                 
-        except Exception as e:
-            self.log_test(
-                "Cross-origin cookie access",
-                False,
-                error=f"Exception during cross-origin test: {str(e)}"
-            )
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check response structure
+                    if data.get("success") and data.get("user"):
+                        user_data = data["user"]
+                        
+                        # Validate user data structure
+                        required_fields = ["id", "email", "role"]
+                        missing_fields = [field for field in required_fields if field not in user_data]
+                        
+                        if not missing_fields:
+                            # Check cookies
+                            cookies = response.cookies
+                            has_access_token = 'access_token' in cookies
+                            has_refresh_token = 'refresh_token' in cookies
+                            
+                            # Store cookies for subsequent tests
+                            if has_access_token:
+                                self.cookies['access_token'] = cookies['access_token']
+                            if has_refresh_token:
+                                self.cookies['refresh_token'] = cookies['refresh_token']
+                            
+                            cookie_details = f"Cookies: access_token={has_access_token}, refresh_token={has_refresh_token}"
+                            user_details = f"User: {user_data['email']} (Role: {user_data['role']}, ID: {user_data['id']})"
+                            
+                            self.log_test(f"POST /api/auth/login - {cred_name}", True, 
+                                        f"{user_details}, {cookie_details}")
+                        else:
+                            self.log_test(f"POST /api/auth/login - {cred_name}", False, 
+                                        f"Missing user fields: {missing_fields}", data)
+                    else:
+                        self.log_test(f"POST /api/auth/login - {cred_name}", False, 
+                                    f"Invalid response structure: {data}", data)
+                        
+                elif response.status_code == 401:
+                    data = response.json()
+                    self.log_test(f"POST /api/auth/login - {cred_name}", False, 
+                                f"Authentication failed: {data.get('detail', 'Invalid credentials')}", data)
+                else:
+                    self.log_test(f"POST /api/auth/login - {cred_name}", False, 
+                                f"Unexpected status code: {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_test(f"POST /api/auth/login - {cred_name}", False, f"Exception: {str(e)}")
     
     def test_complete_authentication_flow(self):
         """Test 3: Complete Authentication Flow"""
