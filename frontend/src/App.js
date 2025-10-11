@@ -37,10 +37,10 @@ import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
 // Use new VITE environment variable
-const `${API_BASE}/ = import.meta.env.VITE_`${API_BASE}/_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 // Console log for debugging
-console.log('Frontend connecting to:', `${API_BASE}/);
+console.log('Frontend connecting to:', API_BASE);
 
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
