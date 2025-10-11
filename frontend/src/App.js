@@ -2375,11 +2375,9 @@ const BusinessDashboard = ({ user }) => {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/orders`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        withCredentials: true
       });
       setOrders(response.data);
     } catch (error) {
