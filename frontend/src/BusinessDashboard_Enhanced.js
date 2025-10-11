@@ -117,12 +117,12 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   const loadRealOrders = async () => {
     try {
       // Get incoming orders from real API
-      const incomingResponse = await apiClient.get('/business/orders/incoming');
+      const incomingResponse = await get('/business/orders/incoming');
       const incomingOrders = Array.isArray(incomingResponse.data) ? incomingResponse.data : [];
       setIncomingOrders(incomingOrders);
       
       // Get active orders from real API
-      const activeResponse = await apiClient.get('/business/orders/active');
+      const activeResponse = await get('/business/orders/active');
       const activeOrders = Array.isArray(activeResponse.data) ? activeResponse.data : [];
       setActiveOrders(activeOrders);
       
@@ -189,7 +189,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   const loadRealStats = async () => {
     try {
       // Get real statistics from API
-      const response = await apiClient.get('/business/stats');
+      const response = await get('/business/stats');
       const statsData = response.data || {};
       
       setStats({
@@ -232,7 +232,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   const loadRealFinancials = async () => {
     try {
       // Get real financial data from API
-      const response = await apiClient.get('/business/financials');
+      const response = await get('/business/financials');
       const financialData = response.data || {};
       
       setFinancials({
@@ -270,7 +270,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await apiClient.patch(`/business/orders/${orderId}/status`,
+      const response = await patch(`/business/orders/${orderId}/status`,
         { status: 'accepted' }
       );
 
@@ -308,7 +308,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await apiClient.patch(`/business/orders/${orderId}/status`,
+      const response = await patch(`/business/orders/${orderId}/status`,
         { status: 'ready' }
       );
 
@@ -334,7 +334,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await apiClient.patch(`/business/orders/${orderId}/status`,
+      const response = await patch(`/business/orders/${orderId}/status`,
         { status: 'preparing' }
       );
 
@@ -426,7 +426,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
       if (editingProduct) {
         // Update existing product
-        const response = await apiClient.patch(`/business/menu/${editingProduct.id}`, productData);
+        const response = await patch(`/business/menu/${editingProduct.id}`, productData);
         
         if (response.data) {
           setProducts(prev => prev.map(p => p.id === editingProduct.id ? response.data : p));
@@ -434,7 +434,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         }
       } else {
         // Add new product
-        const response = await apiClient.post('/business/menu', productData);
+        const response = await post('/business/menu', productData);
         
         if (response.data) {
           setProducts(prev => [...prev, response.data]);
@@ -467,7 +467,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await apiClient.delete(`/business/menu/${productId}`);
+      const response = await del(`/business/menu/${productId}`);
 
       if (response.status === 200 || response.status === 204) {
         setProducts(prev => prev.filter(p => p.id !== productId));
@@ -497,7 +497,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await apiClient.patch(`/business/menu/${productId}`, 
+      const response = await patch(`/business/menu/${productId}`, 
         { is_available: isAvailable }
       );
 
@@ -532,7 +532,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await apiClient.patch(`/business/menu/${productId}`, 
+      const response = await patch(`/business/menu/${productId}`, 
         { price: parseFloat(newPrice) }
       );
 
@@ -633,7 +633,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         return;
       }
       
-      const response = await apiClient.get('/business/orders/incoming');
+      const response = await get('/business/orders/incoming');
       
       if (response.data && response.data.orders) {
         setIncomingOrders(response.data.orders);
@@ -667,7 +667,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       }
       
       // Gerçek API çağrısı - Phase 2 Business Menu CRUD (yeni auth sistemi)
-      const response = await apiClient.get('/business/menu');
+      const response = await get('/business/menu');
       
       if (response.data) {
         setProducts(response.data);
