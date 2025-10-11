@@ -33,9 +33,9 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
   const loadUserAddresses = async () => {
     try {
-      if (!apiClient.isAuthenticated()) return;
+      if (!api.isAuthenticated()) return;
 
-      const response = await apiClient.get('/user/addresses');
+      const response = await api.get('/user/addresses');
 
       const addresses = response.data || [];
       setUserAddresses(addresses);
@@ -133,7 +133,7 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
         notes: `Ödeme yöntemi: ${paymentMethods.find(p => p.id === selectedPaymentMethod)?.name}`
       };
 
-      const response = await apiClient.post('/orders', orderData);
+      const response = await api.post('/orders', orderData);
       const order = response.data;
       return order;
 
@@ -153,7 +153,7 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
         card_details: selectedPaymentMethod === 'online' ? cardDetails : null
       };
 
-      const response = await apiClient.post('/payments/process', paymentData);
+      const response = await api.post('/payments/process', paymentData);
       return response.data;
 
     } catch (error) {
