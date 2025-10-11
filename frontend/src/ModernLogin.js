@@ -74,12 +74,16 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
             await onLogin({ success: true, ...result });
           }
           
-          // Close modal after a short delay to allow state to update
-          setTimeout(() => {
-            onClose && onClose();
-            // Force reload to show dashboard
-            window.location.reload();
-          }, 500);
+          // Wait a bit for state to update
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          // Close modal
+          if (onClose) {
+            onClose();
+          }
+          
+          // Redirect to home - auth check will show dashboard
+          window.location.href = '/';
         }
       } else {
         const errorData = await response.json();
