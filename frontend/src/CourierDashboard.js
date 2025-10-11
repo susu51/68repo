@@ -217,7 +217,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
       params.sort_by = historyFilter.sortBy;
 
       const response = await axios.get(`${API}/courier/orders/history`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
         params
       });
 
