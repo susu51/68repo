@@ -3,7 +3,7 @@
  * Temizlenmiş ve düzenli KYC yönetim paneli
  */
 import React, { useState, useEffect } from 'react';
-import { apiClient } from '../utils/apiClient';
+import api from '../api/http';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 
