@@ -218,21 +218,22 @@ class BusinessMenuTester:
                 data = response.json()
                 kyc_status = data.get("kyc_status", "unknown")
                 business_status = data.get("business_status", "unknown")
+                is_active = data.get("is_active", False)
                 
-                status_details = f"KYC Status: {kyc_status}, Business Status: {business_status}"
+                status_details = f"KYC Status: {kyc_status}, Business Status: {business_status}, Active: {is_active}"
                 
                 if kyc_status == "approved":
                     self.log_test("Business KYC Status Check", True, 
                                 f"Business is approved - {status_details}")
                 elif kyc_status == "pending":
                     self.log_test("Business KYC Status Check", False, 
-                                f"Business KYC pending - may block menu creation - {status_details}")
+                                f"Business KYC pending - will block menu creation - {status_details}")
                 elif kyc_status == "rejected":
                     self.log_test("Business KYC Status Check", False, 
                                 f"Business KYC rejected - will block menu creation - {status_details}")
                 else:
                     self.log_test("Business KYC Status Check", False, 
-                                f"Unknown KYC status - {status_details}")
+                                f"Unknown KYC status - may need approval - {status_details}")
                     
             else:
                 self.log_test("Business KYC Status Check", False, 
@@ -240,6 +241,51 @@ class BusinessMenuTester:
                 
         except Exception as e:
             self.log_test("Business KYC Status Check", False, f"Exception: {str(e)}")
+            
+    def test_business_approval_fix(self):
+        """Try to approve the business if it's pending"""
+        print("\n🔧 TESTING BUSINESS APPROVAL FIX")
+        
+        if not self.business_user:
+            self.log_test("Business Approval Fix", False, "Business login required first")
+            return
+            
+        try:
+            # First check if we can login as admin to approve the business
+            admin_creds = {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}
+            admin_response = self.session.post(f"{API_BASE}/auth/login", json=admin_creds)
+            
+            if admin_response.status_code == 200:
+                # Try to approve the business
+                business_id = self.business_user["id"]
+                approval_data = {"kyc_status": "approved"}
+                
+                approve_response = self.session.patch(
+                    f"{API_BASE}/admin/businesses/{business_id}/status", 
+                    json=approval_data
+                )
+                
+                if approve_response.status_code == 200:
+                    self.log_test("Business Approval Fix", True, 
+                                f"Business {business_id} approved successfully")
+                    
+                    # Re-login as business to get updated status
+                    business_login = self.session.post(f"{API_BASE}/auth/login", json=BUSINESS_CREDENTIALS)
+                    if business_login.status_code == 200:
+                        self.log_test("Business Re-login After Approval", True, 
+                                    "Business re-login successful after approval")
+                    else:
+                        self.log_test("Business Re-login After Approval", False, 
+                                    f"Business re-login failed: {business_login.status_code}")
+                else:
+                    self.log_test("Business Approval Fix", False, 
+                                f"Could not approve business: {approve_response.status_code}")
+            else:
+                self.log_test("Business Approval Fix", False, 
+                            f"Could not login as admin: {admin_response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Business Approval Fix", False, f"Exception: {str(e)}")
             
     def test_validation_errors(self):
         """Test validation scenarios"""
