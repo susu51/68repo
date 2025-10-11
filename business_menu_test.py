@@ -76,6 +76,9 @@ class BusinessMenuTester:
                         if has_access_token:
                             cookie_details = f"Business: {user_data['email']} (ID: {user_data['id']}) - Cookie auth successful"
                             self.log_test("Business Login Authentication", True, cookie_details)
+                            
+                            # Debug: Print full user data to understand the structure
+                            print(f"   DEBUG: Full user data: {user_data}")
                             return True
                         else:
                             self.log_test("Business Login Authentication", False, "No access_token cookie received", data)
