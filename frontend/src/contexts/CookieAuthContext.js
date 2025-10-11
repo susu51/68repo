@@ -17,10 +17,19 @@ export const CookieAuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
 
-  // Check auth status on mount
+  // Check auth status on mount and set up refresh interval
   useEffect(() => {
     checkAuthStatus();
-  }, []);
+    
+    // Set up refresh every 10 minutes
+    const refreshInterval = setInterval(() => {
+      if (user) {
+        refreshAuth();
+      }
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => clearInterval(refreshInterval);
+  }, [user]);
 
   const checkAuthStatus = async () => {
     try {
@@ -33,9 +42,23 @@ export const CookieAuthProvider = ({ children }) => {
     } catch (error) {
       console.log('❌ No valid auth cookie found');
       setUser(null);
+      // Silently redirect to login if 401
+      if (error.message.includes('Authentication expired')) {
+        window.location.href = '/';
+      }
     } finally {
       setLoading(false);
       setReady(true);
+    }
+  };
+
+  const refreshAuth = async () => {
+    try {
+      await api("/auth/refresh", { method: "POST" });
+      console.log('✅ Auth tokens refreshed');
+    } catch (error) {
+      console.log('❌ Token refresh failed, logging out');
+      logout();
     }
   };
 
