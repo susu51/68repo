@@ -1513,11 +1513,36 @@ const CourierRegistration = ({ onComplete, onBack }) => {
         profile_photo_url: profilePhotoUrl
       };
 
-      const response = await axios.post(`${API}/register/courier`, registrationData);
+      const response = await axios.post(`${API}/api/register/courier`, registrationData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
-      onComplete(response.data);
-      toast.success('Kurye kaydınız tamamlandı! KYC onayı bekliyor.');
+      // Auto-login after successful registration  
+      if (response.data.success || response.status === 201) {
+        toast.success('Kurye kaydınız tamamlandı! Giriş yapılıyor...');
+        // Now login the user automatically
+        const loginResponse = await axios.post(`${API}/api/auth/login`, {
+          email: formData.email,
+          password: formData.password
+        }, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (loginResponse.data.success) {
+          onComplete(loginResponse.data);
+        }
+      } else {
+        onComplete(response.data);
+        toast.success('Kurye kaydınız tamamlandı! KYC onayı bekliyor.');
+      }
     } catch (error) {
+      console.error('Courier registration error:', error);
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
     }
     setLoading(false);
