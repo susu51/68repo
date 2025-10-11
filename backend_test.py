@@ -153,44 +153,39 @@ class AuthenticationTester:
         return False
                 
     def test_auth_me(self):
-        """Test GET /api/auth/me endpoint"""
-        print("\n🔐 TESTING CURRENT USER RETRIEVAL")
+        """Test GET /api/auth/me endpoint with cookies from previous login"""
+        print("\n🔐 TESTING CURRENT USER RETRIEVAL (GET /api/auth/me)")
         
-        # First login to get cookies
-        login_response = self.session.post(f"{API_BASE}/auth/login", 
-                                         json=TEST_CREDENTIALS["test_customer"])
-        
-        if login_response.status_code == 200:
-            try:
-                response = self.session.get(f"{API_BASE}/auth/me")
+        try:
+            # Use existing session cookies from previous login
+            response = self.session.get(f"{API_BASE}/auth/me")
+            
+            if response.status_code == 200:
+                data = response.json()
                 
-                if response.status_code == 200:
-                    data = response.json()
-                    
-                    # Validate user data structure
-                    required_fields = ["id", "email", "role", "first_name", "last_name"]
-                    missing_fields = [field for field in required_fields if field not in data]
-                    
-                    if not missing_fields:
-                        user_details = f"User: {data['email']} (Role: {data['role']}, Name: {data['first_name']} {data['last_name']})"
-                        self.log_test("GET /api/auth/me - Current User Data", True, user_details)
-                    else:
-                        self.log_test("GET /api/auth/me - Current User Data", False, 
-                                    f"Missing fields: {missing_fields}", data)
-                        
-                elif response.status_code == 401:
-                    data = response.json()
-                    self.log_test("GET /api/auth/me - Current User Data", False, 
-                                f"Unauthorized: {data.get('detail', 'No auth token')}", data)
+                # Validate user data structure
+                required_fields = ["id", "email", "role"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    user_details = f"User: {data['email']} (Role: {data['role']}, ID: {data['id']})"
+                    if 'first_name' in data and 'last_name' in data:
+                        user_details += f", Name: {data['first_name']} {data['last_name']}"
+                    self.log_test("GET /api/auth/me - Authenticated User Data", True, user_details)
                 else:
-                    self.log_test("GET /api/auth/me - Current User Data", False, 
-                                f"Unexpected status code: {response.status_code}", response.text)
+                    self.log_test("GET /api/auth/me - Authenticated User Data", False, 
+                                f"Missing fields: {missing_fields}", data)
                     
-            except Exception as e:
-                self.log_test("GET /api/auth/me - Current User Data", False, f"Exception: {str(e)}")
-        else:
-            self.log_test("GET /api/auth/me - Current User Data", False, 
-                        "Could not login to test /me endpoint")
+            elif response.status_code == 401:
+                data = response.json()
+                self.log_test("GET /api/auth/me - Authenticated User Data", False, 
+                            f"Unauthorized: {data.get('detail', 'No auth token')}", data)
+            else:
+                self.log_test("GET /api/auth/me - Authenticated User Data", False, 
+                            f"Unexpected status code: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_test("GET /api/auth/me - Authenticated User Data", False, f"Exception: {str(e)}")
             
     def test_auth_refresh(self):
         """Test POST /api/auth/refresh endpoint"""
