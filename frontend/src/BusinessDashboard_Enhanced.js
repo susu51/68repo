@@ -246,7 +246,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       console.log('✅ Real financial data loaded');
     } catch (error) {
       console.error('❌ Error loading real financials:', error);
-      // Set empty/zero financials instead of mock data
+      // Set empty/zero financials on error
       setFinancials({
         dailyRevenue: [],
         monthlyRevenue: 0,
