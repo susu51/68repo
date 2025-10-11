@@ -60,10 +60,10 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
   const loadUserAddresses = async () => {
     try {
       console.log('🔍 DISCOVER PAGE - Loading user addresses for user:', user?.email);
-      console.log('🔑 DISCOVER PAGE - apiClient token status:', apiClient.getToken()?.substring(0, 20) + '...');
-      console.log('🔑 DISCOVER PAGE - apiClient authenticated:', apiClient.isAuthenticated());
+      console.log('🔑 DISCOVER PAGE - api token status:', api.getToken()?.substring(0, 20) + '...');
+      console.log('🔑 DISCOVER PAGE - api authenticated:', api.isAuthenticated());
       
-      const response = await apiClient.get('/user/addresses');
+      const response = await api.get('/user/addresses');
       console.log('📡 DISCOVER PAGE - Raw API response:', response);
       console.log('📊 DISCOVER PAGE - Response status:', response.status);
       console.log('📄 DISCOVER PAGE - Response data:', response.data);
@@ -92,7 +92,7 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
       setLoading(true);
       
       // Get all restaurants first
-      const response = await apiClient.get('/businesses');
+      const response = await api.get('/businesses');
       let restaurantsData = response.data || [];
       
       console.log(`📍 Loaded ${restaurantsData.length} restaurants`);
