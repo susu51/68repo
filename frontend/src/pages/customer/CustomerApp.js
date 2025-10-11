@@ -38,7 +38,7 @@ export const CustomerApp = ({ user, onLogout }) => {
     
     // Fallback to localStorage if context token not available
     if (!workingToken) {
-      const localStorageToken = localStorage.getItem('kuryecini_access_token');
+      const localStorageToken = null /* CI GATE 0 - localStorage removed */;
       if (localStorageToken) {
         workingToken = localStorageToken;
         console.log('  🔄 Using localStorage token as fallback');
@@ -53,7 +53,7 @@ export const CustomerApp = ({ user, onLogout }) => {
     } else {
       console.log('  ❌ No token available from any source - user needs to login');
       console.log('  - AuthContext token:', !!token);
-      console.log('  - localStorage token:', !!localStorage.getItem('kuryecini_access_token'));
+      console.log('  - localStorage token:', !!null /* CI GATE 0 - localStorage removed */);
     }
   }, [token, user]);
 
