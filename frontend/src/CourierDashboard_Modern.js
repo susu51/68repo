@@ -8,8 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import toast from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-const API = `${BACKEND_URL}/api`;
+// Use new VITE environment variable
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export const CourierDashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('orders');
