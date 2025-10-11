@@ -36,7 +36,7 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
         return;
       }
 
-      const response = await apiClient.get('/orders/my');
+      const response = await api.get('/orders/my');
       
       // Ensure all required properties exist and handle item objects
       const ordersData = (response.data || []).map(order => ({
@@ -68,7 +68,7 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
         return;
       }
 
-      await apiClient.post('/reviews', {
+      await api.post('/reviews', {
         orderId: selectedOrder.id,
         targetType: reviewTarget,
         targetId: reviewTarget === 'business' ? selectedOrder.businessId : selectedOrder.courierId,
