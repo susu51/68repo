@@ -247,7 +247,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       }
 
       await axios.put(`${API}/api/profile`, profileData, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Profil bilgileri güncellendi!');
