@@ -409,7 +409,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       const token = null /* CI GATE 0 - localStorage removed */;
 
       await axios.patch(`${API}/api/user/notification-settings`, newSettings, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
 
       setNotificationSettings(newSettings);
