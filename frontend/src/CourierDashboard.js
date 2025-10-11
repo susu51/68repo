@@ -186,9 +186,9 @@ export const CourierDashboard = ({ user, onLogout }) => {
   // Data fetching functions
   const fetchNearbyOrders = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/courier/orders/available`, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       if (isMounted) {
