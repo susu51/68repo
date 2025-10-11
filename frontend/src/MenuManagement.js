@@ -84,7 +84,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onCategoryCreated }) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('delivertr_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.post(`${API}/menu/category`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -178,7 +178,7 @@ export const CreateMenuItemModal = ({ isOpen, onClose, categories, onItemCreated
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('delivertr_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       
       const submitData = {
         ...formData,
@@ -377,7 +377,7 @@ export const MenuDisplay = ({ businessId, isOwner = false }) => {
   const fetchMenu = async () => {
     try {
       const endpoint = isOwner ? '/menu/my-menu' : `/menu/business/${businessId}`;
-      const token = localStorage.getItem('delivertr_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       
       const response = await axios.get(`${API}${endpoint}`, {
         headers: isOwner ? { Authorization: `Bearer ${token}` } : {}
@@ -499,7 +499,7 @@ export const MenuManagement = () => {
 
   const fetchMenu = async () => {
     try {
-      const token = localStorage.getItem('delivertr_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/menu/my-menu`, {
         headers: { Authorization: `Bearer ${token}` }
       });
