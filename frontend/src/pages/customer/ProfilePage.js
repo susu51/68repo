@@ -191,7 +191,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const loadTabData = async (tab) => {
     try {
       setLoading(true);
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
 
       if (!token) {
         // No token - show empty data
@@ -236,7 +236,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
 
       if (!token) {
         toast.success('Profil bilgileri kaydedildi!');
@@ -271,7 +271,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       }
 
       setLoading(true);
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
 
       await axios.post(`${API}/api/auth/change-password`, {
         current_password: passwordData.currentPassword,
@@ -302,7 +302,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleAddPaymentMethod = async () => {
     try {
       setLoading(true);
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
 
       await axios.post(`${API}/api/payment-methods`, newPaymentMethod, {
         withCredentials: true
@@ -404,7 +404,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
 
   const handleUpdateNotificationSettings = async (newSettings) => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
 
       await axios.patch(`${API}/api/user/notification-settings`, newSettings, {
         withCredentials: true
