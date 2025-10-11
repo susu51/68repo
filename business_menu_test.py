@@ -374,6 +374,9 @@ class BusinessMenuTester:
         # Run tests in sequence
         login_success = self.test_business_login()
         
+        # First ensure business user exists
+        self.test_business_user_exists()
+        
         if login_success:
             self.test_business_kyc_status()
             self.test_business_approval_fix()
