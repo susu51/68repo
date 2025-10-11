@@ -137,7 +137,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API}/admin/users`);
+      const response = await axios.get(API_BASEadmin/users`);
       setUsers(response.data || []);
     } catch (error) {
       console.error('Users fetch error:', error);
@@ -150,7 +150,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${API}/admin/products`);
+      const response = await axios.get(API_BASEadmin/products`);
       setProducts(response.data || []);
     } catch (error) {
       console.error('Products fetch error:', error);
@@ -163,7 +163,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${API}/admin/orders`);
+      const response = await axios.get(API_BASEadmin/orders`);
       setOrders(response.data || []);
     } catch (error) {
       console.error('Orders fetch error:', error);
@@ -176,7 +176,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchCouriers = async () => {
     try {
-      const response = await axios.get(`${API}/admin/couriers/kyc`);
+      const response = await axios.get(API_BASEadmin/couriers/kyc`);
       setCouriers(response.data || []);
     } catch (error) {
       console.error('Couriers fetch error:', error);
@@ -209,7 +209,7 @@ const AdminDashboard = ({ user }) => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`);
+      await axios.patch(API_BASEorders/${orderId}/status?new_status=${newStatus}`);
       toast.success('Sipariş durumu güncellendi');
       fetchOrders();
     } catch (error) {
@@ -220,7 +220,7 @@ const AdminDashboard = ({ user }) => {
   const updateCourierKYC = async (courierId, kycStatus, notes = '') => {
     try {
       setLoading(true);
-      await axios.patch(`${API}/admin/couriers/${courierId}/kyc?kyc_status=${kycStatus}`, 
+      await axios.patch(API_BASEadmin/couriers/${courierId}/kyc?kyc_status=${kycStatus}`, 
         notes ? { notes } : {},
         {
           headers: {
@@ -347,7 +347,7 @@ const AdminDashboard = ({ user }) => {
           break;
       }
 
-      await axios.post(`${API}/${endpoint}`, userData);
+      await axios.post(API_BASE${endpoint}`, userData);
       toast.success('Kullanıcı başarıyla eklendi');
       setShowAddUserDialog(false);
       resetNewUserData();
@@ -363,7 +363,7 @@ const AdminDashboard = ({ user }) => {
   const deleteUser = async (userId) => {
     setLoading(true);
     try {
-      await axios.delete(`${API}/admin/users/${userId}`);
+      await axios.delete(API_BASEadmin/users/${userId}`);
       toast.success('Kullanıcı başarıyla silindi');
       setShowDeleteUserDialog(false);
       setSelectedUser(null);
@@ -2459,7 +2459,7 @@ const BusinessDashboard = ({ user }) => {
   const fetchOrders = async () => {
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const response = await axios.get(`${API}/orders`, {
+      const response = await axios.get(API_BASEorders`, {
         withCredentials: true
       });
       setOrders(response.data);
@@ -2486,7 +2486,7 @@ const BusinessDashboard = ({ user }) => {
       };
 
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      await axios.post(`${API}/products`, productData, {
+      await axios.post(API_BASEproducts`, productData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -2514,7 +2514,7 @@ const BusinessDashboard = ({ user }) => {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      await axios.patch(`${API}/orders/${orderId}/status?new_status=${newStatus}`, {}, {
+      await axios.patch(API_BASEorders/${orderId}/status?new_status=${newStatus}`, {}, {
         withCredentials: true
       });
       toast.success('Sipariş durumu güncellendi');
@@ -2946,7 +2946,7 @@ const CustomerDashboard = ({ user }) => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/products`);
+      const response = await axios.get(API_BASEproducts`);
       setProducts(response.data);
     } catch (error) {
       toast.error('Ürünler yüklenemedi');
@@ -2956,7 +2956,7 @@ const CustomerDashboard = ({ user }) => {
 
   const fetchMyOrders = async () => {
     try {
-      const response = await axios.get(`${API}/orders`);
+      const response = await axios.get(API_BASEorders`);
       setOrders(response.data);
     } catch (error) {
       toast.error('Siparişler yüklenemedi');
@@ -2967,7 +2967,7 @@ const CustomerDashboard = ({ user }) => {
   const fetchCampaigns = async () => {
     if (!isMounted) return;
     try {
-      const response = await axios.get(`${API}/campaigns`);
+      const response = await axios.get(API_BASEcampaigns`);
       if (isMounted) {
         setCampaigns(response.data);
       }
@@ -2982,7 +2982,7 @@ const CustomerDashboard = ({ user }) => {
     if (!isMounted) return;
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const response = await axios.get(`${API}/loyalty/points`, {
+      const response = await axios.get(API_BASEloyalty/points`, {
         withCredentials: true
       });
       if (isMounted) {
@@ -2998,7 +2998,7 @@ const CustomerDashboard = ({ user }) => {
   const fetchActiveCoupons = async () => {
     if (!isMounted) return;
     try {
-      const response = await axios.get(`${API}/coupons/active`);
+      const response = await axios.get(API_BASEcoupons/active`);
       if (isMounted) {
         setActiveCoupons(response.data);
       }
@@ -3116,7 +3116,7 @@ const CustomerDashboard = ({ user }) => {
         notes: orderForm.notes
       };
 
-      await axios.post(`${API}/orders`, orderData);
+      await axios.post(API_BASEorders`, orderData);
       
       toast.success('Sipariş başarıyla oluşturuldu! 🎉');
       setCart([]);
