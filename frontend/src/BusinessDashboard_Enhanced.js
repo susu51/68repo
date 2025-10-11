@@ -265,7 +265,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
   // Professional Business Functions
   const acceptOrder = async (orderId) => {
     try {
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         return;
       }
@@ -303,7 +303,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   const markOrderAsReady = async (orderId) => {
     try {
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         return;
       }
@@ -329,7 +329,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   const startPreparingOrder = async (orderId) => {
     try {
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         return;
       }
@@ -419,7 +419,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
         photo_url: productForm.image_url,
       };
 
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         return;
       }
@@ -462,7 +462,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     if (!window.confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
     
     try {
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         return;
       }
@@ -492,7 +492,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   const toggleProductAvailability = async (productId, isAvailable) => {
     try {
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         return;
       }
@@ -527,7 +527,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     }
 
     try {
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         return;
       }
@@ -627,7 +627,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     try {
       setLoading(true);
       
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmalısınız');
         setLoading(false);
         return;
@@ -661,7 +661,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     try {
       setLoading(true);
       
-      if (!isAuthenticated) {
+      if (!cookieUser) {
         toast.error('Giriş yapmadan menü yükleyemezsiniz');
         return;
       }
