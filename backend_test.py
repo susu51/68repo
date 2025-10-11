@@ -55,6 +55,20 @@ class BusinessMenuTester:
             "details": details
         })
         
+    async def make_authenticated_request(self, method: str, url: str, **kwargs):
+        """Make authenticated request with cookie auth and bearer token fallback"""
+        # Try cookie-based auth first
+        async with self.session.request(method, url, **kwargs) as response:
+            if response.status == 401 and self.business_token:
+                # Fallback to bearer token
+                headers = kwargs.get("headers", {})
+                headers["Authorization"] = f"Bearer {self.business_token}"
+                kwargs["headers"] = headers
+                
+                async with self.session.request(method, url, **kwargs) as fallback_response:
+                    return fallback_response, "bearer"
+            return response, "cookie"
+        
     async def test_business_authentication(self):
         """Test 1: Business Authentication"""
         print("\n🔐 Testing Business Authentication...")
