@@ -36,9 +36,8 @@ import { Textarea } from "./components/ui/textarea";
 import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
-// Get backend URL from environment
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-const API = `${BACKEND_URL}/api`;
+// Use new VITE environment variable
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 // Console log for debugging
 console.log('Frontend connecting to:', API);
