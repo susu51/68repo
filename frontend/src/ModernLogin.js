@@ -71,6 +71,7 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
         // Handle error from context
         const errorMsg = result?.error || 'Giriş başarısız';
         setError(errorMsg);
+        console.log('❌ Login failed:', errorMsg, result);
         toast.error(`❌ ${errorMsg}`);
       }
     } catch (error) {
