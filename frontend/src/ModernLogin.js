@@ -32,64 +32,40 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setTheme(prefersDark ? 'dark' : 'light');
   }, []);
 
-  // Handle email/password login - SIMPLIFIED WORKING VERSION
+  // Handle email/password login - USE CONTEXT METHOD
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(''); // Clear previous errors
 
     try {
-      // Get backend URL from environment
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      console.log('🎯 Attempting login via context...');
       
-      // Direct fetch call - bypass API wrapper issues
-      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
-      });
+      // Use context's login method - this properly updates auth state
+      const result = await contextLogin(formData.email, formData.password);
       
-      console.log('🎯 Login response status:', response.status);
+      console.log('🎯 Context login result:', result);
       
-      if (response.ok) {
-        const result = await response.json();
-        console.log('🎯 Login result:', result);
+      if (result && result.success) {
+        // Success!
+        setError('');
+        toast.success('✅ Giriş başarılı!');
         
-        if (result.success) {
-          // Store token for development
-          if (result.access_token) {
-            localStorage.setItem('access_token', result.access_token);
-          }
-          
-          // Success actions
-          setError('');
-          toast.success('✅ Giriş başarılı!');
-          
-          // Call onLogin callback to refresh auth state
-          if (onLogin) {
-            await onLogin({ success: true, ...result });
-          }
-          
-          // Wait a bit for state to update
-          await new Promise(resolve => setTimeout(resolve, 300));
-          
-          // Close modal
-          if (onClose) {
-            onClose();
-          }
-          
-          // Redirect to home - auth check will show dashboard
-          window.location.href = '/';
+        // Call onLogin callback if provided
+        if (onLogin) {
+          onLogin(result);
         }
+        
+        // Close modal - React will handle routing based on updated auth state
+        if (onClose) {
+          onClose();
+        }
+        
+        // No need for redirect - context updates user state and React re-renders
+        console.log('✅ Login successful, context updated');
       } else {
-        const errorData = await response.json();
-        const errorMsg = errorData.detail || errorData.message || 'Giriş başarısız';
+        // Handle error from context
+        const errorMsg = result?.error || 'Giriş başarısız';
         setError(errorMsg);
         toast.error(`❌ ${errorMsg}`);
       }
