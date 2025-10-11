@@ -235,7 +235,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */; // Fixed token key
       await axios.post(`${API}/orders/${orderId}/accept`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Sipariş kabul edildi!');
