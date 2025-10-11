@@ -227,19 +227,31 @@ class BusinessMenuTester:
                         # Fallback to bearer token
                         headers = {"Authorization": f"Bearer {self.business_token}"}
                         async with self.session.post(f"{BASE_URL}/business/menu", 
-                                                   json=item_data, headers=headers) as response:
-                    if response.status == 200:
+                                                   json=item_data, headers=headers) as fallback_response:
+                            if fallback_response.status == 200:
+                                data = await fallback_response.json()
+                                item_id = data.get("id")
+                                self.created_items.append(item_id)
+                                success_count += 1
+                                
+                                self.log_test(f"Create {item_data['category']} Item", True, 
+                                            f"ID: {item_id}, Name: {item_data['name']} (Bearer token)")
+                            else:
+                                error_text = await fallback_response.text()
+                                self.log_test(f"Create {item_data['category']} Item", False, 
+                                            f"Bearer token failed {fallback_response.status}: {error_text}")
+                    elif response.status == 200:
                         data = await response.json()
                         item_id = data.get("id")
                         self.created_items.append(item_id)
                         success_count += 1
                         
                         self.log_test(f"Create {item_data['category']} Item", True, 
-                                    f"ID: {item_id}, Name: {item_data['name']}")
+                                    f"ID: {item_id}, Name: {item_data['name']} (Cookie auth)")
                     else:
                         error_text = await response.text()
                         self.log_test(f"Create {item_data['category']} Item", False, 
-                                    f"Status {response.status}: {error_text}")
+                                    f"Cookie auth failed {response.status}: {error_text}")
                         
             except Exception as e:
                 self.log_test(f"Create {item_data['category']} Item", False, f"Exception: {str(e)}")
