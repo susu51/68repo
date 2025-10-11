@@ -217,13 +217,17 @@ class BusinessMenuTester:
             }
         ]
         
-        headers = {"Authorization": f"Bearer {self.business_token}"}
         success_count = 0
         
         for i, item_data in enumerate(menu_items):
             try:
-                async with self.session.post(f"{BASE_URL}/business/menu", 
-                                           json=item_data, headers=headers) as response:
+                # Try cookie-based auth first, then bearer token fallback
+                async with self.session.post(f"{BASE_URL}/business/menu", json=item_data) as response:
+                    if response.status == 401 and self.business_token:
+                        # Fallback to bearer token
+                        headers = {"Authorization": f"Bearer {self.business_token}"}
+                        async with self.session.post(f"{BASE_URL}/business/menu", 
+                                                   json=item_data, headers=headers) as response:
                     if response.status == 200:
                         data = await response.json()
                         item_id = data.get("id")
