@@ -6,6 +6,7 @@ import "./App.css";
 import { ModernLogin } from "./ModernLogin";
 import { KuryeciniTextLogo, KuryeciniLogo } from "./components/KuryeciniLogo";
 import LandingPage from "./pages/LandingPage";
+import { CookieAuthProvider } from "./contexts/CookieAuthContext";
 import { LocationControls } from "./components/LocationControls";
 import { CourierDashboard } from "./CourierDashboard";
 import { BusinessDashboard as EnhancedBusinessDashboard } from "./BusinessDashboard_Enhanced";
