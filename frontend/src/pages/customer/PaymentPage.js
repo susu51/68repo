@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useCart } from '../../contexts/CartContext';
-import { apiClient } from '../../utils/apiClient';
+import api from '../../api/http';
 import { useAuth } from '../../contexts/AuthContext';
 
 const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess, user }) => {
