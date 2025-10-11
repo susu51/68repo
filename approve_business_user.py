@@ -71,7 +71,7 @@ async def approve_business_user():
         print(f"   User ID: {updated_user.get('id')}")
         print(f"   Role: {updated_user.get('role')}")
     
-    await client.close()
+    client.close()
     print("✅ Business user approval complete!")
 
 if __name__ == "__main__":
