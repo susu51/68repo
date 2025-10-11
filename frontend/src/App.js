@@ -132,7 +132,8 @@ const AdminDashboard = ({ user }) => {
   
   // Theme state
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('admin_theme') === 'dark';
+    // CI GATE 0 COMPLIANCE - NO localStorage usage
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   const fetchUsers = async () => {
