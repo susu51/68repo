@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """
-Cross-Origin Cookie Authentication Testing
-Testing the modified non-HttpOnly cookie authentication system to resolve cross-origin issues
+🔍 COMPREHENSIVE LOGIN & AUTHENTICATION SYSTEM TESTING
+Testing all authentication endpoints and cookie-based auth system
 """
 
 import requests
 import json
 import time
-import sys
+import os
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "http://localhost:8001"
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://address-manager-5.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
-# Test credentials
-TEST_CUSTOMER = {
-    "email": "testcustomer@example.com",
-    "password": "test123"
+# Test credentials from review request
+TEST_CREDENTIALS = {
+    "existing_user": {"email": "demo@kuryecini.com", "password": "demo123"},
+    "new_test_user": {"email": "testuser@kuryecini.com", "password": "test123"},
+    "admin_user": {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
+    "test_customer": {"email": "testcustomer@example.com", "password": "test123"}
 }
 
 class CookieAuthTester:
