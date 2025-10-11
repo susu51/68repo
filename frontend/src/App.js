@@ -37,7 +37,7 @@ import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
 // Use new VITE environment variable
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
 
 // Console log for debugging
 console.log('Frontend connecting to:', API_BASE);
