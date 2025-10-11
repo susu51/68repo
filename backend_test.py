@@ -188,40 +188,33 @@ class AuthenticationTester:
             self.log_test("GET /api/auth/me - Authenticated User Data", False, f"Exception: {str(e)}")
             
     def test_auth_refresh(self):
-        """Test POST /api/auth/refresh endpoint"""
-        print("\n🔐 TESTING TOKEN REFRESH")
+        """Test POST /api/auth/refresh endpoint with existing cookies"""
+        print("\n🔐 TESTING TOKEN REFRESH (POST /api/auth/refresh)")
         
-        # First login to get refresh token
-        login_response = self.session.post(f"{API_BASE}/auth/login", 
-                                         json=TEST_CREDENTIALS["test_customer"])
-        
-        if login_response.status_code == 200:
-            try:
-                response = self.session.post(f"{API_BASE}/auth/refresh")
+        try:
+            # Use existing session cookies from previous login
+            response = self.session.post(f"{API_BASE}/auth/refresh")
+            
+            if response.status_code == 200:
+                data = response.json()
                 
-                if response.status_code == 200:
-                    data = response.json()
-                    
-                    if data.get("success"):
-                        self.log_test("POST /api/auth/refresh - Token Refresh", True, 
-                                    f"Token refreshed: {data.get('message', 'Success')}")
-                    else:
-                        self.log_test("POST /api/auth/refresh - Token Refresh", False, 
-                                    f"Refresh failed: {data}", data)
-                        
-                elif response.status_code == 401:
-                    data = response.json()
-                    self.log_test("POST /api/auth/refresh - Token Refresh", False, 
-                                f"Unauthorized: {data.get('detail', 'No refresh token')}", data)
+                if data.get("success"):
+                    self.log_test("POST /api/auth/refresh - Token Refresh", True, 
+                                f"Token refreshed: {data.get('message', 'Success')}")
                 else:
                     self.log_test("POST /api/auth/refresh - Token Refresh", False, 
-                                f"Unexpected status code: {response.status_code}", response.text)
+                                f"Refresh failed: {data}", data)
                     
-            except Exception as e:
-                self.log_test("POST /api/auth/refresh - Token Refresh", False, f"Exception: {str(e)}")
-        else:
-            self.log_test("POST /api/auth/refresh - Token Refresh", False, 
-                        "Could not login to test refresh endpoint")
+            elif response.status_code == 401:
+                data = response.json()
+                self.log_test("POST /api/auth/refresh - Token Refresh", False, 
+                            f"Unauthorized: {data.get('detail', 'No refresh token')}", data)
+            else:
+                self.log_test("POST /api/auth/refresh - Token Refresh", False, 
+                            f"Unexpected status code: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_test("POST /api/auth/refresh - Token Refresh", False, f"Exception: {str(e)}")
             
     def test_auth_logout(self):
         """Test POST /api/auth/logout endpoint"""
