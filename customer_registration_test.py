@@ -61,11 +61,15 @@ class CustomerRegistrationTester:
         """Test POST /api/register/customer endpoint"""
         print("\n🔐 TESTING CUSTOMER REGISTRATION")
         
+        # Use unique email to avoid conflicts
+        test_data = TEST_CUSTOMER_DATA_UNIQUE.copy()
+        print(f"   Using unique email: {test_data['email']}")
+        
         try:
             # Test customer registration
             response = self.session.post(
                 f"{API_BASE}/register/customer",
-                json=TEST_CUSTOMER_DATA,
+                json=test_data,
                 headers={"Content-Type": "application/json"}
             )
             
