@@ -1523,7 +1523,7 @@ const CourierRegistration = ({ onComplete, onBack }) => {
       if (response.data.success || response.status === 201) {
         toast.success('Kurye kaydınız tamamlandı! Giriş yapılıyor...');
         // Now login the user automatically
-        const loginResponse = await axios.post(`${`${API_BASE}/}/auth/login`, {
+        const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
           email: formData.email,
           password: formData.password
         }, {
@@ -1946,7 +1946,7 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
       if (response.data.success || response.status === 201) {
         toast.success('İşletme kaydınız tamamlandı! Giriş yapılıyor...');
         // Now login the user automatically
-        const loginResponse = await axios.post(`${`${API_BASE}/}/auth/login`, {
+        const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
           email: formData.email,
           password: formData.password
         }, {
@@ -2228,7 +2228,7 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
       if (response.data.success) {
         toast.success('Müşteri kaydınız tamamlandı! Giriş yapılıyor...');
         // Now login the user automatically
-        const loginResponse = await axios.post(`${`${API_BASE}/}/auth/login`, {
+        const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
           email: formData.email,
           password: formData.password
         }, {
