@@ -1287,7 +1287,12 @@ export const BusinessDashboard = ({ user, onLogout }) => {
           </TabsContent>
 
           {/* Menu Tab */}
-          <TabsContent value="menu" className="space-y-6">
+          <TabsContent value="menu" className="p-0">
+            <BusinessMenuManager />
+          </TabsContent>
+
+          {/* OLD MENU TAB - BACKUP */}
+          <TabsContent value="menu-old" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">🍽️ Menü & Fiyat Yönetimi</h2>
               <div className="flex space-x-2">
