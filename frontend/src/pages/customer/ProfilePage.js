@@ -194,7 +194,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       const token = localStorage.getItem('kuryecini_access_token');
 
       if (!token) {
-        // No token - show empty data instead of mock
+        // No token - show empty data
         console.log('No authentication token - showing empty data');
         return;
       }
