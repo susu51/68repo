@@ -172,75 +172,26 @@ async def login(body: LoginRequest, response: Response):
     print(f"🔍 Login attempt with email: {body.email}")
     db = get_db()
     
-    # Test users for development
-    test_users = {
-        "testcustomer@example.com": {
-            "id": "customer-001",
-            "email": "testcustomer@example.com", 
-            "first_name": "Test",
-            "last_name": "Customer",
-            "role": "customer",
-            "is_active": True,
-            "password": "test123"
-        },
-        "testkurye@example.com": {
-            "id": "courier-001",
-            "email": "testkurye@example.com",
-            "first_name": "Test", 
-            "last_name": "Courier",
-            "role": "courier",
-            "is_active": True,
-            "password": "test123"
-        },
-        "testbusiness@example.com": {
-            "id": "business-001",
-            "email": "testbusiness@example.com",
-            "first_name": "Test",
-            "last_name": "Business",
-            "role": "business", 
-            "business_name": "Test Restaurant",
-            "is_active": True,
-            "password": "test123"
-        },
-        "admin@kuryecini.com": {
-            "id": "admin-001",
-            "email": "admin@kuryecini.com",
-            "first_name": "Admin",
-            "last_name": "Kuryecini",
-            "role": "admin",
-            "is_active": True,
-            "password": "KuryeciniAdmin2024!"
-        }
-    }
+    # Always use database for authentication (no hardcoded test users)
+    # Find user in database
+    user = await db.users.find_one({"email": body.email})
+    if not user:
+        raise HTTPException(401, "Invalid credentials")
     
-    # Check test users first
-    user_id = None
-    if body.email in test_users:
-        test_user = test_users[body.email]
-        if body.password == test_user["password"]:
-            user_id = test_user["id"]
+    # Verify password (handle both plain text and bcrypt)
+    if user.get("password"):
+        if user["password"].startswith("$2"):
+            # bcrypt password
+            if not bcrypt.checkpw(body.password.encode(), user["password"].encode()):
+                raise HTTPException(401, "Invalid credentials")
         else:
-            raise HTTPException(401, "Invalid credentials")
+            # Plain text password (for legacy compatibility)
+            if body.password != user["password"]:
+                raise HTTPException(401, "Invalid credentials")
     else:
-        # Find real user in database
-        user = await db.users.find_one({"email": body.email})
-        if not user:
-            raise HTTPException(401, "Invalid credentials")
-        
-        # Verify password (handle both plain text and bcrypt)
-        user_password = user.get("password", "") or user.get("password_hash", "")
-        
-        # Check if it's a bcrypt hash (starts with $2b$)
-        if user_password.startswith("$2b$"):
-            # Use bcrypt verification
-            if not verify_password(body.password, user_password):
-                raise HTTPException(401, "Invalid credentials")
-        else:
-            # Plain text comparison (for existing users)
-            if body.password != user_password:
-                raise HTTPException(401, "Invalid credentials")
-        
-        user_id = user["id"]
+        raise HTTPException(401, "Invalid credentials")
+    
+    user_id = user.get("id")
     
     # Get user data for response
     if body.email in test_users:
