@@ -209,7 +209,7 @@ const AdminDashboard = ({ user }) => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(API_BASEorders/${orderId}/status?new_status=${newStatus}`);
+      await axios.patch(`${API_BASE}/orders/${orderId}/status?new_status=${newStatus}`);
       toast.success('Sipariş durumu güncellendi');
       fetchOrders();
     } catch (error) {
