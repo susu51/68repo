@@ -23,7 +23,7 @@ const ContentEditor = () => {
   const loadContentBlocks = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/content/blocks');
+      const response = await api.get('/content/blocks');
       setContentBlocks(response.data || []);
     } catch (error) {
       console.error('Error loading content blocks:', error);
@@ -36,7 +36,7 @@ const ContentEditor = () => {
   const saveContentBlock = async (blockData) => {
     try {
       setLoading(true);
-      await apiClient.put(`/content/blocks/${blockData._id}`, blockData);
+      await api.put(`/content/blocks/${blockData._id}`, blockData);
       toast.success('İçerik bloğu kaydedildi');
       await loadContentBlocks();
       setEditMode(false);
@@ -59,7 +59,7 @@ const ContentEditor = () => {
     const loadPopularProducts = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.get('/content/popular-products?limit=20');
+        const response = await api.get('/content/popular-products?limit=20');
         setProducts(response.data || []);
       } catch (error) {
         console.error('Error loading popular products:', error);
@@ -551,7 +551,7 @@ const ContentEditor = () => {
     useEffect(() => {
       const loadPopularProducts = async () => {
         try {
-          const response = await apiClient.get('/content/popular-products?limit=4');
+          const response = await api.get('/content/popular-products?limit=4');
           setPopularProducts(response.data || []);
         } catch (error) {
           console.error('Error loading popular products:', error);
