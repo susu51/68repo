@@ -125,8 +125,8 @@ class BusinessMenuTester:
                     
                     # Validate response data matches input
                     validation_issues = []
-                    if created_name != TEST_MENU_ITEM["name"]:
-                        validation_issues.append(f"Name mismatch: expected '{TEST_MENU_ITEM['name']}', got '{created_name}'")
+                    if created_name != TEST_MENU_ITEM["title"]:
+                        validation_issues.append(f"Title mismatch: expected '{TEST_MENU_ITEM['title']}', got '{created_name}'")
                     if created_price != TEST_MENU_ITEM["price"]:
                         validation_issues.append(f"Price mismatch: expected {TEST_MENU_ITEM['price']}, got {created_price}")
                         
