@@ -2217,7 +2217,7 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
         role: 'customer'
       };
       
-      const response = await axios.post(`${API}/api/register/customer`, registrationData, {
+      const response = await axios.post(`${API_BASE}/auth/register?role=customer`, registrationData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
