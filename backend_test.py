@@ -1,37 +1,38 @@
 #!/usr/bin/env python3
 """
-🔍 CUSTOMER REGISTRATION & LOGIN TESTING AFTER PASSWORD FIELD MISMATCH FIX
-Re-testing customer registration and login functionality after fixing the password field mismatch issue.
+BUSINESS MENU CRUD COMPREHENSIVE TESTING
+Testing with KYC-approved business user: testbusiness@example.com/test123
+
+This test covers all scenarios from the review request:
+1. Business Authentication
+2. Menu Item Creation (4 categories)
+3. Menu Item Retrieval
+4. Menu Item Update
+5. Toggle Availability
+6. Soft Delete
+7. Public Customer Endpoints
+8. Validation Tests
 """
 
-import requests
+import asyncio
+import aiohttp
 import json
-import time
-import os
+import sys
 from datetime import datetime
+from typing import Dict, List, Any
 
 # Configuration
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://courier-stable.preview.emergentagent.com')
-API_BASE = f"{BACKEND_URL}/api"
+BASE_URL = "https://courier-stable.preview.emergentagent.com/api"
+BUSINESS_EMAIL = "testbusiness@example.com"
+BUSINESS_PASSWORD = "test123"
 
-# Test credentials from review request - using unique email to avoid conflicts
-TEST_CREDENTIALS = {
-    "new_customer": {
-        "email": "testfix@kuryecini.com",
-        "password": "test123456", 
-        "first_name": "Test",
-        "last_name": "Fix User",
-        "city": "İstanbul"
-    },
-    "existing_customer": {"email": "testcustomer@example.com", "password": "test123"},
-    "admin_user": {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}
-}
-
-class AuthenticationTester:
+class BusinessMenuTester:
     def __init__(self):
-        self.session = requests.Session()
+        self.session = None
+        self.business_token = None
+        self.business_user_id = None
+        self.created_items = []
         self.test_results = []
-        self.cookies = {}
         
     def log_test(self, test_name, success, details="", response_data=None):
         """Log test results"""
