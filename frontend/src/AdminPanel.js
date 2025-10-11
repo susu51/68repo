@@ -14,7 +14,7 @@ const AdminPanel = ({ user, onLogout }) => {
   // Fetch pending businesses for KYC
   const fetchPendingBusinesses = async () => {
     try {
-      const response = await apiClient.get('/admin/businesses?kyc_status=pending');
+      const response = await api.get('/admin/businesses?kyc_status=pending');
       setPendingBusinesses(response.data);
     } catch (error) {
       console.error('Fetch pending businesses error:', error);
