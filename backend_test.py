@@ -22,7 +22,7 @@ TEST_CREDENTIALS = {
     "test_customer": {"email": "testcustomer@example.com", "password": "test123"}
 }
 
-class CookieAuthTester:
+class AuthenticationTester:
     def __init__(self):
         self.session = requests.Session()
         self.test_results = []
