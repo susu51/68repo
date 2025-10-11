@@ -26,23 +26,22 @@ class AuthenticationTester:
     def __init__(self):
         self.session = requests.Session()
         self.test_results = []
-        self.cookies_received = {}
+        self.cookies = {}
         
-    def log_test(self, test_name, success, details="", error=""):
+    def log_test(self, test_name, success, details="", response_data=None):
         """Log test results"""
         status = "✅ PASS" if success else "❌ FAIL"
         print(f"{status} {test_name}")
         if details:
-            print(f"   📝 {details}")
-        if error:
-            print(f"   🚨 {error}")
+            print(f"   {details}")
+        if response_data and not success:
+            print(f"   Response: {response_data}")
         
         self.test_results.append({
             "test": test_name,
             "success": success,
             "details": details,
-            "error": error,
-            "timestamp": datetime.now().isoformat()
+            "response": response_data
         })
         
     def test_backend_cookie_configuration(self):
