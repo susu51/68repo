@@ -51,7 +51,7 @@ const Profile = ({ user, onBack, onLogout }) => {
       
       switch (tab) {
         case 'coupons':
-          // Mock data for now - will be replaced with real API
+          // Placeholder data - will be replaced with real API
           setCoupons([
             {
               id: 1,
