@@ -53,16 +53,20 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
       if (result && result.success) {
         // Success!
         setError('');
-        toast.success('✅ Giriş başarılı!');
+        console.log('✅ About to call callbacks...');
         
         // Call onLogin callback if provided
         if (onLogin) {
+          console.log('✅ Calling onLogin callback...');
           onLogin(result);
         }
         
         // Close modal - React will handle routing based on updated auth state
         if (onClose) {
+          console.log('✅ Calling onClose callback...');
           onClose();
+        } else {
+          console.log('❌ onClose callback not provided!');
         }
         
         // No need for redirect - context updates user state and React re-renders
