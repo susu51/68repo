@@ -4794,10 +4794,31 @@ function App() {
         <LandingPage onAuthStart={handleAuthStart} />
         
         {showLogin && (
-          <ModernLogin 
-            onClose={() => setShowLogin(false)}
-            onLoginSuccess={handleLoginSuccess}
-          />
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}>
+            <div style={{
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              borderRadius: '15px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            }}>
+              <ModernLogin 
+                onClose={() => setShowLogin(false)}
+                onLoginSuccess={handleLoginSuccess}
+              />
+            </div>
+          </div>
         )}
       </div>
     </CookieAuthProvider>
