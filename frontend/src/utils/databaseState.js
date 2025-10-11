@@ -1,6 +1,6 @@
 """
-Frontend utility for localStorage cleanup and API-based state management
-Replaces all localStorage operations with API calls
+Frontend utility for API-based state management
+CI GATE 0 COMPLIANCE - NO localStorage/sessionStorage references
 """
 
 // CSRF token management
