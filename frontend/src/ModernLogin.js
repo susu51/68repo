@@ -64,7 +64,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
         // Close modal - React will handle routing based on updated auth state
         if (onClose) {
           console.log('✅ Calling onClose callback...');
-          onClose();
+          // Use setTimeout to ensure React state updates properly
+          setTimeout(() => {
+            onClose();
+          }, 100);
         } else {
           console.log('❌ onClose callback not provided!');
         }
