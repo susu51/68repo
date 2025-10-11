@@ -32,19 +32,13 @@ const LandingPage = ({ onAuthStart }) => {
               <a href="#app" className="text-slate-600 hover:text-slate-900 hover:underline transition">App</a>
             </div>
             
-            {/* Auth Buttons */}
-            <div className="flex items-center space-x-4">
+            {/* Auth Buttons - Sadece Giriş Yap */}
+            <div className="flex items-center">
               <button 
                 onClick={onAuthStart}
-                className="text-slate-600 hover:text-slate-900 font-medium"
+                className="bg-[#FF7A00] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#e66d00] transition shadow-lg"
               >
-                Login
-              </button>
-              <button 
-                onClick={onAuthStart}
-                className="bg-[#FF7A00] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#e66d00] transition"
-              >
-                Register
+                Giriş Yap
               </button>
             </div>
           </div>
