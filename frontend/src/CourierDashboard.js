@@ -231,7 +231,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchEarnings = async () => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/courier/earnings`, {
         withCredentials: true
       });
@@ -251,7 +251,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchStats = async () => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/courier/stats`, {
         withCredentials: true
       });
@@ -273,7 +273,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchProfile = async () => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/courier/profile`, {
         withCredentials: true
       });
@@ -362,7 +362,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
   // Order management
   const acceptOrder = async (orderId) => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.patch(`${API}/courier/orders/${orderId}/pickup`, {}, {
         withCredentials: true
       });
@@ -378,7 +378,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       await axios.post(`${API}/orders/${orderId}/status`, {
         status,
         location: courierLocation,
@@ -411,7 +411,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const toggleOnlineStatus = async () => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.post(`${API}/courier/status/toggle`, {}, {
         withCredentials: true
       });
@@ -490,7 +490,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
   // Profile update
   const updateProfile = async () => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       await axios.put(`${API}/courier/profile`, profile, {
         withCredentials: true
       });
@@ -504,7 +504,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
   // Generate report
   const generateReport = async (type = 'monthly') => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/courier/report/${type}`, {
         withCredentials: true,
         responseType: 'blob'
