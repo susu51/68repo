@@ -353,33 +353,60 @@ async def update_menu_item(
 @router.delete("/menu/{item_id}")
 async def delete_menu_item(
     item_id: str,
-    current_user: dict = Depends(get_business_user)
+    soft_delete: bool = True,
+    current_user: dict = Depends(get_approved_business_user)
 ):
-    """Delete menu item - Business can only delete their own items"""
+    """
+    Delete menu item - Business can only delete their own items
+    - soft_delete=True: Sets is_available=False (default)
+    - soft_delete=False: Permanently deletes from database
+    """
     try:
         from server import db
         
-        # Get business ID  
-        business = await db.businesses.find_one({"owner_user_id": current_user["id"]})
-        if not business:
-            raise HTTPException(status_code=404, detail="Business not found")
+        # Use current user ID as business ID (since business is registered as user)
+        business_user_id = current_user["id"]
         
-        # Check ownership and delete from both collections
-        result = await db.menu_items.delete_one({
+        # Check ownership
+        existing_item = await db.menu_items.find_one({
             "_id": item_id,
-            "business_id": str(business["_id"])
+            "business_id": business_user_id
         })
         
-        if result.deleted_count == 0:
+        if not existing_item:
             raise HTTPException(
                 status_code=404,
                 detail="Menu item not found or access denied"
             )
         
-        # Also delete from products collection
-        await db.products.delete_one({"_id": item_id})
-        
-        return {"success": True, "message": "Menu item deleted"}
+        if soft_delete:
+            # Soft delete: set is_available to False
+            await db.menu_items.update_one(
+                {"_id": item_id},
+                {"$set": {"is_available": False, "updated_at": datetime.utcnow()}}
+            )
+            await db.products.update_one(
+                {"_id": item_id},
+                {"$set": {"availability": False, "updated_at": datetime.utcnow()}}
+            )
+            return {"success": True, "message": "Menu item disabled (soft delete)"}
+        else:
+            # Hard delete: permanently remove from database
+            result = await db.menu_items.delete_one({
+                "_id": item_id,
+                "business_id": business_user_id
+            })
+            
+            if result.deleted_count == 0:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Menu item not found or access denied"
+                )
+            
+            # Also delete from products collection
+            await db.products.delete_one({"_id": item_id})
+            
+            return {"success": True, "message": "Menu item permanently deleted"}
         
     except HTTPException:
         raise
