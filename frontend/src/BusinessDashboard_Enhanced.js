@@ -217,7 +217,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       console.log('✅ Real business statistics loaded');
     } catch (error) {
       console.error('❌ Error loading real statistics:', error);
-      // Set empty/zero stats instead of mock data
+      // Set empty/zero stats on error
       setStats({
         today: { orders: 0, revenue: 0, avgOrderValue: 0, completionRate: 0 },
         week: { orders: 0, revenue: 0, growth: 0 },
