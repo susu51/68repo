@@ -4,7 +4,7 @@
  */
 
 // HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES
-const API = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
+const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
 
 class CartAPI {
   // Sepeti backend'den yükle
