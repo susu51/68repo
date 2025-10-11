@@ -90,7 +90,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     totalEarnings: 0
   });
 
-  // Initialize with professional mock data
+  // Initialize business data
   useEffect(() => {
     initializeBusinessData();
     const interval = setInterval(fetchLiveData, 30000); // Update every 30 seconds
