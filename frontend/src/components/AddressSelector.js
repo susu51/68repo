@@ -48,7 +48,7 @@ export const AddressSelector = ({
   const loadAddresses = async () => {
     try {
       setLoading(true);
-      // Mock data for demo - in real app this would be API call
+      // Demo data - in real app this would be API call
       const mockAddresses = [
         {
           id: 'addr-1',
