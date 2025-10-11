@@ -334,6 +334,7 @@ class BusinessMenuTester:
         
         if login_success:
             self.test_business_kyc_status()
+            self.test_business_approval_fix()
             self.test_menu_creation_endpoint()
             self.test_validation_errors()
         else:
