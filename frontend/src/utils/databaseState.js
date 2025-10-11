@@ -123,7 +123,7 @@ class SecureApiClient {
 // Global API client instance
 export const apiClient = new SecureApiClient();
 
-// State management utilities (NO localStorage)
+// State management utilities (CI GATE 0 COMPLIANT)
 export class DatabaseStateManager {
   constructor() {
     this.cache = new Map(); // In-memory cache only
