@@ -25,7 +25,7 @@ const KYCManagement = ({ user }) => {
         return;
       }
       
-      const response = await apiClient.get(`/admin/businesses?kyc_status=${status}`);
+      const response = await api.get(`/admin/businesses?kyc_status=${status}`);
       const data = response.data;
       
       setBusinesses(data);
@@ -49,7 +49,7 @@ const KYCManagement = ({ user }) => {
         return;
       }
       
-      const response = await apiClient.get(`/admin/couriers?kyc_status=${status}`);
+      const response = await api.get(`/admin/couriers?kyc_status=${status}`);
       const data = response.data;
       
       setCouriers(data);
@@ -77,7 +77,7 @@ const KYCManagement = ({ user }) => {
         ? `/admin/businesses/${id}/status`
         : `/admin/couriers/${id}/status`;
 
-      const response = await apiClient.patch(endpoint, { kyc_status: 'approved' });
+      const response = await api.patch(endpoint, { kyc_status: 'approved' });
       
       if (response.data.success) {
         toast.success(`✅ ${type === 'business' ? 'İşletme' : 'Kurye'} KYC başarıyla onaylandı!`);
@@ -119,7 +119,7 @@ const KYCManagement = ({ user }) => {
         ? `/admin/businesses/${id}/status`
         : `/admin/couriers/${id}/status`;
 
-      const response = await apiClient.patch(endpoint, { 
+      const response = await api.patch(endpoint, { 
         kyc_status: 'rejected',
         rejection_reason: reason
       });
