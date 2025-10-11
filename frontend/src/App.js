@@ -2402,10 +2402,11 @@ const BusinessDashboard = ({ user }) => {
         preparation_time_minutes: parseInt(productForm.preparation_time_minutes)
       };
 
-      const token = localStorage.getItem('kuryecini_access_token');
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       await axios.post(`${API}/products`, productData, {
+        withCredentials: true,
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
       
