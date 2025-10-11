@@ -86,7 +86,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onCategoryCreated }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.post(`${API}/menu/category`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Kategori oluşturuldu!');
@@ -190,7 +190,7 @@ export const CreateMenuItemModal = ({ isOpen, onClose, categories, onItemCreated
       };
 
       const response = await axios.post(`${API}/menu/item`, submitData, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Ürün eklendi!');
@@ -501,7 +501,7 @@ export const MenuManagement = () => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/menu/my-menu`, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
       
       setMenu(response.data.menu);
