@@ -6,7 +6,7 @@ Debug Nearby Businesses API Response
 import requests
 import json
 
-BACKEND_URL = "https://address-manager-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://quickcourier.preview.emergentagent.com/api"
 
 # Login as customer
 login_response = requests.post(

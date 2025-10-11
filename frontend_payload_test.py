@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://address-manager-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://quickcourier.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_CUSTOMER_EMAIL = "testcustomer@example.com"
