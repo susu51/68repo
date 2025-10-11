@@ -99,7 +99,7 @@ export const AddressSelector = ({
         is_default: addresses.length === 0 // First address becomes default
       };
       
-      // Mock save - in real app this would be API call
+      // Demo save - in real app this would be API call
       const updatedAddresses = [...addresses, addressToSave];
       setAddresses(updatedAddresses);
       
