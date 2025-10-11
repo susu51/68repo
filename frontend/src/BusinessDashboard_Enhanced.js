@@ -132,7 +132,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       console.log(`✅ Loaded ${incomingOrders.length} incoming orders, ${activeOrders.length} active orders`);
     } catch (error) {
       console.error('❌ Error loading real orders:', error);
-      // Set empty arrays instead of mock data
+      // Set empty arrays on error
       setIncomingOrders([]);
       setActiveOrders([]);
       setUnprocessedCount(0);
