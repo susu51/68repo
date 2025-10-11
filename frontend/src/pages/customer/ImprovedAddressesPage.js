@@ -54,7 +54,7 @@ const ImprovedAddressesPage = ({ onSelectAddress, onBack, onAddressAdded }) => {
     setLoading(true);
     try {
       console.log('🔄 Loading addresses...');
-      const response = await apiClient.get('/user/addresses');
+      const response = await api.get('/user/addresses');
       
       if (response && Array.isArray(response)) {
         setAddresses(response);
@@ -145,7 +145,7 @@ const ImprovedAddressesPage = ({ onSelectAddress, onBack, onAddressAdded }) => {
       if (editingAddress) {
         // Update existing address
         console.log('🔄 Updating address:', editingAddress.id);
-        response = await apiClient.put(`/user/addresses/${editingAddress.id}`, addressData);
+        response = await api.put(`/user/addresses/${editingAddress.id}`, addressData);
         
         setAddresses(prev => 
           prev.map(addr => addr.id === editingAddress.id ? response : addr)
@@ -154,7 +154,7 @@ const ImprovedAddressesPage = ({ onSelectAddress, onBack, onAddressAdded }) => {
       } else {
         // Create new address
         console.log('🔄 Creating new address');
-        response = await apiClient.post('/user/addresses', addressData);
+        response = await api.post('/user/addresses', addressData);
         
         setAddresses(prev => [...prev, response]);
         toast.success('Adres başarıyla eklendi!');
@@ -210,7 +210,7 @@ const ImprovedAddressesPage = ({ onSelectAddress, onBack, onAddressAdded }) => {
 
     try {
       console.log('🗑️ Deleting address:', addressId);
-      await apiClient.delete(`/user/addresses/${addressId}`);
+      await api.delete(`/user/addresses/${addressId}`);
       
       setAddresses(prev => prev.filter(addr => addr.id !== addressId));
       toast.success('Adres başarıyla silindi!');
@@ -233,7 +233,7 @@ const ImprovedAddressesPage = ({ onSelectAddress, onBack, onAddressAdded }) => {
   const setDefaultAddress = async (addressId) => {
     try {
       console.log('⭐ Setting default address:', addressId);
-      await apiClient.post(`/user/addresses/${addressId}/set-default`);
+      await api.post(`/user/addresses/${addressId}/set-default`);
       
       // Update local state
       setAddresses(prev => 
