@@ -1,5 +1,5 @@
 /**
- * Cart API Management - localStorage yerine DB entegrasyonu
+ * Cart API Management - DB entegrasyonu (CI GATE 0 Compliant)
  * Müşteri sepeti backend'de tutulur, logout/login sonrası korunur
  */
 
