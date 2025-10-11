@@ -4,7 +4,7 @@
  */
 
 // HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES
-const API = 'http://localhost:8001';
+const API = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
 
 class CartAPI {
   // Sepeti backend'den yükle
