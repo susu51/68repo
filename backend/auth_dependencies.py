@@ -1,23 +1,40 @@
 """
 Shared Authentication Dependencies for FastAPI Routes
 Provides reusable JWT authentication and role-based dependencies
+Now supports BOTH cookie and bearer token authentication
 """
-from fastapi import HTTPException, Depends, status
+from fastapi import HTTPException, Depends, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 import os
 from models import UserRole
+from typing import Optional
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)  # Make it optional
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify JWT token and return user data - shared across all route modules"""
+async def get_current_user(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+):
+    """Verify JWT token from cookie OR bearer token - shared across all route modules"""
     try:
-        token = credentials.credentials
+        # Try cookie first (primary method)
+        token = request.cookies.get("access_token")
+        
+        # Fallback to bearer token if no cookie
+        if not token and credentials:
+            token = credentials.credentials
+        
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authenticated - no token provided"
+            )
+        
         secret_key = os.environ.get("JWT_SECRET", "kuryecini_secret_key_2024")
         payload = jwt.decode(token, secret_key, algorithms=["HS256"])
         
-        user_email = payload.get("sub")
+        user_id = payload.get("sub")
         
         # Handle test users (same as in main server.py)
         test_users = {
