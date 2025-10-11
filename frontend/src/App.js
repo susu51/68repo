@@ -36,8 +36,8 @@ import { Textarea } from "./components/ui/textarea";
 import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
-// HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES
-const BACKEND_URL = 'http://localhost:8001';
+// Get backend URL from environment
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
 
 // Console log for debugging
