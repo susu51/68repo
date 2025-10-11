@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-🔍 COMPREHENSIVE LOGIN & AUTHENTICATION SYSTEM TESTING
-Testing all authentication endpoints and cookie-based auth system
+🔍 CUSTOMER REGISTRATION & LOGIN TESTING AFTER PASSWORD FIELD MISMATCH FIX
+Re-testing customer registration and login functionality after fixing the password field mismatch issue.
 """
 
 import requests
@@ -14,12 +14,17 @@ from datetime import datetime
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://quickcourier.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
-# Test credentials from review request
+# Test credentials from review request - using unique email to avoid conflicts
 TEST_CREDENTIALS = {
-    "existing_user": {"email": "demo@kuryecini.com", "password": "demo123"},
-    "new_test_user": {"email": "testuser@kuryecini.com", "password": "test123"},
-    "admin_user": {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
-    "test_customer": {"email": "testcustomer@example.com", "password": "test123"}
+    "new_customer": {
+        "email": "testfix@kuryecini.com",
+        "password": "test123456", 
+        "first_name": "Test",
+        "last_name": "Fix User",
+        "city": "İstanbul"
+    },
+    "existing_customer": {"email": "testcustomer@example.com", "password": "test123"},
+    "admin_user": {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}
 }
 
 class AuthenticationTester:
