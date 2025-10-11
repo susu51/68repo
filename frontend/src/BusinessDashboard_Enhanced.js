@@ -13,7 +13,7 @@ import { Textarea } from './components/ui/textarea';
 import { toast } from 'react-hot-toast';
 
 // Use new VITE environment variable
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
 
 export const BusinessDashboard = ({ user, onLogout }) => {
   const { user: cookieUser } = useCookieAuth();  // Get user from cookie auth context
