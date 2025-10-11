@@ -1387,7 +1387,7 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Customer Registration Frontend Integration"
+    - "FAZ 1 - Business Menu CRUD System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
