@@ -60,7 +60,7 @@ class BusinessMenuTester:
         print("\n🔐 Testing Business Authentication...")
         
         try:
-            # Login with approved business user
+            # Login with approved business user (cookie-based auth)
             login_data = {
                 "email": BUSINESS_EMAIL,
                 "password": BUSINESS_PASSWORD
@@ -69,22 +69,53 @@ class BusinessMenuTester:
             async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as response:
                 if response.status == 200:
                     data = await response.json()
-                    self.business_token = data.get("access_token")
+                    self.business_token = data.get("access_token")  # Fallback token
                     user_data = data.get("user", {})
                     self.business_user_id = user_data.get("id")
-                    kyc_status = user_data.get("kyc_status")
                     
-                    if self.business_token and kyc_status == "approved":
-                        self.log_test("Business Login", True, 
-                                    f"Token: {len(self.business_token)} chars, User ID: {self.business_user_id}, KYC: {kyc_status}")
-                        return True
-                    else:
-                        self.log_test("Business Login", False, 
-                                    f"Missing token or KYC not approved. KYC Status: {kyc_status}")
-                        return False
+                    # Cookies are automatically stored in session
+                    # Now get full user details including KYC status from /me endpoint
+                    async with self.session.get(f"{BASE_URL}/me") as me_response:
+                        if me_response.status == 200:
+                            me_data = await me_response.json()
+                            kyc_status = me_data.get("kyc_status", "pending")
+                            
+                            if kyc_status == "approved":
+                                self.log_test("Business Login", True, 
+                                            f"User ID: {self.business_user_id}, KYC: {kyc_status} (Cookie auth)")
+                                return True
+                            else:
+                                self.log_test("Business Login", False, 
+                                            f"KYC not approved. Status: {kyc_status}")
+                                return False
+                        else:
+                            # Try with bearer token as fallback
+                            if self.business_token:
+                                headers = {"Authorization": f"Bearer {self.business_token}"}
+                                async with self.session.get(f"{BASE_URL}/me", headers=headers) as token_response:
+                                    if token_response.status == 200:
+                                        token_data = await token_response.json()
+                                        kyc_status = token_data.get("kyc_status", "pending")
+                                        
+                                        if kyc_status == "approved":
+                                            self.log_test("Business Login", True, 
+                                                        f"User ID: {self.business_user_id}, KYC: {kyc_status} (Bearer token)")
+                                            return True
+                                        else:
+                                            self.log_test("Business Login", False, 
+                                                        f"KYC not approved. Status: {kyc_status}")
+                                            return False
+                                    else:
+                                        error_text = await token_response.text()
+                                        self.log_test("Business Login", False, f"Token validation failed: {error_text}")
+                                        return False
+                            else:
+                                error_text = await me_response.text()
+                                self.log_test("Business Login", False, f"Cookie auth failed: {error_text}")
+                                return False
                 else:
                     error_text = await response.text()
-                    self.log_test("Business Login", False, f"Status {response.status}: {error_text}")
+                    self.log_test("Business Login", False, f"Login failed {response.status}: {error_text}")
                     return False
                     
         except Exception as e:
