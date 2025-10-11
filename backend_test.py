@@ -44,83 +44,44 @@ class AuthenticationTester:
             "response": response_data
         })
         
-    def test_backend_cookie_configuration(self):
-        """Test 1: Backend Cookie Configuration Testing"""
-        print("\n🔧 TEST 1: Backend Cookie Configuration Testing")
+    def test_auth_register(self):
+        """Test POST /api/auth/register endpoint"""
+        print("\n🔐 TESTING AUTHENTICATION REGISTRATION")
+        
+        # Test new user registration
+        register_data = {
+            "email": TEST_CREDENTIALS["new_test_user"]["email"],
+            "password": TEST_CREDENTIALS["new_test_user"]["password"],
+            "first_name": "Test",
+            "last_name": "User",
+            "role": "customer"
+        }
         
         try:
-            # Test login with testcustomer@example.com/test123
-            login_data = {
-                "email": TEST_CUSTOMER["email"],
-                "password": TEST_CUSTOMER["password"]
-            }
+            response = self.session.post(f"{API_BASE}/auth/register", json=register_data)
             
-            response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
-            
-            if response.status_code == 200:
-                # Check if cookies are set
-                cookies = response.cookies
-                cookie_headers = response.headers.get('Set-Cookie', '')
-                
-                # Verify access_token and refresh_token cookies are created
-                has_access_token = 'access_token' in cookies
-                has_refresh_token = 'refresh_token' in cookies
-                
-                if has_access_token and has_refresh_token:
-                    # Store cookies for later tests
-                    self.cookies_received = {
-                        'access_token': cookies.get('access_token'),
-                        'refresh_token': cookies.get('refresh_token')
-                    }
-                    
-                    # Check cookie attributes in response headers
-                    cookie_details = []
-                    if 'SameSite=none' in cookie_headers or 'SameSite=None' in cookie_headers:
-                        cookie_details.append("SameSite=none ✅")
-                    else:
-                        cookie_details.append("SameSite=none ❌")
-                        
-                    if 'Path=/' in cookie_headers:
-                        cookie_details.append("Path=/ ✅")
-                    else:
-                        cookie_details.append("Path=/ ❌")
-                        
-                    # Check if HttpOnly is NOT set (should be non-HttpOnly)
-                    if 'HttpOnly' not in cookie_headers:
-                        cookie_details.append("Non-HttpOnly ✅")
-                    else:
-                        cookie_details.append("Non-HttpOnly ❌ (HttpOnly still set)")
-                    
-                    self.log_test(
-                        "Login with cookie setting",
-                        True,
-                        f"Cookies set: access_token, refresh_token. Attributes: {', '.join(cookie_details)}"
-                    )
+            if response.status_code == 201 or response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    self.log_test("POST /api/auth/register - New User Registration", True, 
+                                f"User registered successfully: {data.get('user_id', 'N/A')}")
                 else:
-                    missing = []
-                    if not has_access_token:
-                        missing.append("access_token")
-                    if not has_refresh_token:
-                        missing.append("refresh_token")
-                    
-                    self.log_test(
-                        "Login with cookie setting",
-                        False,
-                        error=f"Missing cookies: {', '.join(missing)}"
-                    )
+                    self.log_test("POST /api/auth/register - New User Registration", False, 
+                                f"Registration failed: {data.get('message', 'Unknown error')}", data)
+            elif response.status_code == 400:
+                data = response.json()
+                if "already exists" in data.get("detail", "").lower():
+                    self.log_test("POST /api/auth/register - New User Registration", True, 
+                                "User already exists (expected for existing test user)")
+                else:
+                    self.log_test("POST /api/auth/register - New User Registration", False, 
+                                f"Unexpected 400 error: {data.get('detail', 'Unknown')}", data)
             else:
-                self.log_test(
-                    "Login with cookie setting",
-                    False,
-                    error=f"Login failed with status {response.status_code}: {response.text}"
-                )
+                self.log_test("POST /api/auth/register - New User Registration", False, 
+                            f"Unexpected status code: {response.status_code}", response.text)
                 
         except Exception as e:
-            self.log_test(
-                "Login with cookie setting",
-                False,
-                error=f"Exception during login: {str(e)}"
-            )
+            self.log_test("POST /api/auth/register - New User Registration", False, f"Exception: {str(e)}")
     
     def test_cross_origin_cookie_verification(self):
         """Test 2: Cross-Origin Cookie Verification"""
