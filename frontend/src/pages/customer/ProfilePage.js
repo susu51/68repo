@@ -307,7 +307,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       const token = null /* CI GATE 0 - localStorage removed */;
 
       await axios.post(`${API}/api/payment-methods`, newPaymentMethod, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Ödeme yöntemi başarıyla eklendi!');
