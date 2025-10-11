@@ -4815,7 +4815,7 @@ function App() {
             }}>
               <ModernLogin 
                 onClose={() => setShowLogin(false)}
-                onLoginSuccess={handleLoginSuccess}
+                onLogin={handleLoginSuccess}
               />
             </div>
           </div>
