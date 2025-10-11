@@ -67,9 +67,19 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
           
           // Success actions
           setError('');
-          onLogin && onLogin({ success: true, ...result });
-          onClose && onClose();
           toast.success('✅ Giriş başarılı!');
+          
+          // Call onLogin callback to refresh auth state
+          if (onLogin) {
+            await onLogin({ success: true, ...result });
+          }
+          
+          // Close modal after a short delay to allow state to update
+          setTimeout(() => {
+            onClose && onClose();
+            // Force reload to show dashboard
+            window.location.reload();
+          }, 500);
         }
       } else {
         const errorData = await response.json();
