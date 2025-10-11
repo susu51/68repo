@@ -221,7 +221,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
           setCampaigns(campaignsRes.data || []);
           break;
         case 'payment_methods':
-          const paymentRes = await axios.get(`${API}/api/payment-methods`, { headers });
+          const paymentRes = await axios.get(`${API}/api/payment-methods`, { withCredentials: true });
           setPaymentMethods(paymentRes.data || []);
           break;
       }
