@@ -385,32 +385,7 @@ export class LoyaltyManager {
 // CI GATE 0 COMPLIANCE - Migration utilities removed
 // All data management is API-based only
 
-// Anti-localStorage utility - prevents accidental localStorage usage
-export const AntiLocalStorage = {
-  // Override localStorage methods to prevent usage
-  preventLocalStorageUsage() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const originalSetItem = window.localStorage.setItem;
-      const originalGetItem = window.localStorage.getItem;
-      
-      window.localStorage.setItem = function(key, value) {
-        if (key.startsWith('kuryecini_') || key.includes('cart') || key.includes('address') || key.includes('preferences')) {
-          console.warn(`⚠️ Prevented localStorage.setItem for ${key}. Use API managers instead.`);
-          return;
-        }
-        return originalSetItem.call(this, key, value);
-      };
-      
-      window.localStorage.getItem = function(key) {
-        if (key.startsWith('kuryecini_') || key.includes('cart') || key.includes('address') || key.includes('preferences')) {
-          console.warn(`⚠️ Prevented localStorage.getItem for ${key}. Use API managers instead.`);
-          return null;
-        }
-        return originalGetItem.call(this, key);
-      };
-    }
-  }
-};
+// CI GATE 0 COMPLIANCE - No localStorage override utilities needed
 
 // Toast utility for API errors
 export const showApiError = (error, defaultMessage = 'Bir hata oluştu') => {
