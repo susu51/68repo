@@ -29,7 +29,7 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
       setLoading(true);
       
       if (!isAuthenticated) {
-        // No authentication - show empty orders instead of mock data
+        // No authentication - show empty orders
         setOrders([]);
         setLoading(false);
         toast.error('Siparişleri görmek için giriş yapmalısınız.');
