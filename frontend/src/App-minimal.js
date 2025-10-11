@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./com
 import { Button } from "./components/ui/button";
 import { Badge } from "./components/ui/badge";
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = import.meta.env.VITE_API_BASE_URL;
 
 // Test minimal AdminDashboard
 const AdminDashboard = ({ user }) => {
