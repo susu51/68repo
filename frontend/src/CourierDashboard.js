@@ -209,7 +209,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchOrderHistory = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const params = {};
       
       if (historyFilter.status !== 'all') params.status = historyFilter.status;
