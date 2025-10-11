@@ -149,7 +149,7 @@ const Profile = ({ user, onBack, onLogout }) => {
     setIsUpdating(true);
     
     try {
-      // Mock API call - gerçek profil güncelleme API'si
+      // Placeholder API call - gerçek profil güncelleme API'si
       console.log('Updating profile:', profileData);
       
       // Simulate API delay
