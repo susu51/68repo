@@ -102,6 +102,15 @@ async def get_current_user_from_cookie_or_bearer(request: Request):
     
     payload = verify_token(token)
     user_id = payload["sub"]
+    
+    # Get user from database
+    db = db_client["kuryecini"]
+    user = await db.users.find_one({"id": user_id})
+    
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    return user
 
 # Keep original function for backward compatibility
 async def get_current_user_from_cookie(request: Request):
