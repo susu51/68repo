@@ -20,13 +20,12 @@ BUSINESS_CREDENTIALS = {
     "password": "business123"
 }
 
-# Test payload from review request
+# Test payload from review request - Updated to match API schema
 TEST_MENU_ITEM = {
-    "name": "Test Pizza",
+    "title": "Test Pizza",  # API uses 'title' not 'name'
     "description": "Delicious test pizza",
     "price": 50.00,
     "category": "food",
-    "preparation_time": 15,
     "is_available": True
 }
 
