@@ -195,13 +195,19 @@ async def get_my_menu(
             MenuItemResponse(
                 id=str(item["_id"]),
                 business_id=item["business_id"],
-                title=item["title"],
-                description=item["description"],
-                price=item["price"],
-                photo_url=item.get("photo_url"),
-                category=item.get("category", "Ana Yemek"),
+                name=item.get("name", item.get("title", "")),  # Backward compatibility
+                description=item.get("description", ""),
+                price=item.get("price", 0),
+                currency=item.get("currency", "TRY"),
+                category=item.get("category", "Yemek"),
+                tags=item.get("tags", []),
+                image_url=item.get("image_url", item.get("photo_url")),  # Backward compatibility
                 is_available=item.get("is_available", True),
-                created_at=item["created_at"]
+                vat_rate=item.get("vat_rate", 0.10),
+                options=item.get("options", []),
+                preparation_time=item.get("preparation_time", 15),
+                created_at=item["created_at"],
+                updated_at=item.get("updated_at")
             )
             for item in menu_items
         ]
