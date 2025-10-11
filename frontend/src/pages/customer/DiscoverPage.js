@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../utils/apiClient';
+import api from '../../api/http';
 
 const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
   const [restaurants, setRestaurants] = useState([]);
