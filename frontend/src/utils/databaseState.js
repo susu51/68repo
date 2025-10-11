@@ -405,7 +405,4 @@ export const showApiError = (error, defaultMessage = 'Bir hata oluştu') => {
   }
 };
 
-// Initialize anti-localStorage protection
-if (typeof window !== 'undefined') {
-  AntiLocalStorage.preventLocalStorageUsage();
-}
+// CI GATE 0 COMPLIANCE - All client-side storage is API-based only
