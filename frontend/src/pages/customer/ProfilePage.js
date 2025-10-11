@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../utils/apiClient';
+import api from '../../api/http';
 
 const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAddress, onAddressAdded }) => {
   const [activeTab, setActiveTab] = useState('profile');
