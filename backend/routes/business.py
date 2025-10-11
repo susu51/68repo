@@ -13,32 +13,73 @@ from auth_dependencies import get_business_user, get_approved_business_user
 router = APIRouter(prefix="/business", tags=["business"])
 
 # Request/Response Models
-class MenuItemCreate(BaseModel):
-    title: str
-    description: Optional[str] = ""  # Allow empty description
+class MenuItemOption(BaseModel):
+    name: str
     price: float
-    photo_url: Optional[str] = None
-    category: Optional[str] = "Ana Yemek"
+
+class MenuItemCreate(BaseModel):
+    name: str  # Changed from 'title' to 'name' for consistency
+    description: Optional[str] = ""
+    price: float
+    currency: str = "TRY"
+    category: str  # Required field: Yemek | Kahvaltı | İçecek | Atıştırmalık
+    tags: Optional[List[str]] = []
+    image_url: Optional[str] = None
     is_available: bool = True
+    vat_rate: float = 0.10  # KDV oranı: 0, 0.08, 0.10, 0.18
+    options: Optional[List[MenuItemOption]] = []
+    preparation_time: Optional[int] = 15  # dakika cinsinden
+    
+    # Validation
+    @classmethod
+    def validate_category(cls, v):
+        allowed = ["Yemek", "Kahvaltı", "İçecek", "Atıştırmalık"]
+        if v not in allowed:
+            raise ValueError(f"Category must be one of: {', '.join(allowed)}")
+        return v
+    
+    @classmethod
+    def validate_vat_rate(cls, v):
+        allowed_vat = [0, 0.08, 0.10, 0.18]
+        if v not in allowed_vat:
+            raise ValueError(f"VAT rate must be one of: {', '.join(map(str, allowed_vat))}")
+        return v
+    
+    @classmethod
+    def validate_price(cls, v):
+        if v < 0:
+            raise ValueError("Price must be >= 0")
+        return v
 
 class MenuItemUpdate(BaseModel):
-    title: Optional[str] = None
+    name: Optional[str] = None
     description: Optional[str] = None
     price: Optional[float] = None
-    photo_url: Optional[str] = None
+    currency: Optional[str] = None
     category: Optional[str] = None
+    tags: Optional[List[str]] = None
+    image_url: Optional[str] = None
     is_available: Optional[bool] = None
+    vat_rate: Optional[float] = None
+    options: Optional[List[MenuItemOption]] = None
+    preparation_time: Optional[int] = None
 
 class MenuItemResponse(BaseModel):
     id: str
     business_id: str
-    title: str
+    name: str
     description: str
     price: float
-    photo_url: Optional[str]
+    currency: str
     category: str
+    tags: List[str]
+    image_url: Optional[str]
     is_available: bool
+    vat_rate: float
+    options: List[dict]
+    preparation_time: int
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
 @router.post("/menu", response_model=MenuItemResponse)
 async def create_menu_item(
