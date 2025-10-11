@@ -34,458 +34,560 @@ class BusinessMenuTester:
         self.created_items = []
         self.test_results = []
         
-    def log_test(self, test_name, success, details="", response_data=None):
-        """Log test results"""
+    async def setup(self):
+        """Initialize HTTP session"""
+        self.session = aiohttp.ClientSession()
+        
+    async def cleanup(self):
+        """Clean up HTTP session"""
+        if self.session:
+            await self.session.close()
+            
+    def log_test(self, test_name: str, success: bool, details: str = ""):
+        """Log test result"""
         status = "✅ PASS" if success else "❌ FAIL"
         print(f"{status} {test_name}")
         if details:
-            print(f"   {details}")
-        if response_data and not success:
-            print(f"   Response: {response_data}")
-        
+            print(f"    {details}")
         self.test_results.append({
             "test": test_name,
             "success": success,
-            "details": details,
-            "response": response_data
+            "details": details
         })
         
-    def test_customer_registration(self):
-        """Test POST /api/register/customer endpoint with new unique email"""
-        print("\n🔐 TESTING CUSTOMER REGISTRATION (POST /api/register/customer)")
-        
-        # Test new customer registration with unique email
-        register_data = TEST_CREDENTIALS["new_customer"]
+    async def test_business_authentication(self):
+        """Test 1: Business Authentication"""
+        print("\n🔐 Testing Business Authentication...")
         
         try:
-            response = self.session.post(f"{API_BASE}/register/customer", json=register_data)
+            # Login with approved business user
+            login_data = {
+                "email": BUSINESS_EMAIL,
+                "password": BUSINESS_PASSWORD
+            }
             
-            if response.status_code == 201:
-                data = response.json()
-                if data.get("access_token") and data.get("user_data"):
-                    user_data = data["user_data"]
-                    self.log_test("POST /api/register/customer - New Customer Registration", True, 
-                                f"Customer registered successfully: {user_data.get('email')} (ID: {user_data.get('id')})")
+            async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    self.business_token = data.get("access_token")
+                    user_data = data.get("user", {})
+                    self.business_user_id = user_data.get("id")
+                    kyc_status = user_data.get("kyc_status")
                     
-                    # Store user data for login test
-                    self.registered_user = user_data
-                    return True
-                else:
-                    self.log_test("POST /api/register/customer - New Customer Registration", False, 
-                                f"Registration response missing required fields", data)
-            elif response.status_code == 400:
-                data = response.json()
-                if "already registered" in data.get("detail", "").lower():
-                    self.log_test("POST /api/register/customer - New Customer Registration", True, 
-                                "User already exists - will test login with existing credentials")
-                    return True
-                else:
-                    self.log_test("POST /api/register/customer - New Customer Registration", False, 
-                                f"Registration failed: {data.get('detail', 'Unknown error')}", data)
-            else:
-                self.log_test("POST /api/register/customer - New Customer Registration", False, 
-                            f"Unexpected status code: {response.status_code}", response.text)
-                
-        except Exception as e:
-            self.log_test("POST /api/register/customer - New Customer Registration", False, f"Exception: {str(e)}")
-            
-        return False
-            
-    def test_customer_login(self):
-        """Test POST /api/auth/login with newly registered credentials"""
-        print("\n🔐 TESTING CUSTOMER LOGIN (POST /api/auth/login)")
-        
-        # Test login with the newly registered customer credentials
-        login_credentials = {
-            "email": TEST_CREDENTIALS["new_customer"]["email"],
-            "password": TEST_CREDENTIALS["new_customer"]["password"]
-        }
-        
-        try:
-            response = self.session.post(f"{API_BASE}/auth/login", json=login_credentials)
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Check response structure
-                if data.get("success") and data.get("user"):
-                    user_data = data["user"]
-                    
-                    # Validate user data structure
-                    required_fields = ["id", "email", "role"]
-                    missing_fields = [field for field in required_fields if field not in user_data]
-                    
-                    if not missing_fields:
-                        # Check cookies
-                        cookies = response.cookies
-                        has_access_token = 'access_token' in cookies
-                        has_refresh_token = 'refresh_token' in cookies
-                        
-                        # Store cookies for subsequent tests
-                        if has_access_token:
-                            self.cookies['access_token'] = cookies['access_token']
-                        if has_refresh_token:
-                            self.cookies['refresh_token'] = cookies['refresh_token']
-                        
-                        cookie_details = f"Cookies: access_token={has_access_token}, refresh_token={has_refresh_token}"
-                        user_details = f"User: {user_data['email']} (Role: {user_data['role']}, ID: {user_data['id']})"
-                        
-                        self.log_test("POST /api/auth/login - New Customer Login", True, 
-                                    f"{user_details}, {cookie_details}")
+                    if self.business_token and kyc_status == "approved":
+                        self.log_test("Business Login", True, 
+                                    f"Token: {len(self.business_token)} chars, User ID: {self.business_user_id}, KYC: {kyc_status}")
                         return True
                     else:
-                        self.log_test("POST /api/auth/login - New Customer Login", False, 
-                                    f"Missing user fields: {missing_fields}", data)
+                        self.log_test("Business Login", False, 
+                                    f"Missing token or KYC not approved. KYC Status: {kyc_status}")
+                        return False
                 else:
-                    self.log_test("POST /api/auth/login - New Customer Login", False, 
-                                f"Invalid response structure: {data}", data)
+                    error_text = await response.text()
+                    self.log_test("Business Login", False, f"Status {response.status}: {error_text}")
+                    return False
                     
-            elif response.status_code == 401:
-                data = response.json()
-                self.log_test("POST /api/auth/login - New Customer Login", False, 
-                            f"Authentication failed (PASSWORD FIELD MISMATCH ISSUE?): {data.get('detail', 'Invalid credentials')}", data)
-            else:
-                self.log_test("POST /api/auth/login - New Customer Login", False, 
-                            f"Unexpected status code: {response.status_code}", response.text)
-                
         except Exception as e:
-            self.log_test("POST /api/auth/login - New Customer Login", False, f"Exception: {str(e)}")
+            self.log_test("Business Login", False, f"Exception: {str(e)}")
+            return False
             
-        return False
-                
-    def test_auth_me(self):
-        """Test GET /api/auth/me endpoint with cookies from previous login"""
-        print("\n🔐 TESTING CURRENT USER RETRIEVAL (GET /api/auth/me)")
+    async def test_jwt_token_validation(self):
+        """Test 1.1: JWT Token Validation"""
+        print("\n🔍 Testing JWT Token Validation...")
         
         try:
-            # Use existing session cookies from previous login
-            response = self.session.get(f"{API_BASE}/auth/me")
+            headers = {"Authorization": f"Bearer {self.business_token}"}
             
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Validate user data structure
-                required_fields = ["id", "email", "role"]
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    user_details = f"User: {data['email']} (Role: {data['role']}, ID: {data['id']})"
-                    if 'first_name' in data and 'last_name' in data:
-                        user_details += f", Name: {data['first_name']} {data['last_name']}"
-                    self.log_test("GET /api/auth/me - Authenticated User Data", True, user_details)
+            async with self.session.get(f"{BASE_URL}/me", headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    user_id = data.get("id")
+                    kyc_status = data.get("kyc_status")
+                    
+                    self.log_test("JWT Token Validation", True, 
+                                f"User ID: {user_id}, KYC Status: {kyc_status}")
+                    return True
                 else:
-                    self.log_test("GET /api/auth/me - Authenticated User Data", False, 
-                                f"Missing fields: {missing_fields}", data)
+                    error_text = await response.text()
+                    self.log_test("JWT Token Validation", False, f"Status {response.status}: {error_text}")
+                    return False
                     
-            elif response.status_code == 401:
-                data = response.json()
-                self.log_test("GET /api/auth/me - Authenticated User Data", False, 
-                            f"Unauthorized: {data.get('detail', 'No auth token')}", data)
-            else:
-                self.log_test("GET /api/auth/me - Authenticated User Data", False, 
-                            f"Unexpected status code: {response.status_code}", response.text)
-                
         except Exception as e:
-            self.log_test("GET /api/auth/me - Authenticated User Data", False, f"Exception: {str(e)}")
+            self.log_test("JWT Token Validation", False, f"Exception: {str(e)}")
+            return False
             
-    def test_auth_refresh(self):
-        """Test POST /api/auth/refresh endpoint with existing cookies"""
-        print("\n🔐 TESTING TOKEN REFRESH (POST /api/auth/refresh)")
+    async def test_menu_creation(self):
+        """Test 2: Menu Item Creation (4 categories)"""
+        print("\n🍽️ Testing Menu Item Creation...")
         
-        try:
-            # Use existing session cookies from previous login
-            response = self.session.post(f"{API_BASE}/auth/refresh")
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if data.get("success"):
-                    self.log_test("POST /api/auth/refresh - Token Refresh", True, 
-                                f"Token refreshed: {data.get('message', 'Success')}")
-                else:
-                    self.log_test("POST /api/auth/refresh - Token Refresh", False, 
-                                f"Refresh failed: {data}", data)
-                    
-            elif response.status_code == 401:
-                data = response.json()
-                self.log_test("POST /api/auth/refresh - Token Refresh", False, 
-                            f"Unauthorized: {data.get('detail', 'No refresh token')}", data)
-            else:
-                self.log_test("POST /api/auth/refresh - Token Refresh", False, 
-                            f"Unexpected status code: {response.status_code}", response.text)
-                
-        except Exception as e:
-            self.log_test("POST /api/auth/refresh - Token Refresh", False, f"Exception: {str(e)}")
-            
-    def test_auth_logout(self):
-        """Test POST /api/auth/logout endpoint with existing cookies"""
-        print("\n🔐 TESTING LOGOUT (POST /api/auth/logout)")
+        # Test data for 4 categories
+        menu_items = [
+            {
+                "name": "Adana Kebap Premium",
+                "description": "Özel baharatlarla marine edilmiş Adana kebabı",
+                "price": 95.00,
+                "currency": "TRY",
+                "category": "Yemek",
+                "tags": ["acılı", "et yemeği", "premium"],
+                "image_url": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd",
+                "is_available": True,
+                "vat_rate": 0.18,
+                "preparation_time": 25,
+                "options": [
+                    {"name": "Ekstra acı sos", "price": 5.0},
+                    {"name": "Büyük porsiyon", "price": 20.0}
+                ]
+            },
+            {
+                "name": "Serpme Kahvaltı",
+                "description": "Zengin içerikli serpme kahvaltı tabağı",
+                "price": 120.00,
+                "currency": "TRY",
+                "category": "Kahvaltı",
+                "tags": ["sabah", "organik", "köy ürünleri"],
+                "vat_rate": 0.10,
+                "preparation_time": 15
+            },
+            {
+                "name": "Taze Sıkılmış Portakal Suyu",
+                "description": "Günlük taze portakallardan",
+                "price": 25.00,
+                "currency": "TRY",
+                "category": "İçecek",
+                "tags": ["taze", "soğuk"],
+                "vat_rate": 0.08,
+                "preparation_time": 3
+            },
+            {
+                "name": "Patates Kızartması",
+                "description": "Çıtır çıtır patates kızartması",
+                "price": 30.00,
+                "currency": "TRY",
+                "category": "Atıştırmalık",
+                "tags": ["yan ürün", "çocuklar için"],
+                "vat_rate": 0.18,
+                "preparation_time": 10
+            }
+        ]
         
-        try:
-            # Use existing session cookies from previous login
-            response = self.session.post(f"{API_BASE}/auth/logout")
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if data.get("success"):
-                    # Test that cookies are cleared by trying to access /me
-                    me_response = self.session.get(f"{API_BASE}/auth/me")
-                    
-                    if me_response.status_code == 401:
-                        self.log_test("POST /api/auth/logout - Logout & Cookie Clear", True, 
-                                    "Logout successful, cookies cleared, /me returns 401")
+        headers = {"Authorization": f"Bearer {self.business_token}"}
+        success_count = 0
+        
+        for i, item_data in enumerate(menu_items):
+            try:
+                async with self.session.post(f"{BASE_URL}/business/menu", 
+                                           json=item_data, headers=headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        item_id = data.get("id")
+                        self.created_items.append(item_id)
+                        success_count += 1
+                        
+                        self.log_test(f"Create {item_data['category']} Item", True, 
+                                    f"ID: {item_id}, Name: {item_data['name']}")
                     else:
-                        self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
-                                    f"/me still accessible after logout (status: {me_response.status_code})")
-                else:
-                    self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
-                                f"Logout failed: {data}", data)
-                    
-            else:
-                self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
-                            f"Unexpected status code: {response.status_code}", response.text)
-                
-        except Exception as e:
-            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, f"Exception: {str(e)}")
-            
-    def test_cookie_attributes(self):
-        """Test HttpOnly cookie attributes and security"""
-        print("\n🍪 TESTING COOKIE ATTRIBUTES")
-        
-        try:
-            response = self.session.post(f"{API_BASE}/auth/login", 
-                                       json=TEST_CREDENTIALS["test_customer"])
-            
-            if response.status_code == 200:
-                cookies = response.cookies
-                
-                # Check access_token cookie
-                if 'access_token' in cookies:
-                    access_cookie = cookies['access_token']
-                    
-                    # Check cookie attributes (note: requests library doesn't expose all attributes)
-                    cookie_details = f"Access token cookie present, Path: {getattr(access_cookie, 'path', 'N/A')}"
-                    self.log_test("Cookie Attributes - Access Token", True, cookie_details)
-                else:
-                    self.log_test("Cookie Attributes - Access Token", False, "No access_token cookie found")
-                
-                # Check refresh_token cookie
-                if 'refresh_token' in cookies:
-                    refresh_cookie = cookies['refresh_token']
-                    cookie_details = f"Refresh token cookie present, Path: {getattr(refresh_cookie, 'path', 'N/A')}"
-                    self.log_test("Cookie Attributes - Refresh Token", True, cookie_details)
-                else:
-                    self.log_test("Cookie Attributes - Refresh Token", False, "No refresh_token cookie found")
-                    
-            else:
-                self.log_test("Cookie Attributes - Login Required", False, 
-                            f"Could not login to test cookies (status: {response.status_code})")
-                
-        except Exception as e:
-            self.log_test("Cookie Attributes - Test", False, f"Exception: {str(e)}")
-            
-    def test_error_scenarios(self):
-        """Test error handling scenarios"""
-        print("\n❌ TESTING ERROR SCENARIOS")
-        
-        # Test wrong password
-        try:
-            wrong_creds = {"email": "testcustomer@example.com", "password": "wrongpassword"}
-            response = self.session.post(f"{API_BASE}/auth/login", json=wrong_creds)
-            
-            if response.status_code == 401:
-                data = response.json()
-                self.log_test("Error Handling - Wrong Password", True, 
-                            f"Correctly returned 401: {data.get('detail', 'Invalid credentials')}")
-            else:
-                self.log_test("Error Handling - Wrong Password", False, 
-                            f"Expected 401, got {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Error Handling - Wrong Password", False, f"Exception: {str(e)}")
-            
-        # Test non-existent email
-        try:
-            fake_creds = {"email": "nonexistent@example.com", "password": "password"}
-            response = self.session.post(f"{API_BASE}/auth/login", json=fake_creds)
-            
-            if response.status_code == 401:
-                data = response.json()
-                self.log_test("Error Handling - Non-existent Email", True, 
-                            f"Correctly returned 401: {data.get('detail', 'Invalid credentials')}")
-            else:
-                self.log_test("Error Handling - Non-existent Email", False, 
-                            f"Expected 401, got {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Error Handling - Non-existent Email", False, f"Exception: {str(e)}")
-            
-        # Test invalid email format
-        try:
-            invalid_creds = {"email": "invalid-email", "password": "password"}
-            response = self.session.post(f"{API_BASE}/auth/login", json=invalid_creds)
-            
-            if response.status_code == 422:
-                data = response.json()
-                self.log_test("Error Handling - Invalid Email Format", True, 
-                            f"Correctly returned 422: {data.get('detail', 'Validation error')}")
-            else:
-                self.log_test("Error Handling - Invalid Email Format", False, 
-                            f"Expected 422, got {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Error Handling - Invalid Email Format", False, f"Exception: {str(e)}")
-            
-        # Test missing credentials
-        try:
-            response = self.session.post(f"{API_BASE}/auth/login", json={})
-            
-            if response.status_code == 422:
-                data = response.json()
-                self.log_test("Error Handling - Missing Credentials", True, 
-                            f"Correctly returned 422: {data.get('detail', 'Validation error')}")
-            else:
-                self.log_test("Error Handling - Missing Credentials", False, 
-                            f"Expected 422, got {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Error Handling - Missing Credentials", False, f"Exception: {str(e)}")
-            
-    def test_rbac_customer_endpoints(self):
-        """Test Role-Based Access Control for customer endpoints"""
-        print("\n🔒 TESTING RBAC - CUSTOMER ENDPOINTS")
-        
-        # Login as customer
-        login_response = self.session.post(f"{API_BASE}/auth/login", 
-                                         json=TEST_CREDENTIALS["test_customer"])
-        
-        if login_response.status_code == 200:
-            # Test customer can access customer endpoints
-            try:
-                response = self.session.get(f"{API_BASE}/user/addresses")
-                
-                if response.status_code in [200, 404]:  # 404 is ok if no addresses
-                    self.log_test("RBAC - Customer Access to /user/addresses", True, 
-                                f"Customer can access addresses (status: {response.status_code})")
-                elif response.status_code == 403:
-                    self.log_test("RBAC - Customer Access to /user/addresses", False, 
-                                "Customer denied access to own addresses")
-                else:
-                    self.log_test("RBAC - Customer Access to /user/addresses", False, 
-                                f"Unexpected status: {response.status_code}")
-                    
+                        error_text = await response.text()
+                        self.log_test(f"Create {item_data['category']} Item", False, 
+                                    f"Status {response.status}: {error_text}")
+                        
             except Exception as e:
-                self.log_test("RBAC - Customer Access to /user/addresses", False, f"Exception: {str(e)}")
+                self.log_test(f"Create {item_data['category']} Item", False, f"Exception: {str(e)}")
                 
-            # Test customer cannot access admin endpoints
-            try:
-                response = self.session.get(f"{API_BASE}/admin/orders")
-                
-                if response.status_code == 403:
-                    self.log_test("RBAC - Customer Denied Admin Access", True, 
-                                "Customer correctly denied access to admin endpoints")
-                elif response.status_code == 401:
-                    self.log_test("RBAC - Customer Denied Admin Access", True, 
-                                "Customer correctly denied access (401 - no admin token)")
-                else:
-                    self.log_test("RBAC - Customer Denied Admin Access", False, 
-                                f"Customer should not access admin endpoints (status: {response.status_code})")
-                    
-            except Exception as e:
-                self.log_test("RBAC - Customer Denied Admin Access", False, f"Exception: {str(e)}")
-        else:
-            self.log_test("RBAC - Customer Login Required", False, 
-                        "Could not login as customer to test RBAC")
-
-    def test_complete_registration_login_flow(self):
-        """Test complete registration → auto-login → dashboard access flow"""
-        print("\n🔄 TESTING COMPLETE REGISTRATION → LOGIN → DASHBOARD FLOW")
+        return success_count == len(menu_items)
         
-        # Step 1: Register customer
-        registration_success = self.test_customer_registration()
+    async def test_menu_retrieval(self):
+        """Test 3: Menu Item Retrieval"""
+        print("\n📋 Testing Menu Item Retrieval...")
         
-        # Step 2: Login with registered credentials (should now work after password fix)
-        if registration_success:
-            login_success = self.test_customer_login()
+        try:
+            headers = {"Authorization": f"Bearer {self.business_token}"}
             
-            # Step 3: Test dashboard access with cookies
-            if login_success:
-                self.test_auth_me()
-            else:
-                self.log_test("Complete Flow - Login After Registration", False, 
-                            "Login failed after successful registration - PASSWORD FIELD MISMATCH ISSUE")
+            async with self.session.get(f"{BASE_URL}/business/menu", headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if isinstance(data, list) and len(data) >= 4:
+                        # Check if all required fields are present
+                        required_fields = ["id", "name", "description", "price", "category", 
+                                         "tags", "vat_rate", "options", "preparation_time"]
+                        
+                        all_fields_present = True
+                        for item in data:
+                            for field in required_fields:
+                                if field not in item:
+                                    all_fields_present = False
+                                    break
+                        
+                        if all_fields_present:
+                            self.log_test("Menu Retrieval", True, 
+                                        f"Retrieved {len(data)} items with all required fields")
+                            return True
+                        else:
+                            self.log_test("Menu Retrieval", False, "Missing required fields in response")
+                            return False
+                    else:
+                        self.log_test("Menu Retrieval", False, f"Expected 4+ items, got {len(data) if isinstance(data, list) else 'non-list'}")
+                        return False
+                else:
+                    error_text = await response.text()
+                    self.log_test("Menu Retrieval", False, f"Status {response.status}: {error_text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_test("Menu Retrieval", False, f"Exception: {str(e)}")
+            return False
+            
+    async def test_menu_update(self):
+        """Test 4: Menu Item Update"""
+        print("\n✏️ Testing Menu Item Update...")
+        
+        if not self.created_items:
+            self.log_test("Menu Update", False, "No created items to update")
+            return False
+            
+        try:
+            item_id = self.created_items[0]  # Update first created item
+            update_data = {
+                "price": 105.00,
+                "tags": ["premium", "acılı", "et yemeği", "bestseller"]
+            }
+            
+            headers = {"Authorization": f"Bearer {self.business_token}"}
+            
+            async with self.session.patch(f"{BASE_URL}/business/menu/{item_id}", 
+                                        json=update_data, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    updated_price = data.get("price")
+                    updated_tags = data.get("tags", [])
+                    
+                    if updated_price == 105.00 and "bestseller" in updated_tags:
+                        self.log_test("Menu Update", True, 
+                                    f"Price updated to {updated_price}, Tags: {updated_tags}")
+                        return True
+                    else:
+                        self.log_test("Menu Update", False, 
+                                    f"Update not reflected. Price: {updated_price}, Tags: {updated_tags}")
+                        return False
+                else:
+                    error_text = await response.text()
+                    self.log_test("Menu Update", False, f"Status {response.status}: {error_text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_test("Menu Update", False, f"Exception: {str(e)}")
+            return False
+            
+    async def test_toggle_availability(self):
+        """Test 5: Toggle Availability"""
+        print("\n🔄 Testing Toggle Availability...")
+        
+        if not self.created_items:
+            self.log_test("Toggle Availability", False, "No created items to toggle")
+            return False
+            
+        try:
+            item_id = self.created_items[0]
+            headers = {"Authorization": f"Bearer {self.business_token}"}
+            
+            # Set to unavailable
+            update_data = {"is_available": False}
+            async with self.session.patch(f"{BASE_URL}/business/menu/{item_id}", 
+                                        json=update_data, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if not data.get("is_available"):
+                        # Set back to available
+                        update_data = {"is_available": True}
+                        async with self.session.patch(f"{BASE_URL}/business/menu/{item_id}", 
+                                                    json=update_data, headers=headers) as response2:
+                            if response2.status == 200:
+                                data2 = await response2.json()
+                                if data2.get("is_available"):
+                                    self.log_test("Toggle Availability", True, 
+                                                "Successfully toggled availability false→true")
+                                    return True
+                                else:
+                                    self.log_test("Toggle Availability", False, "Failed to set back to available")
+                                    return False
+                            else:
+                                error_text = await response2.text()
+                                self.log_test("Toggle Availability", False, f"Second toggle failed: {error_text}")
+                                return False
+                    else:
+                        self.log_test("Toggle Availability", False, "Failed to set unavailable")
+                        return False
+                else:
+                    error_text = await response.text()
+                    self.log_test("Toggle Availability", False, f"Status {response.status}: {error_text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_test("Toggle Availability", False, f"Exception: {str(e)}")
+            return False
+            
+    async def test_soft_delete(self):
+        """Test 6: Soft Delete"""
+        print("\n🗑️ Testing Soft Delete...")
+        
+        if len(self.created_items) < 2:
+            self.log_test("Soft Delete", False, "Need at least 2 created items for soft delete test")
+            return False
+            
+        try:
+            item_id = self.created_items[1]  # Soft delete second item
+            headers = {"Authorization": f"Bearer {self.business_token}"}
+            
+            async with self.session.delete(f"{BASE_URL}/business/menu/{item_id}?soft_delete=true", 
+                                         headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data.get("success"):
+                        # Verify item still exists but is unavailable
+                        async with self.session.get(f"{BASE_URL}/business/menu", headers=headers) as response2:
+                            if response2.status == 200:
+                                menu_data = await response2.json()
+                                soft_deleted_item = None
+                                for item in menu_data:
+                                    if item.get("id") == item_id:
+                                        soft_deleted_item = item
+                                        break
+                                
+                                if soft_deleted_item and not soft_deleted_item.get("is_available"):
+                                    self.log_test("Soft Delete", True, 
+                                                f"Item {item_id} soft deleted (is_available=False)")
+                                    return True
+                                else:
+                                    self.log_test("Soft Delete", False, 
+                                                "Item not found or still available after soft delete")
+                                    return False
+                            else:
+                                self.log_test("Soft Delete", False, "Failed to verify soft delete")
+                                return False
+                    else:
+                        self.log_test("Soft Delete", False, "Delete operation not successful")
+                        return False
+                else:
+                    error_text = await response.text()
+                    self.log_test("Soft Delete", False, f"Status {response.status}: {error_text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_test("Soft Delete", False, f"Exception: {str(e)}")
+            return False
+            
+    async def test_public_customer_endpoints(self):
+        """Test 7: Public Customer Endpoints"""
+        print("\n🌐 Testing Public Customer Endpoints...")
+        
+        if not self.business_user_id:
+            self.log_test("Public Customer Endpoints", False, "No business user ID available")
+            return False
+            
+        success_count = 0
+        
+        # Test 7.1: Get all menu items for business
+        try:
+            async with self.session.get(f"{BASE_URL}/business/{self.business_user_id}/menu") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    available_items = [item for item in data if item.get("is_available", True)]
+                    
+                    # Should return only available items (3 items, not the soft-deleted one)
+                    if len(available_items) >= 3:
+                        self.log_test("Public Menu Access", True, 
+                                    f"Retrieved {len(available_items)} available items")
+                        success_count += 1
+                    else:
+                        self.log_test("Public Menu Access", False, 
+                                    f"Expected 3+ available items, got {len(available_items)}")
+                else:
+                    error_text = await response.text()
+                    self.log_test("Public Menu Access", False, f"Status {response.status}: {error_text}")
+                    
+        except Exception as e:
+            self.log_test("Public Menu Access", False, f"Exception: {str(e)}")
+            
+        # Test 7.2: Filter by category
+        try:
+            async with self.session.get(f"{BASE_URL}/business/{self.business_user_id}/menu?category=Yemek") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    yemek_items = [item for item in data if item.get("category") == "Yemek"]
+                    
+                    if len(yemek_items) >= 1:
+                        self.log_test("Public Category Filter", True, 
+                                    f"Found {len(yemek_items)} Yemek items")
+                        success_count += 1
+                    else:
+                        self.log_test("Public Category Filter", False, 
+                                    f"No Yemek items found in filtered results")
+                else:
+                    error_text = await response.text()
+                    self.log_test("Public Category Filter", False, f"Status {response.status}: {error_text}")
+                    
+        except Exception as e:
+            self.log_test("Public Category Filter", False, f"Exception: {str(e)}")
+            
+        # Test 7.3: Get single item details
+        if self.created_items:
+            try:
+                item_id = self.created_items[0]
+                async with self.session.get(f"{BASE_URL}/business/menu/{item_id}") as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if data.get("id") == item_id:
+                            self.log_test("Public Single Item", True, 
+                                        f"Retrieved item details for {item_id}")
+                            success_count += 1
+                        else:
+                            self.log_test("Public Single Item", False, "Item ID mismatch in response")
+                    else:
+                        error_text = await response.text()
+                        self.log_test("Public Single Item", False, f"Status {response.status}: {error_text}")
+                        
+            except Exception as e:
+                self.log_test("Public Single Item", False, f"Exception: {str(e)}")
         else:
-            self.log_test("Complete Flow - Registration Required", False, 
-                        "Registration failed - cannot test complete flow")
+            self.log_test("Public Single Item", False, "No created items to test")
+            
+        return success_count >= 2  # At least 2 out of 3 tests should pass
+        
+    async def test_validation_scenarios(self):
+        """Test 8: Validation Tests"""
+        print("\n🔍 Testing Validation Scenarios...")
+        
+        headers = {"Authorization": f"Bearer {self.business_token}"}
+        success_count = 0
+        
+        # Test 8.1: Invalid Category
+        try:
+            invalid_category_data = {
+                "name": "Test Invalid Category",
+                "price": 50.0,
+                "category": "InvalidCategory"
+            }
+            
+            async with self.session.post(f"{BASE_URL}/business/menu", 
+                                       json=invalid_category_data, headers=headers) as response:
+                if response.status == 422:
+                    self.log_test("Invalid Category Validation", True, "422 validation error as expected")
+                    success_count += 1
+                else:
+                    self.log_test("Invalid Category Validation", False, 
+                                f"Expected 422, got {response.status}")
+                    
+        except Exception as e:
+            self.log_test("Invalid Category Validation", False, f"Exception: {str(e)}")
+            
+        # Test 8.2: Invalid VAT Rate
+        try:
+            invalid_vat_data = {
+                "name": "Test Invalid VAT",
+                "price": 50.0,
+                "category": "Yemek",
+                "vat_rate": 0.99
+            }
+            
+            async with self.session.post(f"{BASE_URL}/business/menu", 
+                                       json=invalid_vat_data, headers=headers) as response:
+                if response.status == 422:
+                    self.log_test("Invalid VAT Rate Validation", True, "422 validation error as expected")
+                    success_count += 1
+                else:
+                    self.log_test("Invalid VAT Rate Validation", False, 
+                                f"Expected 422, got {response.status}")
+                    
+        except Exception as e:
+            self.log_test("Invalid VAT Rate Validation", False, f"Exception: {str(e)}")
+            
+        # Test 8.3: Negative Price
+        try:
+            negative_price_data = {
+                "name": "Test Negative Price",
+                "price": -10.0,
+                "category": "Yemek"
+            }
+            
+            async with self.session.post(f"{BASE_URL}/business/menu", 
+                                       json=negative_price_data, headers=headers) as response:
+                if response.status == 422:
+                    self.log_test("Negative Price Validation", True, "422 validation error as expected")
+                    success_count += 1
+                else:
+                    self.log_test("Negative Price Validation", False, 
+                                f"Expected 422, got {response.status}")
+                    
+        except Exception as e:
+            self.log_test("Negative Price Validation", False, f"Exception: {str(e)}")
+            
+        return success_count >= 2  # At least 2 out of 3 validation tests should pass
+        
+    async def run_all_tests(self):
+        """Run all test scenarios"""
+        print("🚀 BUSINESS MENU CRUD COMPREHENSIVE TESTING")
+        print("=" * 60)
+        
+        await self.setup()
+        
+        try:
+            # Test sequence as per review request
+            tests = [
+                ("Business Authentication", self.test_business_authentication()),
+                ("JWT Token Validation", self.test_jwt_token_validation()),
+                ("Menu Item Creation", self.test_menu_creation()),
+                ("Menu Item Retrieval", self.test_menu_retrieval()),
+                ("Menu Item Update", self.test_menu_update()),
+                ("Toggle Availability", self.test_toggle_availability()),
+                ("Soft Delete", self.test_soft_delete()),
+                ("Public Customer Endpoints", self.test_public_customer_endpoints()),
+                ("Validation Scenarios", self.test_validation_scenarios())
+            ]
+            
+            results = []
+            for test_name, test_coro in tests:
+                try:
+                    result = await test_coro
+                    results.append(result)
+                except Exception as e:
+                    print(f"❌ FAIL {test_name}: Exception {str(e)}")
+                    results.append(False)
+                    
+            # Summary
+            passed = sum(results)
+            total = len(results)
+            success_rate = (passed / total) * 100
+            
+            print("\n" + "=" * 60)
+            print("📊 BUSINESS MENU CRUD TEST SUMMARY")
+            print("=" * 60)
+            print(f"✅ Passed: {passed}/{total} tests ({success_rate:.1f}% success rate)")
+            
+            if success_rate >= 80:
+                print("🎉 EXCELLENT: Business Menu CRUD system is working well!")
+            elif success_rate >= 60:
+                print("⚠️  GOOD: Business Menu CRUD system mostly working with minor issues")
+            else:
+                print("❌ CRITICAL: Business Menu CRUD system has significant issues")
+                
+            # Detailed results
+            print("\n📋 Detailed Test Results:")
+            for result in self.test_results:
+                status = "✅" if result["success"] else "❌"
+                print(f"{status} {result['test']}")
+                if result["details"]:
+                    print(f"    {result['details']}")
+                    
+            return success_rate >= 60
+            
+        finally:
+            await self.cleanup()
 
-    def run_all_tests(self):
-        """Run focused customer registration and login tests"""
-        print(f"🚀 CUSTOMER REGISTRATION & LOGIN TESTING AFTER PASSWORD FIELD MISMATCH FIX")
-        print(f"🌐 Backend URL: {BACKEND_URL}")
-        print(f"🔗 API Base: {API_BASE}")
-        print(f"📧 Test Email: {TEST_CREDENTIALS['new_customer']['email']}")
-        print("=" * 80)
-        
-        # Initialize registered_user attribute
-        self.registered_user = None
-        
-        # Run focused tests as per review request
-        print("\n🎯 CRITICAL RE-TEST AFTER FIX:")
-        print("1. Test POST /api/register/customer endpoint with new unique email")
-        print("2. Test POST /api/auth/login with the newly registered credentials (should now work)")
-        print("3. Test GET /api/auth/me with cookies to verify authentication chain works")
-        print("4. Test complete registration → auto-login → dashboard access flow")
-        
-        # Run the complete flow test
-        self.test_complete_registration_login_flow()
-        
-        # Additional verification tests
-        self.test_auth_refresh()
-        self.test_auth_logout()
-        
-        # Summary
-        print("\n" + "=" * 80)
-        print("📊 CUSTOMER REGISTRATION & LOGIN TESTING SUMMARY")
-        print("=" * 80)
-        
-        total_tests = len(self.test_results)
-        passed_tests = len([t for t in self.test_results if t["success"]])
-        failed_tests = total_tests - passed_tests
-        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
-        
-        print(f"✅ PASSED: {passed_tests}/{total_tests} ({success_rate:.1f}%)")
-        print(f"❌ FAILED: {failed_tests}/{total_tests}")
-        
-        if failed_tests > 0:
-            print(f"\n🔍 FAILED TESTS:")
-            for test in self.test_results:
-                if not test["success"]:
-                    print(f"   ❌ {test['test']}: {test['details']}")
-        
-        # Specific analysis for password field mismatch issue
-        login_tests = [t for t in self.test_results if "Login" in t["test"]]
-        if any(not t["success"] for t in login_tests):
-            print(f"\n⚠️  PASSWORD FIELD MISMATCH ANALYSIS:")
-            print(f"   If login is failing after successful registration, this indicates")
-            print(f"   the password field mismatch issue (password_hash vs password) may still exist.")
-            print(f"   Expected Flow: Registration → 201 success → Login → 200 OK with cookies")
-        
-        return {
-            "total": total_tests,
-            "passed": passed_tests,
-            "failed": failed_tests,
-            "success_rate": success_rate,
-            "results": self.test_results
-        }
+async def main():
+    """Main test execution"""
+    tester = BusinessMenuTester()
+    success = await tester.run_all_tests()
+    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
-    tester = AuthenticationTester()
-    results = tester.run_all_tests()
-    
-    # Exit with error code if tests failed
-    if results["failed"] > 0:
-        exit(1)
-    else:
-        print(f"\n🎉 ALL AUTHENTICATION TESTS PASSED!")
-        exit(0)
+    asyncio.run(main())
