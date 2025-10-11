@@ -51,7 +51,7 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
       }
     } catch (error) {
       console.error('Error fetching menu:', error);
-      // Show empty menu on error instead of mock data
+      // Show empty menu on error
       setMenuItems([]);
     } finally {
       setLoading(false);
