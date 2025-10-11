@@ -23,6 +23,17 @@ TEST_CUSTOMER_DATA = {
     "city": "İstanbul"
 }
 
+# Alternative test data with unique email for testing
+import uuid
+UNIQUE_EMAIL = f"testcustomer{str(uuid.uuid4())[:8]}@kuryecini.com"
+TEST_CUSTOMER_DATA_UNIQUE = {
+    "email": UNIQUE_EMAIL,
+    "password": "test123456", 
+    "first_name": "Test",
+    "last_name": "Customer",
+    "city": "İstanbul"
+}
+
 class CustomerRegistrationTester:
     def __init__(self):
         self.session = requests.Session()
