@@ -37,10 +37,10 @@ import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
 // Use new VITE environment variable
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const `${API_BASE}/ = import.meta.env.VITE_`${API_BASE}/_URL;
 
 // Console log for debugging
-console.log('Frontend connecting to:', API_BASE);
+console.log('Frontend connecting to:', `${API_BASE}/);
 
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
@@ -137,7 +137,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(API_BASEadmin/users`);
+      const response = await axios.get(`${API_BASE}/admin/users`);
       setUsers(response.data || []);
     } catch (error) {
       console.error('Users fetch error:', error);
@@ -150,7 +150,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(API_BASEadmin/products`);
+      const response = await axios.get(`${API_BASE}/admin/products`);
       setProducts(response.data || []);
     } catch (error) {
       console.error('Products fetch error:', error);
@@ -163,7 +163,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(API_BASEadmin/orders`);
+      const response = await axios.get(`${API_BASE}/admin/orders`);
       setOrders(response.data || []);
     } catch (error) {
       console.error('Orders fetch error:', error);
@@ -176,7 +176,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchCouriers = async () => {
     try {
-      const response = await axios.get(API_BASEadmin/couriers/kyc`);
+      const response = await axios.get(`${API_BASE}/admin/couriers/kyc`);
       setCouriers(response.data || []);
     } catch (error) {
       console.error('Couriers fetch error:', error);
@@ -209,7 +209,7 @@ const AdminDashboard = ({ user }) => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(`${API_BASE}/orders/${orderId}/status?new_status=${newStatus}`);
+      await axios.patch(`${`${API_BASE}/}/orders/${orderId}/status?new_status=${newStatus}`);
       toast.success('Sipariş durumu güncellendi');
       fetchOrders();
     } catch (error) {
@@ -220,7 +220,7 @@ const AdminDashboard = ({ user }) => {
   const updateCourierKYC = async (courierId, kycStatus, notes = '') => {
     try {
       setLoading(true);
-      await axios.patch(API_BASEadmin/couriers/${courierId}/kyc?kyc_status=${kycStatus}`, 
+      await axios.patch(`${API_BASE}/admin/couriers/${courierId}/kyc?kyc_status=${kycStatus}`, 
         notes ? { notes } : {},
         {
           headers: {
@@ -347,7 +347,7 @@ const AdminDashboard = ({ user }) => {
           break;
       }
 
-      await axios.post(API_BASE${endpoint}`, userData);
+      await axios.post(`${API_BASE}/${endpoint}`, userData);
       toast.success('Kullanıcı başarıyla eklendi');
       setShowAddUserDialog(false);
       resetNewUserData();
@@ -363,7 +363,7 @@ const AdminDashboard = ({ user }) => {
   const deleteUser = async (userId) => {
     setLoading(true);
     try {
-      await axios.delete(API_BASEadmin/users/${userId}`);
+      await axios.delete(`${API_BASE}/admin/users/${userId}`);
       toast.success('Kullanıcı başarıyla silindi');
       setShowDeleteUserDialog(false);
       setSelectedUser(null);
@@ -1512,7 +1512,7 @@ const CourierRegistration = ({ onComplete, onBack }) => {
         profile_photo_url: profilePhotoUrl
       };
 
-      const response = await axios.post(`${API_BASE}/auth/register?role=courier`, registrationData, {
+      const response = await axios.post(`${`${API_BASE}/}/auth/register?role=courier`, registrationData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -1523,7 +1523,7 @@ const CourierRegistration = ({ onComplete, onBack }) => {
       if (response.data.success || response.status === 201) {
         toast.success('Kurye kaydınız tamamlandı! Giriş yapılıyor...');
         // Now login the user automatically
-        const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
+        const loginResponse = await axios.post(`${`${API_BASE}/}/auth/login`, {
           email: formData.email,
           password: formData.password
         }, {
@@ -1935,7 +1935,7 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
 
     try {
       // CI GATE 0 COMPLIANCE - Use correct endpoint and cookie auth
-      const response = await axios.post(`${API_BASE}/auth/register?role=business`, formData, {
+      const response = await axios.post(`${`${API_BASE}/}/auth/register?role=business`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -1946,7 +1946,7 @@ const BusinessRegistration = ({ onComplete, onBack }) => {
       if (response.data.success || response.status === 201) {
         toast.success('İşletme kaydınız tamamlandı! Giriş yapılıyor...');
         // Now login the user automatically
-        const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
+        const loginResponse = await axios.post(`${`${API_BASE}/}/auth/login`, {
           email: formData.email,
           password: formData.password
         }, {
@@ -2217,7 +2217,7 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
         role: 'customer'
       };
       
-      const response = await axios.post(`${API_BASE}/auth/register?role=customer`, registrationData, {
+      const response = await axios.post(`${`${API_BASE}/}/auth/register?role=customer`, registrationData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -2228,7 +2228,7 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
       if (response.data.success) {
         toast.success('Müşteri kaydınız tamamlandı! Giriş yapılıyor...');
         // Now login the user automatically
-        const loginResponse = await axios.post(`${API_BASE}/auth/login`, {
+        const loginResponse = await axios.post(`${`${API_BASE}/}/auth/login`, {
           email: formData.email,
           password: formData.password
         }, {
@@ -2445,7 +2445,7 @@ const BusinessDashboard = ({ user }) => {
     setLoading(true);
     try {
       // Use new http client with double /api prevention
-      const response = await axios.get(`${API_BASE}/products/my`, {
+      const response = await axios.get(`${`${API_BASE}/}/products/my`, {
         withCredentials: true
       });
       setProducts(response.data);
@@ -2459,7 +2459,7 @@ const BusinessDashboard = ({ user }) => {
   const fetchOrders = async () => {
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const response = await axios.get(API_BASEorders`, {
+      const response = await axios.get(`${API_BASE}/orders`, {
         withCredentials: true
       });
       setOrders(response.data);
@@ -2486,7 +2486,7 @@ const BusinessDashboard = ({ user }) => {
       };
 
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      await axios.post(API_BASEproducts`, productData, {
+      await axios.post(`${API_BASE}/products`, productData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -2514,7 +2514,7 @@ const BusinessDashboard = ({ user }) => {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      await axios.patch(API_BASEorders/${orderId}/status?new_status=${newStatus}`, {}, {
+      await axios.patch(`${API_BASE}/orders/${orderId}/status?new_status=${newStatus}`, {}, {
         withCredentials: true
       });
       toast.success('Sipariş durumu güncellendi');
@@ -2946,7 +2946,7 @@ const CustomerDashboard = ({ user }) => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(API_BASEproducts`);
+      const response = await axios.get(`${API_BASE}/products`);
       setProducts(response.data);
     } catch (error) {
       toast.error('Ürünler yüklenemedi');
@@ -2956,7 +2956,7 @@ const CustomerDashboard = ({ user }) => {
 
   const fetchMyOrders = async () => {
     try {
-      const response = await axios.get(API_BASEorders`);
+      const response = await axios.get(`${API_BASE}/orders`);
       setOrders(response.data);
     } catch (error) {
       toast.error('Siparişler yüklenemedi');
@@ -2967,7 +2967,7 @@ const CustomerDashboard = ({ user }) => {
   const fetchCampaigns = async () => {
     if (!isMounted) return;
     try {
-      const response = await axios.get(API_BASEcampaigns`);
+      const response = await axios.get(`${API_BASE}/campaigns`);
       if (isMounted) {
         setCampaigns(response.data);
       }
@@ -2982,7 +2982,7 @@ const CustomerDashboard = ({ user }) => {
     if (!isMounted) return;
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const response = await axios.get(API_BASEloyalty/points`, {
+      const response = await axios.get(`${API_BASE}/loyalty/points`, {
         withCredentials: true
       });
       if (isMounted) {
@@ -2998,7 +2998,7 @@ const CustomerDashboard = ({ user }) => {
   const fetchActiveCoupons = async () => {
     if (!isMounted) return;
     try {
-      const response = await axios.get(API_BASEcoupons/active`);
+      const response = await axios.get(`${API_BASE}/coupons/active`);
       if (isMounted) {
         setActiveCoupons(response.data);
       }
@@ -3116,7 +3116,7 @@ const CustomerDashboard = ({ user }) => {
         notes: orderForm.notes
       };
 
-      await axios.post(API_BASEorders`, orderData);
+      await axios.post(`${API_BASE}/orders`, orderData);
       
       toast.success('Sipariş başarıyla oluşturuldu! 🎉');
       setCart([]);
