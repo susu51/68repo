@@ -174,9 +174,9 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const updateLocationOnServer = React.useCallback(async (location) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       await axios.post(`${API}/courier/location`, location, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
     } catch (error) {
       console.error('Location update failed:', error);
