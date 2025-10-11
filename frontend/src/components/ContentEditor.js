@@ -7,7 +7,7 @@ import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../utils/apiClient';
+import api from '../api/http';
 
 const ContentEditor = () => {
   const [contentBlocks, setContentBlocks] = useState([]);
