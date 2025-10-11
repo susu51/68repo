@@ -79,23 +79,47 @@ const refreshAuth = async () => {
   return res;
 };
 
-// Convenience methods
-export const get = (path, options = {}) => api(path, { method: 'GET', ...options });
-export const post = (path, body, options = {}) => api(path, { 
-  method: 'POST', 
-  body: JSON.stringify(body),
-  ...options 
-});
-export const put = (path, body, options = {}) => api(path, { 
-  method: 'PUT', 
-  body: JSON.stringify(body),
-  ...options 
-});
-export const patch = (path, body, options = {}) => api(path, { 
-  method: 'PATCH', 
-  body: JSON.stringify(body),
-  ...options 
-});
-export const del = (path, options = {}) => api(path, { method: 'DELETE', ...options });
+// Convenience methods that return parsed JSON with .data wrapper for compatibility
+export const get = async (path, options = {}) => {
+  const res = await api(path, { method: 'GET', ...options });
+  const data = await res.json();
+  return { data };
+};
+
+export const post = async (path, body, options = {}) => {
+  const res = await api(path, { 
+    method: 'POST', 
+    body: JSON.stringify(body),
+    ...options 
+  });
+  const data = await res.json();
+  return { data };
+};
+
+export const put = async (path, body, options = {}) => {
+  const res = await api(path, { 
+    method: 'PUT', 
+    body: JSON.stringify(body),
+    ...options 
+  });
+  const data = await res.json();
+  return { data };
+};
+
+export const patch = async (path, body, options = {}) => {
+  const res = await api(path, { 
+    method: 'PATCH', 
+    body: JSON.stringify(body),
+    ...options 
+  });
+  const data = await res.json();
+  return { data };
+};
+
+export const del = async (path, options = {}) => {
+  const res = await api(path, { method: 'DELETE', ...options });
+  const data = await res.json();
+  return { data };
+};
 
 export default api;
