@@ -436,7 +436,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
 
   // Duplicate function removed
 
-  // Mock data
+  // Placeholder data
   const mockCoupons = [
     {
       id: 'coupon-1',
