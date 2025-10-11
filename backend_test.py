@@ -49,44 +49,46 @@ class AuthenticationTester:
             "response": response_data
         })
         
-    def test_auth_register(self):
-        """Test POST /api/auth/register endpoint"""
-        print("\n🔐 TESTING AUTHENTICATION REGISTRATION")
+    def test_customer_registration(self):
+        """Test POST /api/register/customer endpoint with new unique email"""
+        print("\n🔐 TESTING CUSTOMER REGISTRATION (POST /api/register/customer)")
         
-        # Test new user registration
-        register_data = {
-            "email": TEST_CREDENTIALS["new_test_user"]["email"],
-            "password": TEST_CREDENTIALS["new_test_user"]["password"],
-            "first_name": "Test",
-            "last_name": "User",
-            "role": "customer"
-        }
+        # Test new customer registration with unique email
+        register_data = TEST_CREDENTIALS["new_customer"]
         
         try:
-            response = self.session.post(f"{API_BASE}/auth/register", json=register_data)
+            response = self.session.post(f"{API_BASE}/register/customer", json=register_data)
             
-            if response.status_code == 201 or response.status_code == 200:
+            if response.status_code == 201:
                 data = response.json()
-                if data.get("success"):
-                    self.log_test("POST /api/auth/register - New User Registration", True, 
-                                f"User registered successfully: {data.get('user_id', 'N/A')}")
+                if data.get("access_token") and data.get("user_data"):
+                    user_data = data["user_data"]
+                    self.log_test("POST /api/register/customer - New Customer Registration", True, 
+                                f"Customer registered successfully: {user_data.get('email')} (ID: {user_data.get('id')})")
+                    
+                    # Store user data for login test
+                    self.registered_user = user_data
+                    return True
                 else:
-                    self.log_test("POST /api/auth/register - New User Registration", False, 
-                                f"Registration failed: {data.get('message', 'Unknown error')}", data)
+                    self.log_test("POST /api/register/customer - New Customer Registration", False, 
+                                f"Registration response missing required fields", data)
             elif response.status_code == 400:
                 data = response.json()
-                if "already exists" in data.get("detail", "").lower():
-                    self.log_test("POST /api/auth/register - New User Registration", True, 
-                                "User already exists (expected for existing test user)")
+                if "already registered" in data.get("detail", "").lower():
+                    self.log_test("POST /api/register/customer - New Customer Registration", True, 
+                                "User already exists - will test login with existing credentials")
+                    return True
                 else:
-                    self.log_test("POST /api/auth/register - New User Registration", False, 
-                                f"Unexpected 400 error: {data.get('detail', 'Unknown')}", data)
+                    self.log_test("POST /api/register/customer - New Customer Registration", False, 
+                                f"Registration failed: {data.get('detail', 'Unknown error')}", data)
             else:
-                self.log_test("POST /api/auth/register - New User Registration", False, 
+                self.log_test("POST /api/register/customer - New Customer Registration", False, 
                             f"Unexpected status code: {response.status_code}", response.text)
                 
         except Exception as e:
-            self.log_test("POST /api/auth/register - New User Registration", False, f"Exception: {str(e)}")
+            self.log_test("POST /api/register/customer - New Customer Registration", False, f"Exception: {str(e)}")
+            
+        return False
             
     def test_auth_login(self):
         """Test POST /api/auth/login endpoint with cookie validation"""
