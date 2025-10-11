@@ -115,56 +115,6 @@ async def get_current_user_from_cookie_or_bearer(request: Request):
 # Keep original function for backward compatibility
 async def get_current_user_from_cookie(request: Request):
     return await get_current_user_from_cookie_or_bearer(request)
-    
-    # Handle test users first (same as in login)
-    test_users = {
-        "customer-001": {
-            "id": "customer-001",
-            "email": "testcustomer@example.com", 
-            "first_name": "Test",
-            "last_name": "Customer",
-            "role": "customer",
-            "is_active": True
-        },
-        "courier-001": {
-            "id": "courier-001",
-            "email": "testkurye@example.com",
-            "first_name": "Test", 
-            "last_name": "Courier",
-            "role": "courier",
-            "is_active": True
-        },
-        "business-001": {
-            "id": "business-001",
-            "email": "testbusiness@example.com",
-            "first_name": "Test",
-            "last_name": "Business",
-            "role": "business", 
-            "business_name": "Test Restaurant",
-            "is_active": True
-        },
-        "admin-001": {
-            "id": "admin-001",
-            "email": "admin@kuryecini.com",
-            "first_name": "Admin",
-            "last_name": "Kuryecini",
-            "role": "admin",
-            "is_active": True
-        }
-    }
-    
-    # Check if it's a test user
-    if user_id in test_users:
-        return test_users[user_id]
-    
-    # Get user from database
-    db = get_db()
-    user = await db.users.find_one({"id": user_id}, {"password": 0})
-    
-    if not user:
-        raise HTTPException(401, "User not found")
-    
-    return user
 
 # Routes
 @auth_router.post("/login")
