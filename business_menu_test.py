@@ -251,11 +251,11 @@ class BusinessMenuTester:
             
         # Test missing required fields
         test_cases = [
-            {"name": "Missing Name", "data": {k: v for k, v in TEST_MENU_ITEM.items() if k != "name"}},
+            {"name": "Missing Title", "data": {k: v for k, v in TEST_MENU_ITEM.items() if k != "title"}},
             {"name": "Missing Price", "data": {k: v for k, v in TEST_MENU_ITEM.items() if k != "price"}},
             {"name": "Invalid Price", "data": {**TEST_MENU_ITEM, "price": "invalid"}},
             {"name": "Negative Price", "data": {**TEST_MENU_ITEM, "price": -10}},
-            {"name": "Empty Name", "data": {**TEST_MENU_ITEM, "name": ""}},
+            {"name": "Empty Title", "data": {**TEST_MENU_ITEM, "title": ""}},
         ]
         
         for test_case in test_cases:
