@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "../../components/ui/badge";
 import { Textarea } from "../../components/ui/textarea";
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../utils/apiClient';
+import api from '../../api/http';
 import { MapPin, Plus, Edit2, Trash2, Navigation, Star, Clock, Check } from 'lucide-react';
 
 const turkishCities = [
