@@ -13,7 +13,7 @@ import aiohttp
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://quickcourier.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-stable.preview.emergentagent.com/api"
 
 class CriticalIssuesFixer:
     def __init__(self):

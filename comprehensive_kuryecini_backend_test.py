@@ -25,7 +25,7 @@ import uuid
 import random
 
 # Configuration
-BACKEND_URL = "https://quickcourier.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-stable.preview.emergentagent.com/api"
 
 # Test credentials for all user types
 TEST_CREDENTIALS = {

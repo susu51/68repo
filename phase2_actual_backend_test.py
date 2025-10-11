@@ -31,7 +31,7 @@ import random
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://quickcourier.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-stable.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_CREDENTIALS = {

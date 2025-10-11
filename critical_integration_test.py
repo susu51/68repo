@@ -22,7 +22,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://quickcourier.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-stable.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 class IntegrationTester:

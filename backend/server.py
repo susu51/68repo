@@ -609,7 +609,7 @@ async def log_requests(request: Request, call_next):
     return response
 
 # CORS origins from environment
-cors_origins_env = os.getenv("CORS_ORIGINS", "https://quickcourier.preview.emergentagent.com")
+cors_origins_env = os.getenv("CORS_ORIGINS", "https://courier-stable.preview.emergentagent.com")
 cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
 
 app.add_middleware(
