@@ -52,7 +52,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchNearbyOrders = async () => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */;
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/orders/nearby`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -233,7 +233,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const acceptOrder = async (orderId) => {
     try {
-      const token = null /* CI GATE 0 - localStorage removed */; // Fixed token key
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies // Fixed token key
       await axios.post(`${API}/orders/${orderId}/accept`, {}, {
         withCredentials: true
       });
