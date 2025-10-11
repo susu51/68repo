@@ -150,7 +150,7 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     : 'bg-white/70 border-white/50 backdrop-blur-xl';
 
   return (
-    <div className={`min-h-screen ${backgroundClass} flex items-center justify-center p-4 relative overflow-hidden`}>
+    <div className={`${backgroundClass} flex items-center justify-center p-4 relative overflow-hidden max-w-md w-full`} style={{ minHeight: '500px' }}>
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-400/20 rounded-full blur-3xl"></div>
