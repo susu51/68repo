@@ -7,8 +7,10 @@ import { KuryeciniLogo, KuryeciniTextLogo } from "./components/KuryeciniLogo";
 import PhoneAuth from "./PhoneAuth";
 import toast from 'react-hot-toast';
 import { api } from './api/http';  // Use cookie-aware API client
+import { useCookieAuth } from './contexts/CookieAuthContext';  // Use auth context
 
 export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
+  const { login: contextLogin, checkAuthStatus } = useCookieAuth();
   const [loginMethod, setLoginMethod] = useState('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
