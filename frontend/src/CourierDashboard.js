@@ -231,7 +231,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchEarnings = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/earnings`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -251,7 +251,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -273,7 +273,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -362,7 +362,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
   // Order management
   const acceptOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.patch(`${API}/courier/orders/${orderId}/pickup`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -378,7 +378,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       await axios.post(`${API}/orders/${orderId}/status`, {
         status,
         location: courierLocation,
@@ -411,7 +411,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const toggleOnlineStatus = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.post(`${API}/courier/status/toggle`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -490,7 +490,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
   // Profile update
   const updateProfile = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       await axios.put(`${API}/courier/profile`, profile, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -504,7 +504,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
   // Generate report
   const generateReport = async (type = 'monthly') => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/report/${type}`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
