@@ -57,7 +57,8 @@ export const api = async (path, init = {}) => {
 
 // Refresh token helper
 const refreshAuth = async () => {
-  const res = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+  const res = await fetch(`${BACKEND_URL}/api/auth/refresh`, {
     method: 'POST',
     credentials: 'include'
   });
