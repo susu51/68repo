@@ -1512,7 +1512,7 @@ const CourierRegistration = ({ onComplete, onBack }) => {
         profile_photo_url: profilePhotoUrl
       };
 
-      const response = await axios.post(`${API}/api/register/courier`, registrationData, {
+      const response = await axios.post(`${API_BASE}/auth/register?role=courier`, registrationData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
