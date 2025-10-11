@@ -382,69 +382,8 @@ export class LoyaltyManager {
   }
 }
 
-// Migration utility for existing localStorage data
-export class LocalStorageMigration {
-  static async migrateToDatabase() {
-    try {
-      // Check if migration already completed
-      // Migration system disabled - using real MongoDB only
-      return { skipped: true, reason: 'SessionStorage migration disabled for CI Gate 0 compliance' };
-
-      // Collect all localStorage data
-      const migrationData = {};
-
-      // Cart data
-      const cartData = localStorage.getItem('kuryecini_cart');
-      if (cartData) {
-        try {
-          migrationData.cart = JSON.parse(cartData);
-        } catch (e) {
-          console.warn('Failed to parse cart data for migration:', e);
-        }
-      }
-
-      // Address data
-      const addressData = localStorage.getItem('kuryecini_addresses');
-      if (addressData) {
-        try {
-          migrationData.addresses = JSON.parse(addressData);
-        } catch (e) {
-          console.warn('Failed to parse address data for migration:', e);
-        }
-      }
-
-      // Preferences data
-      const prefsData = localStorage.getItem('kuryecini_preferences');
-      if (prefsData) {
-        try {
-          migrationData.preferences = JSON.parse(prefsData);
-        } catch (e) {
-          console.warn('Failed to parse preferences data for migration:', e);
-        }
-      }
-
-      // Loyalty points data
-      const loyaltyData = localStorage.getItem('kuryecini_loyalty_points');
-      if (loyaltyData) {
-        try {
-          migrationData.loyalty_points = parseInt(loyaltyData, 10);
-        } catch (e) {
-          console.warn('Failed to parse loyalty points for migration:', e);
-        }
-      }
-
-      // Migration disabled - no sessionStorage usage allowed
-
-      // Migration system disabled for CI Gate 0 compliance
-      console.log('LocalStorage migration disabled - using MongoDB only');
-      return { skipped: true, reason: 'Migration disabled for compliance' };
-
-    } catch (error) {
-      console.error('Migration failed:', error);
-      throw error;
-    }
-  }
-}
+// CI GATE 0 COMPLIANCE - Migration utilities removed
+// All data management is API-based only
 
 // Anti-localStorage utility - prevents accidental localStorage usage
 export const AntiLocalStorage = {
