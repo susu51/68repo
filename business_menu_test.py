@@ -245,6 +245,45 @@ class BusinessMenuTester:
         except Exception as e:
             self.log_test("Business KYC Status Check", False, f"Exception: {str(e)}")
             
+    def test_business_user_exists(self):
+        """Check if business user exists in database"""
+        print("\n🔍 TESTING BUSINESS USER DATABASE EXISTENCE")
+        
+        try:
+            # Try to register the business user first (in case it doesn't exist)
+            register_data = {
+                "email": BUSINESS_CREDENTIALS["email"],
+                "password": BUSINESS_CREDENTIALS["password"],
+                "business_name": "Test Business",
+                "tax_number": "1234567890",
+                "address": "Test Address",
+                "city": "Istanbul",
+                "district": "Test District",
+                "business_category": "gida",
+                "description": "Test business for menu testing"
+            }
+            
+            register_response = self.session.post(f"{API_BASE}/register/business", json=register_data)
+            
+            if register_response.status_code in [200, 201]:
+                data = register_response.json()
+                self.log_test("Business User Registration", True, 
+                            f"Business registered successfully: {data.get('user_data', {}).get('id', 'N/A')}")
+            elif register_response.status_code == 400:
+                data = register_response.json()
+                if "already registered" in data.get("detail", "").lower():
+                    self.log_test("Business User Registration", True, 
+                                "Business already exists (expected)")
+                else:
+                    self.log_test("Business User Registration", False, 
+                                f"Registration failed: {data.get('detail', 'Unknown error')}", data)
+            else:
+                self.log_test("Business User Registration", False, 
+                            f"Unexpected registration status: {register_response.status_code}", register_response.text)
+                
+        except Exception as e:
+            self.log_test("Business User Registration", False, f"Exception: {str(e)}")
+            
     def test_business_approval_fix(self):
         """Try to approve the business if it's pending"""
         print("\n🔧 TESTING BUSINESS APPROVAL FIX")
