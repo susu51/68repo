@@ -2445,7 +2445,7 @@ const BusinessDashboard = ({ user }) => {
     setLoading(true);
     try {
       // Use new http client with double /api prevention
-      const response = await axios.get(`${`${API_BASE}/}/products/my`, {
+      const response = await axios.get(`${API_BASE}/products/my`, {
         withCredentials: true
       });
       setProducts(response.data);
