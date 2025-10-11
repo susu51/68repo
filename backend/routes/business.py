@@ -415,3 +415,92 @@ async def delete_menu_item(
             status_code=500,
             detail=f"Error deleting menu item: {str(e)}"
         )
+
+# Public endpoint for customers to view business menu
+@router.get("/{business_id}/menu", response_model=List[MenuItemResponse])
+async def get_business_menu(
+    business_id: str,
+    category: Optional[str] = None
+):
+    """
+    Public endpoint - Get menu items for a specific business
+    Optionally filter by category
+    """
+    try:
+        from server import db
+        
+        # Build query - only show available items
+        query = {
+            "business_id": business_id,
+            "is_available": True
+        }
+        
+        if category:
+            query["category"] = category
+        
+        # Get menu items
+        menu_items = await db.menu_items.find(query).sort("category", 1).sort("name", 1).to_list(length=None)
+        
+        return [
+            MenuItemResponse(
+                id=str(item["_id"]),
+                business_id=item["business_id"],
+                name=item.get("name", item.get("title", "")),
+                description=item.get("description", ""),
+                price=item.get("price", 0),
+                currency=item.get("currency", "TRY"),
+                category=item.get("category", "Yemek"),
+                tags=item.get("tags", []),
+                image_url=item.get("image_url", item.get("photo_url")),
+                is_available=item.get("is_available", True),
+                vat_rate=item.get("vat_rate", 0.10),
+                options=item.get("options", []),
+                preparation_time=item.get("preparation_time", 15),
+                created_at=item["created_at"],
+                updated_at=item.get("updated_at")
+            )
+            for item in menu_items
+        ]
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching business menu: {str(e)}"
+        )
+
+@router.get("/menu/{item_id}", response_model=MenuItemResponse)
+async def get_menu_item(item_id: str):
+    """Public endpoint - Get single menu item details"""
+    try:
+        from server import db
+        
+        item = await db.menu_items.find_one({"_id": item_id})
+        
+        if not item:
+            raise HTTPException(status_code=404, detail="Menu item not found")
+        
+        return MenuItemResponse(
+            id=str(item["_id"]),
+            business_id=item["business_id"],
+            name=item.get("name", item.get("title", "")),
+            description=item.get("description", ""),
+            price=item.get("price", 0),
+            currency=item.get("currency", "TRY"),
+            category=item.get("category", "Yemek"),
+            tags=item.get("tags", []),
+            image_url=item.get("image_url", item.get("photo_url")),
+            is_available=item.get("is_available", True),
+            vat_rate=item.get("vat_rate", 0.10),
+            options=item.get("options", []),
+            preparation_time=item.get("preparation_time", 15),
+            created_at=item["created_at"],
+            updated_at=item.get("updated_at")
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching menu item: {str(e)}"
+        )
