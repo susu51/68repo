@@ -2157,10 +2157,42 @@ const CustomerRegistration = ({ onComplete, onBack }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/register/customer`, formData);
-      onComplete(response.data);
-      toast.success('Müşteri kaydınız tamamlandı!');
+      // CI GATE 0 COMPLIANCE - Use correct endpoint and cookie auth
+      const registrationData = {
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        role: 'customer'
+      };
+      
+      const response = await axios.post(`${API}/api/auth/register`, registrationData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Auto-login after successful registration
+      if (response.data.success) {
+        toast.success('Müşteri kaydınız tamamlandı! Giriş yapılıyor...');
+        // Now login the user automatically
+        const loginResponse = await axios.post(`${API}/api/auth/login`, {
+          email: formData.email,
+          password: formData.password
+        }, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (loginResponse.data.success) {
+          onComplete(loginResponse.data);
+        }
+      }
     } catch (error) {
+      console.error('Registration error:', error);
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
     }
     setLoading(false);
