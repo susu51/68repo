@@ -24,6 +24,15 @@ export const api = async (path, init = {}) => {
     const res = await fetch(url, config);
     
     if (!res.ok) {
+      // Try to get error details from response body
+      let errorMessage = `${res.status} ${res.statusText}`;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.detail || errorData.message || errorMessage;
+      } catch (e) {
+        // If parsing fails, use default message
+      }
+      
       // Handle auth errors
       if (res.status === 401) {
         // Only try refresh if we're not already on an auth endpoint
@@ -33,19 +42,19 @@ export const api = async (path, init = {}) => {
             // Retry original request
             const retryRes = await fetch(url, config);
             if (!retryRes.ok) {
-              throw new Error(`${retryRes.status} ${retryRes.statusText}`);
+              const retryError = await retryRes.json().catch(() => ({}));
+              throw new Error(retryError.detail || retryError.message || `${retryRes.status} ${retryRes.statusText}`);
             }
             return retryRes;
           } catch (refreshError) {
             // Refresh failed, just throw error without redirecting
             throw new Error('Authentication expired');
           }
-        } else {
-          // For auth endpoints, just throw the error without trying to refresh
-          throw new Error(`${res.status} ${res.statusText}`);
         }
       }
-      throw new Error(`${res.status} ${res.statusText}`);
+      
+      // For other errors, throw with detailed message
+      throw new Error(errorMessage);
     }
     
     return res;
