@@ -209,7 +209,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
           setUserAddresses(addressesRes.data || []);
           break;
         case 'coupons':
-          const couponsRes = await axios.get(`${API}/api/profile/coupons`, { headers });
+          const couponsRes = await axios.get(`${API}/api/profile/coupons`, { withCredentials: true });
           setCoupons(couponsRes.data || []);
           break;
         case 'discounts':
