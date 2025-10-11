@@ -28,7 +28,7 @@ const AdminPanel = ({ user, onLogout }) => {
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/couriers?kyc_status=pending`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
       
       if (response.ok) {
@@ -47,7 +47,7 @@ const AdminPanel = ({ user, onLogout }) => {
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
       
       if (response.ok) {
@@ -66,7 +66,7 @@ const AdminPanel = ({ user, onLogout }) => {
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
       
       if (response.ok) {
@@ -261,7 +261,7 @@ const AdminPanel = ({ user, onLogout }) => {
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}/toggle`, {
         method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
       
       if (response.ok) {
@@ -291,7 +291,7 @@ const AdminPanel = ({ user, onLogout }) => {
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
       
       if (response.ok) {
@@ -318,7 +318,7 @@ const AdminPanel = ({ user, onLogout }) => {
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}/toggle`, {
         method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
       
       if (response.ok) {
@@ -348,7 +348,7 @@ const AdminPanel = ({ user, onLogout }) => {
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        withCredentials: true
       });
       
       if (response.ok) {
