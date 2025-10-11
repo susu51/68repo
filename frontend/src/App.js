@@ -2898,9 +2898,9 @@ const CustomerDashboard = ({ user }) => {
   const fetchLoyaltyPoints = async () => {
     if (!isMounted) return;
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
       const response = await axios.get(`${API}/loyalty/points`, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
       if (isMounted) {
         setLoyaltyPoints(response.data);
