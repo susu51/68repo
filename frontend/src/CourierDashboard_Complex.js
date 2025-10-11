@@ -52,7 +52,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const fetchNearbyOrders = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/orders/nearby`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -233,7 +233,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
   const acceptOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token'); // Fixed token key
+      const token = null /* CI GATE 0 - localStorage removed */; // Fixed token key
       await axios.post(`${API}/orders/${orderId}/accept`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
