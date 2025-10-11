@@ -2444,8 +2444,8 @@ const BusinessDashboard = ({ user }) => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const response = await axios.get(`${API}/products/my`, {
+      // Use new http client with double /api prevention
+      const response = await axios.get(`${API_BASE}/products/my`, {
         withCredentials: true
       });
       setProducts(response.data);
