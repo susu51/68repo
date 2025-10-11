@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from './contexts/AuthContext';
+import { useCookieAuth } from './contexts/CookieAuthContext';  // Use cookie-based auth
 import { get, post, patch, del } from './api/http';  // Use cookie-aware API client
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
