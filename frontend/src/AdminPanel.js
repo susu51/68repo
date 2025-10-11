@@ -24,7 +24,7 @@ const AdminPanel = ({ user, onLogout }) => {
   // Fetch pending couriers for KYC
   const fetchPendingCouriers = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/couriers?kyc_status=pending`, {
@@ -43,7 +43,7 @@ const AdminPanel = ({ user, onLogout }) => {
   // Fetch all promotions
   const fetchPromotions = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions`, {
@@ -62,7 +62,7 @@ const AdminPanel = ({ user, onLogout }) => {
   // Fetch all products for menu management
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products`, {
@@ -92,7 +92,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const handleBusinessApprove = async (businessId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}/status`, {
@@ -125,7 +125,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const handleBusinessReject = async (businessId, reason = '') => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}/status`, {
@@ -159,7 +159,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const handleCourierApprove = async (courierId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/couriers/${courierId}/status`, {
@@ -192,7 +192,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const handleCourierReject = async (courierId, reason = '') => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/couriers/${courierId}/status`, {
@@ -226,7 +226,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const handleCreatePromotion = async (promotionData) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions`, {
@@ -256,7 +256,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const handleTogglePromotion = async (promotionId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}/toggle`, {
@@ -286,7 +286,7 @@ const AdminPanel = ({ user, onLogout }) => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}`, {
@@ -313,7 +313,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const handleToggleProduct = async (productId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}/toggle`, {
@@ -343,7 +343,7 @@ const AdminPanel = ({ user, onLogout }) => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('kuryecini_access_token');
+      const token = null /* CI GATE 0 - localStorage removed */;
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}`, {
