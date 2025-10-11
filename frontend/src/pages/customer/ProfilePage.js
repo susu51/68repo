@@ -199,8 +199,6 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
         return;
       }
 
-      const headers = { 'Authorization': `Bearer ${token}` };
-
       switch (tab) {
         case 'addresses':
           console.log('📡 ProfilePage: Loading addresses from /user/addresses...');
