@@ -86,25 +86,40 @@ async def create_menu_item(
     item_data: MenuItemCreate,
     current_user: dict = Depends(get_approved_business_user)
 ):
-    """Create new menu item - Business role only"""
+    """Create new menu item - Business role only (KYC approved)"""
     try:
         from server import db
+        
+        # Validate category
+        MenuItemCreate.validate_category(item_data.category)
+        # Validate VAT rate
+        MenuItemCreate.validate_vat_rate(item_data.vat_rate)
+        # Validate price
+        MenuItemCreate.validate_price(item_data.price)
         
         # Use current user ID as business ID (since business is registered as user)
         business_user_id = current_user["id"]
         
         # Create menu item document
         menu_item_id = str(uuid.uuid4())
+        now = datetime.utcnow()
+        
         menu_item_doc = {
             "_id": menu_item_id,
             "business_id": business_user_id,
-            "title": item_data.title,
+            "name": item_data.name,
             "description": item_data.description,
             "price": float(item_data.price),
-            "photo_url": item_data.photo_url,
-            "category": item_data.category or "Ana Yemek",
+            "currency": item_data.currency,
+            "category": item_data.category,
+            "tags": item_data.tags or [],
+            "image_url": item_data.image_url,
             "is_available": item_data.is_available,
-            "created_at": datetime.utcnow()
+            "vat_rate": item_data.vat_rate,
+            "options": [opt.dict() for opt in (item_data.options or [])],
+            "preparation_time": item_data.preparation_time or 15,
+            "created_at": now,
+            "updated_at": now
         }
         
         # Insert into both collections for compatibility
@@ -115,14 +130,19 @@ async def create_menu_item(
         product_doc = {
             "_id": menu_item_doc["_id"],
             "business_id": menu_item_doc["business_id"],
-            "name": item_data.title,  # products uses 'name' field
+            "name": item_data.name,
             "description": item_data.description,
             "price": item_data.price,
-            "image": item_data.photo_url,  # products uses 'image' field
+            "currency": item_data.currency,
+            "image": item_data.image_url,
             "category": item_data.category,
-            "availability": item_data.is_available,  # products uses 'availability' field
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "tags": item_data.tags or [],
+            "availability": item_data.is_available,
+            "vat_rate": item_data.vat_rate,
+            "options": [opt.dict() for opt in (item_data.options or [])],
+            "preparation_time": item_data.preparation_time or 15,
+            "created_at": now,
+            "updated_at": now
         }
         
         await db.products.insert_one(product_doc)
@@ -130,17 +150,25 @@ async def create_menu_item(
         return MenuItemResponse(
             id=menu_item_doc["_id"],
             business_id=menu_item_doc["business_id"],
-            title=menu_item_doc["title"],
+            name=menu_item_doc["name"],
             description=menu_item_doc["description"],
             price=menu_item_doc["price"],
-            photo_url=menu_item_doc["photo_url"],
+            currency=menu_item_doc["currency"],
             category=menu_item_doc["category"],
+            tags=menu_item_doc["tags"],
+            image_url=menu_item_doc["image_url"],
             is_available=menu_item_doc["is_available"],
-            created_at=menu_item_doc["created_at"]
+            vat_rate=menu_item_doc["vat_rate"],
+            options=menu_item_doc["options"],
+            preparation_time=menu_item_doc["preparation_time"],
+            created_at=menu_item_doc["created_at"],
+            updated_at=menu_item_doc.get("updated_at")
         )
         
     except HTTPException:
         raise
+    except ValueError as ve:
+        raise HTTPException(status_code=422, detail=str(ve))
     except Exception as e:
         raise HTTPException(
             status_code=500,
