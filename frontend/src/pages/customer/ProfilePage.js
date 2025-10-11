@@ -227,7 +227,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
       }
     } catch (error) {
       console.error(`Error loading ${tab}:`, error);
-      // Don't load mock data - show empty state instead
+      // Show empty state on error
     } finally {
       setLoading(false);
     }
