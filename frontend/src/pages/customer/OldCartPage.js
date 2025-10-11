@@ -21,7 +21,7 @@ const CartPage = ({ onBack, onProceedToPayment, user }) => {
   };
 
   const handleApplyCoupon = () => {
-    // Mock coupon logic
+    // Demo coupon logic
     if (couponCode.toLowerCase() === 'indirim20') {
       const discountAmount = orderTotal * 0.20;
       setDiscount(discountAmount);
