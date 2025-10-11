@@ -326,7 +326,7 @@ export class CartManager {
   }
 }
 
-// Preferences Management (replaces localStorage)
+// Preferences Management (API-based)
 export class PreferencesManager {
   static async getPreferences() {
     try {
