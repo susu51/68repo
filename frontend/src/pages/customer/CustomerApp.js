@@ -7,7 +7,7 @@ import ProfilePage from './ProfilePage';
 import PaymentPage from './PaymentPage';
 import OrderTrackingPage from './OrderTrackingPage';
 import { useCart } from '../../contexts/CartContext';
-import { apiClient } from '../../utils/apiClient';
+import api from '../../api/http';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
 import { KuryeciniLogo } from '../../components/KuryeciniLogo';
