@@ -194,10 +194,7 @@ async def login(body: LoginRequest, response: Response):
     user_id = user.get("id")
     
     # Get user data for response
-    if body.email in test_users:
-        user_data = test_users[body.email]
-    else:
-        user_data = user
+    user_data = user
     
     # Generate tokens
     access_token = make_token(user_id, ACCESS_TTL)
