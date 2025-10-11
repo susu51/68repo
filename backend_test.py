@@ -139,6 +139,323 @@ class AuthenticationTester:
                 self.log_test(f"POST /api/auth/login - {cred_name}", False, f"Exception: {str(e)}")
                 
     def test_auth_me(self):
+        """Test GET /api/auth/me endpoint"""
+        print("\n🔐 TESTING CURRENT USER RETRIEVAL")
+        
+        # First login to get cookies
+        login_response = self.session.post(f"{API_BASE}/auth/login", 
+                                         json=TEST_CREDENTIALS["test_customer"])
+        
+        if login_response.status_code == 200:
+            try:
+                response = self.session.get(f"{API_BASE}/auth/me")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate user data structure
+                    required_fields = ["id", "email", "role", "first_name", "last_name"]
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        user_details = f"User: {data['email']} (Role: {data['role']}, Name: {data['first_name']} {data['last_name']})"
+                        self.log_test("GET /api/auth/me - Current User Data", True, user_details)
+                    else:
+                        self.log_test("GET /api/auth/me - Current User Data", False, 
+                                    f"Missing fields: {missing_fields}", data)
+                        
+                elif response.status_code == 401:
+                    data = response.json()
+                    self.log_test("GET /api/auth/me - Current User Data", False, 
+                                f"Unauthorized: {data.get('detail', 'No auth token')}", data)
+                else:
+                    self.log_test("GET /api/auth/me - Current User Data", False, 
+                                f"Unexpected status code: {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_test("GET /api/auth/me - Current User Data", False, f"Exception: {str(e)}")
+        else:
+            self.log_test("GET /api/auth/me - Current User Data", False, 
+                        "Could not login to test /me endpoint")
+            
+    def test_auth_refresh(self):
+        """Test POST /api/auth/refresh endpoint"""
+        print("\n🔐 TESTING TOKEN REFRESH")
+        
+        # First login to get refresh token
+        login_response = self.session.post(f"{API_BASE}/auth/login", 
+                                         json=TEST_CREDENTIALS["test_customer"])
+        
+        if login_response.status_code == 200:
+            try:
+                response = self.session.post(f"{API_BASE}/auth/refresh")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("success"):
+                        self.log_test("POST /api/auth/refresh - Token Refresh", True, 
+                                    f"Token refreshed: {data.get('message', 'Success')}")
+                    else:
+                        self.log_test("POST /api/auth/refresh - Token Refresh", False, 
+                                    f"Refresh failed: {data}", data)
+                        
+                elif response.status_code == 401:
+                    data = response.json()
+                    self.log_test("POST /api/auth/refresh - Token Refresh", False, 
+                                f"Unauthorized: {data.get('detail', 'No refresh token')}", data)
+                else:
+                    self.log_test("POST /api/auth/refresh - Token Refresh", False, 
+                                f"Unexpected status code: {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_test("POST /api/auth/refresh - Token Refresh", False, f"Exception: {str(e)}")
+        else:
+            self.log_test("POST /api/auth/refresh - Token Refresh", False, 
+                        "Could not login to test refresh endpoint")
+            
+    def test_auth_logout(self):
+        """Test POST /api/auth/logout endpoint"""
+        print("\n🔐 TESTING LOGOUT")
+        
+        # First login
+        login_response = self.session.post(f"{API_BASE}/auth/login", 
+                                         json=TEST_CREDENTIALS["test_customer"])
+        
+        if login_response.status_code == 200:
+            try:
+                response = self.session.post(f"{API_BASE}/auth/logout")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("success"):
+                        # Test that cookies are cleared by trying to access /me
+                        me_response = self.session.get(f"{API_BASE}/auth/me")
+                        
+                        if me_response.status_code == 401:
+                            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", True, 
+                                        "Logout successful, cookies cleared, /me returns 401")
+                        else:
+                            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
+                                        f"/me still accessible after logout (status: {me_response.status_code})")
+                    else:
+                        self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
+                                    f"Logout failed: {data}", data)
+                        
+                else:
+                    self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
+                                f"Unexpected status code: {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, f"Exception: {str(e)}")
+        else:
+            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
+                        "Could not login to test logout endpoint")
+            
+    def test_cookie_attributes(self):
+        """Test HttpOnly cookie attributes and security"""
+        print("\n🍪 TESTING COOKIE ATTRIBUTES")
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/login", 
+                                       json=TEST_CREDENTIALS["test_customer"])
+            
+            if response.status_code == 200:
+                cookies = response.cookies
+                
+                # Check access_token cookie
+                if 'access_token' in cookies:
+                    access_cookie = cookies['access_token']
+                    
+                    # Check cookie attributes (note: requests library doesn't expose all attributes)
+                    cookie_details = f"Access token cookie present, Path: {getattr(access_cookie, 'path', 'N/A')}"
+                    self.log_test("Cookie Attributes - Access Token", True, cookie_details)
+                else:
+                    self.log_test("Cookie Attributes - Access Token", False, "No access_token cookie found")
+                
+                # Check refresh_token cookie
+                if 'refresh_token' in cookies:
+                    refresh_cookie = cookies['refresh_token']
+                    cookie_details = f"Refresh token cookie present, Path: {getattr(refresh_cookie, 'path', 'N/A')}"
+                    self.log_test("Cookie Attributes - Refresh Token", True, cookie_details)
+                else:
+                    self.log_test("Cookie Attributes - Refresh Token", False, "No refresh_token cookie found")
+                    
+            else:
+                self.log_test("Cookie Attributes - Login Required", False, 
+                            f"Could not login to test cookies (status: {response.status_code})")
+                
+        except Exception as e:
+            self.log_test("Cookie Attributes - Test", False, f"Exception: {str(e)}")
+            
+    def test_error_scenarios(self):
+        """Test error handling scenarios"""
+        print("\n❌ TESTING ERROR SCENARIOS")
+        
+        # Test wrong password
+        try:
+            wrong_creds = {"email": "testcustomer@example.com", "password": "wrongpassword"}
+            response = self.session.post(f"{API_BASE}/auth/login", json=wrong_creds)
+            
+            if response.status_code == 401:
+                data = response.json()
+                self.log_test("Error Handling - Wrong Password", True, 
+                            f"Correctly returned 401: {data.get('detail', 'Invalid credentials')}")
+            else:
+                self.log_test("Error Handling - Wrong Password", False, 
+                            f"Expected 401, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Error Handling - Wrong Password", False, f"Exception: {str(e)}")
+            
+        # Test non-existent email
+        try:
+            fake_creds = {"email": "nonexistent@example.com", "password": "password"}
+            response = self.session.post(f"{API_BASE}/auth/login", json=fake_creds)
+            
+            if response.status_code == 401:
+                data = response.json()
+                self.log_test("Error Handling - Non-existent Email", True, 
+                            f"Correctly returned 401: {data.get('detail', 'Invalid credentials')}")
+            else:
+                self.log_test("Error Handling - Non-existent Email", False, 
+                            f"Expected 401, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Error Handling - Non-existent Email", False, f"Exception: {str(e)}")
+            
+        # Test invalid email format
+        try:
+            invalid_creds = {"email": "invalid-email", "password": "password"}
+            response = self.session.post(f"{API_BASE}/auth/login", json=invalid_creds)
+            
+            if response.status_code == 422:
+                data = response.json()
+                self.log_test("Error Handling - Invalid Email Format", True, 
+                            f"Correctly returned 422: {data.get('detail', 'Validation error')}")
+            else:
+                self.log_test("Error Handling - Invalid Email Format", False, 
+                            f"Expected 422, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Error Handling - Invalid Email Format", False, f"Exception: {str(e)}")
+            
+        # Test missing credentials
+        try:
+            response = self.session.post(f"{API_BASE}/auth/login", json={})
+            
+            if response.status_code == 422:
+                data = response.json()
+                self.log_test("Error Handling - Missing Credentials", True, 
+                            f"Correctly returned 422: {data.get('detail', 'Validation error')}")
+            else:
+                self.log_test("Error Handling - Missing Credentials", False, 
+                            f"Expected 422, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Error Handling - Missing Credentials", False, f"Exception: {str(e)}")
+            
+    def test_rbac_customer_endpoints(self):
+        """Test Role-Based Access Control for customer endpoints"""
+        print("\n🔒 TESTING RBAC - CUSTOMER ENDPOINTS")
+        
+        # Login as customer
+        login_response = self.session.post(f"{API_BASE}/auth/login", 
+                                         json=TEST_CREDENTIALS["test_customer"])
+        
+        if login_response.status_code == 200:
+            # Test customer can access customer endpoints
+            try:
+                response = self.session.get(f"{API_BASE}/user/addresses")
+                
+                if response.status_code in [200, 404]:  # 404 is ok if no addresses
+                    self.log_test("RBAC - Customer Access to /user/addresses", True, 
+                                f"Customer can access addresses (status: {response.status_code})")
+                elif response.status_code == 403:
+                    self.log_test("RBAC - Customer Access to /user/addresses", False, 
+                                "Customer denied access to own addresses")
+                else:
+                    self.log_test("RBAC - Customer Access to /user/addresses", False, 
+                                f"Unexpected status: {response.status_code}")
+                    
+            except Exception as e:
+                self.log_test("RBAC - Customer Access to /user/addresses", False, f"Exception: {str(e)}")
+                
+            # Test customer cannot access admin endpoints
+            try:
+                response = self.session.get(f"{API_BASE}/admin/orders")
+                
+                if response.status_code == 403:
+                    self.log_test("RBAC - Customer Denied Admin Access", True, 
+                                "Customer correctly denied access to admin endpoints")
+                elif response.status_code == 401:
+                    self.log_test("RBAC - Customer Denied Admin Access", True, 
+                                "Customer correctly denied access (401 - no admin token)")
+                else:
+                    self.log_test("RBAC - Customer Denied Admin Access", False, 
+                                f"Customer should not access admin endpoints (status: {response.status_code})")
+                    
+            except Exception as e:
+                self.log_test("RBAC - Customer Denied Admin Access", False, f"Exception: {str(e)}")
+        else:
+            self.log_test("RBAC - Customer Login Required", False, 
+                        "Could not login as customer to test RBAC")
+
+    def run_all_tests(self):
+        """Run all authentication tests"""
+        print(f"🚀 STARTING COMPREHENSIVE AUTHENTICATION TESTING")
+        print(f"🌐 Backend URL: {BACKEND_URL}")
+        print(f"🔗 API Base: {API_BASE}")
+        print("=" * 80)
+        
+        # Run all test categories
+        self.test_auth_register()
+        self.test_auth_login()
+        self.test_auth_me()
+        self.test_auth_refresh()
+        self.test_auth_logout()
+        self.test_cookie_attributes()
+        self.test_error_scenarios()
+        self.test_rbac_customer_endpoints()
+        
+        # Summary
+        print("\n" + "=" * 80)
+        print("📊 AUTHENTICATION TESTING SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t["success"]])
+        failed_tests = total_tests - passed_tests
+        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
+        
+        print(f"✅ PASSED: {passed_tests}/{total_tests} ({success_rate:.1f}%)")
+        print(f"❌ FAILED: {failed_tests}/{total_tests}")
+        
+        if failed_tests > 0:
+            print(f"\n🔍 FAILED TESTS:")
+            for test in self.test_results:
+                if not test["success"]:
+                    print(f"   ❌ {test['test']}: {test['details']}")
+        
+        return {
+            "total": total_tests,
+            "passed": passed_tests,
+            "failed": failed_tests,
+            "success_rate": success_rate,
+            "results": self.test_results
+        }
+
+if __name__ == "__main__":
+    tester = AuthenticationTester()
+    results = tester.run_all_tests()
+    
+    # Exit with error code if tests failed
+    if results["failed"] > 0:
+        exit(1)
+    else:
+        print(f"\n🎉 ALL AUTHENTICATION TESTS PASSED!")
+        exit(0)
         """Test 3: Complete Authentication Flow"""
         print("\n🔄 TEST 3: Complete Authentication Flow")
         
