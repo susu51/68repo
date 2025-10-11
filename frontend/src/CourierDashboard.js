@@ -233,7 +233,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/earnings`, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       if (isMounted) {
@@ -253,7 +253,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       if (isMounted) {
@@ -275,7 +275,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       if (isMounted) {
@@ -364,7 +364,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.patch(`${API}/courier/orders/${orderId}/pickup`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Sipariş alındı! Teslim etmeye başlayabilirsiniz.');
@@ -384,7 +384,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
         location: courierLocation,
         timestamp: new Date().toISOString()
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       const statusMessages = {
@@ -413,7 +413,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.post(`${API}/courier/status/toggle`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       setIsOnline(response.data.is_online);
@@ -492,7 +492,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       await axios.put(`${API}/courier/profile`, profile, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
 
       toast.success('Profil güncellendi!');
@@ -506,7 +506,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
     try {
       const token = null /* CI GATE 0 - localStorage removed */;
       const response = await axios.get(`${API}/courier/report/${type}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
         responseType: 'blob'
       });
 
