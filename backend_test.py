@@ -416,26 +416,55 @@ class AuthenticationTester:
             self.log_test("RBAC - Customer Login Required", False, 
                         "Could not login as customer to test RBAC")
 
+    def test_complete_registration_login_flow(self):
+        """Test complete registration → auto-login → dashboard access flow"""
+        print("\n🔄 TESTING COMPLETE REGISTRATION → LOGIN → DASHBOARD FLOW")
+        
+        # Step 1: Register customer
+        registration_success = self.test_customer_registration()
+        
+        # Step 2: Login with registered credentials (should now work after password fix)
+        if registration_success:
+            login_success = self.test_customer_login()
+            
+            # Step 3: Test dashboard access with cookies
+            if login_success:
+                self.test_auth_me()
+            else:
+                self.log_test("Complete Flow - Login After Registration", False, 
+                            "Login failed after successful registration - PASSWORD FIELD MISMATCH ISSUE")
+        else:
+            self.log_test("Complete Flow - Registration Required", False, 
+                        "Registration failed - cannot test complete flow")
+
     def run_all_tests(self):
-        """Run all authentication tests"""
-        print(f"🚀 STARTING COMPREHENSIVE AUTHENTICATION TESTING")
+        """Run focused customer registration and login tests"""
+        print(f"🚀 CUSTOMER REGISTRATION & LOGIN TESTING AFTER PASSWORD FIELD MISMATCH FIX")
         print(f"🌐 Backend URL: {BACKEND_URL}")
         print(f"🔗 API Base: {API_BASE}")
+        print(f"📧 Test Email: {TEST_CREDENTIALS['new_customer']['email']}")
         print("=" * 80)
         
-        # Run all test categories
-        self.test_auth_register()
-        self.test_auth_login()
-        self.test_auth_me()
+        # Initialize registered_user attribute
+        self.registered_user = None
+        
+        # Run focused tests as per review request
+        print("\n🎯 CRITICAL RE-TEST AFTER FIX:")
+        print("1. Test POST /api/register/customer endpoint with new unique email")
+        print("2. Test POST /api/auth/login with the newly registered credentials (should now work)")
+        print("3. Test GET /api/auth/me with cookies to verify authentication chain works")
+        print("4. Test complete registration → auto-login → dashboard access flow")
+        
+        # Run the complete flow test
+        self.test_complete_registration_login_flow()
+        
+        # Additional verification tests
         self.test_auth_refresh()
         self.test_auth_logout()
-        self.test_cookie_attributes()
-        self.test_error_scenarios()
-        self.test_rbac_customer_endpoints()
         
         # Summary
         print("\n" + "=" * 80)
-        print("📊 AUTHENTICATION TESTING SUMMARY")
+        print("📊 CUSTOMER REGISTRATION & LOGIN TESTING SUMMARY")
         print("=" * 80)
         
         total_tests = len(self.test_results)
@@ -451,6 +480,14 @@ class AuthenticationTester:
             for test in self.test_results:
                 if not test["success"]:
                     print(f"   ❌ {test['test']}: {test['details']}")
+        
+        # Specific analysis for password field mismatch issue
+        login_tests = [t for t in self.test_results if "Login" in t["test"]]
+        if any(not t["success"] for t in login_tests):
+            print(f"\n⚠️  PASSWORD FIELD MISMATCH ANALYSIS:")
+            print(f"   If login is failing after successful registration, this indicates")
+            print(f"   the password field mismatch issue (password_hash vs password) may still exist.")
+            print(f"   Expected Flow: Registration → 201 success → Login → 200 OK with cookies")
         
         return {
             "total": total_tests,
