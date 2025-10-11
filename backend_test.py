@@ -217,43 +217,36 @@ class AuthenticationTester:
             self.log_test("POST /api/auth/refresh - Token Refresh", False, f"Exception: {str(e)}")
             
     def test_auth_logout(self):
-        """Test POST /api/auth/logout endpoint"""
-        print("\n🔐 TESTING LOGOUT")
+        """Test POST /api/auth/logout endpoint with existing cookies"""
+        print("\n🔐 TESTING LOGOUT (POST /api/auth/logout)")
         
-        # First login
-        login_response = self.session.post(f"{API_BASE}/auth/login", 
-                                         json=TEST_CREDENTIALS["test_customer"])
-        
-        if login_response.status_code == 200:
-            try:
-                response = self.session.post(f"{API_BASE}/auth/logout")
+        try:
+            # Use existing session cookies from previous login
+            response = self.session.post(f"{API_BASE}/auth/logout")
+            
+            if response.status_code == 200:
+                data = response.json()
                 
-                if response.status_code == 200:
-                    data = response.json()
+                if data.get("success"):
+                    # Test that cookies are cleared by trying to access /me
+                    me_response = self.session.get(f"{API_BASE}/auth/me")
                     
-                    if data.get("success"):
-                        # Test that cookies are cleared by trying to access /me
-                        me_response = self.session.get(f"{API_BASE}/auth/me")
-                        
-                        if me_response.status_code == 401:
-                            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", True, 
-                                        "Logout successful, cookies cleared, /me returns 401")
-                        else:
-                            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
-                                        f"/me still accessible after logout (status: {me_response.status_code})")
+                    if me_response.status_code == 401:
+                        self.log_test("POST /api/auth/logout - Logout & Cookie Clear", True, 
+                                    "Logout successful, cookies cleared, /me returns 401")
                     else:
                         self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
-                                    f"Logout failed: {data}", data)
-                        
+                                    f"/me still accessible after logout (status: {me_response.status_code})")
                 else:
                     self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
-                                f"Unexpected status code: {response.status_code}", response.text)
+                                f"Logout failed: {data}", data)
                     
-            except Exception as e:
-                self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, f"Exception: {str(e)}")
-        else:
-            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
-                        "Could not login to test logout endpoint")
+            else:
+                self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, 
+                            f"Unexpected status code: {response.status_code}", response.text)
+                
+        except Exception as e:
+            self.log_test("POST /api/auth/logout - Logout & Cookie Clear", False, f"Exception: {str(e)}")
             
     def test_cookie_attributes(self):
         """Test HttpOnly cookie attributes and security"""
