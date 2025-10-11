@@ -224,21 +224,27 @@ async def get_my_menu(
 async def update_menu_item(
     item_id: str,
     item_data: MenuItemUpdate,
-    current_user: dict = Depends(get_business_user)
+    current_user: dict = Depends(get_approved_business_user)
 ):
     """Update menu item - Business can only update their own items"""
     try:
         from server import db
         
-        # Get business ID
-        business = await db.businesses.find_one({"owner_user_id": current_user["id"]})
-        if not business:
-            raise HTTPException(status_code=404, detail="Business not found")
+        # Validate optional fields if provided
+        if item_data.category is not None:
+            MenuItemCreate.validate_category(item_data.category)
+        if item_data.vat_rate is not None:
+            MenuItemCreate.validate_vat_rate(item_data.vat_rate)
+        if item_data.price is not None:
+            MenuItemCreate.validate_price(item_data.price)
+        
+        # Use current user ID as business ID (since business is registered as user)
+        business_user_id = current_user["id"]
         
         # Check if item belongs to this business
         existing_item = await db.menu_items.find_one({
             "_id": item_id,
-            "business_id": str(business["_id"])
+            "business_id": business_user_id
         })
         
         if not existing_item:
@@ -249,18 +255,28 @@ async def update_menu_item(
         
         # Prepare update data
         update_data = {}
-        if item_data.title is not None:
-            update_data["title"] = item_data.title
+        if item_data.name is not None:
+            update_data["name"] = item_data.name
         if item_data.description is not None:
             update_data["description"] = item_data.description
         if item_data.price is not None:
             update_data["price"] = float(item_data.price)
-        if item_data.photo_url is not None:
-            update_data["photo_url"] = item_data.photo_url
+        if item_data.currency is not None:
+            update_data["currency"] = item_data.currency
         if item_data.category is not None:
             update_data["category"] = item_data.category
+        if item_data.tags is not None:
+            update_data["tags"] = item_data.tags
+        if item_data.image_url is not None:
+            update_data["image_url"] = item_data.image_url
         if item_data.is_available is not None:
             update_data["is_available"] = item_data.is_available
+        if item_data.vat_rate is not None:
+            update_data["vat_rate"] = item_data.vat_rate
+        if item_data.options is not None:
+            update_data["options"] = [opt.dict() for opt in item_data.options]
+        if item_data.preparation_time is not None:
+            update_data["preparation_time"] = item_data.preparation_time
         
         update_data["updated_at"] = datetime.utcnow()
         
@@ -272,18 +288,28 @@ async def update_menu_item(
         
         # Prepare product update data with field mapping
         product_update_data = {}
-        if item_data.title is not None:
-            product_update_data["name"] = item_data.title  # products uses 'name'
+        if item_data.name is not None:
+            product_update_data["name"] = item_data.name
         if item_data.description is not None:
             product_update_data["description"] = item_data.description
         if item_data.price is not None:
             product_update_data["price"] = float(item_data.price)
-        if item_data.photo_url is not None:
-            product_update_data["image"] = item_data.photo_url  # products uses 'image'
+        if item_data.currency is not None:
+            product_update_data["currency"] = item_data.currency
         if item_data.category is not None:
             product_update_data["category"] = item_data.category
+        if item_data.tags is not None:
+            product_update_data["tags"] = item_data.tags
+        if item_data.image_url is not None:
+            product_update_data["image"] = item_data.image_url
         if item_data.is_available is not None:
-            product_update_data["availability"] = item_data.is_available  # products uses 'availability'
+            product_update_data["availability"] = item_data.is_available
+        if item_data.vat_rate is not None:
+            product_update_data["vat_rate"] = item_data.vat_rate
+        if item_data.options is not None:
+            product_update_data["options"] = [opt.dict() for opt in item_data.options]
+        if item_data.preparation_time is not None:
+            product_update_data["preparation_time"] = item_data.preparation_time
         
         product_update_data["updated_at"] = datetime.utcnow()
         
@@ -299,17 +325,25 @@ async def update_menu_item(
         return MenuItemResponse(
             id=str(updated_item["_id"]),
             business_id=updated_item["business_id"],
-            title=updated_item["title"],
-            description=updated_item["description"],
-            price=updated_item["price"],
-            photo_url=updated_item.get("photo_url"),
-            category=updated_item.get("category", "Ana Yemek"),
+            name=updated_item.get("name", updated_item.get("title", "")),
+            description=updated_item.get("description", ""),
+            price=updated_item.get("price", 0),
+            currency=updated_item.get("currency", "TRY"),
+            category=updated_item.get("category", "Yemek"),
+            tags=updated_item.get("tags", []),
+            image_url=updated_item.get("image_url", updated_item.get("photo_url")),
             is_available=updated_item.get("is_available", True),
-            created_at=updated_item["created_at"]
+            vat_rate=updated_item.get("vat_rate", 0.10),
+            options=updated_item.get("options", []),
+            preparation_time=updated_item.get("preparation_time", 15),
+            created_at=updated_item["created_at"],
+            updated_at=updated_item.get("updated_at")
         )
         
     except HTTPException:
         raise
+    except ValueError as ve:
+        raise HTTPException(status_code=422, detail=str(ve))
     except Exception as e:
         raise HTTPException(
             status_code=500,
