@@ -170,7 +170,7 @@ export class DatabaseStateManager {
 // Global state manager
 export const stateManager = new DatabaseStateManager();
 
-// Address Management (replaces localStorage)
+// Address Management (API-based)
 export class AddressManager {
   static async getAddresses() {
     try {
