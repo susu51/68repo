@@ -76,16 +76,23 @@ export const BusinessMenuManager = () => {
 
       if (editingItem) {
         // Update existing item
-        await patch(`/business/menu/${editingItem.id}`, data);
+        const result = await patch(`/business/menu/${editingItem.id}`, data);
+        console.log('✅ Update response:', result);
         toast.success('Menü ürünü güncellendi!');
       } else {
         // Create new item
-        await post('/business/menu', data);
+        const result = await post('/business/menu', data);
+        console.log('✅ Create response:', result);
         toast.success('Menü ürünü eklendi!');
       }
 
+      // Reload menu items
       await fetchMenuItems();
-      handleCloseModal();
+      
+      // Small delay to ensure state update
+      setTimeout(() => {
+        handleCloseModal();
+      }, 100);
     } catch (error) {
       console.error('Error saving menu item:', error);
       const errorMsg = error.message || error.response?.data?.detail || error.detail || 'Kaydetme hatası';
