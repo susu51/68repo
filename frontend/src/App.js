@@ -657,7 +657,17 @@ const AdminDashboard = ({ user }) => {
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      👤 Kullanıcı Raporu
+                      👤 Kullanıcı
+                    </button>
+                    <button
+                      onClick={() => setReportSubTab('category')}
+                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                        reportSubTab === 'category'
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      📊 Kategori
                     </button>
                   </div>
                 </div>
@@ -666,6 +676,7 @@ const AdminDashboard = ({ user }) => {
                 {reportSubTab === 'financial' && <FinancialReport />}
                 {reportSubTab === 'orders' && <OrderReport />}
                 {reportSubTab === 'user' && <UserReport />}
+                {reportSubTab === 'category' && <CategoryAnalytics />}
               </TabsContent>
 
               {/* Users Tab */}
