@@ -14,6 +14,7 @@ import AdminPanel from "./AdminPanel";
 import { CustomerApp } from "./pages/customer/CustomerApp";
 import { CartProvider } from "./contexts/CartContext";
 import { AdminDashboardTab } from "./components/AdminDashboard";
+import { FinancialReport } from "./components/FinancialReport";
 
 // Components
 import { Button } from "./components/ui/button";
