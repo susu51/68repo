@@ -587,6 +587,7 @@ const AdminDashboard = ({ user }) => {
             <div className="space-y-2">
               {[
                 { value: 'dashboard', icon: '📊', label: 'Gösterge Paneli' },
+                { value: 'reports', icon: '📈', label: 'Raporlar' },
                 { value: 'users', icon: '👥', label: 'Kullanıcılar' },
                 { value: 'kyc', icon: '📋', label: 'KYC Onay' },
                 { value: 'products', icon: '🍽️', label: 'Ürünler' },
