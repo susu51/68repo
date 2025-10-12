@@ -4264,7 +4264,7 @@ async def get_user_report(
                     "total_spent": total_spent,
                     "average_order_value": avg_order_value,
                     "status_distribution": status_counts,
-                    "last_order_date": last_order_date.isoformat() if last_order_date else None,
+                    "last_order_date": last_order_date.isoformat() if isinstance(last_order_date, datetime) else (last_order_date if last_order_date else None),
                     "favorite_businesses": favorite_businesses
                 }
             })
