@@ -612,6 +612,11 @@ const AdminDashboard = ({ user }) => {
           {/* Main Content Area */}
           <div className="flex-1">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
+              {/* Dashboard Tab */}
+              <TabsContent value="dashboard" className="space-y-6">
+                <AdminDashboardTab />
+              </TabsContent>
+
               {/* Users Tab */}
               <TabsContent value="users" className="space-y-6">
                 <Card>
