@@ -300,12 +300,16 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 disabled:opacity-50 flex items-center justify-center space-x-2"
+                onClick={(e) => {
+                  // Ensure form submission on button click
+                  if (!loading && formData.email && formData.password) {
+                    e.currentTarget.form.requestSubmit();
+                  }
+                }}
               >
-                <div className="flex items-center justify-center space-x-2">
-                  <KuryeciniLogo size="small" className="opacity-90" />
-                  <span>Kuryecini'ye Giriş Yap</span>
-                </div>
+                <KuryeciniLogo size="small" className="opacity-90" />
+                <span>Kuryecini'ye Giriş Yap</span>
               </button>
               
               <div className="text-center">
