@@ -4783,14 +4783,17 @@ function App() {
     setShowLogin(true);
   };
 
-  const handleLoginSuccess = (userData) => {
+  const handleLoginSuccess = async (userData) => {
     console.log('🎯 handleLoginSuccess called with:', userData);
     
     // Force close modal
     setShowLogin(false);
     
-    // Immediate page reload to complete login state and show dashboard
-    window.location.reload();
+    // Small delay to ensure cookies are set
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Reload to trigger auth check and show dashboard
+    window.location.href = '/';
   };
 
   return (
