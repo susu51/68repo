@@ -592,11 +592,10 @@ const AdminDashboard = ({ user }) => {
               {[
                 { value: 'dashboard', icon: '📊', label: 'Gösterge Paneli' },
                 { value: 'reports', icon: '📈', label: 'Raporlar' },
+                { value: 'orders', icon: '📦', label: 'Siparişler' },
                 { value: 'users', icon: '👥', label: 'Kullanıcılar' },
                 { value: 'kyc', icon: '📋', label: 'KYC Onay' },
-                { value: 'products', icon: '🍽️', label: 'Ürünler' },
-                { value: 'orders', icon: '📦', label: 'Siparişler' },
-                { value: 'map', icon: '🗺️', label: 'Harita' }
+                { value: 'settings', icon: '⚙️', label: 'Ayarlar' }
               ].map((item, index) => (
                 <button
                   key={`admin-nav-${item.value}-${index}`}
