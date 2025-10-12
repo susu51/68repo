@@ -4830,7 +4830,7 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
       case 'customer':
         return <CustomerApp user={user} />;
       case 'business':
-        return <BusinessDashboard user={user} onLogout={() => window.location.reload()} />;
+        return <EnhancedBusinessDashboard user={user} onLogout={() => window.location.reload()} />;
       case 'courier':
         return <CourierDashboard user={user} onLogout={() => window.location.reload()} />;
       case 'admin':
