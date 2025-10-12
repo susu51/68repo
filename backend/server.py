@@ -1452,8 +1452,8 @@ async def admin_login(admin_data: AdminLogin):
     )
 
 # Admin dependency
-async def get_admin_user(current_user: dict = Depends(get_current_user)):
-    """Require admin role - JWT token based authentication only"""
+async def get_admin_user(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Require admin role - Cookie or JWT token based authentication"""
     if current_user.get("role") != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
