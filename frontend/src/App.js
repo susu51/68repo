@@ -623,7 +623,32 @@ const AdminDashboard = ({ user }) => {
 
               {/* Reports Tab */}
               <TabsContent value="reports" className="space-y-6">
-                <FinancialReport />
+                <Tabs defaultValue="financial" className="w-full">
+                  <div className="border-b mb-6">
+                    <div className="flex space-x-4">
+                      <button
+                        onClick={() => document.querySelector('[value="financial"]')?.click()}
+                        className="pb-3 px-4 border-b-2 border-transparent hover:border-green-500 text-sm font-medium text-gray-600 hover:text-gray-900"
+                      >
+                        💰 Finansal Rapor
+                      </button>
+                      <button
+                        onClick={() => document.querySelector('[value="orders"]')?.click()}
+                        className="pb-3 px-4 border-b-2 border-transparent hover:border-blue-500 text-sm font-medium text-gray-600 hover:text-gray-900"
+                      >
+                        📦 Sipariş Raporu
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <TabsContent value="financial">
+                    <FinancialReport />
+                  </TabsContent>
+                  
+                  <TabsContent value="orders">
+                    <OrderReport />
+                  </TabsContent>
+                </Tabs>
               </TabsContent>
 
               {/* Users Tab */}
