@@ -4783,17 +4783,12 @@ function App() {
     setShowLogin(true);
   };
 
-  const handleLoginSuccess = async (userData) => {
+  const handleLoginSuccess = (userData) => {
     console.log('🎯 handleLoginSuccess called with:', userData);
     
-    // Force close modal
+    // Simply close modal - CookieAuthContext already updated user state
+    // React will re-render and show appropriate dashboard
     setShowLogin(false);
-    
-    // Small delay to ensure cookies are set
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Reload to trigger auth check and show dashboard
-    window.location.href = '/';
   };
 
   return (
