@@ -512,3 +512,157 @@ MONGODB_INDEXES = {
         {"user_id": 1}
     ]
 }
+
+
+# ==================== ADMIN PANEL MODELS ====================
+
+class ContentBlockType(str, Enum):
+    """Content block types for CMS"""
+    TEXT = "text"
+    IMAGE = "image"
+    VIDEO = "video"
+    CAROUSEL = "carousel"
+    CTA = "cta"
+
+class ContentBlock(BaseModel):
+    """Content block for CMS"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    page: str  # "dashboard", "landing", "about"
+    section: str  # "hero", "features", "testimonials"
+    type: ContentBlockType
+    content: Dict[str, Any]  # Flexible content structure
+    order: int = 0
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
+    
+    class Config:
+        populate_by_name = True
+
+class AdBoardCTA(BaseModel):
+    """Call-to-action for ad board"""
+    text: str
+    href: str
+
+class AdBoard(BaseModel):
+    """Advertisement board/banner"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    title: str
+    subtitle: Optional[str] = None
+    image: str  # URL or file path
+    cta: Optional[AdBoardCTA] = None
+    order: int = 0  # Display order (lower = higher priority)
+    is_active: bool = True
+    impressions: int = 0
+    clicks: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
+    
+    class Config:
+        populate_by_name = True
+
+class PromotionTarget(str, Enum):
+    """Promotion target type"""
+    ALL = "all"
+    BUSINESS = "business"
+    CUSTOMER = "customer"
+
+class Promotion(BaseModel):
+    """Promotion/Coupon code"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    code: str  # Coupon code (e.g., "KUPON10")
+    title: str
+    description: str
+    discount_pct: float = Field(ge=0, le=100)  # Percentage discount
+    discount_amount: Optional[float] = Field(None, ge=0)  # Fixed discount
+    target: PromotionTarget = PromotionTarget.ALL
+    target_id: Optional[str] = None  # business_id if target=BUSINESS
+    min_order: float = Field(default=0, ge=0)  # Minimum order amount
+    usage_limit: Optional[int] = Field(None, ge=1)  # Total usage limit
+    usage_per_user: int = Field(default=1, ge=1)  # Per user limit
+    used_count: int = 0
+    start_date: datetime
+    end_date: datetime
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
+    
+    class Config:
+        populate_by_name = True
+
+class PromotionUsage(BaseModel):
+    """Track promotion usage"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    promotion_id: str
+    user_id: str
+    order_id: str
+    discount_applied: float
+    used_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    class Config:
+        populate_by_name = True
+
+class MessageRecipientType(str, Enum):
+    """Message recipient type"""
+    COURIER = "courier"
+    BUSINESS = "business"
+    CUSTOMER = "customer"
+    ALL_COURIERS = "all_couriers"
+    ALL_BUSINESSES = "all_businesses"
+
+class MessageStatus(str, Enum):
+    """Message delivery status"""
+    SENT = "sent"
+    DELIVERED = "delivered"
+    READ = "read"
+
+class Message(BaseModel):
+    """Admin to Courier/Business messaging"""
+    id: str = Field(default_factory=generate_id, alias="_id")
+    sender_type: str = "admin"  # Always admin for now
+    sender_id: str  # Admin user ID
+    recipient_type: MessageRecipientType
+    recipient_id: Optional[str] = None  # null for broadcast messages
+    subject: str
+    message: str
+    status: MessageStatus = MessageStatus.SENT
+    is_read: bool = False
+    read_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    class Config:
+        populate_by_name = True
+
+# Update collection names
+COLLECTION_NAMES.update({
+    "content_blocks": "content_blocks",
+    "ad_boards": "ad_boards",
+    "promotions": "promotions",
+    "promotion_usage": "promotion_usage",
+    "messages": "messages"
+})
+
+# Update indexes
+MONGODB_INDEXES.update({
+    "content_blocks": [
+        {"page": 1, "section": 1, "order": 1},
+        {"is_active": 1}
+    ],
+    "ad_boards": [
+        {"is_active": 1, "order": 1}
+    ],
+    "promotions": [
+        {"code": 1},
+        {"is_active": 1},
+        {"start_date": 1, "end_date": 1},
+        {"target": 1, "target_id": 1}
+    ],
+    "promotion_usage": [
+        {"promotion_id": 1, "user_id": 1},
+        {"order_id": 1}
+    ],
+    "messages": [
+        {"recipient_type": 1, "recipient_id": 1, "created_at": -1},
+        {"is_read": 1}
+    ]
+})
