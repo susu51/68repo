@@ -221,8 +221,9 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
         toast.success('Adres başarıyla güncellendi!');
       } else {
         // Create new address
-        console.log('🔄 Creating new address');
-        response = await api.post('/user/addresses', addressData);
+        console.log('🔄 Creating new address:', addressData);
+        const result = await api.post('/user/addresses', addressData);
+        response = result.data; // Extract data from api response
         
         setAddresses(prev => [...prev, response]);
         toast.success('Adres başarıyla eklendi!');
