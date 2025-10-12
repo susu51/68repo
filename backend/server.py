@@ -4527,7 +4527,7 @@ async def delete_user_address(
 @api_router.post("/user/addresses/{address_id}/set-default")
 async def set_default_address(
     address_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user_from_cookie_or_bearer)
 ):
     """Set address as default"""
     try:
