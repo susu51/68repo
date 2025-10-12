@@ -357,9 +357,10 @@ async def update_menu_item(
 
 @router.delete("/menu/{item_id}")
 async def delete_menu_item(
+    request: Request,
     item_id: str,
     soft_delete: bool = True,
-    current_user: dict = Depends(get_approved_business_user)
+    current_user: dict = Depends(get_approved_business_user_from_cookie)
 ):
     """
     Delete menu item - Business can only delete their own items
