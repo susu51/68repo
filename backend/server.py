@@ -4379,7 +4379,7 @@ async def get_user_addresses(current_user: dict = Depends(get_current_user)):
         return []
 
 @api_router.post("/user/addresses")
-async def add_user_address(address_data: dict, current_user: dict = Depends(get_current_user)):
+async def add_user_address(address_data: dict, current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
     """Add a new address for user"""
     from utils.city_normalize import normalize_city_name
     
