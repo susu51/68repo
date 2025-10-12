@@ -4015,6 +4015,184 @@ async def get_financial_reports(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating financial report: {str(e)}")
 
+@api_router.get("/admin/reports/orders")
+async def get_order_reports(
+    business_name: Optional[str] = None,
+    customer_name: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Get order reports with filters (Admin only)"""
+    try:
+        # Build match query
+        match_query = {}
+        
+        # Date range filter
+        if start_date:
+            start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+            match_query["created_at"] = {"$gte": start}
+        
+        if end_date:
+            end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+            if "created_at" in match_query:
+                match_query["created_at"]["$lte"] = end
+            else:
+                match_query["created_at"] = {"$lte": end}
+        
+        # Status filter
+        if status:
+            match_query["status"] = status
+        
+        # Business name filter
+        if business_name:
+            # Find businesses matching name (case-insensitive)
+            business_cursor = db.users.find({
+                "role": "business",
+                "business_name": {"$regex": business_name, "$options": "i"}
+            })
+            business_ids = []
+            async for business in business_cursor:
+                business_ids.append(business.get("id"))
+            
+            if business_ids:
+                match_query["business_id"] = {"$in": business_ids}
+            else:
+                # No matching businesses found
+                return {
+                    "filters": {
+                        "business_name": business_name,
+                        "customer_name": customer_name,
+                        "status": status,
+                        "start_date": start_date,
+                        "end_date": end_date
+                    },
+                    "summary": {
+                        "total_orders": 0,
+                        "total_revenue": 0,
+                        "average_order_value": 0
+                    },
+                    "orders": [],
+                    "message": "İşletme bulunamadı"
+                }
+        
+        # Customer name filter
+        if customer_name:
+            # Find customers matching name (case-insensitive)
+            customer_cursor = db.users.find({
+                "role": "customer",
+                "$or": [
+                    {"first_name": {"$regex": customer_name, "$options": "i"}},
+                    {"last_name": {"$regex": customer_name, "$options": "i"}}
+                ]
+            })
+            customer_ids = []
+            async for customer in customer_cursor:
+                customer_ids.append(customer.get("id"))
+            
+            if customer_ids:
+                match_query["customer_id"] = {"$in": customer_ids}
+            else:
+                # No matching customers found
+                return {
+                    "filters": {
+                        "business_name": business_name,
+                        "customer_name": customer_name,
+                        "status": status,
+                        "start_date": start_date,
+                        "end_date": end_date
+                    },
+                    "summary": {
+                        "total_orders": 0,
+                        "total_revenue": 0,
+                        "average_order_value": 0
+                    },
+                    "orders": [],
+                    "message": "Müşteri bulunamadı"
+                }
+        
+        # Fetch orders
+        orders_cursor = db.orders.find(match_query).sort("created_at", -1).limit(100)
+        orders = []
+        
+        # Create user lookup dict for efficiency
+        user_cache = {}
+        
+        async for order in orders_cursor:
+            # Get business info
+            business_id = order.get("business_id")
+            if business_id and business_id not in user_cache:
+                business = await db.users.find_one({"id": business_id})
+                user_cache[business_id] = business
+            business_info = user_cache.get(business_id, {})
+            
+            # Get customer info
+            customer_id = order.get("customer_id")
+            if customer_id and customer_id not in user_cache:
+                customer = await db.users.find_one({"id": customer_id})
+                user_cache[customer_id] = customer
+            customer_info = user_cache.get(customer_id, {})
+            
+            # Get courier info
+            courier_id = order.get("courier_id")
+            courier_info = {}
+            if courier_id and courier_id not in user_cache:
+                courier = await db.users.find_one({"id": courier_id})
+                user_cache[courier_id] = courier
+            courier_info = user_cache.get(courier_id, {})
+            
+            orders.append({
+                "order_id": order.get("id"),
+                "created_at": order.get("created_at").isoformat() if order.get("created_at") else None,
+                "status": order.get("status"),
+                "total_amount": order.get("total_amount", 0),
+                "delivery_fee": order.get("delivery_fee", 0),
+                "business": {
+                    "id": business_id,
+                    "name": business_info.get("business_name", "N/A"),
+                    "email": business_info.get("email", "N/A"),
+                    "phone": business_info.get("phone", "N/A")
+                },
+                "customer": {
+                    "id": customer_id,
+                    "name": f"{customer_info.get('first_name', '')} {customer_info.get('last_name', '')}".strip(),
+                    "email": customer_info.get("email", "N/A"),
+                    "phone": customer_info.get("phone", "N/A")
+                },
+                "courier": {
+                    "id": courier_id,
+                    "name": f"{courier_info.get('first_name', '')} {courier_info.get('last_name', '')}".strip() if courier_id else "Atanmadı",
+                    "phone": courier_info.get("phone", "N/A") if courier_id else "N/A"
+                },
+                "items_count": len(order.get("items", [])),
+                "delivery_address": order.get("delivery_address", {})
+            })
+        
+        # Calculate summary
+        total_orders = len(orders)
+        total_revenue = sum(order["total_amount"] for order in orders)
+        average_order_value = total_revenue / total_orders if total_orders > 0 else 0
+        
+        return {
+            "filters": {
+                "business_name": business_name,
+                "customer_name": customer_name,
+                "status": status,
+                "start_date": start_date,
+                "end_date": end_date
+            },
+            "summary": {
+                "total_orders": total_orders,
+                "total_revenue": total_revenue,
+                "average_order_value": average_order_value
+            },
+            "orders": orders
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating order report: {str(e)}")
+
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
 async def get_public_businesses(
