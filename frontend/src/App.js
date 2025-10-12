@@ -11,6 +11,7 @@ import { LocationControls } from "./components/LocationControls";
 import { CourierDashboard } from "./CourierDashboard";
 import { BusinessDashboard as EnhancedBusinessDashboard } from "./BusinessDashboard_Enhanced";
 import AdminPanel from "./AdminPanel";
+import { CustomerApp } from "./pages/customer/CustomerApp";
 import { CartProvider } from "./contexts/CartContext";
 
 // Components
