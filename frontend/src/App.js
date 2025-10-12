@@ -19,6 +19,8 @@ import { OrderReport } from "./components/OrderReport";
 import { UserReport } from "./components/UserReport";
 import { CategoryAnalytics } from "./components/CategoryAnalytics";
 import { PlatformSettings } from "./components/PlatformSettings";
+import { AdminMessages } from "./components/AdminMessages";
+import { BannerManager } from "./components/BannerManager";
 
 // Components
 import { Button } from "./components/ui/button";
