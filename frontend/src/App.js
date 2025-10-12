@@ -620,6 +620,11 @@ const AdminDashboard = ({ user }) => {
                 <AdminDashboardTab />
               </TabsContent>
 
+              {/* Reports Tab */}
+              <TabsContent value="reports" className="space-y-6">
+                <FinancialReport />
+              </TabsContent>
+
               {/* Users Tab */}
               <TabsContent value="users" className="space-y-6">
                 <Card>
