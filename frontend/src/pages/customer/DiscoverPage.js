@@ -100,11 +100,15 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
       if (sortMode === 'location' && userLocation) {
         // Distance-based sorting (GPS location)
         restaurantsData = restaurantsData.map(restaurant => {
+          // Get restaurant coordinates - support multiple formats
+          const restaurantLat = restaurant.lat || restaurant.location?.lat || 0;
+          const restaurantLng = restaurant.lng || restaurant.location?.lng || 0;
+          
           const distance = calculateDistance(
             userLocation.lat,
             userLocation.lng,
-            restaurant.lat || 0,
-            restaurant.lng || 0
+            restaurantLat,
+            restaurantLng
           );
           
           return {
