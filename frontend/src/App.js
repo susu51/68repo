@@ -92,6 +92,7 @@ const CitySelector = ({ value, onChange, required = false }) => {
 const AdminDashboard = ({ user }) => {
   const { logout } = useCookieAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [reportSubTab, setReportSubTab] = useState('financial');
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
