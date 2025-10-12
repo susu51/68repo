@@ -710,76 +710,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Professional Header - Hidden on Mobile, Full on Desktop */}
-      <div className="hidden md:block bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Left: Brand */}
-            <div className="flex items-center space-x-4">
-              <div className="text-3xl">🏪</div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">İşletme Yönetim Paneli</h1>
-                <p className="text-sm text-gray-600">
-                  {user?.business_name || 'Test Restaurant'} • {user?.email}
-                </p>
-              </div>
-            </div>
-            
-            {/* Right: Status + Actions */}
-            <div className="flex items-center space-x-6">
-              {/* Live Status */}
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full ${restaurantStatus.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <span className="text-sm font-medium">
-                    {restaurantStatus.isOpen ? 'Açık' : 'Kapalı'}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  Bugün: <span className="font-bold text-green-600">₺{(stats.today?.revenue || 0).toFixed(2)}</span>
-                </div>
-                {unprocessedCount > 0 && (
-                  <Badge className="bg-red-500 animate-pulse">
-                    {unprocessedCount} yeni sipariş
-                  </Badge>
-                )}
-              </div>
-              
-              {/* Quick Actions */}
-              <Button
-                onClick={() => setActiveTab('orders')}
-                variant={unprocessedCount > 0 ? 'default' : 'outline'}
-                size="sm"
-                className={unprocessedCount > 0 ? 'bg-red-600 hover:bg-red-700 animate-pulse' : ''}
-              >
-                {unprocessedCount > 0 ? `🔔 ${unprocessedCount} Yeni` : '📋 Siparişler'}
-              </Button>
-              
-              <Button onClick={onLogout} variant="outline" size="sm">
-                Çıkış
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Header - Minimal, integrated with tabs */}
-      <div className="md:hidden bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="flex items-center justify-between px-4 py-2">
-          <div className="flex items-center space-x-2">
-            <div className="text-xl">🏪</div>
-            <span className="text-sm font-bold">{user?.business_name || 'İşletme'}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            {unprocessedCount > 0 && (
-              <Badge className="bg-red-500 text-xs">{unprocessedCount}</Badge>
-            )}
-            <Button onClick={onLogout} variant="outline" size="sm" className="text-xs px-2 py-1">
-              Çıkış
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* NO HEADER - Only Tabs Navigation */}
 
       {/* Professional Navigation Tabs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
