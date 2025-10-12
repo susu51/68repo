@@ -77,7 +77,7 @@ async def get_business_user(current_user: dict = Depends(get_current_user)):
     return current_user
 
 async def get_approved_business_user(current_user: dict = Depends(get_current_user)):
-    """Get current user and verify business role + KYC approval"""
+    """Get current user and verify business role + KYC approval (Legacy - Bearer token only)"""
     if current_user.get("role") != UserRole.BUSINESS.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, 
@@ -93,6 +93,31 @@ async def get_approved_business_user(current_user: dict = Depends(get_current_us
         )
     
     return current_user
+
+async def get_approved_business_user_cookie():
+    """Get current user from cookie and verify business role + KYC approval"""
+    # Import here to avoid circular dependency
+    from auth_cookie import get_current_user_from_cookie_or_bearer
+    from fastapi import Request, Depends
+    
+    async def _inner(request: Request, current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+        if current_user.get("role") != UserRole.BUSINESS.value:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Business access required"
+            )
+        
+        # Check KYC status
+        kyc_status = current_user.get("kyc_status", "pending")
+        if kyc_status != "approved":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"KYC approval required. Current status: {kyc_status}. Please wait for admin approval."
+            )
+        
+        return current_user
+    
+    return _inner
 
 async def get_customer_user(current_user: dict = Depends(get_current_user)):
     """Require customer role"""
