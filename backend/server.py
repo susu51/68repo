@@ -3631,58 +3631,7 @@ async def get_all_promotions(current_user: dict = Depends(get_admin_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving promotions: {str(e)}")
 
-@api_router.post("/admin/promotions")
-async def create_promotion(
-    promotion_data: dict,
-    current_user: dict = Depends(get_admin_user)
-):
-    """Create new promotion (Admin only)"""
-    try:
-        # Validate required fields
-        required_fields = ["title", "description", "type"]
-        for field in required_fields:
-            if field not in promotion_data:
-                raise HTTPException(status_code=422, detail=f"Missing required field: {field}")
-        
-        # Handle both 'value' and 'discount_value' fields (flexible)
-        if "value" not in promotion_data and "discount_value" not in promotion_data:
-            raise HTTPException(status_code=422, detail="Missing required field: 'value' or 'discount_value'")
-        
-        # Normalize to 'value' field
-        if "discount_value" in promotion_data and "value" not in promotion_data:
-            promotion_data["value"] = promotion_data["discount_value"]
-        
-        # Validate promotion type and value
-        valid_types = ["percentage", "fixed_amount", "free_delivery", "buy_x_get_y"]
-        if promotion_data["type"] not in valid_types:
-            raise HTTPException(status_code=422, detail=f"Invalid type. Must be one of: {valid_types}")
-        
-        # Add metadata
-        promotion_data["id"] = str(uuid.uuid4())
-        promotion_data["created_at"] = datetime.now(timezone.utc)
-        promotion_data["created_by"] = current_user["id"]
-        promotion_data["is_active"] = promotion_data.get("is_active", True)
-        promotion_data["usage_count"] = 0
-        
-        # Handle datetime fields
-        if "start_date" in promotion_data and isinstance(promotion_data["start_date"], str):
-            promotion_data["start_date"] = datetime.fromisoformat(promotion_data["start_date"].replace('Z', '+00:00'))
-        
-        if "end_date" in promotion_data and isinstance(promotion_data["end_date"], str):
-            promotion_data["end_date"] = datetime.fromisoformat(promotion_data["end_date"].replace('Z', '+00:00'))
-        
-        # Insert promotion
-        result = await db.promotions.insert_one(promotion_data)
-        
-        return {
-            "message": "Promotion created successfully",
-            "promotion_id": promotion_data["id"]
-        }
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating promotion: {str(e)}")
+# OLD PROMOTION ENDPOINT REMOVED - Using new one at line ~6400
 
 @api_router.get("/admin/promotions/{promotion_id}")
 async def get_promotion_by_id(promotion_id: str, current_user: dict = Depends(get_admin_user)):
