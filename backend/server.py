@@ -4257,7 +4257,7 @@ async def get_user_report(
                     "name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip(),
                     "email": customer.get("email"),
                     "phone": customer.get("phone"),
-                    "created_at": customer.get("created_at").isoformat() if customer.get("created_at") else None
+                    "created_at": customer.get("created_at").isoformat() if isinstance(customer.get("created_at"), datetime) else (customer.get("created_at") if customer.get("created_at") else None)
                 },
                 "analytics": {
                     "total_orders": total_orders,
