@@ -251,5 +251,25 @@ async def register(body: RegisterRequest):
     
     return {"success": True, "message": "Registration successful", "user_id": user_id}
 
+# Additional dependency for business users with KYC approval
+async def get_approved_business_user_from_cookie(request: Request):
+    """Get approved business user from cookie - requires KYC approval"""
+    current_user = await get_current_user_from_cookie_or_bearer(request)
+    
+    if current_user.get("role") != "business":
+        raise HTTPException(
+            status_code=403,
+            detail="Business access required"
+        )
+    
+    kyc_status = current_user.get("kyc_status", "pending")
+    if kyc_status != "approved":
+        raise HTTPException(
+            status_code=403,
+            detail=f"KYC approval required. Current status: {kyc_status}"
+        )
+    
+    return current_user
+
 # Export the dependency for use in other modules
-__all__ = ["auth_router", "get_current_user_from_cookie", "set_db_client"]
+__all__ = ["auth_router", "get_current_user_from_cookie", "get_current_user_from_cookie_or_bearer", "get_approved_business_user_from_cookie", "set_db_client"]
