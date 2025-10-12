@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import KYCManagement from './components/KYCManagement';
 import ContentEditor from './components/ContentEditor';
+import AdBoardManager from './components/AdBoardManager';
+import PromotionManager from './components/PromotionManager';
+import MessageCenter from './components/MessageCenter';
 import api from './api/http';
 
 const AdminPanel = ({ user, onLogout }) => {
