@@ -102,7 +102,8 @@ export const BusinessMenuManager = () => {
       await fetchMenuItems();
     } catch (error) {
       console.error('Error deleting menu item:', error);
-      toast.error('Silme hatası');
+      const errorMsg = error.message || error.detail || 'Silme hatası';
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
