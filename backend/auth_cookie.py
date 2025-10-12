@@ -127,7 +127,7 @@ async def login(body: LoginRequest, response: Response):
     # Find user in database
     user = await db.users.find_one({"email": body.email})
     if not user:
-        raise HTTPException(401, "Invalid credentials")
+        raise HTTPException(401, "E-posta veya şifre hatalı")
     
     # Verify password (handle both field names and hash types)
     # Check for password_hash (from new registration) or password (legacy)
