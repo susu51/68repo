@@ -710,23 +710,25 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Professional Header */}
+      {/* Professional Header - Mobile Responsive */}
       <div className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="text-3xl">🏪</div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-3 sm:py-0 sm:h-16 gap-2">
+            {/* Left: Brand */}
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="text-2xl sm:text-3xl">🏪</div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">İşletme Yönetim Paneli</h1>
-                <p className="text-sm text-gray-600">
-                  {user?.business_name || 'Test Restaurant'} • {user?.email}
+                <h1 className="text-base sm:text-xl font-bold text-gray-900">İşletme Paneli</h1>
+                <p className="text-xs sm:text-sm text-gray-600 truncate max-w-[200px] sm:max-w-none">
+                  {user?.business_name || 'Test Restaurant'}
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-6">
-              {/* Live Status Indicators */}
-              <div className="flex items-center space-x-4">
+            {/* Right: Status + Actions */}
+            <div className="flex items-center space-x-2 sm:space-x-6 w-full sm:w-auto justify-between sm:justify-end">
+              {/* Live Status - Hidden on mobile */}
+              <div className="hidden md:flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <div className={`w-3 h-3 rounded-full ${restaurantStatus.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
                   <span className="text-sm font-medium">
@@ -736,24 +738,26 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                 <div className="text-sm text-gray-600">
                   Bugün: <span className="font-bold text-green-600">₺{(stats.today?.revenue || 0).toFixed(2)}</span>
                 </div>
-                {unprocessedCount > 0 && (
-                  <Badge className="bg-red-500 animate-pulse">
-                    {unprocessedCount} yeni sipariş
-                  </Badge>
-                )}
               </div>
+              
+              {/* Mobile: Show only badge if new orders */}
+              {unprocessedCount > 0 && (
+                <Badge className="bg-red-500 animate-pulse text-xs">
+                  {unprocessedCount} yeni
+                </Badge>
+              )}
               
               {/* Quick Actions */}
               <Button
                 onClick={() => setActiveTab('orders')}
                 variant={unprocessedCount > 0 ? 'default' : 'outline'}
                 size="sm"
-                className={unprocessedCount > 0 ? 'bg-red-600 hover:bg-red-700 animate-pulse' : ''}
+                className={`text-xs sm:text-sm ${unprocessedCount > 0 ? 'bg-red-600 hover:bg-red-700 animate-pulse' : ''}`}
               >
-                {unprocessedCount > 0 ? `🔔 ${unprocessedCount} Yeni` : '📋 Siparişler'}
+                {unprocessedCount > 0 ? `🔔 ${unprocessedCount}` : '📋'}
               </Button>
               
-              <Button onClick={onLogout} variant="outline" size="sm">
+              <Button onClick={onLogout} variant="outline" size="sm" className="text-xs sm:text-sm">
                 Çıkış
               </Button>
             </div>
