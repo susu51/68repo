@@ -60,8 +60,6 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
   const loadUserAddresses = async () => {
     try {
       console.log('🔍 DISCOVER PAGE - Loading user addresses for user:', user?.email);
-      console.log('🔑 DISCOVER PAGE - api token status:', api.getToken()?.substring(0, 20) + '...');
-      console.log('🔑 DISCOVER PAGE - api authenticated:', api.isAuthenticated());
       
       const response = await api.get('/user/addresses');
       console.log('📡 DISCOVER PAGE - Raw API response:', response);
