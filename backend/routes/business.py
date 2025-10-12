@@ -226,9 +226,10 @@ async def get_my_menu(
 
 @router.patch("/menu/{item_id}", response_model=MenuItemResponse)
 async def update_menu_item(
+    request: Request,
     item_id: str,
     item_data: MenuItemUpdate,
-    current_user: dict = Depends(get_approved_business_user)
+    current_user: dict = Depends(get_approved_business_user_from_cookie)
 ):
     """Update menu item - Business can only update their own items"""
     try:
