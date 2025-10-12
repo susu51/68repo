@@ -4501,7 +4501,7 @@ async def update_user_address(
 @api_router.delete("/user/addresses/{address_id}")
 async def delete_user_address(
     address_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user_from_cookie_or_bearer)
 ):
     """Delete user address"""
     try:
