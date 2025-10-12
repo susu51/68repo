@@ -566,28 +566,6 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
               />
             </div>
             
-            <div>
-              <Label className="flex items-center justify-between">
-                <span>Konum (Opsiyonel)</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={getCurrentLocation}
-                  disabled={gettingLocation}
-                  className="text-orange-600 hover:text-orange-700"
-                >
-                  <Navigation className="w-4 h-4 mr-1" />
-                  {gettingLocation ? 'Alınıyor...' : 'Mevcut Konum'}
-                </Button>
-              </Label>
-              {(addressForm.lat && addressForm.lng) && (
-                <div className="text-sm text-gray-500 mt-1">
-                  📍 {addressForm.lat.toFixed(6)}, {addressForm.lng.toFixed(6)}
-                </div>
-              )}
-            </div>
-            
             <div className="flex gap-2 pt-4">
               <Button
                 type="button"
