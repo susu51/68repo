@@ -26,36 +26,12 @@ export const CustomerApp = ({ user, onLogout }) => {
   console.log('🚀 CustomerApp FAZ 2 rendered - activeView:', activeView, 'user:', user?.first_name, 'cart:', cart, 'getCartSummary:', typeof getCartSummary);
 
   // Set authentication token for API calls
+  // Cookie-based authentication - no token management needed
   useEffect(() => {
-    console.log('🔑 CustomerApp Authentication Debug:');
-    console.log('  - Auth context token exists:', !!token);
-    console.log('  - Auth context token length:', token?.length);
-    console.log('  - User:', user?.email);
-    console.log('  - api token before:', api.getToken()?.substring(0, 20) + '...');
-    
-    // Try to get token from multiple sources
-    let workingToken = token;
-    
-    // Fallback to localStorage if context token not available
-    if (!workingToken) {
-      const localStorageToken = null /* CI GATE 0 - localStorage removed */;
-      if (localStorageToken) {
-        workingToken = localStorageToken;
-        console.log('  🔄 Using localStorage token as fallback');
-      }
+    if (user) {
+      console.log('✅ CustomerApp loaded for user:', user.email);
     }
-    
-    if (workingToken) {
-      api.setToken(workingToken);
-      console.log('  ✅ Token set to api');
-      console.log('  - api token after:', api.getToken()?.substring(0, 20) + '...');
-      console.log('  - Working token source:', token ? 'AuthContext' : 'localStorage');
-    } else {
-      console.log('  ❌ No token available from any source - user needs to login');
-      console.log('  - AuthContext token:', !!token);
-      console.log('  - localStorage token:', !!null /* CI GATE 0 - localStorage removed */);
-    }
-  }, [token, user]);
+  }, [user]);
 
   // Handle address refresh when user adds new address
   const handleAddressAdded = (newAddress) => {
