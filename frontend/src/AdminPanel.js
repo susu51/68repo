@@ -1523,6 +1523,21 @@ const AdminPanel = ({ user, onLogout }) => {
         {currentView === 'content-editor' && (
           <ContentEditor />
         )}
+
+        {/* Ad Board Manager View */}
+        {currentView === 'adboards' && (
+          <AdBoardManager />
+        )}
+
+        {/* Promotion Manager View */}
+        {currentView === 'promotions-new' && (
+          <PromotionManager />
+        )}
+
+        {/* Message Center View */}
+        {currentView === 'messages' && (
+          <MessageCenter />
+        )}
       </main>
     </div>
   );
