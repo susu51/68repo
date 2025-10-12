@@ -648,12 +648,23 @@ const AdminDashboard = ({ user }) => {
                     >
                       📦 Sipariş Raporu
                     </button>
+                    <button
+                      onClick={() => setReportSubTab('user')}
+                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                        reportSubTab === 'user'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      👤 Kullanıcı Raporu
+                    </button>
                   </div>
                 </div>
                 
                 {/* Report Content */}
                 {reportSubTab === 'financial' && <FinancialReport />}
                 {reportSubTab === 'orders' && <OrderReport />}
+                {reportSubTab === 'user' && <UserReport />}
               </TabsContent>
 
               {/* Users Tab */}
