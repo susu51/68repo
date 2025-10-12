@@ -9,6 +9,8 @@ from datetime import datetime
 import uuid
 from models import MenuItem, UserRole
 from auth_dependencies import get_business_user, get_approved_business_user
+from auth_cookie import get_approved_business_user_from_cookie
+from fastapi import Request
 
 router = APIRouter(prefix="/business", tags=["business"])
 
