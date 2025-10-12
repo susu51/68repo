@@ -119,7 +119,8 @@ export const BusinessMenuManager = () => {
       await fetchMenuItems();
     } catch (error) {
       console.error('Error toggling availability:', error);
-      toast.error('Güncelleme hatası');
+      const errorMsg = error.message || error.detail || 'Güncelleme hatası';
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
