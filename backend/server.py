@@ -41,8 +41,6 @@ from models import (
 
 # Import logging configuration
 from logging_config import get_loggers, log_health_check
-import logging
-import time
 
 # Import authentication dependencies
 from auth_dependencies import get_current_user, get_business_user, get_approved_business_user
@@ -154,7 +152,7 @@ client = None  # Global client for auth system
 
 if mongo_url:
     try:
-        print(f"🔗 Connecting to MongoDB Atlas...")
+        print("🔗 Connecting to MongoDB Atlas...")
         print(f"📍 CA File: {certifi.where()}")
         
         # Check if this is Atlas or local MongoDB
@@ -200,7 +198,7 @@ if mongo_url:
         print("🍪 Cookie auth system initialized")
     except Exception as e:
         print(f"❌ MongoDB connection error: {e}")
-        print(f"🔍 Trying fallback connection method...")
+        print("🔍 Trying fallback connection method...")
         
         try:
             # Fallback: Simple connection without SSL
@@ -1583,7 +1581,7 @@ async def get_business_stats(current_user: dict = Depends(get_approved_business_
             ],
             "customerSatisfaction": 4.6
         }
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Stats retrieval failed")
 
 @api_router.get("/business/orders/incoming")
