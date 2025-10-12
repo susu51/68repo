@@ -795,9 +795,13 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                 <span className="hidden sm:inline">Çıkış</span>
               </button>
             </div>
-          </div>
+          </Tabs>
+        </div>
+      </div>
 
-          {/* Professional Dashboard Content */}
+      {/* Professional Dashboard Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
               {/* Status Control Panel */}
