@@ -4278,6 +4278,80 @@ async def get_user_report(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating user report: {str(e)}")
 
+@api_router.get("/admin/reports/category-analytics")
+async def get_category_analytics(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Get category sales analytics (Admin only)"""
+    try:
+        # Parse dates
+        if start_date:
+            start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        else:
+            start = datetime.now(timezone.utc) - timedelta(days=30)
+        
+        if end_date:
+            end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        else:
+            end = datetime.now(timezone.utc)
+        
+        # Category sales from order items
+        category_pipeline = [
+            {"$match": {
+                "created_at": {"$gte": start, "$lte": end},
+                "status": {"$in": ["delivered", "completed"]}
+            }},
+            {"$unwind": "$items"},
+            {"$group": {
+                "_id": "$items.category",
+                "total_quantity": {"$sum": "$items.quantity"},
+                "total_revenue": {"$sum": {"$multiply": ["$items.price", "$items.quantity"]}},
+                "order_count": {"$sum": 1}
+            }},
+            {"$sort": {"total_revenue": -1}}
+        ]
+        
+        categories = []
+        total_revenue = 0
+        
+        async for result in db.orders.aggregate(category_pipeline):
+            category = result["_id"] or "Diğer"
+            revenue = result["total_revenue"]
+            total_revenue += revenue
+            
+            categories.append({
+                "category": category,
+                "quantity": result["total_quantity"],
+                "revenue": revenue,
+                "order_count": result["order_count"]
+            })
+        
+        # Calculate percentages
+        for category in categories:
+            category["percentage"] = (category["revenue"] / total_revenue * 100) if total_revenue > 0 else 0
+        
+        # Get top selling category
+        top_category = categories[0] if categories else None
+        
+        return {
+            "period": {
+                "start_date": start.isoformat(),
+                "end_date": end.isoformat()
+            },
+            "summary": {
+                "total_revenue": total_revenue,
+                "total_categories": len(categories),
+                "top_category": top_category["category"] if top_category else None,
+                "top_category_revenue": top_category["revenue"] if top_category else 0
+            },
+            "categories": categories
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating category analytics: {str(e)}")
+
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
 async def get_public_businesses(
