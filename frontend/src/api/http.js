@@ -16,8 +16,13 @@ export async function api(path, init = {}) {
     headers: { 'Content-Type': 'application/json', ...(init.headers || {}) },
     ...init
   });
-  if (res.status === 401) throw new Error('Authentication expired');
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  
+  // Don't throw generic "Authentication expired" for all 401s
+  // Let the caller handle the specific error message from backend
+  if (!res.ok && res.status !== 401) {
+    throw new Error(`${res.status} ${res.statusText}`);
+  }
+  
   return res;
 }
 
