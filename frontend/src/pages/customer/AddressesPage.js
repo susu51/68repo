@@ -91,23 +91,91 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
         setCurrentLocation({ lat: latitude, lng: longitude });
-        setAddressForm(prev => ({
-          ...prev,
-          lat: latitude,
-          lng: longitude
-        }));
-        toast.success('Mevcut konumunuz alındı!');
+        
+        toast.success('📍 Konum alındı! Adres bilgisi getiriliyor...');
+        
+        // Reverse geocoding - koordinatlardan adres bilgisi al
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=tr`
+          );
+          const data = await response.json();
+          
+          if (data && data.address) {
+            const addr = data.address;
+            
+            // Şehir bilgisini al (province, state, city sırasıyla dene)
+            const city = addr.province || addr.state || addr.city || '';
+            
+            // İlçe bilgisini al
+            const district = addr.county || addr.town || addr.suburb || addr.city_district || '';
+            
+            // Tam adres açıklaması
+            const street = addr.road || '';
+            const neighbourhood = addr.neighbourhood || addr.suburb || '';
+            const fullAddress = [street, neighbourhood].filter(Boolean).join(', ');
+            
+            setAddressForm(prev => ({
+              ...prev,
+              lat: latitude,
+              lng: longitude,
+              city: city,
+              district: district,
+              description: fullAddress || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+            }));
+            
+            toast.success('✅ Adres bilgisi otomatik dolduruldu!');
+          } else {
+            // Reverse geocoding başarısız olursa sadece koordinatları kaydet
+            setAddressForm(prev => ({
+              ...prev,
+              lat: latitude,
+              lng: longitude
+            }));
+            toast.success('📍 Konum alındı! Şehir ve ilçe bilgisini manuel girebilirsiniz.');
+          }
+        } catch (error) {
+          console.error('Adres bilgisi alınamadı:', error);
+          // Hata olursa sadece koordinatları kaydet
+          setAddressForm(prev => ({
+            ...prev,
+            lat: latitude,
+            lng: longitude
+          }));
+          toast.success('📍 Konum alındı! Şehir ve ilçe bilgisini manuel girebilirsiniz.');
+        }
+        
         setGettingLocation(false);
       },
       (error) => {
         console.error('Konum alınamadı:', error);
-        toast.error('Konum erişimi reddedildi veya alınamadı');
+        let errorMsg = 'Konum alınamadı';
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg = 'Konum izni reddedildi. Lütfen tarayıcı ayarlarından konum iznini açın.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMsg = 'Konum bilgisi mevcut değil.';
+            break;
+          case error.TIMEOUT:
+            errorMsg = 'Konum alınırken zaman aşımı. Tekrar deneyin.';
+            break;
+          default:
+            errorMsg = 'Konum alınırken bir hata oluştu.';
+        }
+        
+        toast.error(errorMsg);
         setGettingLocation(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { 
+        enableHighAccuracy: true, 
+        timeout: 15000,
+        maximumAge: 0 
+      }
     );
   };
 
