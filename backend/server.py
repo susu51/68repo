@@ -1247,8 +1247,9 @@ async def register_courier(courier_data: CourierRegistration):
 
 @api_router.post("/register/business")
 async def register_business(business_data: BusinessRegister):
-    """Register a new business with city normalization"""
+    """Register a new business with city normalization and GPS coordinates"""
     from utils.city_normalize import normalize_city_name
+    from utils.turkish_cities_coordinates import get_city_coordinates
     
     # Check if email already exists
     existing_user = await db.users.find_one({"email": business_data.email})
@@ -1261,6 +1262,16 @@ async def register_business(business_data: BusinessRegister):
     # Normalize city name
     city_original = business_data.city
     city_normalized = normalize_city_name(city_original)
+    
+    # Get GPS coordinates for city/district
+    coordinates = get_city_coordinates(city_original, business_data.district)
+    lat = coordinates["lat"] if coordinates else None
+    lng = coordinates["lng"] if coordinates else None
+    
+    if coordinates:
+        print(f"✅ GPS coordinates found for {city_original}/{business_data.district}: {lat}, {lng}")
+    else:
+        print(f"⚠️  No GPS coordinates found for {city_original}/{business_data.district}, using null")
     
     # Create new business user with pending status for KYC approval
     hashed_password = hash_password(business_data.password)
@@ -1275,6 +1286,8 @@ async def register_business(business_data: BusinessRegister):
         "city": city_original,  # Keep original for reference
         "city_normalized": city_normalized,  # Normalized for searching
         "district": business_data.district,  # Required for location-based filtering
+        "lat": lat,  # GPS latitude
+        "lng": lng,  # GPS longitude
         "business_category": business_data.business_category,
         "description": business_data.description,
         "is_active": True,
