@@ -1679,8 +1679,8 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
     </div>
   );
