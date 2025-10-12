@@ -4638,7 +4638,10 @@ const AuthPage = ({ onBack }) => {
       return (
         <ModernLogin 
           onLogin={login}
-          onRegisterClick={() => setStep('user_type_selection')}
+          onRegisterClick={() => {
+            setShowModernLogin(false);
+            setStep('user_type_selection');
+          }}
           onClose={() => setShowModernLogin(false)}
         />
       );
