@@ -2967,6 +2967,11 @@ const BusinessDashboard = ({ user }) => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <PlatformSettings />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
