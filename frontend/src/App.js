@@ -89,7 +89,7 @@ const CitySelector = ({ value, onChange, required = false }) => {
 // Admin Dashboard - Simple Working Version with Theme
 const AdminDashboard = ({ user }) => {
   const { logout } = useCookieAuth();
-  const [activeTab, setActiveTab] = useState('users');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
