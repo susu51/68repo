@@ -712,10 +712,11 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     <div className="min-h-screen bg-gray-50">
       {/* NO HEADER - Only Tabs Navigation */}
 
-      {/* Professional Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 mb-6">
+      {/* Professional Navigation Tabs - Sticky */}
+      <div className="sticky top-0 z-40 bg-gray-50 py-4 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
             <div className="flex space-x-1 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('dashboard')}
