@@ -715,8 +715,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
       {/* Professional Navigation Tabs - Sticky */}
       <div className="sticky top-0 z-40 bg-gray-50 py-4 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
             <div className="flex space-x-1 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('dashboard')}
