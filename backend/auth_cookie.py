@@ -137,13 +137,13 @@ async def login(body: LoginRequest, response: Response):
         if stored_password.startswith("$2"):
             # bcrypt password
             if not bcrypt.checkpw(body.password.encode(), stored_password.encode()):
-                raise HTTPException(401, "Invalid credentials")
+                raise HTTPException(401, "E-posta veya şifre hatalı")
         else:
             # Plain text password (for legacy compatibility)
             if body.password != stored_password:
-                raise HTTPException(401, "Invalid credentials")
+                raise HTTPException(401, "E-posta veya şifre hatalı")
     else:
-        raise HTTPException(401, "Invalid credentials")
+        raise HTTPException(401, "E-posta veya şifre hatalı")
     
     user_id = user.get("id")
     
