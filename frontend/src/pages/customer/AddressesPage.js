@@ -54,14 +54,15 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
     setLoading(true);
     try {
       console.log('🔄 Loading addresses...');
-      const response = await api.get('/user/addresses');
+      const result = await api.get('/user/addresses');
+      const response = result.data; // Extract data from api response
       
       if (response && Array.isArray(response)) {
         setAddresses(response);
         console.log(`✅ Loaded ${response.length} addresses`);
       } else {
         setAddresses([]);
-        console.log('ℹ️ No addresses found or invalid response format');
+        console.log('ℹ️ No addresses found or invalid response format', response);
       }
     } catch (error) {
       console.error('❌ Error loading addresses:', error);
