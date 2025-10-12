@@ -23,7 +23,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BASE_URL = "https://stable-menus.preview.emergentagent.com/api"
+BASE_URL = "https://kurye-express-2.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class Colors:
@@ -262,7 +262,7 @@ def test_health_and_public_endpoints():
     
     # Test public menus endpoint (legacy)
     try:
-        response = requests.get(f"https://stable-menus.preview.emergentagent.com/menus", headers=HEADERS)
+        response = requests.get(f"https://kurye-express-2.preview.emergentagent.com/menus", headers=HEADERS)
         if response.status_code == 200:
             data = response.json()
             record_test("Public Menus (Legacy)", True, f"Retrieved {len(data) if isinstance(data, list) else 'data'}")

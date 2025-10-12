@@ -21,7 +21,7 @@ from datetime import datetime
 from typing import Dict, List, Any
 
 # Configuration
-BASE_URL = "https://stable-menus.preview.emergentagent.com/api"
+BASE_URL = "https://kurye-express-2.preview.emergentagent.com/api"
 BUSINESS_EMAIL = "testbusiness@example.com"
 BUSINESS_PASSWORD = "test123"
 

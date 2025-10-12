@@ -17,7 +17,7 @@ import random
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://stable-menus.preview.emergentagent.com/api"
+BACKEND_URL = "https://kurye-express-2.preview.emergentagent.com/api"
 
 # Test credentials
 BUSINESS_EMAIL = "testbusiness@example.com"
