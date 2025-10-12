@@ -4824,15 +4824,20 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
   if (user) {
     console.log('✅ User authenticated, showing dashboard for role:', user.role);
     
+    const handleLogout = async () => {
+      await logout(); // Call CookieAuthContext logout (clears cookies)
+      window.location.href = '/'; // Redirect to landing page
+    };
+
     switch(user.role) {
       case 'customer':
-        return <CustomerApp user={user} onLogout={() => window.location.reload()} />;
+        return <CustomerApp user={user} onLogout={handleLogout} />;
       case 'business':
-        return <EnhancedBusinessDashboard user={user} onLogout={() => window.location.reload()} />;
+        return <EnhancedBusinessDashboard user={user} onLogout={handleLogout} />;
       case 'courier':
-        return <CourierDashboard user={user} onLogout={() => window.location.reload()} />;
+        return <CourierDashboard user={user} onLogout={handleLogout} />;
       case 'admin':
-        return <AdminPanel user={user} onLogout={() => window.location.reload()} />;
+        return <AdminPanel user={user} onLogout={handleLogout} />;
       default:
         console.warn('Unknown user role:', user.role);
         return <LandingPage onAuthStart={onAuthStart} />;
