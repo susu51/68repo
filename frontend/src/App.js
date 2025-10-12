@@ -16,6 +16,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { AdminDashboardTab } from "./components/AdminDashboard";
 import { FinancialReport } from "./components/FinancialReport";
 import { OrderReport } from "./components/OrderReport";
+import { UserReport } from "./components/UserReport";
 
 // Components
 import { Button } from "./components/ui/button";
