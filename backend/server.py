@@ -5445,6 +5445,7 @@ async def get_businesses(lat: float = None, lng: float = None, radius: int = 500
                 "name": business.get("business_name", "İsimsiz İşletme"),
                 "category": business.get("business_category", "Restaurant"),
                 "city": business.get("city", ""),
+                "district": business.get("district", ""),
                 "address": business.get("address", ""),
                 "description": business.get("description", ""),
                 "rating": 4.5,  # Default rating
@@ -5452,13 +5453,21 @@ async def get_businesses(lat: float = None, lng: float = None, radius: int = 500
                 "is_active": business.get("is_active", True)
             }
             
-            # Add location if available
-            location = business.get("location")
-            if location and isinstance(location, dict):
-                coordinates = location.get("coordinates", [])
-                if len(coordinates) >= 2:
-                    formatted_business["lat"] = coordinates[1] 
-                    formatted_business["lng"] = coordinates[0]
+            # Add GPS coordinates if available (directly from lat/lng fields)
+            business_lat = business.get("lat")
+            business_lng = business.get("lng")
+            
+            if business_lat is not None and business_lng is not None:
+                formatted_business["lat"] = business_lat
+                formatted_business["lng"] = business_lng
+            else:
+                # Fallback: try location.coordinates structure (legacy)
+                location = business.get("location")
+                if location and isinstance(location, dict):
+                    coordinates = location.get("coordinates", [])
+                    if len(coordinates) >= 2:
+                        formatted_business["lat"] = coordinates[1] 
+                        formatted_business["lng"] = coordinates[0]
                     
             formatted_businesses.append(formatted_business)
         
