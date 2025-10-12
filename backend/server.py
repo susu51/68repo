@@ -6137,4 +6137,594 @@ async def process_payment(
         print(f"❌ Error processing payment: {e}")
         raise HTTPException(status_code=500, detail=f"Payment processing failed: {str(e)}")
 
+
+
+# ==================== ADMIN PANEL UPGRADE ENDPOINTS ====================
+
+# Content Management Endpoints
+@api_router.get("/admin/content")
+async def get_content_blocks(
+    page: Optional[str] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Get all content blocks (Admin only)"""
+    query = {}
+    if page:
+        query["page"] = page
+    
+    blocks = await db.content_blocks.find(query).sort("order", 1).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for block in blocks:
+        block["id"] = str(block.pop("_id"))
+        if "created_at" in block and hasattr(block["created_at"], 'isoformat'):
+            block["created_at"] = block["created_at"].isoformat()
+        if "updated_at" in block and hasattr(block["updated_at"], 'isoformat'):
+            block["updated_at"] = block["updated_at"].isoformat()
+    
+    return blocks
+
+@api_router.post("/admin/content")
+async def create_content_block(
+    block_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Create new content block (Admin only)"""
+    from models import ContentBlock
+    
+    # Create new block
+    new_block = {
+        "_id": str(uuid.uuid4()),
+        "page": block_data["page"],
+        "section": block_data["section"],
+        "type": block_data["type"],
+        "content": block_data["content"],
+        "order": block_data.get("order", 0),
+        "is_active": block_data.get("is_active", True),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": None
+    }
+    
+    await db.content_blocks.insert_one(new_block)
+    
+    new_block["id"] = new_block.pop("_id")
+    new_block["created_at"] = new_block["created_at"].isoformat()
+    
+    return new_block
+
+@api_router.patch("/admin/content/{block_id}")
+async def update_content_block(
+    block_id: str,
+    block_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update content block (Admin only)"""
+    update_data = {
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    # Update allowed fields
+    for field in ["content", "order", "is_active", "page", "section", "type"]:
+        if field in block_data:
+            update_data[field] = block_data[field]
+    
+    result = await db.content_blocks.update_one(
+        {"_id": block_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(404, "Content block not found")
+    
+    return {"message": "Content block updated", "block_id": block_id}
+
+@api_router.delete("/admin/content/{block_id}")
+async def delete_content_block(
+    block_id: str,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Delete content block (Admin only)"""
+    result = await db.content_blocks.delete_one({"_id": block_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Content block not found")
+    
+    return {"message": "Content block deleted"}
+
+# Ad Board Management Endpoints
+@api_router.get("/admin/adboards")
+async def get_ad_boards(current_user: dict = Depends(get_admin_user)):
+    """Get all ad boards (Admin only)"""
+    boards = await db.ad_boards.find({}).sort("order", 1).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for board in boards:
+        board["id"] = str(board.pop("_id"))
+        if "created_at" in board and hasattr(board["created_at"], 'isoformat'):
+            board["created_at"] = board["created_at"].isoformat()
+        if "updated_at" in board and hasattr(board["updated_at"], 'isoformat'):
+            board["updated_at"] = board["updated_at"].isoformat()
+    
+    return boards
+
+@api_router.get("/adboards/active")
+async def get_active_ad_boards():
+    """Get active ad boards (Public - for customer landing page)"""
+    # Get only active boards, max 5
+    boards = await db.ad_boards.find({"is_active": True}).sort("order", 1).limit(5).to_list(length=None)
+    
+    # Convert MongoDB documents and increment impressions
+    for board in boards:
+        board["id"] = str(board.pop("_id"))
+        if "created_at" in board and hasattr(board["created_at"], 'isoformat'):
+            board["created_at"] = board["created_at"].isoformat()
+        if "updated_at" in board and hasattr(board["updated_at"], 'isoformat'):
+            board["updated_at"] = board["updated_at"].isoformat()
+        
+        # Increment impressions
+        await db.ad_boards.update_one(
+            {"_id": board["id"]},
+            {"$inc": {"impressions": 1}}
+        )
+    
+    return boards
+
+@api_router.post("/admin/adboards")
+async def create_ad_board(
+    board_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Create new ad board (Admin only)"""
+    # Validate max 5 active boards
+    active_count = await db.ad_boards.count_documents({"is_active": True})
+    if board_data.get("is_active", True) and active_count >= 5:
+        raise HTTPException(400, "Maximum 5 active ad boards allowed")
+    
+    new_board = {
+        "_id": str(uuid.uuid4()),
+        "title": board_data["title"],
+        "subtitle": board_data.get("subtitle"),
+        "image": board_data["image"],
+        "cta": board_data.get("cta"),
+        "order": board_data.get("order", 0),
+        "is_active": board_data.get("is_active", True),
+        "impressions": 0,
+        "clicks": 0,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": None
+    }
+    
+    await db.ad_boards.insert_one(new_board)
+    
+    new_board["id"] = new_board.pop("_id")
+    new_board["created_at"] = new_board["created_at"].isoformat()
+    
+    return new_board
+
+@api_router.patch("/admin/adboards/{board_id}")
+async def update_ad_board(
+    board_id: str,
+    board_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update ad board (Admin only)"""
+    # Check if activating and limit reached
+    if board_data.get("is_active"):
+        active_count = await db.ad_boards.count_documents({
+            "_id": {"$ne": board_id},
+            "is_active": True
+        })
+        if active_count >= 5:
+            raise HTTPException(400, "Maximum 5 active ad boards allowed")
+    
+    update_data = {
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    # Update allowed fields
+    for field in ["title", "subtitle", "image", "cta", "order", "is_active"]:
+        if field in board_data:
+            update_data[field] = board_data[field]
+    
+    result = await db.ad_boards.update_one(
+        {"_id": board_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(404, "Ad board not found")
+    
+    return {"message": "Ad board updated", "board_id": board_id}
+
+@api_router.delete("/admin/adboards/{board_id}")
+async def delete_ad_board(
+    board_id: str,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Delete ad board (Admin only)"""
+    result = await db.ad_boards.delete_one({"_id": board_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Ad board not found")
+    
+    return {"message": "Ad board deleted"}
+
+@api_router.post("/adboards/{board_id}/click")
+async def track_ad_click(board_id: str):
+    """Track ad board click (Public)"""
+    result = await db.ad_boards.update_one(
+        {"_id": board_id},
+        {"$inc": {"clicks": 1}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(404, "Ad board not found")
+    
+    return {"message": "Click tracked"}
+
+# Promotion Management Endpoints
+@api_router.get("/admin/promotions")
+async def get_promotions(current_user: dict = Depends(get_admin_user)):
+    """Get all promotions (Admin only)"""
+    promotions = await db.promotions.find({}).sort("created_at", -1).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for promo in promotions:
+        promo["id"] = str(promo.pop("_id"))
+        for date_field in ["start_date", "end_date", "created_at", "updated_at"]:
+            if date_field in promo and hasattr(promo[date_field], 'isoformat'):
+                promo[date_field] = promo[date_field].isoformat()
+    
+    return promotions
+
+@api_router.get("/promotions/active")
+async def get_active_promotions():
+    """Get active promotions (Public - for customer)"""
+    now = datetime.now(timezone.utc)
+    
+    promotions = await db.promotions.find({
+        "is_active": True,
+        "start_date": {"$lte": now},
+        "end_date": {"$gte": now}
+    }).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for promo in promotions:
+        promo["id"] = str(promo.pop("_id"))
+        for date_field in ["start_date", "end_date", "created_at", "updated_at"]:
+            if date_field in promo and hasattr(promo[date_field], 'isoformat'):
+                promo[date_field] = promo[date_field].isoformat()
+    
+    return promotions
+
+@api_router.post("/admin/promotions")
+async def create_promotion(
+    promo_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Create new promotion (Admin only)"""
+    # Check if code already exists
+    existing = await db.promotions.find_one({"code": promo_data["code"].upper()})
+    if existing:
+        raise HTTPException(400, "Promotion code already exists")
+    
+    # Parse dates
+    start_date = datetime.fromisoformat(promo_data["start_date"].replace("Z", "+00:00"))
+    end_date = datetime.fromisoformat(promo_data["end_date"].replace("Z", "+00:00"))
+    
+    new_promo = {
+        "_id": str(uuid.uuid4()),
+        "code": promo_data["code"].upper(),
+        "title": promo_data["title"],
+        "description": promo_data["description"],
+        "discount_pct": promo_data.get("discount_pct", 0),
+        "discount_amount": promo_data.get("discount_amount"),
+        "target": promo_data.get("target", "all"),
+        "target_id": promo_data.get("target_id"),
+        "min_order": promo_data.get("min_order", 0),
+        "usage_limit": promo_data.get("usage_limit"),
+        "usage_per_user": promo_data.get("usage_per_user", 1),
+        "used_count": 0,
+        "start_date": start_date,
+        "end_date": end_date,
+        "is_active": promo_data.get("is_active", True),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": None
+    }
+    
+    await db.promotions.insert_one(new_promo)
+    
+    new_promo["id"] = new_promo.pop("_id")
+    new_promo["start_date"] = new_promo["start_date"].isoformat()
+    new_promo["end_date"] = new_promo["end_date"].isoformat()
+    new_promo["created_at"] = new_promo["created_at"].isoformat()
+    
+    return new_promo
+
+@api_router.patch("/admin/promotions/{promo_id}")
+async def update_promotion(
+    promo_id: str,
+    promo_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update promotion (Admin only)"""
+    update_data = {
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    # Update allowed fields
+    for field in ["title", "description", "discount_pct", "discount_amount", 
+                  "min_order", "usage_limit", "usage_per_user", "is_active"]:
+        if field in promo_data:
+            update_data[field] = promo_data[field]
+    
+    # Parse dates if provided
+    if "start_date" in promo_data:
+        update_data["start_date"] = datetime.fromisoformat(promo_data["start_date"].replace("Z", "+00:00"))
+    if "end_date" in promo_data:
+        update_data["end_date"] = datetime.fromisoformat(promo_data["end_date"].replace("Z", "+00:00"))
+    
+    result = await db.promotions.update_one(
+        {"_id": promo_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(404, "Promotion not found")
+    
+    return {"message": "Promotion updated", "promo_id": promo_id}
+
+@api_router.delete("/admin/promotions/{promo_id}")
+async def delete_promotion(
+    promo_id: str,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Delete promotion (Admin only)"""
+    result = await db.promotions.delete_one({"_id": promo_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Promotion not found")
+    
+    return {"message": "Promotion deleted"}
+
+@api_router.get("/customer/promotions/validate")
+async def validate_promotion(
+    code: str,
+    order_amount: float,
+    current_user: dict = Depends(get_current_user_from_cookie_or_bearer)
+):
+    """Validate promotion code (Customer)"""
+    now = datetime.now(timezone.utc)
+    
+    # Find promotion
+    promo = await db.promotions.find_one({
+        "code": code.upper(),
+        "is_active": True,
+        "start_date": {"$lte": now},
+        "end_date": {"$gte": now}
+    })
+    
+    if not promo:
+        raise HTTPException(404, "Geçersiz veya süresi dolmuş promosyon kodu")
+    
+    # Check minimum order amount
+    if order_amount < promo["min_order"]:
+        raise HTTPException(400, f"Minimum sipariş tutarı {promo['min_order']} TL olmalıdır")
+    
+    # Check total usage limit
+    if promo.get("usage_limit") and promo["used_count"] >= promo["usage_limit"]:
+        raise HTTPException(400, "Bu promosyon kullanım limitine ulaştı")
+    
+    # Check user usage limit
+    user_usage = await db.promotion_usage.count_documents({
+        "promotion_id": promo["_id"],
+        "user_id": current_user["id"]
+    })
+    
+    if user_usage >= promo["usage_per_user"]:
+        raise HTTPException(400, "Bu promosyonu kullanım limitinize ulaştınız")
+    
+    # Calculate discount
+    if promo.get("discount_pct"):
+        discount = order_amount * (promo["discount_pct"] / 100)
+    elif promo.get("discount_amount"):
+        discount = promo["discount_amount"]
+    else:
+        discount = 0
+    
+    return {
+        "valid": True,
+        "promo_id": str(promo["_id"]),
+        "code": promo["code"],
+        "title": promo["title"],
+        "description": promo["description"],
+        "discount": discount,
+        "discount_pct": promo.get("discount_pct"),
+        "new_total": max(0, order_amount - discount)
+    }
+
+@api_router.post("/customer/promotions/apply")
+async def apply_promotion(
+    promo_data: dict,
+    current_user: dict = Depends(get_current_user_from_cookie_or_bearer)
+):
+    """Apply promotion to order (Customer)"""
+    # This will be called after order creation
+    # Record promotion usage
+    usage_record = {
+        "_id": str(uuid.uuid4()),
+        "promotion_id": promo_data["promo_id"],
+        "user_id": current_user["id"],
+        "order_id": promo_data["order_id"],
+        "discount_applied": promo_data["discount"],
+        "used_at": datetime.now(timezone.utc)
+    }
+    
+    await db.promotion_usage.insert_one(usage_record)
+    
+    # Increment promotion used_count
+    await db.promotions.update_one(
+        {"_id": promo_data["promo_id"]},
+        {"$inc": {"used_count": 1}}
+    )
+    
+    return {"message": "Promotion applied successfully"}
+
+# Message Management Endpoints
+@api_router.get("/admin/messages")
+async def get_all_messages(current_user: dict = Depends(get_admin_user)):
+    """Get all messages (Admin only)"""
+    messages = await db.messages.find({}).sort("created_at", -1).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for msg in messages:
+        msg["id"] = str(msg.pop("_id"))
+        for date_field in ["created_at", "read_at"]:
+            if date_field in msg and msg[date_field] and hasattr(msg[date_field], 'isoformat'):
+                msg[date_field] = msg[date_field].isoformat()
+    
+    return messages
+
+@api_router.post("/admin/messages")
+async def send_message(
+    message_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Send message from admin (Admin only)"""
+    recipient_type = message_data["recipient_type"]
+    recipient_id = message_data.get("recipient_id")
+    
+    # Create message(s)
+    messages_to_send = []
+    
+    if recipient_type in ["all_couriers", "all_businesses"]:
+        # Broadcast message
+        role = "courier" if recipient_type == "all_couriers" else "business"
+        recipients = await db.users.find({"role": role}).to_list(length=None)
+        
+        for recipient in recipients:
+            msg = {
+                "_id": str(uuid.uuid4()),
+                "sender_type": "admin",
+                "sender_id": current_user["id"],
+                "recipient_type": role,
+                "recipient_id": str(recipient.get("id") or recipient.get("_id")),
+                "subject": message_data["subject"],
+                "message": message_data["message"],
+                "status": "sent",
+                "is_read": False,
+                "read_at": None,
+                "created_at": datetime.now(timezone.utc)
+            }
+            messages_to_send.append(msg)
+    else:
+        # Single recipient
+        msg = {
+            "_id": str(uuid.uuid4()),
+            "sender_type": "admin",
+            "sender_id": current_user["id"],
+            "recipient_type": recipient_type,
+            "recipient_id": recipient_id,
+            "subject": message_data["subject"],
+            "message": message_data["message"],
+            "status": "sent",
+            "is_read": False,
+            "read_at": None,
+            "created_at": datetime.now(timezone.utc)
+        }
+        messages_to_send.append(msg)
+    
+    # Insert all messages
+    if messages_to_send:
+        await db.messages.insert_many(messages_to_send)
+    
+    return {
+        "message": "Message(s) sent successfully",
+        "count": len(messages_to_send)
+    }
+
+@api_router.get("/courier/messages")
+async def get_courier_messages(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Get messages for courier"""
+    if current_user["role"] != "courier":
+        raise HTTPException(403, "Only couriers can access this endpoint")
+    
+    messages = await db.messages.find({
+        "recipient_type": "courier",
+        "recipient_id": current_user["id"]
+    }).sort("created_at", -1).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for msg in messages:
+        msg["id"] = str(msg.pop("_id"))
+        for date_field in ["created_at", "read_at"]:
+            if date_field in msg and msg[date_field] and hasattr(msg[date_field], 'isoformat'):
+                msg[date_field] = msg[date_field].isoformat()
+    
+    return messages
+
+@api_router.get("/business/messages")
+async def get_business_messages(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Get messages for business"""
+    if current_user["role"] != "business":
+        raise HTTPException(403, "Only businesses can access this endpoint")
+    
+    messages = await db.messages.find({
+        "recipient_type": "business",
+        "recipient_id": current_user["id"]
+    }).sort("created_at", -1).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for msg in messages:
+        msg["id"] = str(msg.pop("_id"))
+        for date_field in ["created_at", "read_at"]:
+            if date_field in msg and msg[date_field] and hasattr(msg[date_field], 'isoformat'):
+                msg[date_field] = msg[date_field].isoformat()
+    
+    return messages
+
+@api_router.patch("/messages/{message_id}/read")
+async def mark_message_read(
+    message_id: str,
+    current_user: dict = Depends(get_current_user_from_cookie_or_bearer)
+):
+    """Mark message as read"""
+    result = await db.messages.update_one(
+        {
+            "_id": message_id,
+            "recipient_id": current_user["id"]
+        },
+        {
+            "$set": {
+                "is_read": True,
+                "status": "read",
+                "read_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(404, "Message not found")
+    
+    return {"message": "Message marked as read"}
+
+# Public Content Endpoint for Landing Page
+@api_router.get("/content/{page}")
+async def get_public_content(page: str):
+    """Get public content for a page (landing, about, etc)"""
+    blocks = await db.content_blocks.find({
+        "page": page,
+        "is_active": True
+    }).sort("order", 1).to_list(length=None)
+    
+    # Convert MongoDB documents
+    for block in blocks:
+        block["id"] = str(block.pop("_id"))
+        if "created_at" in block and hasattr(block["created_at"], 'isoformat'):
+            block["created_at"] = block["created_at"].isoformat()
+        if "updated_at" in block and hasattr(block["updated_at"], 'isoformat'):
+            block["updated_at"] = block["updated_at"].isoformat()
+    
+    return blocks
+
 app.include_router(api_router)
