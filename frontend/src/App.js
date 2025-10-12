@@ -4805,7 +4805,7 @@ function App() {
 
 // Separate component to access CookieAuthContext
 function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
-  const { user, loading } = useCookieAuth();
+  const { user, loading, logout } = useCookieAuth();
 
   if (loading) {
     return (
