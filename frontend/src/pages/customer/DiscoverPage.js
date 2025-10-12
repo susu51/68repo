@@ -61,12 +61,10 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     try {
       console.log('🔍 DISCOVER PAGE - Loading user addresses for user:', user?.email);
       
-      const response = await api.get('/user/addresses');
-      console.log('📡 DISCOVER PAGE - Raw API response:', response);
-      console.log('📊 DISCOVER PAGE - Response status:', response.status);
-      console.log('📄 DISCOVER PAGE - Response data:', response.data);
+      const result = await api.get('/user/addresses');
+      console.log('📡 DISCOVER PAGE - Raw API response:', result);
       
-      const addresses = response.data || response || [];
+      const addresses = result.data || [];
       
       console.log('✅ DISCOVER PAGE - Processed addresses:', addresses.length, addresses);
       
