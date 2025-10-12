@@ -6399,7 +6399,7 @@ async def get_active_promotions():
 
 @api_router.post("/admin/promotions")
 async def create_promotion(
-    promo_data: dict,
+    promo_data: dict = Body(...),
     current_user: dict = Depends(get_admin_user)
 ):
     """Create new promotion (Admin only)"""
