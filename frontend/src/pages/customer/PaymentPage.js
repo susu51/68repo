@@ -33,8 +33,7 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
   const loadUserAddresses = async () => {
     try {
-      if (!api.isAuthenticated()) return;
-
+      // Cookie-based auth - no manual check needed
       const response = await api.get('/user/addresses');
 
       const addresses = response.data || [];
