@@ -4826,7 +4826,7 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
     
     switch(user.role) {
       case 'customer':
-        return <CustomerApp user={user} />;
+        return <CustomerApp user={user} onLogout={() => window.location.reload()} />;
       case 'business':
         return <EnhancedBusinessDashboard user={user} onLogout={() => window.location.reload()} />;
       case 'courier':
