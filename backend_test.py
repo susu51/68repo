@@ -1,52 +1,66 @@
 #!/usr/bin/env python3
 """
-BUSINESS MENU CRUD COMPREHENSIVE TESTING
-Testing with KYC-approved business user: testbusiness@example.com/test123
+Admin Panel Backend Testing - Comprehensive Test Suite
+Testing all admin panel endpoints as requested in the review.
 
-This test covers all scenarios from the review request:
-1. Business Authentication
-2. Menu Item Creation (4 categories)
-3. Menu Item Retrieval
-4. Menu Item Update
-5. Toggle Availability
-6. Soft Delete
-7. Public Customer Endpoints
-8. Validation Tests
+Test Endpoints:
+1. Dashboard: GET /api/admin/reports/dashboard
+2. Financial Report: GET /api/admin/reports/financial
+3. Order Report: GET /api/admin/reports/orders?business_name=test
+4. User Report: GET /api/admin/reports/user?customer_name=test
+5. Category Analytics: GET /api/admin/reports/category-analytics
+6. Platform Settings: GET /api/admin/settings, PATCH /api/admin/settings
+7. Promotions: GET /api/admin/promotions
+
+Test Credentials: admin@kuryecini.com / admin123
 """
 
 import requests
 import json
 import sys
 from datetime import datetime
-from typing import Dict, List, Any
+import os
 
 # Configuration
-BASE_URL = "https://kurye-express-2.preview.emergentagent.com/api"
-BUSINESS_EMAIL = "testbusiness@example.com"
-BUSINESS_PASSWORD = "test123"
+BACKEND_URL = "https://kurye-express-2.preview.emergentagent.com/api"
+ADMIN_EMAIL = "admin@kuryecini.com"
+ADMIN_PASSWORD = "admin123"
 
-class BusinessMenuTester:
+class AdminPanelTester:
     def __init__(self):
         self.session = requests.Session()
-        self.business_user_id = None
-        self.created_items = []
+        self.admin_token = None
         self.test_results = []
+        self.total_tests = 0
+        self.passed_tests = 0
         
-    def log_test(self, test_name: str, success: bool, details: str = ""):
-        """Log test result"""
-        status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
-        if details:
-            print(f"    {details}")
-        self.test_results.append({
+    def log_test(self, test_name, success, details="", response_data=None):
+        """Log test results"""
+        self.total_tests += 1
+        if success:
+            self.passed_tests += 1
+            status = "✅ PASS"
+        else:
+            status = "❌ FAIL"
+            
+        result = {
             "test": test_name,
+            "status": status,
             "success": success,
-            "details": details
-        })
-        
-    def test_business_authentication(self):
-        """Test 1: Business Authentication"""
-        print("\n🔐 Testing Business Authentication...")
+            "details": details,
+            "response_data": response_data
+        }
+        self.test_results.append(result)
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        if not success and response_data:
+            print(f"   Response: {response_data}")
+        print()
+
+    def authenticate_admin(self):
+        """Authenticate admin user and get token"""
+        print("🔐 Authenticating admin user...")
         
         try:
             # Login with approved business user (cookie-based auth)
