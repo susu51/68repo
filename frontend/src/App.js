@@ -2843,6 +2843,15 @@ const BusinessDashboard = ({ user }) => {
                 <CardDescription className="text-xs sm:text-sm">
                   Müşteri siparişlerini yönetin ve takip edin
                 </CardDescription>
+                {/* City Filter */}
+                <div className="mt-4">
+                  <select className="px-3 py-2 border rounded-lg text-sm">
+                    <option value="">Tüm Şehirler</option>
+                    <option value="istanbul">İstanbul</option>
+                    <option value="ankara">Ankara</option>
+                    <option value="izmir">İzmir</option>
+                  </select>
+                </div>
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
                 {orders.length === 0 ? (
