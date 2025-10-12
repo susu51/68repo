@@ -154,20 +154,20 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
           }
         });
         
-        // Combine in priority order: District → City → Others
-        restaurantsData = [...sameDistrict, ...sameCity, ...others];
+        // Combine in priority order: District → City (NO OTHERS - city filter!)
+        restaurantsData = [...sameDistrict, ...sameCity];
         
-        console.log(`📊 Smart sorting results:`);
+        console.log(`📊 City-filtered results:`);
         console.log(`  🎯 Same district (${selectedAddress.district}): ${sameDistrict.length}`);
         console.log(`  🏙️ Same city (${selectedAddress.city}): ${sameCity.length}`);
-        console.log(`  🌍 Other locations: ${others.length}`);
+        console.log(`  🚫 Other cities excluded: ${others.length}`);
         
-        if (sameDistrict.length > 0) {
-          toast.success(`${sameDistrict.length} restoran ${selectedAddress.district} ilçesinde bulundu`);
+        if (restaurantsData.length === 0) {
+          toast.error(`${selectedAddress.city} şehrinde restoran bulunamadı`);
+        } else if (sameDistrict.length > 0) {
+          toast.success(`${sameDistrict.length} restoran ${selectedAddress.district} ilçesinde, ${sameCity.length} restoran ${selectedAddress.city} genelinde`);
         } else if (sameCity.length > 0) {
           toast.success(`${sameCity.length} restoran ${selectedAddress.city} şehrinde bulundu`);
-        } else {
-          toast.success('Yakın restoran bulunamadı, tüm restoranlar gösteriliyor');
         }
       } else {
         // Fallback: Show all active restaurants
