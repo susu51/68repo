@@ -4193,6 +4193,91 @@ async def get_order_reports(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating order report: {str(e)}")
 
+@api_router.get("/admin/reports/user")
+async def get_user_report(
+    customer_name: str,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Get user (customer) report with analytics (Admin only)"""
+    try:
+        # Find customers matching name
+        customer_cursor = db.users.find({
+            "role": "customer",
+            "$or": [
+                {"first_name": {"$regex": customer_name, "$options": "i"}},
+                {"last_name": {"$regex": customer_name, "$options": "i"}},
+                {"email": {"$regex": customer_name, "$options": "i"}}
+            ]
+        }).limit(10)
+        
+        customers_report = []
+        
+        async for customer in customer_cursor:
+            customer_id = customer.get("id")
+            
+            # Get customer's orders
+            orders_cursor = db.orders.find({"customer_id": customer_id})
+            orders = []
+            total_spent = 0
+            status_counts = {}
+            
+            async for order in orders_cursor:
+                orders.append(order)
+                total_spent += order.get("total_amount", 0)
+                status = order.get("status", "unknown")
+                status_counts[status] = status_counts.get(status, 0) + 1
+            
+            # Calculate analytics
+            total_orders = len(orders)
+            avg_order_value = total_spent / total_orders if total_orders > 0 else 0
+            
+            # Get favorite businesses
+            business_orders = {}
+            for order in orders:
+                business_id = order.get("business_id")
+                if business_id:
+                    business_orders[business_id] = business_orders.get(business_id, 0) + 1
+            
+            favorite_businesses = []
+            for business_id, count in sorted(business_orders.items(), key=lambda x: x[1], reverse=True)[:3]:
+                business = await db.users.find_one({"id": business_id})
+                if business:
+                    favorite_businesses.append({
+                        "name": business.get("business_name", "N/A"),
+                        "order_count": count
+                    })
+            
+            # Last order date
+            last_order = orders[-1] if orders else None
+            last_order_date = last_order.get("created_at") if last_order else None
+            
+            customers_report.append({
+                "customer": {
+                    "id": customer_id,
+                    "name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip(),
+                    "email": customer.get("email"),
+                    "phone": customer.get("phone"),
+                    "created_at": customer.get("created_at").isoformat() if customer.get("created_at") else None
+                },
+                "analytics": {
+                    "total_orders": total_orders,
+                    "total_spent": total_spent,
+                    "average_order_value": avg_order_value,
+                    "status_distribution": status_counts,
+                    "last_order_date": last_order_date.isoformat() if last_order_date else None,
+                    "favorite_businesses": favorite_businesses
+                }
+            })
+        
+        return {
+            "search_term": customer_name,
+            "customers_found": len(customers_report),
+            "customers": customers_report
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating user report: {str(e)}")
+
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
 async def get_public_businesses(
