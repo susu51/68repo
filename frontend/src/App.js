@@ -17,6 +17,7 @@ import { AdminDashboardTab } from "./components/AdminDashboard";
 import { FinancialReport } from "./components/FinancialReport";
 import { OrderReport } from "./components/OrderReport";
 import { UserReport } from "./components/UserReport";
+import { CategoryAnalytics } from "./components/CategoryAnalytics";
 
 // Components
 import { Button } from "./components/ui/button";
