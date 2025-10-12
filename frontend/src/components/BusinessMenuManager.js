@@ -41,12 +41,18 @@ export const BusinessMenuManager = () => {
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
-      const response = await get('/business/menu');
-      setMenuItems(response.data || []);
-      console.log('✅ Menu items loaded:', response.data?.length || 0);
+      const result = await get('/business/menu');
+      console.log('📡 Raw API response:', result);
+      
+      // Handle both {data: [...]} and direct array responses
+      const items = result.data || result || [];
+      const menuArray = Array.isArray(items) ? items : [];
+      
+      setMenuItems(menuArray);
+      console.log('✅ Menu items loaded:', menuArray.length, menuArray);
     } catch (error) {
       console.error('❌ Error loading menu:', error);
-      toast.error('Menü yüklenirken hata oluştu');
+      toast.error('Menü yüklenirken hata oluştu: ' + (error.message || 'Bilinmeyen hata'));
       setMenuItems([]);
     } finally {
       setLoading(false);
