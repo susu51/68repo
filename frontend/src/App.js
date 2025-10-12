@@ -624,32 +624,35 @@ const AdminDashboard = ({ user }) => {
 
               {/* Reports Tab */}
               <TabsContent value="reports" className="space-y-6">
-                <Tabs defaultValue="financial" className="w-full">
-                  <div className="border-b mb-6">
-                    <div className="flex space-x-4">
-                      <button
-                        onClick={() => document.querySelector('[value="financial"]')?.click()}
-                        className="pb-3 px-4 border-b-2 border-transparent hover:border-green-500 text-sm font-medium text-gray-600 hover:text-gray-900"
-                      >
-                        💰 Finansal Rapor
-                      </button>
-                      <button
-                        onClick={() => document.querySelector('[value="orders"]')?.click()}
-                        className="pb-3 px-4 border-b-2 border-transparent hover:border-blue-500 text-sm font-medium text-gray-600 hover:text-gray-900"
-                      >
-                        📦 Sipariş Raporu
-                      </button>
-                    </div>
+                {/* Sub Navigation */}
+                <div className="bg-white rounded-lg shadow-sm border p-2 mb-6">
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setReportSubTab('financial')}
+                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                        reportSubTab === 'financial'
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      💰 Finansal Rapor
+                    </button>
+                    <button
+                      onClick={() => setReportSubTab('orders')}
+                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                        reportSubTab === 'orders'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      📦 Sipariş Raporu
+                    </button>
                   </div>
-                  
-                  <TabsContent value="financial">
-                    <FinancialReport />
-                  </TabsContent>
-                  
-                  <TabsContent value="orders">
-                    <OrderReport />
-                  </TabsContent>
-                </Tabs>
+                </div>
+                
+                {/* Report Content */}
+                {reportSubTab === 'financial' && <FinancialReport />}
+                {reportSubTab === 'orders' && <OrderReport />}
               </TabsContent>
 
               {/* Users Tab */}
