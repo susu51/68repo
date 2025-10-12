@@ -407,13 +407,15 @@ const AdminPanel = ({ user, onLogout }) => {
             {[
               { id: 'dashboard', label: '📊 Dashboard' },
               { id: 'content-editor', label: '📝 İçerik Editörü' },
+              { id: 'adboards', label: '📢 Reklam Panoları' },
+              { id: 'promotions-new', label: '🎁 Promosyonlar' },
+              { id: 'messages', label: '💬 Mesajlar' },
               { id: 'orders', label: '📦 Siparişler' },
               { id: 'businesses', label: '🏪 İşletmeler' },
               { id: 'business-kyc', label: '✅ İşletme KYC' },
               { id: 'couriers', label: '🚴 Kuryeler' },
               { id: 'courier-kyc', label: '✅ Kurye KYC' },
               { id: 'menus', label: '📋 Menü Yönetimi' },
-              { id: 'promotions', label: '🎯 Promosyonlar' },
               { id: 'settings', label: '⚙️ Ayarlar' },
               { id: 'reports', label: '📈 Raporlar' }
             ].map((tab) => (
