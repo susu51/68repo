@@ -558,6 +558,7 @@ const AdminDashboard = ({ user }) => {
           {/* Mobile Navigation Pills */}
           <div className="lg:hidden flex overflow-x-auto space-x-2 p-2 bg-white rounded-xl shadow-lg">
             {[
+              { value: 'dashboard', icon: '📊', label: 'Dashboard' },
               { value: 'users', icon: '👥', label: 'Kullanıcılar' },
               { value: 'kyc', icon: '📋', label: 'KYC' },
               { value: 'products', icon: '🍽️', label: 'Ürünler' },
