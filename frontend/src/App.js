@@ -584,6 +584,7 @@ const AdminDashboard = ({ user }) => {
           <div className="hidden lg:block w-64 flex-shrink-0 bg-white rounded-xl shadow-lg p-4">
             <div className="space-y-2">
               {[
+                { value: 'dashboard', icon: '📊', label: 'Gösterge Paneli' },
                 { value: 'users', icon: '👥', label: 'Kullanıcılar' },
                 { value: 'kyc', icon: '📋', label: 'KYC Onay' },
                 { value: 'products', icon: '🍽️', label: 'Ürünler' },
