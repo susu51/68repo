@@ -4444,7 +4444,7 @@ async def add_user_address(address_data: dict, current_user: dict = Depends(get_
 async def update_user_address(
     address_id: str,
     address_data: dict,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user_from_cookie_or_bearer)
 ):
     """Update user address"""
     from utils.city_normalize import normalize_city_name
