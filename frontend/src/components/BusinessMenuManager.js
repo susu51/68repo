@@ -82,7 +82,7 @@ export const BusinessMenuManager = () => {
       handleCloseModal();
     } catch (error) {
       console.error('Error saving menu item:', error);
-      const errorMsg = error.response?.data?.detail || 'Kaydetme hatası';
+      const errorMsg = error.message || error.response?.data?.detail || error.detail || 'Kaydetme hatası';
       toast.error(errorMsg);
     } finally {
       setLoading(false);
