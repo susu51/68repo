@@ -1027,7 +1027,6 @@ export const BusinessDashboard = ({ user, onLogout }) => {
               </div>
             </div>
           )}
-        </Tabs>
       </div>
 
       {/* Main Content */}
