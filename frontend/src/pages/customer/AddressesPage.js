@@ -213,7 +213,8 @@ const AddressesPageComponent = ({ onSelectAddress, onBack, onAddressAdded }) => 
       if (editingAddress) {
         // Update existing address
         console.log('🔄 Updating address:', editingAddress.id);
-        response = await api.put(`/user/addresses/${editingAddress.id}`, addressData);
+        const result = await api.put(`/user/addresses/${editingAddress.id}`, addressData);
+        response = result.data; // Extract data from api response
         
         setAddresses(prev => 
           prev.map(addr => addr.id === editingAddress.id ? response : addr)
