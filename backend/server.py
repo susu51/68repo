@@ -4340,7 +4340,7 @@ async def get_nearby_restaurants(
 
 # Address Endpoints
 @api_router.get("/user/addresses")
-async def get_user_addresses(current_user: dict = Depends(get_current_user)):
+async def get_user_addresses(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
     """Get user's saved addresses"""
     try:
         # FIXED: Properly extract user_id from current_user object returned by get_current_user
