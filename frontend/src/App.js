@@ -4785,60 +4785,94 @@ function App() {
   const handleLoginSuccess = (userData) => {
     console.log('🎯 handleLoginSuccess called with:', userData);
     
-    // Force close modal with multiple methods
+    // Force close modal
     setShowLogin(false);
     
-    // Force DOM removal as backup
-    setTimeout(() => {
-      const modalElement = document.querySelector('[style*="position: fixed"]');
-      if (modalElement) {
-        modalElement.remove();
-        console.log('🎯 Modal force-removed from DOM');
-      }
-    }, 500);
-    
-    alert('✅ Giriş başarılı! Hoş geldin ' + (userData.user?.first_name || userData.first_name || 'kullanıcı'));
-    
-    // Optional: Refresh page to complete login state
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    // Immediate page reload to complete login state and show dashboard
+    window.location.reload();
   };
 
   return (
     <CookieAuthProvider>
-      <div className="App">
-        <LandingPage onAuthStart={handleAuthStart} />
-        
-        {showLogin && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            padding: '20px'
-          }}>
-            <div style={{
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              borderRadius: '15px',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-            }}>
-              <ModernLogin 
-                onClose={() => setShowLogin(false)}
-                onLogin={handleLoginSuccess}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      <AppContent 
+        showLogin={showLogin}
+        onAuthStart={handleAuthStart}
+        onLoginSuccess={handleLoginSuccess}
+        onCloseLogin={() => setShowLogin(false)}
+      />
     </CookieAuthProvider>
+  );
+}
+
+// Separate component to access CookieAuthContext
+function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
+  const { user, loading } = useCookieAuth();
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <div>Yükleniyor...</div>
+      </div>
+    );
+  }
+
+  // If user is authenticated, show appropriate dashboard
+  if (user) {
+    console.log('✅ User authenticated, showing dashboard for role:', user.role);
+    
+    switch(user.role) {
+      case 'customer':
+        return <CustomerApp user={user} />;
+      case 'business':
+        return <BusinessDashboard user={user} onLogout={() => window.location.reload()} />;
+      case 'courier':
+        return <CourierDashboard user={user} onLogout={() => window.location.reload()} />;
+      case 'admin':
+        return <AdminPanel user={user} onLogout={() => window.location.reload()} />;
+      default:
+        console.warn('Unknown user role:', user.role);
+        return <LandingPage onAuthStart={onAuthStart} />;
+    }
+  }
+
+  // If not authenticated, show landing page
+  return (
+    <div className="App">
+      <LandingPage onAuthStart={onAuthStart} />
+      
+      {showLogin && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            borderRadius: '15px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <ModernLogin 
+              onClose={onCloseLogin}
+              onLogin={onLoginSuccess}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
