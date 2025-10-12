@@ -781,7 +781,17 @@ export const BusinessDashboard = ({ user, onLogout }) => {
                 }`}
               >
                 <span className="text-lg">⚙️</span>
-                <span>Ayarlar</span>
+                <span className="hidden sm:inline">Ayarlar</span>
+              </button>
+              
+              {/* Logout Button - Right aligned */}
+              <div className="flex-1"></div>
+              <button
+                onClick={onLogout}
+                className="flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <span className="text-lg">🚪</span>
+                <span className="hidden sm:inline">Çıkış</span>
               </button>
             </div>
           </div>
