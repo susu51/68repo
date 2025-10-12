@@ -20,7 +20,7 @@ import random
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://courier-stable.preview.emergentagent.com/api"
+BACKEND_URL = "https://stable-menus.preview.emergentagent.com/api"
 CUSTOMER_EMAIL = "testcustomer@example.com"
 CUSTOMER_PASSWORD = "test123"
 

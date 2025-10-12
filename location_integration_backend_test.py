@@ -25,7 +25,7 @@ import sys
 import os
 
 # Backend URL from environment
-BACKEND_URL = "https://courier-stable.preview.emergentagent.com/api"
+BACKEND_URL = "https://stable-menus.preview.emergentagent.com/api"
 
 class LocationIntegrationTester:
     def __init__(self):

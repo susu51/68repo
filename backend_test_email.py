@@ -13,7 +13,7 @@ import os
 from io import BytesIO
 
 class DeliverTREmailAPITester:
-    def __init__(self, base_url="https://courier-stable.preview.emergentagent.com"):
+    def __init__(self, base_url="https://stable-menus.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.access_token = None

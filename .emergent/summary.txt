@@ -65,16 +65,16 @@ The application uses a monolithic repository structure with  (React) and  (FastA
 *   ****:
     *   **Importance**: Handles cart-related API calls.
     *   **Changes**: Removed hardcoded  and replaced  usage.
-*   **/app/frontend/src/utils/databaseState.js:26:  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com') {
-/app/frontend/src/utils/cartAPI.js:7:const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
+*   **/app/frontend/src/utils/databaseState.js:26:  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com') {
+/app/frontend/src/utils/cartAPI.js:7:const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
 /app/frontend/src/EnhancedBusinessDashboard_OLD.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/BusinessDashboard_Enhanced.js:16:const API_BASE = process.env.REACT_APP_API_BASE_URL;
-/app/frontend/src/api/http.js:2:const BASE = (process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api').replace(/\/+$/, ''); // remove trailing /
+/app/frontend/src/api/http.js:2:const BASE = (process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api').replace(/\/+$/, ''); // remove trailing /
 /app/frontend/src/AdminPanel_OLD.js:9:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/CourierDashboard_Complex.js:8:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/MenuManagement.js:12:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/CourierDashboard.js:14:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-/app/frontend/src/App.js:28:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api';
+/app/frontend/src/App.js:28:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api';
 /app/frontend/src/CourierBalance.js:7:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/pages/customer/Profile.js:29:  const API = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/pages/customer/OrdersPage.js:21:  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
@@ -87,29 +87,29 @@ The application uses a monolithic repository structure with  (React) and  (FastA
 /app/frontend/src/pages/customer/OrderTrackingPage.js:24:      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/pages/customer/OrderTrackingPage.js:55:      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/pages/customer/ProfilePage.js:74:  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-/app/frontend/src/pages/Auth/ModernAuthPage.js:5:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://quickcourier.preview.emergentagent.com";
+/app/frontend/src/pages/Auth/ModernAuthPage.js:5:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://stable-menus.preview.emergentagent.com";
 /app/frontend/src/pages/Auth/ResetPassword.js:9:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/pages/Auth/ForgotPassword.js:9:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/AdminPanel.js.broken:12:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-/app/frontend/src/App.js.backup:40:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api';
+/app/frontend/src/App.js.backup:40:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api';
 /app/frontend/src/AdminPanel.js.backup:12:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/components/AdCarousel.js:7:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/components/ErrorBoundary.jsx:110:      if (process.env.REACT_APP_ERROR_TRACKING_URL) {
 /app/frontend/src/components/ErrorBoundary.jsx:111:        await fetch(process.env.REACT_APP_ERROR_TRACKING_URL, {
-/app/frontend/src/AdminPanel.js:28:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:47:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:66:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:96:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:129:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:163:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:196:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:230:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:260:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:290:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:317:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:347:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:28:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:47:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:66:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:96:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:129:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:163:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:196:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:230:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:260:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:290:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:317:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:347:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
 /app/frontend/src/EnhancedAdminPanel.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-/app/frontend/src/App.minimal.working.js:3:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api';
+/app/frontend/src/App.minimal.working.js:3:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api';
 /app/frontend/src/CourierDashboard_Original.js:8:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/lib/analytics.js:25:      if (window.gtag && process.env.REACT_APP_GA_MEASUREMENT_ID) {
 /app/frontend/src/PackageOrder.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -119,7 +119,7 @@ The application uses a monolithic repository structure with  (React) and  (FastA
 /app/frontend/src/FileUpload.js:8:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/ComprehensiveBusinessDashboard.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/OrderSystem.js:11:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-/app/frontend/.env:1:REACT_APP_API_BASE_URL=https://quickcourier.preview.emergentagent.com/api
+/app/frontend/.env:1:REACT_APP_API_BASE_URL=https://stable-menus.preview.emergentagent.com/api
 /app/frontend/.env.example:8:REACT_APP_BACKEND_URL=http://localhost:8001
 /app/frontend/.env.example:11:# REACT_APP_BACKEND_URL=https://your-backend.herokuapp.com
 /app/frontend/.env.example:12:# REACT_APP_BACKEND_URL=https://your-backend.render.com
@@ -129,16 +129,16 @@ The application uses a monolithic repository structure with  (React) and  (FastA
     *   **Changes**: Created to enforce rules for hotfix.
 
 **Directory Structure Summary:**
-The application maintains a clear separation between  (FastAPI with , , , and feature-specific routes) and  (React with , context providers, pages for different roles, and common components/utilities). Environment variables are managed in  files in both root directories. A new /app/frontend/src/utils/databaseState.js:26:  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com') {
-/app/frontend/src/utils/cartAPI.js:7:const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
+The application maintains a clear separation between  (FastAPI with , , , and feature-specific routes) and  (React with , context providers, pages for different roles, and common components/utilities). Environment variables are managed in  files in both root directories. A new /app/frontend/src/utils/databaseState.js:26:  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com') {
+/app/frontend/src/utils/cartAPI.js:7:const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
 /app/frontend/src/EnhancedBusinessDashboard_OLD.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/BusinessDashboard_Enhanced.js:16:const API_BASE = process.env.REACT_APP_API_BASE_URL;
-/app/frontend/src/api/http.js:2:const BASE = (process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api').replace(/\/+$/, ''); // remove trailing /
+/app/frontend/src/api/http.js:2:const BASE = (process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api').replace(/\/+$/, ''); // remove trailing /
 /app/frontend/src/AdminPanel_OLD.js:9:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/CourierDashboard_Complex.js:8:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/MenuManagement.js:12:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/CourierDashboard.js:14:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-/app/frontend/src/App.js:28:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api';
+/app/frontend/src/App.js:28:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api';
 /app/frontend/src/CourierBalance.js:7:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/pages/customer/Profile.js:29:  const API = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/pages/customer/OrdersPage.js:21:  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
@@ -151,29 +151,29 @@ The application maintains a clear separation between  (FastAPI with , , , and fe
 /app/frontend/src/pages/customer/OrderTrackingPage.js:24:      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/pages/customer/OrderTrackingPage.js:55:      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/pages/customer/ProfilePage.js:74:  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-/app/frontend/src/pages/Auth/ModernAuthPage.js:5:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://quickcourier.preview.emergentagent.com";
+/app/frontend/src/pages/Auth/ModernAuthPage.js:5:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://stable-menus.preview.emergentagent.com";
 /app/frontend/src/pages/Auth/ResetPassword.js:9:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/pages/Auth/ForgotPassword.js:9:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/AdminPanel.js.broken:12:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-/app/frontend/src/App.js.backup:40:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api';
+/app/frontend/src/App.js.backup:40:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api';
 /app/frontend/src/AdminPanel.js.backup:12:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/components/AdCarousel.js:7:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 /app/frontend/src/components/ErrorBoundary.jsx:110:      if (process.env.REACT_APP_ERROR_TRACKING_URL) {
 /app/frontend/src/components/ErrorBoundary.jsx:111:        await fetch(process.env.REACT_APP_ERROR_TRACKING_URL, {
-/app/frontend/src/AdminPanel.js:28:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:47:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:66:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:96:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:129:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:163:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:196:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:230:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:260:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:290:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:317:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
-/app/frontend/src/AdminPanel.js:347:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://quickcourier.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:28:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:47:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:66:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:96:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:129:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:163:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:196:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:230:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:260:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:290:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:317:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
+/app/frontend/src/AdminPanel.js:347:      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://stable-menus.preview.emergentagent.com';
 /app/frontend/src/EnhancedAdminPanel.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-/app/frontend/src/App.minimal.working.js:3:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://quickcourier.preview.emergentagent.com/api';
+/app/frontend/src/App.minimal.working.js:3:const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://stable-menus.preview.emergentagent.com/api';
 /app/frontend/src/CourierDashboard_Original.js:8:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/lib/analytics.js:25:      if (window.gtag && process.env.REACT_APP_GA_MEASUREMENT_ID) {
 /app/frontend/src/PackageOrder.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -183,7 +183,7 @@ The application maintains a clear separation between  (FastAPI with , , , and fe
 /app/frontend/src/FileUpload.js:8:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/ComprehensiveBusinessDashboard.js:13:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 /app/frontend/src/OrderSystem.js:11:const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-/app/frontend/.env:1:REACT_APP_API_BASE_URL=https://quickcourier.preview.emergentagent.com/api
+/app/frontend/.env:1:REACT_APP_API_BASE_URL=https://stable-menus.preview.emergentagent.com/api
 /app/frontend/.env.example:8:REACT_APP_BACKEND_URL=http://localhost:8001
 /app/frontend/.env.example:11:# REACT_APP_BACKEND_URL=https://your-backend.herokuapp.com
 /app/frontend/.env.example:12:# REACT_APP_BACKEND_URL=https://your-backend.render.com
