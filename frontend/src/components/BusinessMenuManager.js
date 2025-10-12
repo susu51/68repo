@@ -198,16 +198,16 @@ export const BusinessMenuManager = () => {
   }, {});
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Menü Yönetimi</h1>
-          <p className="text-gray-600 mt-1">Ürünlerinizi ekleyin, düzenleyin ve yönetin</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Menü Yönetimi</h1>
+          <p className="text-sm md:text-base text-gray-600 mt-1">Ürünlerinizi ekleyin, düzenleyin ve yönetin</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold shadow-md"
+          className="flex items-center justify-center gap-2 bg-orange-500 text-white px-4 md:px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold shadow-md w-full md:w-auto"
         >
           <Plus size={20} />
           Yeni Ürün Ekle
