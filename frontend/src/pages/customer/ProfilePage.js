@@ -336,8 +336,6 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
   const handleAddAddress = async () => {
     try {
       console.log('🔄 ProfilePage Address Save Debug:');
-      console.log('  - api token:', api.getToken()?.substring(0, 20) + '...');
-      console.log('  - api authenticated:', api.isAuthenticated());
       console.log('  - New address data:', newAddress);
 
       if (!newAddress.label || !newAddress.city) {
