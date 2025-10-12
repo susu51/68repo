@@ -4807,6 +4807,14 @@ function App() {
 function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
   const { user, loading, logout } = useCookieAuth();
 
+  // Auto-close login modal when user becomes authenticated
+  useEffect(() => {
+    if (user && showLogin) {
+      console.log('🔄 User authenticated, auto-closing login modal');
+      onCloseLogin();
+    }
+  }, [user, showLogin, onCloseLogin]);
+
   if (loading) {
     return (
       <div style={{ 
