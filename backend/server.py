@@ -4278,6 +4278,126 @@ async def get_user_report(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating user report: {str(e)}")
 
+@api_router.get("/courier/order-history")
+async def get_courier_order_history(
+    current_user: dict = Depends(get_current_courier_user)
+):
+    """Get courier order history with details"""
+    try:
+        courier_id = current_user.get("id")
+        
+        # Get all orders for this courier
+        orders_cursor = db.orders.find({
+            "courier_id": courier_id
+        }).sort("created_at", -1).limit(100)
+        
+        orders_list = []
+        total_earnings = 0
+        
+        async for order in orders_cursor:
+            # Get business info
+            business = await db.users.find_one({"id": order.get("business_id")})
+            # Get customer info
+            customer = await db.users.find_one({"id": order.get("customer_id")})
+            
+            delivery_fee = order.get("delivery_fee", 0)
+            courier_earning = delivery_fee * 0.8  # 80% goes to courier
+            total_earnings += courier_earning
+            
+            orders_list.append({
+                "order_id": order.get("id"),
+                "created_at": order.get("created_at").isoformat() if order.get("created_at") else None,
+                "delivered_at": order.get("delivered_at").isoformat() if order.get("delivered_at") else None,
+                "status": order.get("status"),
+                "total_amount": order.get("total_amount", 0),
+                "delivery_fee": delivery_fee,
+                "courier_earning": courier_earning,
+                "business": {
+                    "name": business.get("business_name") if business else "N/A",
+                    "address": business.get("business_address") if business else "N/A"
+                },
+                "customer": {
+                    "name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip() if customer else "N/A",
+                    "address": order.get("delivery_address", {})
+                },
+                "items": order.get("items", [])
+            })
+        
+        return {
+            "orders": orders_list,
+            "summary": {
+                "total_deliveries": len(orders_list),
+                "total_earnings": total_earnings
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching order history: {str(e)}")
+
+@api_router.get("/courier/earnings-report")
+async def get_courier_earnings_report(
+    period: str = "daily",  # daily, weekly, monthly
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_courier_user)
+):
+    """Get courier earnings report"""
+    try:
+        courier_id = current_user.get("id")
+        
+        # Parse dates
+        if start_date:
+            start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        else:
+            if period == "daily":
+                start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0)
+            elif period == "weekly":
+                start = datetime.now(timezone.utc) - timedelta(days=7)
+            else:  # monthly
+                start = datetime.now(timezone.utc) - timedelta(days=30)
+        
+        if end_date:
+            end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        else:
+            end = datetime.now(timezone.utc)
+        
+        # Get orders in period
+        orders_cursor = db.orders.find({
+            "courier_id": courier_id,
+            "created_at": {"$gte": start, "$lte": end},
+            "status": {"$in": ["delivered", "completed"]}
+        })
+        
+        total_earnings = 0
+        total_deliveries = 0
+        orders_by_day = {}
+        
+        async for order in orders_cursor:
+            delivery_fee = order.get("delivery_fee", 0)
+            courier_earning = delivery_fee * 0.8
+            total_earnings += courier_earning
+            total_deliveries += 1
+            
+            # Group by day
+            day_key = order.get("created_at").strftime("%Y-%m-%d") if order.get("created_at") else "unknown"
+            if day_key not in orders_by_day:
+                orders_by_day[day_key] = {"count": 0, "earnings": 0}
+            orders_by_day[day_key]["count"] += 1
+            orders_by_day[day_key]["earnings"] += courier_earning
+        
+        return {
+            "period": period,
+            "start_date": start.isoformat(),
+            "end_date": end.isoformat(),
+            "summary": {
+                "total_deliveries": total_deliveries,
+                "total_earnings": total_earnings,
+                "average_per_delivery": total_earnings / total_deliveries if total_deliveries > 0 else 0
+            },
+            "daily_breakdown": orders_by_day
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating earnings report: {str(e)}")
+
 @api_router.get("/admin/reports/category-analytics")
 async def get_category_analytics(
     start_date: Optional[str] = None,
