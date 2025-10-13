@@ -144,6 +144,16 @@ export const CustomerApp = ({ user, onLogout }) => {
           />
         );
 
+      case 'gps-discover':
+        return (
+          <CustomerDiscover 
+            onSelectBusiness={handleRestaurantSelect}
+          />
+        );
+
+      case 'addresses':
+        return <CustomerAddressManager />;
+
       case 'restaurant':
         return (
           <RestaurantMenu 
