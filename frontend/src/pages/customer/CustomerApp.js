@@ -11,6 +11,8 @@ import api from '../../api/http';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
 import { KuryeciniLogo } from '../../components/KuryeciniLogo';
+import { CustomerDiscover } from '../../components/CustomerDiscover';
+import { CustomerAddressManager } from '../../components/CustomerAddressManager';
 
 // FAZ 2 - Customer App with complete cart & payment flow
 export const CustomerApp = ({ user, onLogout }) => {
