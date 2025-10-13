@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import KuryeciniLogo from '../../components/KuryeciniLogo';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://kurye-express-2.preview.emergentagent.com";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://quickship-49.preview.emergentagent.com";
 
 const ModernAuthPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);

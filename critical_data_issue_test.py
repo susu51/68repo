@@ -7,7 +7,7 @@ Testing the root cause: Admin and customer endpoints query different collections
 import requests
 import json
 
-BACKEND_URL = "https://kurye-express-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://quickship-49.preview.emergentagent.com/api"
 
 def get_admin_token():
     creds = {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}

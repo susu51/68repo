@@ -12,7 +12,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://kurye-express-2.preview.emergentagent.com/api"
+BASE_URL = "https://quickship-49.preview.emergentagent.com/api"
 TEST_USER_EMAIL = "testcustomer@example.com"
 TEST_USER_PASSWORD = "test123"
 

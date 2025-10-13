@@ -8,7 +8,7 @@ import asyncio
 import aiohttp
 import json
 
-BASE_URL = "https://kurye-express-2.preview.emergentagent.com"
+BASE_URL = "https://quickship-49.preview.emergentagent.com"
 AUTH_BASE_URL = f"{BASE_URL}/api/auth"
 
 async def debug_cookie_auth():

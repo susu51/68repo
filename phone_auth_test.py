@@ -6,7 +6,7 @@ Quick test for phone authentication endpoints
 import requests
 import json
 
-BASE_URL = "https://kurye-express-2.preview.emergentagent.com/api"
+BASE_URL = "https://quickship-49.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 def test_phone_auth():

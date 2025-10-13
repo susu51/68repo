@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { CourierOrderHistory } from './components/CourierOrderHistory';
 import { CourierEarningsReport } from './components/CourierEarningsReport';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kurye-express-2.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://quickship-49.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierDashboard = ({ user, onLogout }) => {

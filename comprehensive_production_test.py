@@ -16,7 +16,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 
 # Configuration
-BACKEND_URL = "https://kurye-express-2.preview.emergentagent.com"
+BACKEND_URL = "https://quickship-49.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
@@ -176,7 +176,7 @@ class ComprehensiveProductionTest:
         # Feature 4: Environment variables and CORS
         try:
             headers = {
-                'Origin': 'https://kurye-express-2.preview.emergentagent.com',
+                'Origin': 'https://quickship-49.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type,Authorization'
             }

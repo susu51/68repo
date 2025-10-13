@@ -17,7 +17,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://kurye-express-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://quickship-49.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 class CorrectedIntegrationTester:
