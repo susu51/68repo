@@ -5925,6 +5925,9 @@ from routes.content import router as content_router
 # Debug routes (temporary for Atlas testing)
 from routes.debug import router as debug_router
 
+# Phase 1 - Courier Reports & Profile Management
+from routes.courier_reports import router as courier_reports_router
+
 # Cookie-based authentication router (PRIORITY - include first)
 api_router.include_router(auth_router)
 
@@ -5937,6 +5940,9 @@ api_router.include_router(order_status_router)
 api_router.include_router(courier_workflow_router)
 api_router.include_router(courier_location_router)
 api_router.include_router(admin_settings_router)
+
+# Phase 1 - Courier Reports
+api_router.include_router(courier_reports_router)
 
 # Phase 3.5 - localStorage → DB Migration
 api_router.include_router(customer_cart_router)
