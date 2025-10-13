@@ -54,7 +54,7 @@ class CourierPanelTester:
         print("🔐 AUTHENTICATING COURIER...")
         
         try:
-            # Login with courier credentials
+            # Login with courier credentials using cookie-based auth
             login_url = f"{self.base_url}/auth/login"
             login_data = {
                 "email": COURIER_EMAIL,
@@ -65,17 +65,30 @@ class CourierPanelTester:
             
             if response.status_code == 200:
                 data = response.json()
-                user_data = data.get('user', {})
                 
-                if user_data.get('role') == 'courier':
-                    self.courier_id = user_data.get('id')
-                    print(f"✅ Courier authenticated: {user_data.get('email')} (ID: {self.courier_id})")
-                    print(f"   📋 Role: {user_data.get('role')}")
-                    print(f"   🏷️  Name: {user_data.get('first_name', '')} {user_data.get('last_name', '')}")
-                    print(f"   🎯 KYC Status: {user_data.get('kyc_status', 'N/A')}")
-                    return True
+                # Check if login was successful
+                if data.get('success') == True:
+                    print(f"✅ Courier authenticated via cookie: {COURIER_EMAIL}")
+                    print(f"   📋 Message: {data.get('message', 'Login successful')}")
+                    
+                    # Verify authentication by calling /me endpoint
+                    me_response = self.session.get(f"{self.base_url}/auth/me")
+                    if me_response.status_code == 200:
+                        user_data = me_response.json()
+                        if user_data.get('role') == 'courier':
+                            self.courier_id = user_data.get('id')
+                            print(f"   🆔 Courier ID: {self.courier_id}")
+                            print(f"   🏷️  Name: {user_data.get('first_name', '')} {user_data.get('last_name', '')}")
+                            print(f"   🎯 KYC Status: {user_data.get('kyc_status', 'N/A')}")
+                            return True
+                        else:
+                            print(f"❌ User is not a courier: {user_data.get('role')}")
+                            return False
+                    else:
+                        print(f"❌ Failed to verify authentication: {me_response.status_code}")
+                        return False
                 else:
-                    print(f"❌ User is not a courier: {user_data.get('role')}")
+                    print(f"❌ Login failed: {data.get('message', 'Unknown error')}")
                     return False
             else:
                 print(f"❌ Login failed: {response.status_code} - {response.text}")
