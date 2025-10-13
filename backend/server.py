@@ -1471,6 +1471,26 @@ async def get_admin_user(current_user: dict = Depends(get_current_user_from_cook
         )
     return current_user
 
+# Courier dependency
+async def get_current_courier_user(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Require courier role"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Courier access required"
+        )
+    return current_user
+
+# Customer dependency
+async def get_current_customer_user(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Require customer role"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Customer access required"
+        )
+    return current_user
+
 # Business dependency
 async def get_business_user(current_user: dict = Depends(get_current_user)):
     """Require business role"""
