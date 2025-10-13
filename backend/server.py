@@ -4472,6 +4472,80 @@ async def get_category_analytics(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating category analytics: {str(e)}")
 
+# GPS-Based Discovery for Customers
+@api_router.get("/customer/discover")
+async def discover_nearby_businesses(
+    lat: float,
+    lng: float,
+    radius_km: int = 50,
+    current_user: dict = Depends(get_current_customer_user)
+):
+    """Discover businesses within radius based on GPS location"""
+    try:
+        # Convert radius to meters for geospatial query
+        radius_meters = radius_km * 1000
+        
+        # Find businesses near the location
+        businesses_cursor = db.users.find({
+            "role": "business",
+            "kyc_status": "approved",
+            "is_active": True,
+            "location": {
+                "$nearSphere": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [lng, lat]
+                    },
+                    "$maxDistance": radius_meters
+                }
+            }
+        }).limit(50)
+        
+        businesses_list = []
+        async for business in businesses_cursor:
+            # Calculate distance
+            business_loc = business.get("location", {}).get("coordinates", [0, 0])
+            
+            # Simple distance calculation (Haversine would be better in production)
+            from math import radians, cos, sin, asin, sqrt
+            def haversine(lon1, lat1, lon2, lat2):
+                lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+                dlon = lon2 - lon1
+                dlat = lat2 - lat1
+                a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+                c = 2 * asin(sqrt(a))
+                km = 6371 * c
+                return km
+            
+            distance = haversine(lng, lat, business_loc[0], business_loc[1])
+            
+            businesses_list.append({
+                "id": business.get("id"),
+                "name": business.get("business_name"),
+                "address": business.get("business_address"),
+                "city": business.get("city"),
+                "cuisine_type": business.get("cuisine_type", ""),
+                "rating": business.get("rating", 4.5),
+                "distance_km": round(distance, 2),
+                "image_url": business.get("business_image_url"),
+                "location": {
+                    "lat": business_loc[1],
+                    "lng": business_loc[0]
+                }
+            })
+        
+        # Sort by distance (nearest first)
+        businesses_list.sort(key=lambda x: x["distance_km"])
+        
+        return {
+            "user_location": {"lat": lat, "lng": lng},
+            "radius_km": radius_km,
+            "businesses": businesses_list,
+            "total_found": len(businesses_list)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error discovering businesses: {str(e)}")
+
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
 async def get_public_businesses(
