@@ -49,9 +49,47 @@ class CourierPanelTester:
         })
         print()
     
+    def register_test_courier(self):
+        """Register a test courier user if not exists"""
+        print("📝 REGISTERING TEST COURIER...")
+        
+        try:
+            register_url = f"{self.base_url}/register/courier"
+            courier_data = {
+                "email": COURIER_EMAIL,
+                "password": COURIER_PASSWORD,
+                "first_name": "Test",
+                "last_name": "Courier",
+                "iban": "TR330006100519786457841326",
+                "vehicle_type": "Motosiklet",
+                "vehicle_model": "Honda CB150R",
+                "license_class": "A2",
+                "license_number": "TEST123456",
+                "city": "İstanbul"
+            }
+            
+            response = self.session.post(register_url, json=courier_data)
+            
+            if response.status_code == 200:
+                print(f"✅ Test courier registered successfully")
+                return True
+            elif response.status_code == 400 and "already registered" in response.text:
+                print(f"✅ Test courier already exists")
+                return True
+            else:
+                print(f"⚠️  Courier registration failed: {response.status_code} - {response.text}")
+                return True  # Continue anyway, maybe user exists
+                
+        except Exception as e:
+            print(f"⚠️  Courier registration error: {e}")
+            return True  # Continue anyway
+
     def authenticate_courier(self):
         """Authenticate courier user"""
         print("🔐 AUTHENTICATING COURIER...")
+        
+        # First try to register the test courier
+        self.register_test_courier()
         
         try:
             # Login with courier credentials using cookie-based auth
