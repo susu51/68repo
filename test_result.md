@@ -975,6 +975,66 @@ backend:
           agent: "testing"
           comment: "🎉 CITY-STRICT ADDRESS CRUD TESTING COMPLETE: PERFECT results (100% success rate, 15/15 tests passed). ✅ CRITICAL FEATURES VERIFIED: 1) Customer Authentication - testcustomer@example.com/test123 login working perfectly with cookie-based auth system. 2) Address Creation Validation - All required field validation working (city, district, lat, lng return 422 if missing). 3) Successful Address Creation - POST /api/me/addresses working flawlessly with test data {label:'Ev', full:'Test Address', city:'İstanbul', district:'Kadıköy', lat:41.03, lng:28.97, is_default:true}. 4) Address Retrieval with Slugs - GET /api/me/addresses returning addresses with proper Turkish slug normalization (İstanbul→istanbul, Kadıköy→kadikoy). 5) City-Strict Catalog - GET /api/catalog/city-nearby working with required parameter validation and city filtering (no cross-city results allowed). 6) Authentication Security - All endpoints properly require authentication, unauthorized requests rejected with 401/403. 7) Database Schema - Address documents contain required fields: city_slug, district_slug, location (GeoJSON Point), proper coordinate handling. ✅ SECURITY VALIDATION CONFIRMED: Turkish slug normalization working correctly, default address setting unsetting other defaults, authentication required for all address operations, city-strict filtering preventing cross-city data leaks. ✅ FIXES APPLIED DURING TESTING: Updated address routes to use cookie-based authentication (get_current_user_from_cookie), fixed MongoDB connection string (removed auth for local MongoDB), resolved address retrieval Pydantic validation errors with proper ObjectId and coordinate handling. 📝 CONCLUSION: City-strict address system is production-ready and working excellently. All security requirements met, Turkish localization working, GeoJSON storage operational."
 
+  - task: "PHASE 1 - Courier PDF Reports System"
+    implemented: true
+    working: "NA"
+    file: "routes/courier_reports.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "🚀 PHASE 1 COURIER PDF REPORTS IMPLEMENTED: Created comprehensive PDF earnings report system with ReportLab. ENDPOINT: GET /api/courier/earnings/report/pdf?range=daily|weekly|monthly&from=YYYY-MM-DD&to=YYYY-MM-DD. FEATURES: 1) ReportLab PDF generation with Turkish character support using default Unicode fonts. 2) Range-based filtering (daily/weekly/monthly) with auto-calculated date ranges. 3) Comprehensive report sections: Courier info header, summary statistics (total deliveries, total earnings, average earnings), business breakdown (earnings by business with delivery counts), detailed transaction list (date, business, order number, amount). 4) Professional styling with colored tables, proper spacing, header/footer. 5) Empty data handling - generates 'no data' PDF with proper message when no earnings found. 6) Secure filename generation with courier ID and date range. 7) Proper content-disposition headers for PDF download. VALIDATION: Turkish IBAN validation (TR + 24 characters), phone number validation. DEPENDENCIES: ReportLab 4.4.4 installed and added to requirements.txt. Ready for backend testing."
+
+  - task: "PHASE 1 - Courier Profile Update System"
+    implemented: true
+    working: "NA"
+    file: "routes/courier_reports.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ PHASE 1 COURIER PROFILE UPDATE IMPLEMENTED: Created PUT /api/courier/profile endpoint for courier profile management. FIELDS: name (first_name), surname (last_name), phone, email, iban (Turkish IBAN validation with auto TR prefix), vehicleType (vehicle_type), plate (license_plate). FEATURES: 1) Partial update support - only provided fields are updated. 2) IBAN validation - auto-adds TR prefix if missing, validates 26 character length. 3) Optimistic UI support - returns updated profile immediately after save. 4) Proper authentication with get_courier_user dependency. 5) Database persistence with updated_at timestamp. 6) Returns full updated profile for frontend state update. Ready for backend testing."
+
+  - task: "PHASE 1 - Courier Availability Management"
+    implemented: true
+    working: "NA"
+    file: "routes/courier_reports.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ PHASE 1 COURIER AVAILABILITY IMPLEMENTED: Created GET/POST /api/courier/availability endpoints for persistent weekday schedule management. DATA MODEL: availability: [{weekday: 0-6 (Monday-Sunday), start: 'HH:mm', end: 'HH:mm'}]. FEATURES: 1) GET endpoint retrieves saved availability schedule from database. 2) POST endpoint saves/updates complete availability schedule. 3) Weekday validation (0-6 range check). 4) Time format validation (HH:mm format). 5) Persistent storage in users collection. 6) Loads preselected on re-login (data persists in MongoDB). 7) Updated_at timestamp tracking. Ready for backend testing."
+
+  - task: "PHASE 1 - Courier Order History Enhanced Filters"
+    implemented: true
+    working: "NA"
+    file: "routes/courier_reports.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "🔍 PHASE 1 COURIER ORDER HISTORY FILTERS IMPLEMENTED: Created enhanced GET /api/courier/orders/history endpoint with comprehensive server-side filtering. FILTERS: status (order status), from_date/to_date (YYYY-MM-DD date range), business (business name partial match), city (city name), page/size (pagination with default 20 per page), sort (field:direction like createdAt:desc). FEATURES: 1) Server-side filtering with MongoDB queries. 2) Pagination support (page, size, total, pages calculation). 3) Sorting by any field (createdAt, total_amount, etc.) with asc/desc direction. 4) Business info enrichment (fetches business name and address). 5) Returns enriched orders with: business details, items, total_amount, courier_earning, delivery_address, status, timestamps. 6) Empty state handling with proper message. 7) Business name filtering applied post-query for partial match support. Ready for backend testing."
+
+  - task: "PHASE 1 - Courier Ready Orders Real-time System"
+    implemented: true
+    working: "NA"
+    file: "routes/courier_ready_orders.py, routes/order_status.py, models.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "🗺️ PHASE 1 COURIER READY ORDERS MAP SYSTEM IMPLEMENTED: Created real-time ready order system with WebSocket + 10s polling fallback. COMPONENTS: 1) MODELS: Added OrderStatus.READY_FOR_PICKUP to enum, updated BUSINESS_TRANSITIONS to support ready_for_pickup status (preparing→ready_for_pickup, ready→ready_for_pickup, ready_for_pickup→courier_pending). 2) REST ENDPOINT: GET /api/courier/orders/ready?city=... returns orders with status='ready_for_pickup' filtered by city (same city restriction). Returns: order ID, business location {lat,lng}, business details, items count, delivery address, estimated time. 3) WEBSOCKET: WebSocket endpoint at /api/courier/ws/ready?token=JWT_TOKEN for real-time updates. Broadcasts events: new_ready (order becomes ready_for_pickup), order_accepted (order removed from ready list), order_cancelled. 4) CONNECTION MANAGEMENT: Stores active courier connections in memory, handles authentication via JWT token query param, sends initial ready orders on connect, supports ping/pong keepalive, auto cleanup on disconnect. 5) BROADCAST FUNCTION: broadcast_ready_order_update() function exported for use when order status changes. FEATURES: City filtering (same city only), distance calculation, real-time push updates via WebSocket, 10s polling fallback support via REST endpoint, proper authentication and authorization. Ready for backend testing with WebSocket client."
+
 frontend:
   - task: "Customer Panel New Features - GPS Keşfet & Adresler Tabs"
     implemented: true
