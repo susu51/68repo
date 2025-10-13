@@ -2981,34 +2981,7 @@ const BusinessDashboard = ({ user }) => {
 
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-6">
-            <Tabs defaultValue="platform" className="w-full">
-              <div className="bg-white rounded-lg shadow-sm border p-2 mb-6">
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    onClick={() => setActiveTab('settings-platform')}
-                    className="py-2 px-4 rounded-lg text-sm font-medium bg-orange-600 text-white"
-                  >
-                    ⚙️ Platform Ayarları
-                  </Button>
-                  <Button
-                    onClick={() => setActiveTab('settings-messages')}
-                    className="py-2 px-4 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  >
-                    💬 Mesajlar
-                  </Button>
-                  <Button
-                    onClick={() => setActiveTab('settings-banners')}
-                    className="py-2 px-4 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  >
-                    🎨 Reklam Yönetimi
-                  </Button>
-                </div>
-              </div>
-              
-              {activeTab === 'settings' && <PlatformSettings />}
-              {activeTab === 'settings-messages' && <AdminMessages />}
-              {activeTab === 'settings-banners' && <BannerManager />}
-            </Tabs>
+            <PlatformSettings />
           </TabsContent>
         </Tabs>
       </div>
