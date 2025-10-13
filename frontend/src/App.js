@@ -2984,38 +2984,30 @@ const BusinessDashboard = ({ user }) => {
             <Tabs defaultValue="platform" className="w-full">
               <div className="bg-white rounded-lg shadow-sm border p-2 mb-6">
                 <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => document.querySelector('[value=\"platform\"]')?.click()}
+                  <Button
+                    onClick={() => setActiveTab('settings-platform')}
                     className="py-2 px-4 rounded-lg text-sm font-medium bg-orange-600 text-white"
                   >
                     ⚙️ Platform Ayarları
-                  </button>
-                  <button
-                    onClick={() => document.querySelector('[value=\"messages\"]')?.click()}
+                  </Button>
+                  <Button
+                    onClick={() => setActiveTab('settings-messages')}
                     className="py-2 px-4 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
                   >
                     💬 Mesajlar
-                  </button>
-                  <button
-                    onClick={() => document.querySelector('[value=\"banners\"]')?.click()}
+                  </Button>
+                  <Button
+                    onClick={() => setActiveTab('settings-banners')}
                     className="py-2 px-4 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
                   >
                     🎨 Reklam Yönetimi
-                  </button>
+                  </Button>
                 </div>
               </div>
               
-              <TabsContent value=\"platform\">
-                <PlatformSettings />
-              </TabsContent>
-              
-              <TabsContent value=\"messages\">
-                <AdminMessages />
-              </TabsContent>
-              
-              <TabsContent value=\"banners\">
-                <BannerManager />
-              </TabsContent>
+              {activeTab === 'settings' && <PlatformSettings />}
+              {activeTab === 'settings-messages' && <AdminMessages />}
+              {activeTab === 'settings-banners' && <BannerManager />}
             </Tabs>
           </TabsContent>
         </Tabs>
