@@ -4546,6 +4546,93 @@ async def discover_nearby_businesses(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error discovering businesses: {str(e)}")
 
+# Customer Address Management
+@api_router.get("/customer/addresses")
+async def get_customer_addresses(
+    current_user: dict = Depends(get_current_customer_user)
+):
+    """Get all saved addresses for customer"""
+    try:
+        customer_id = current_user.get("id")
+        addresses_cursor = db.addresses.find({"customer_id": customer_id})
+        addresses = []
+        async for addr in addresses_cursor:
+            addresses.append({
+                "id": addr.get("id"),
+                "title": addr.get("title"),
+                "street": addr.get("street"),
+                "building": addr.get("building"),
+                "floor": addr.get("floor"),
+                "apartment": addr.get("apartment"),
+                "city": addr.get("city"),
+                "district": addr.get("district"),
+                "postal_code": addr.get("postal_code"),
+                "lat": addr.get("lat"),
+                "lng": addr.get("lng"),
+                "is_default": addr.get("is_default", False)
+            })
+        return {"addresses": addresses}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching addresses: {str(e)}")
+
+@api_router.post("/customer/addresses")
+async def add_customer_address(
+    address: dict,
+    current_user: dict = Depends(get_current_customer_user)
+):
+    """Add new address for customer"""
+    try:
+        customer_id = current_user.get("id")
+        
+        # If this is set as default, unset other defaults
+        if address.get("is_default"):
+            await db.addresses.update_many(
+                {"customer_id": customer_id},
+                {"$set": {"is_default": False}}
+            )
+        
+        new_address = {
+            "id": str(uuid.uuid4()),
+            "customer_id": customer_id,
+            "title": address.get("title"),
+            "street": address.get("street"),
+            "building": address.get("building"),
+            "floor": address.get("floor"),
+            "apartment": address.get("apartment"),
+            "city": address.get("city"),
+            "district": address.get("district"),
+            "postal_code": address.get("postal_code"),
+            "lat": address.get("lat"),
+            "lng": address.get("lng"),
+            "is_default": address.get("is_default", False),
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.addresses.insert_one(new_address)
+        return {"success": True, "address_id": new_address["id"]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error adding address: {str(e)}")
+
+@api_router.delete("/customer/addresses/{address_id}")
+async def delete_customer_address(
+    address_id: str,
+    current_user: dict = Depends(get_current_customer_user)
+):
+    """Delete customer address"""
+    try:
+        customer_id = current_user.get("id")
+        result = await db.addresses.delete_one({
+            "id": address_id,
+            "customer_id": customer_id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Address not found")
+        
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting address: {str(e)}")
+
 # Public Business Endpoints for Customers
 @api_router.get("/businesses")
 async def get_public_businesses(
