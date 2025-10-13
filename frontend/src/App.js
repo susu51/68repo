@@ -4933,7 +4933,7 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
       case 'courier':
         return <CourierDashboard user={user} onLogout={handleLogout} />;
       case 'admin':
-        return <AdminPanel user={user} onLogout={handleLogout} />;
+        return <AdminDashboard user={user} />;
       default:
         console.warn('Unknown user role:', user.role);
         return <LandingPage onAuthStart={onAuthStart} />;
