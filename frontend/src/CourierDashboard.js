@@ -10,6 +10,8 @@ import { Label } from './components/ui/label';
 import { Textarea } from './components/ui/textarea';
 import OpenStreetMap from './components/OpenStreetMap';
 import { toast } from 'sonner';
+import { CourierOrderHistory } from './components/CourierOrderHistory';
+import { CourierEarningsReport } from './components/CourierEarningsReport';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
