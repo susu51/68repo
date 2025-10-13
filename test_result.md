@@ -698,6 +698,21 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "FRONTEND TESTING INITIATED: Starting comprehensive frontend testing of courier location system. Will test CourierDashboard.js location tracking (navigator.geolocation.watchPosition, location badge 'Konum: AKTİF/KAPALI', coordinate display), OrderTrackingPage.js real-time tracking (5-second refresh, live courier location display), location permission handling, error states, and integration with backend endpoints."
+
+  - task: "Phase 1 - Courier Panel Backend Endpoints"
+    implemented: true
+    working: false
+    file: "routes/courier_reports.py, routes/courier_workflow.py, routes/courier_ready_orders.py"
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Complete Phase 1 Courier Panel backend endpoints including PDF Reports System (GET /api/courier/earnings/report/pdf with daily/weekly/monthly ranges), Profile Update System (PUT /api/courier/profile with IBAN validation and Turkish character support), Availability Management (POST/GET /api/courier/availability with persistent scheduling), Order History Enhanced Filters (GET /api/courier/orders/history with status, date, business, city filters, pagination, sorting), Ready Orders System (GET /api/courier/orders/ready with city restriction and business location data). All endpoints include proper authentication, validation, and Turkish language support."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL AUTHENTICATION ISSUE IDENTIFIED: Comprehensive Phase 1 Courier Panel testing reveals MAJOR AUTHENTICATION FAILURE (2.8% success rate, 1/36 tests passed). ✅ COURIER REGISTRATION & LOGIN: Test courier testkurye@example.com successfully registered and authenticated via cookie-based auth system, JWT token generated correctly (d8f15c4c-421f-453a-a14b-a7c3a9808f60). ✅ AUTH VERIFICATION: /api/auth/me endpoint working perfectly with same credentials and cookies. ❌ CRITICAL AUTHENTICATION BUG: ALL courier endpoints (/api/courier/*) returning 401 'Invalid token' despite successful authentication. Root cause analysis shows auth_dependencies.py get_current_user function failing to validate tokens that work perfectly with auth_cookie.py get_current_user_from_cookie function. This suggests circular import issue or database connection problem in auth_dependencies.py when importing 'from server import db' at runtime. ❌ AFFECTED ENDPOINTS: PDF Reports (0/5 tests passed), Profile Update (0/5 tests passed), Availability Management (0/5 tests passed), Order History Filters (0/9 tests passed), Ready Orders (0/5 tests passed), Input Validation (0/3 tests passed), Turkish Support (0/2 tests passed). 🔧 URGENT FIX REQUIRED: auth_dependencies.py authentication system needs to be aligned with working auth_cookie.py system or courier endpoints need to use cookie-based authentication dependency instead of JWT bearer token dependency."
         - working: "NA"
           agent: "testing"
           comment: "PHASE 1 COURIER LOCATION SYSTEM FRONTEND TESTING INITIATED: Starting comprehensive testing of courier location tracking system frontend implementation. Testing areas: 1) CourierDashboard.js location tracking (login as testkurye@example.com/test123, verify location badge 'Konum: KAPALI/AKTİF', test location permission handling, verify coordinate display), 2) OrderTrackingPage.js courier location display (login as testcustomer@example.com/test123, verify real-time location updates, check live tracking indicators), 3) Integration testing (courier location update → customer sees live updates), 4) User flow testing (complete courier→customer location visibility flow)."
