@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kurye-express-2.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kurye-express-2.preview.emergentagent.com';
 
 export const CustomerAddressManager = () => {
   const [addresses, setAddresses] = useState([]);
