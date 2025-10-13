@@ -16,6 +16,7 @@ class OrderStatus(str, Enum):
     CREATED = "created"
     PREPARING = "preparing" 
     READY = "ready"
+    READY_FOR_PICKUP = "ready_for_pickup"  # Phase 1: For courier map
     COURIER_PENDING = "courier_pending"
     COURIER_ASSIGNED = "courier_assigned"
     PICKED_UP = "picked_up"
