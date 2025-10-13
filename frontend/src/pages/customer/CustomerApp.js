@@ -100,6 +100,18 @@ export const CustomerApp = ({ user, onLogout }) => {
       active: activeView === 'discover'
     },
     { 
+      id: 'gps-discover', 
+      label: 'GPS Keşfet', 
+      icon: '📍',
+      active: activeView === 'gps-discover'
+    },
+    { 
+      id: 'addresses', 
+      label: 'Adresler', 
+      icon: '🏠',
+      active: activeView === 'addresses'
+    },
+    { 
       id: 'cart', 
       label: 'Sepet', 
       icon: '🛒',
