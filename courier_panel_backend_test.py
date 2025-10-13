@@ -106,8 +106,14 @@ class CourierPanelTester:
                 
                 # Check if login was successful
                 if data.get('success') == True:
-                    print(f"✅ Courier authenticated via cookie: {COURIER_EMAIL}")
-                    print(f"   📋 Message: {data.get('message', 'Login successful')}")
+                    # Get the access token for bearer authentication
+                    access_token = data.get('access_token')
+                    if access_token:
+                        # Set bearer token for all future requests
+                        self.session.headers.update({'Authorization': f'Bearer {access_token}'})
+                        print(f"✅ Courier authenticated with bearer token: {COURIER_EMAIL}")
+                        print(f"   📋 Message: {data.get('message', 'Login successful')}")
+                        print(f"   🔑 Token: {access_token[:50]}...")
                     
                     # Verify authentication by calling /me endpoint
                     me_response = self.session.get(f"{self.base_url}/auth/me")
