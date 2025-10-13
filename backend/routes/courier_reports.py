@@ -15,9 +15,20 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
-from auth_dependencies import get_courier_user
+from auth_cookie import get_current_user_from_cookie_or_bearer
 
 router = APIRouter(prefix="/courier", tags=["courier-reports"])
+
+# === AUTHENTICATION HELPER ===
+
+async def get_courier_user(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Get current courier user with role validation"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(
+            status_code=403,
+            detail="Courier access required"
+        )
+    return current_user
 
 # === MODELS ===
 
