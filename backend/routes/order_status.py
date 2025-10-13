@@ -31,8 +31,9 @@ class OrderStatusResponse(BaseModel):
 # İzinli Durum Geçişleri - Business Chain
 BUSINESS_TRANSITIONS = {
     "created": ["preparing"],
-    "preparing": ["ready"], 
-    "ready": ["courier_pending"]
+    "preparing": ["ready", "ready_for_pickup"],  # Phase 1: Can go to ready or ready_for_pickup
+    "ready": ["courier_pending", "ready_for_pickup"],  # Phase 1: Can transition to ready_for_pickup
+    "ready_for_pickup": ["courier_pending"]  # Phase 1: Courier can see on map, then becomes courier_pending when accepted
 }
 
 # İzinli Durum Geçişleri - Courier Chain  
