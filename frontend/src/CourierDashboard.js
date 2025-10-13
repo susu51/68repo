@@ -1664,6 +1664,20 @@ export const CourierDashboard = ({ user, onLogout }) => {
             </div>
             </div>
           )}
+
+          {/* Order History Tab */}
+          {activeTab === 'history' && (
+            <div className="p-6">
+              <CourierOrderHistory />
+            </div>
+          )}
+
+          {/* Earnings Report Tab */}
+          {activeTab === 'earnings' && (
+            <div className="p-6">
+              <CourierEarningsReport />
+            </div>
+          )}
         </Tabs>
       </div>
     </div>
