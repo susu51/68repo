@@ -4996,7 +4996,7 @@ const AuthRouter = () => {
     return (
       <Routes>
         <Route path="/" element={
-          user.role === 'admin' ? <AdminPanel user={user} onLogout={logout} /> :
+          user.role === 'admin' ? <AdminDashboard user={user} /> :
           user.role === 'courier' ? <CourierDashboard user={user} onLogout={logout} /> :
           user.role === 'business' ? <EnhancedBusinessDashboard user={user} onLogout={logout} /> :
           <CustomerApp user={user} onLogout={logout} />
