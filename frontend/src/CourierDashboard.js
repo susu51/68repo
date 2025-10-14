@@ -1746,37 +1746,47 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
           {/* Ready Orders Map Tab - Phase 1 */}
           {activeTab === 'ready_map' && (
-            <div className="p-6">
-              <CourierReadyOrdersMap />
-            </div>
+            <React.Fragment>
+              <div className="p-6">
+                <CourierReadyOrdersMap />
+              </div>
+            </React.Fragment>
           )}
 
           {/* PDF Reports Tab - Phase 1 */}
           {activeTab === 'pdf_reports' && (
-            <div className="p-6">
-              <CourierPDFReports />
-            </div>
+            <React.Fragment>
+              <div className="p-6">
+                <CourierPDFReports />
+              </div>
+            </React.Fragment>
           )}
 
           {/* Availability Tab - Phase 1 */}
           {activeTab === 'availability' && (
-            <div className="p-6">
-              <CourierAvailability />
-            </div>
+            <React.Fragment>
+              <div className="p-6">
+                <CourierAvailability />
+              </div>
+            </React.Fragment>
           )}
 
           {/* Filtered History Tab - Phase 1 */}
           {activeTab === 'history_filtered' && (
-            <div className="p-6">
-              <CourierOrderHistoryFiltered />
-            </div>
+            <React.Fragment>
+              <div className="p-6">
+                <CourierOrderHistoryFiltered />
+              </div>
+            </React.Fragment>
           )}
 
           {/* Profile Update Tab - Phase 1 */}
           {activeTab === 'profile_update' && (
-            <div className="p-6">
-              <CourierProfileUpdate user={user} />
-            </div>
+            <React.Fragment>
+              <div className="p-6">
+                <CourierProfileUpdate user={user} />
+              </div>
+            </React.Fragment>
           )}
         </Tabs>
       </div>
