@@ -1380,7 +1380,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
           )}
 
           {/* Earnings Content */}
-          {activeTab === 'earnings' && (
+          <div style={{ display: activeTab === 'earnings' ? 'block' : 'none' }}>
             <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Kazanç Raporu</h2>
