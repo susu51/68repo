@@ -1,30 +1,19 @@
 #!/usr/bin/env python3
 """
-Admin Panel Backend Testing - Comprehensive Test Suite
-Testing all admin panel endpoints as requested in the review.
-
-Test Endpoints:
-1. Dashboard: GET /api/admin/reports/dashboard
-2. Financial Report: GET /api/admin/reports/financial
-3. Order Report: GET /api/admin/reports/orders?business_name=test
-4. User Report: GET /api/admin/reports/user?customer_name=test
-5. Category Analytics: GET /api/admin/reports/category-analytics
-6. Platform Settings: GET /api/admin/settings, PATCH /api/admin/settings
-7. Promotions: GET /api/admin/promotions
-
-Test Credentials: admin@kuryecini.com / admin123
+🚀 PHASE 1 COURIER BACKEND QUICK TEST
+Testing 5 newly added courier endpoints with authentication
 """
 
 import requests
 import json
 import sys
-from datetime import datetime
-import os
+from datetime import datetime, timezone
+import time
 
 # Configuration
 BACKEND_URL = "https://quickship-49.preview.emergentagent.com/api"
-ADMIN_EMAIL = "admin@kuryecini.com"
-ADMIN_PASSWORD = "admin123"
+COURIER_EMAIL = "testkurye@example.com"
+COURIER_PASSWORD = "test123"
 
 class AdminPanelTester:
     def __init__(self):
