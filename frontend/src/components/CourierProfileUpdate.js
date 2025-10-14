@@ -210,20 +210,18 @@ export const CourierProfileUpdate = ({ user }) => {
               <Car className="h-4 w-4 inline mr-1" />
               Araç Tipi
             </Label>
-            <Select
+            <select
+              id="vehicleType"
               value={profile.vehicleType}
-              onValueChange={(value) => handleInputChange('vehicleType', value)}
+              onChange={(e) => handleInputChange('vehicleType', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <SelectTrigger id="vehicleType">
-                <SelectValue placeholder="Seçiniz" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Motosiklet">Motosiklet</SelectItem>
-                <SelectItem value="Scooter">Scooter</SelectItem>
-                <SelectItem value="Bisiklet">Bisiklet</SelectItem>
-                <SelectItem value="Araba">Araba</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="">Seçiniz</option>
+              <option value="Motosiklet">Motosiklet</option>
+              <option value="Scooter">Scooter</option>
+              <option value="Bisiklet">Bisiklet</option>
+              <option value="Araba">Araba</option>
+            </select>
           </div>
           
           <div className="space-y-2">
