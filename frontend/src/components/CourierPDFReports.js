@@ -45,15 +45,41 @@ export const CourierPDFReports = () => {
       // Get the PDF blob
       const blob = await response.blob();
       
-      // Create download link
+      // Check if blob is empty
+      if (blob.size === 0) {
+        toast.warning('Rapor boş - Bu dönem için veri bulunmuyor');
+        return;
+      }
+      
+      // Create download link (React-safe approach)
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
       a.download = `kazanc_raporu_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(downloadUrl);
-      document.body.removeChild(a);
+      a.style.display = 'none';
+      
+      // Safe DOM manipulation
+      try {
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup with timeout to avoid React conflicts
+        setTimeout(() => {
+          try {
+            if (a.parentNode) {
+              document.body.removeChild(a);
+            }
+            window.URL.revokeObjectURL(downloadUrl);
+          } catch (cleanupError) {
+            console.warn('Cleanup error (non-critical):', cleanupError);
+          }
+        }, 100);
+      } catch (domError) {
+        console.error('DOM manipulation error:', domError);
+        // Fallback: try opening in new tab
+        window.open(downloadUrl, '_blank');
+        setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 1000);
+      }
 
       toast.success('PDF rapor başarıyla indirildi!');
     } catch (error) {
