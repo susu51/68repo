@@ -156,21 +156,18 @@ export const CourierOrderHistoryFiltered = () => {
               {/* Status Filter */}
               <div className="space-y-2">
                 <Label htmlFor="statusFilter">Durum</Label>
-                <Select
+                <select
+                  id="statusFilter"
                   value={filters.status}
-                  onValueChange={(value) => handleFilterChange('status', value)}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <SelectTrigger id="statusFilter">
-                    <SelectValue placeholder="Tümü" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Tümü</SelectItem>
-                    <SelectItem value="picked_up">Alındı</SelectItem>
-                    <SelectItem value="delivering">Yolda</SelectItem>
-                    <SelectItem value="delivered">Teslim Edildi</SelectItem>
-                    <SelectItem value="cancelled">İptal</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="">Tümü</option>
+                  <option value="picked_up">Alındı</option>
+                  <option value="delivering">Yolda</option>
+                  <option value="delivered">Teslim Edildi</option>
+                  <option value="cancelled">İptal</option>
+                </select>
               </div>
 
               {/* Date From */}
