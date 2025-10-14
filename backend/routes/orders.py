@@ -32,6 +32,7 @@ class OrderCreate(BaseModel):
     items: List[OrderItem]
     delivery_address: DeliveryAddress
     payment_method: str = "cash_on_delivery"  # online, cash_on_delivery, pos_on_delivery
+    coupon_code: Optional[str] = None
     notes: Optional[str] = None
 
 class OrderResponse(BaseModel):
