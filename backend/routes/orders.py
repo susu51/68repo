@@ -92,6 +92,16 @@ async def create_order(
             if product:
                 total_amount += product["price"] * item.quantity
         
+        # Delivery fee
+        delivery_fee = 10.0
+        
+        # Determine payment status based on payment method
+        payment_status = "pending"
+        if order_data.payment_method == "online":
+            payment_status = "paid_mock"  # Mock payment for online orders
+        elif order_data.payment_method in ["cash_on_delivery", "pos_on_delivery"]:
+            payment_status = "pending"  # Will be paid on delivery
+        
         # Create order document
         order_doc = {
             "_id": str(uuid.uuid4()),
@@ -100,8 +110,11 @@ async def create_order(
             "business_name": business["name"],
             "items": [item.dict() for item in order_data.items],
             "total_amount": round(total_amount, 2),
+            "delivery_fee": delivery_fee,
             "delivery_address": order_data.delivery_address.dict(),
             "payment_method": order_data.payment_method,
+            "payment_status": payment_status,
+            "coupon_code": order_data.coupon_code,
             "status": OrderStatus.CREATED.value,
             "notes": order_data.notes,
             "created_at": datetime.now(timezone.utc),
