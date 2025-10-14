@@ -1266,29 +1266,27 @@ export const CourierDashboard = ({ user, onLogout }) => {
               <h2 className="text-xl font-bold">Sipariş Geçmişi</h2>
               
               <div className="flex space-x-2">
-                <Select value={historyFilter.status} onValueChange={(value) => setHistoryFilter(prev => ({ ...prev, status: value }))}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tüm Durumlar</SelectItem>
-                    <SelectItem value="delivered">Teslim Edildi</SelectItem>
-                    <SelectItem value="cancelled">İptal Edildi</SelectItem>
-                    <SelectItem value="on_way">Yolda</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select 
+                  value={historyFilter.status} 
+                  onChange={(e) => setHistoryFilter(prev => ({ ...prev, status: e.target.value }))}
+                  className="w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Tüm Durumlar</option>
+                  <option value="delivered">Teslim Edildi</option>
+                  <option value="cancelled">İptal Edildi</option>
+                  <option value="on_way">Yolda</option>
+                </select>
                 
-                <Select value={historyFilter.dateRange} onValueChange={(value) => setHistoryFilter(prev => ({ ...prev, dateRange: value }))}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tüm Zamanlar</SelectItem>
-                    <SelectItem value="today">Bugün</SelectItem>
-                    <SelectItem value="week">Bu Hafta</SelectItem>
-                    <SelectItem value="month">Bu Ay</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select 
+                  value={historyFilter.dateRange} 
+                  onChange={(e) => setHistoryFilter(prev => ({ ...prev, dateRange: e.target.value }))}
+                  className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Tüm Zamanlar</option>
+                  <option value="today">Bugün</option>
+                  <option value="week">Bu Hafta</option>
+                  <option value="month">Bu Ay</option>
+                </select>
                 
                 <Button onClick={fetchOrderHistory} variant="outline" size="sm">
                   🔍 Filtrele
