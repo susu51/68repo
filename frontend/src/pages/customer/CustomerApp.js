@@ -251,22 +251,34 @@ export const CustomerApp = ({ user, onLogout }) => {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="bg-white border-t border-gray-200 sticky bottom-0">
-        <div className="max-w-7xl mx-auto px-4">
+      {/* Bottom Navigation - Trendyol Go Style */}
+      <nav className="bg-white dark:bg-card border-t border-border sticky bottom-0 z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <div className="max-w-7xl mx-auto">
           <div className="flex justify-around">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveView(tab.id)}
-                className={`flex flex-col items-center py-3 px-6 transition-colors ${
+                className={`flex flex-col items-center py-3 px-4 sm:px-8 transition-all duration-200 relative ${
                   activeView === tab.id
-                    ? 'text-orange-600 border-t-2 border-orange-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <span className="text-2xl mb-1">{tab.icon}</span>
-                <span className="text-xs font-medium">{tab.label}</span>
+                {/* Active indicator */}
+                {activeView === tab.id && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full" />
+                )}
+                <span className={`text-2xl mb-1 transition-transform ${
+                  activeView === tab.id ? 'scale-110' : 'scale-100'
+                }`}>
+                  {tab.icon}
+                </span>
+                <span className={`text-xs font-medium ${
+                  activeView === tab.id ? 'font-semibold' : ''
+                }`}>
+                  {tab.label}
+                </span>
               </button>
             ))}
           </div>
