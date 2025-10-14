@@ -30,25 +30,7 @@ export const CustomerApp = ({ user, onLogout }) => {
 
   console.log('🚀 CustomerApp FAZ 2 rendered - activeView:', activeView, 'user:', user?.first_name, 'cart:', cart, 'getCartSummary:', typeof getCartSummary);
 
-  // Set authentication token for API calls
-  // Cookie-based authentication - no token management needed
-  useEffect(() => {
-    if (user) {
-      console.log('✅ CustomerApp loaded for user:', user.email);
-    }
-  }, [user]);
-
-  // Handle address refresh when user adds new address
-  const handleAddressAdded = (newAddress) => {
-    console.log('📍 New address added:', newAddress);
-    // DiscoverPage will be notified via re-render
-    if (activeView === 'profile') {
-      // Switch back to discover after adding address
-      setActiveView('discover');
-    }
-  };
-
-  // Navigation handlers for the customer journey
+  // Navigation handlers
   const handleRestaurantSelect = (restaurant) => {
     setSelectedRestaurant(restaurant);
     setActiveView('restaurant');
@@ -58,23 +40,63 @@ export const CustomerApp = ({ user, onLogout }) => {
     setActiveView('cart');
   };
 
-  const handleProceedToPayment = (cartData) => {
-    console.log('Proceeding to payment with cart data:', cartData);
-    if (cartData.selectedAddress) {
-      setSelectedAddress(cartData.selectedAddress);
+  const handleProceedToCheckout = () => {
+    if (cartSummary.itemCount === 0) {
+      toast.error('Sepetiniz boş');
+      return;
     }
-    setActiveView('payment');
+    setActiveView('checkout');
   };
 
-  const handlePaymentSuccess = (orderData) => {
-    console.log('Payment successful:', orderData);
-    setCurrentOrderId(orderData.order.id);
-    setActiveView('orderTracking');
-  };
+  const handleCreateOrder = async () => {
+    try {
+      if (!selectedAddress) {
+        toast.error('Lütfen teslimat adresi seçin');
+        return;
+      }
+      if (!selectedPaymentMethod) {
+        toast.error('Lütfen ödeme yöntemi seçin');
+        return;
+      }
 
-  const handleOrderSelect = (orderId) => {
-    setCurrentOrderId(orderId);
-    setActiveView('orderTracking');
+      const orderData = {
+        business_id: selectedRestaurant?._id,
+        items: cart.map(item => ({
+          product_id: item._id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        delivery_address: {
+          label: selectedAddress.label,
+          address: selectedAddress.full,
+          lat: selectedAddress.location?.coordinates?.[1] || 0,
+          lng: selectedAddress.location?.coordinates?.[0] || 0
+        },
+        payment_method: selectedPaymentMethod
+      };
+
+      const response = await fetch(`${API}/orders`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success('Sipariş oluşturuldu!');
+        clearCart();
+        setCurrentOrderId(data.id);
+        setActiveView('orders');
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Sipariş oluşturulamadı');
+      }
+    } catch (error) {
+      console.error('Sipariş oluşturma hatası:', error);
+      toast.error('Bir hata oluştu');
+    }
   };
 
   const handleBackToDiscover = () => {
@@ -84,14 +106,6 @@ export const CustomerApp = ({ user, onLogout }) => {
 
   const handleBackToCart = () => {
     setActiveView('cart');
-  };
-
-  const handleBackToOrders = () => {
-    setActiveView('orders');
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveView(tab);
   };
 
   // Bottom tab navigation data
