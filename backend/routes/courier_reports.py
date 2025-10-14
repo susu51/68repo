@@ -467,7 +467,7 @@ async def set_courier_availability(
         
         # Update in database
         result = await db.users.update_one(
-            {"_id": courier_id, "role": "courier"},
+            {"id": courier_id, "role": "courier"},
             {
                 "$set": {
                     "availability": slots_data,
