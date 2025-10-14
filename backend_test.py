@@ -15,7 +15,7 @@ BACKEND_URL = "https://quickship-49.preview.emergentagent.com/api"
 COURIER_EMAIL = "testkurye@example.com"
 COURIER_PASSWORD = "test123"
 
-class AdminPanelTester:
+class CourierBackendTester:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None
