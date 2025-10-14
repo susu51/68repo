@@ -26,11 +26,13 @@ export const CourierReadyOrdersMap = () => {
     }
 
     return () => {
+      // Cleanup interval on unmount or when autoRefresh changes
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [autoRefresh]);
+  }, [autoRefresh]); // Only depend on autoRefresh to avoid infinite loops
 
   const fetchReadyOrders = async () => {
     try {
