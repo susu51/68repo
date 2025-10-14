@@ -1784,7 +1784,6 @@ export const CourierDashboard = ({ user, onLogout }) => {
               </div>
             </React.Fragment>
           )}
-        </Tabs>
       </div>
     </div>
   );
