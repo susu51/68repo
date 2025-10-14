@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DiscoverPage from './DiscoverPage';
 import RestaurantMenu from './RestaurantMenu';
-import CartPage from './CartPage';
+import CartPageEnhanced from './CartPageEnhanced';
 import OrdersPage from './OrdersPage';
 import { useCart } from '../../contexts/CartContext';
 import { Button } from '../../components/ui/button';
