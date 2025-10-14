@@ -116,28 +116,42 @@ export const CustomerApp = ({ user, onLogout }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header - Trendyol Go Style */}
+      <header className="bg-white dark:bg-card border-b border-border sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+            {/* Left: Logo */}
+            <div className="flex items-center space-x-3">
               <KuryeciniLogo />
-              <span className="text-sm text-gray-600">Müşteri</span>
+              <div className="hidden sm:flex items-center space-x-2">
+                <span className="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded-full">
+                  Müşteri
+                </span>
+              </div>
             </div>
             
-            {/* Cart Badge */}
+            {/* Center: Cart Badge */}
             {cartSummary.itemCount > 0 && activeView !== 'cart' && activeView !== 'checkout' && (
-              <Button onClick={handleGoToCart} variant="outline">
-                🛒 Sepet ({cartSummary.itemCount})
+              <Button 
+                onClick={handleGoToCart} 
+                variant="outline"
+                className="relative border-primary text-primary hover:bg-primary/5"
+              >
+                <span className="text-lg mr-1">🛒</span>
+                <span className="hidden sm:inline">Sepet</span>
+                <span className="ml-1 sm:ml-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                  {cartSummary.itemCount}
+                </span>
               </Button>
             )}
             
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
+            {/* Right: User menu */}
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <span className="text-sm font-medium text-foreground hidden sm:inline">
                 Merhaba, {user?.first_name || user?.email?.split('@')[0]}
               </span>
-              <Button onClick={onLogout} variant="outline" size="sm">
+              <Button onClick={onLogout} variant="outline" size="sm" className="text-xs sm:text-sm">
                 Çıkış
               </Button>
             </div>
