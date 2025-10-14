@@ -8,7 +8,7 @@ import { KuryeciniTextLogo, KuryeciniLogo } from "./components/KuryeciniLogo";
 import LandingPage from "./pages/LandingPage";
 import { CookieAuthProvider, useCookieAuth } from "./contexts/CookieAuthContext";
 import { LocationControls } from "./components/LocationControls";
-import { OpenStreetMap } from "./components/OpenStreetMap";
+import OpenStreetMap from "./components/OpenStreetMap";
 import { CourierDashboard } from "./CourierDashboard";
 import { BusinessDashboard as EnhancedBusinessDashboard } from "./BusinessDashboard_Enhanced";
 import { CustomerApp } from "./pages/customer/CustomerApp";
