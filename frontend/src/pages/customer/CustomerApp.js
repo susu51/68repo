@@ -3,26 +3,29 @@ import DiscoverPage from './DiscoverPage';
 import RestaurantMenu from './RestaurantMenu';
 import CartPage from './CartPage';
 import OrdersPage from './OrdersPage';
-import ProfilePage from './ProfilePage';
-import PaymentPage from './PaymentPage';
-import OrderTrackingPage from './OrderTrackingPage';
 import { useCart } from '../../contexts/CartContext';
-import api from '../../api/http';
-import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/button';
 import { KuryeciniLogo } from '../../components/KuryeciniLogo';
-import { CustomerDiscover } from '../../components/CustomerDiscover';
-import { CustomerAddressManager } from '../../components/CustomerAddressManager';
+import { CustomerProfile } from '../../components/CustomerProfile';
+import { AddressSelector } from '../../components/AddressSelector';
+import { PaymentOptions } from '../../components/PaymentOptions';
+import { RatingModal } from '../../components/RatingModal';
+import { toast } from 'react-hot-toast';
 
-// FAZ 2 - Customer App with complete cart & payment flow
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://quickship-49.preview.emergentagent.com';
+const API = `${BACKEND_URL}/api`;
+
+// PHASE 2 - Customer App: Profil, Checkout Flow, Ratings
 export const CustomerApp = ({ user, onLogout }) => {
-  const [activeView, setActiveView] = useState('discover'); // discover, restaurant, cart, payment, orders, profile, orderTracking
+  const [activeView, setActiveView] = useState('discover'); // discover, restaurant, cart, checkout, orders, profile
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [currentOrderId, setCurrentOrderId] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [ratingOrder, setRatingOrder] = useState(null);
   
-  const { cart, getCartSummary } = useCart();
-  const { token } = useAuth();
+  const { cart, getCartSummary, clearCart } = useCart();
   const cartSummary = getCartSummary ? getCartSummary() : { itemCount: 0, total: 0 };
 
   console.log('🚀 CustomerApp FAZ 2 rendered - activeView:', activeView, 'user:', user?.first_name, 'cart:', cart, 'getCartSummary:', typeof getCartSummary);
