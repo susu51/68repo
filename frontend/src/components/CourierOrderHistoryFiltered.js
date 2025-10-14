@@ -4,7 +4,6 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { History, Filter, ChevronLeft, ChevronRight, Package, MapPin, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
