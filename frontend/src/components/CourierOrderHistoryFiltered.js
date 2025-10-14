@@ -217,20 +217,17 @@ export const CourierOrderHistoryFiltered = () => {
               {/* Sort */}
               <div className="space-y-2">
                 <Label htmlFor="sortFilter">Sıralama</Label>
-                <Select
+                <select
+                  id="sortFilter"
                   value={filters.sort}
-                  onValueChange={(value) => handleFilterChange('sort', value)}
+                  onChange={(e) => handleFilterChange('sort', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <SelectTrigger id="sortFilter">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="createdAt:desc">Yeni → Eski</SelectItem>
-                    <SelectItem value="createdAt:asc">Eski → Yeni</SelectItem>
-                    <SelectItem value="total_amount:desc">Tutar (Yüksek → Düşük)</SelectItem>
-                    <SelectItem value="total_amount:asc">Tutar (Düşük → Yüksek)</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="createdAt:desc">Yeni → Eski</option>
+                  <option value="createdAt:asc">Eski → Yeni</option>
+                  <option value="total_amount:desc">Tutar (Yüksek → Düşük)</option>
+                  <option value="total_amount:asc">Tutar (Düşük → Yüksek)</option>
+                </select>
               </div>
             </div>
 
