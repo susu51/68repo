@@ -1496,7 +1496,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
           )}
 
           {/* Profile Content */}
-          {activeTab === 'profile' && (
+          <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}>
             <div className="space-y-6">
             <h2 className="text-xl font-bold">Profil & Ayarlar</h2>
 
