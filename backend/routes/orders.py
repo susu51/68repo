@@ -42,8 +42,10 @@ class OrderResponse(BaseModel):
     business_name: str
     items: List[OrderItem]
     total_amount: float
+    delivery_fee: float = 10.0
     delivery_address: DeliveryAddress
     payment_method: str
+    payment_status: str = "pending"  # pending, paid_mock, paid, failed
     status: OrderStatus
     estimated_delivery: Optional[str] = None
     created_at: datetime
