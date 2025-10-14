@@ -5949,6 +5949,9 @@ api_router.include_router(admin_settings_router)
 api_router.include_router(courier_reports_router)
 api_router.include_router(courier_ready_orders_router)
 
+# Phase 2 - Customer Profile & Ratings
+api_router.include_router(customer_profile_router)
+
 # Phase 3.5 - localStorage → DB Migration
 api_router.include_router(customer_cart_router)
 
