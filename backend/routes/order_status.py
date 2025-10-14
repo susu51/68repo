@@ -17,9 +17,12 @@ class OrderStatusUpdate(BaseModel):
     to: str                      # Hedef durum
     
     class Config:
-        # Map 'from' in JSON to 'from_' in Python  
-        allow_population_by_field_name = True
-        fields = {'from_': 'from'}
+        # Map 'from' in JSON to 'from_' in Python (Pydantic V2)
+        populate_by_name = True
+        # Pydantic V2: Use Field alias instead of 'fields'
+    
+    # Alternatively, use Field with alias (Pydantic V2 style)
+    # from_: Optional[str] = Field(None, alias='from')
 
 class OrderStatusResponse(BaseModel):
     id: str
