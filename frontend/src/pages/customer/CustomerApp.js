@@ -180,7 +180,7 @@ export const CustomerApp = ({ user, onLogout }) => {
 
         {/* Cart */}
         {activeView === 'cart' && (
-          <CartPage
+          <CartPageEnhanced
             onBack={handleBackToDiscover}
             onProceedToCheckout={handleProceedToCheckout}
           />
