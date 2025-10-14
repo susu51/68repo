@@ -6,7 +6,7 @@ import OrdersPage from './OrdersPage';
 import { useCart } from '../../contexts/CartContext';
 import { Button } from '../../components/ui/button';
 import { KuryeciniLogo } from '../../components/KuryeciniLogo';
-import { CustomerProfile } from '../../components/CustomerProfile';
+import { CustomerProfileEnhanced } from '../../components/CustomerProfileEnhanced';
 import { AddressSelector } from '../../components/AddressSelector';
 import { PaymentOptions } from '../../components/PaymentOptions';
 import { RatingModal } from '../../components/RatingModal';
