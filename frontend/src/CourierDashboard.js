@@ -1723,7 +1723,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
               </Card>
             </div>
             </div>
-          )}
+          </div>
 
           {/* Order History Tab */}
           <div style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
