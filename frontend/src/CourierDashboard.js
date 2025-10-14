@@ -1493,7 +1493,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
               </CardContent>
             </Card>
             </div>
-          )}
+          </div>
 
           {/* Profile Content */}
           <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}>
