@@ -730,6 +730,66 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 <span className="text-lg">👤</span>
                 <span>Profil</span>
               </button>
+              
+              <button
+                onClick={() => setActiveTab('ready_map')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'ready_map' 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                }`}
+              >
+                <span className="text-lg">🗺️</span>
+                <span>Hazır Siparişler</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('pdf_reports')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'pdf_reports' 
+                    ? 'bg-red-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-red-500 hover:bg-red-50'
+                }`}
+              >
+                <span className="text-lg">📄</span>
+                <span>PDF Rapor</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('availability')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'availability' 
+                    ? 'bg-teal-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-teal-500 hover:bg-teal-50'
+                }`}
+              >
+                <span className="text-lg">📅</span>
+                <span>Müsaitlik</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('history_filtered')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'history_filtered' 
+                    ? 'bg-indigo-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-indigo-500 hover:bg-indigo-50'
+                }`}
+              >
+                <span className="text-lg">🔍</span>
+                <span>Detaylı Geçmiş</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('profile_update')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'profile_update' 
+                    ? 'bg-pink-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-pink-500 hover:bg-pink-50'
+                }`}
+              >
+                <span className="text-lg">✏️</span>
+                <span>Profil Güncelle</span>
+              </button>
             </div>
           </div>
 
