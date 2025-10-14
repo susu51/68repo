@@ -85,9 +85,6 @@ const LoginForm = ({ onRegisterClick }) => {
     />
   );
 };
-    />
-  );
-};
 
 // Simple Login Component for backward compatibility
 // SimpleLoginForm component removed - using ModernLogin only
