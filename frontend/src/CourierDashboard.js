@@ -1726,63 +1726,63 @@ export const CourierDashboard = ({ user, onLogout }) => {
           )}
 
           {/* Order History Tab */}
-          {activeTab === 'history' && (
+          <div style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
             <div className="p-6">
               <CourierOrderHistory />
             </div>
-          )}
+          </div>
 
           {/* Earnings Report Tab */}
-          {activeTab === 'earnings' && (
+          <div style={{ display: activeTab === 'earnings' ? 'block' : 'none' }}>
             <div className="p-6">
               <CourierEarningsReport />
             </div>
-          )}
+          </div>
 
           {/* Ready Orders Map Tab - Phase 1 */}
-          {activeTab === 'ready_map' && (
+          <div style={{ display: activeTab === 'ready_map' ? 'block' : 'none' }}>
             <React.Fragment>
               <div className="p-6">
                 <CourierReadyOrdersMap />
               </div>
             </React.Fragment>
-          )}
+          </div>
 
           {/* PDF Reports Tab - Phase 1 */}
-          {activeTab === 'pdf_reports' && (
+          <div style={{ display: activeTab === 'pdf_reports' ? 'block' : 'none' }}>
             <React.Fragment>
               <div className="p-6">
                 <CourierPDFReports />
               </div>
             </React.Fragment>
-          )}
+          </div>
 
           {/* Availability Tab - Phase 1 */}
-          {activeTab === 'availability' && (
+          <div style={{ display: activeTab === 'availability' ? 'block' : 'none' }}>
             <React.Fragment>
               <div className="p-6">
                 <CourierAvailability />
               </div>
             </React.Fragment>
-          )}
+          </div>
 
           {/* Filtered History Tab - Phase 1 */}
-          {activeTab === 'history_filtered' && (
+          <div style={{ display: activeTab === 'history_filtered' ? 'block' : 'none' }}>
             <React.Fragment>
               <div className="p-6">
                 <CourierOrderHistoryFiltered />
               </div>
             </React.Fragment>
-          )}
+          </div>
 
           {/* Profile Update Tab - Phase 1 */}
-          {activeTab === 'profile_update' && (
+          <div style={{ display: activeTab === 'profile_update' ? 'block' : 'none' }}>
             <React.Fragment>
               <div className="p-6">
                 <CourierProfileUpdate user={user} />
               </div>
             </React.Fragment>
-          )}
+          </div>
       </div>
     </div>
   );
