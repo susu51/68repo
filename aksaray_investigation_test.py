@@ -25,7 +25,7 @@ class AksarayBusinessVisibilityTester:
     
     def __init__(self):
         self.session = requests.Session()
-        self.backend_url = "https://quickship-49.preview.emergentagent.com/api"
+        self.backend_url = "https://express-track-2.preview.emergentagent.com/api"
         self.admin_token = None
         self.customer_token = None
         self.test_results = []

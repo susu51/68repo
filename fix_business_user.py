@@ -8,7 +8,7 @@ import json
 import os
 
 # Configuration
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://quickship-49.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://express-track-2.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 BUSINESS_CREDENTIALS = {

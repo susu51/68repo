@@ -12,7 +12,7 @@ import { PaymentOptions } from '../../components/PaymentOptions';
 import { RatingModal } from '../../components/RatingModal';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://quickship-49.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://express-track-2.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 // PHASE 2 - Customer App: Profil, Checkout Flow, Ratings

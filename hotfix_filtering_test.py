@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BACKEND_URL = "https://quickship-49.preview.emergentagent.com/api"
+BACKEND_URL = "https://express-track-2.preview.emergentagent.com/api"
 
 async def test_business_filtering():
     """Test business filtering with normalized cities"""

@@ -25,7 +25,7 @@ from datetime import datetime, timedelta
 import uuid
 
 # Configuration
-BASE_URL = "https://quickship-49.preview.emergentagent.com/api"
+BASE_URL = "https://express-track-2.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@kuryecini.com"
 ADMIN_PASSWORD = "KuryeciniAdmin2024!"
 
