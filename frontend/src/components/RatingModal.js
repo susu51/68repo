@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card.jsx';
+import { Button } from './ui/button.jsx';
 import { Star } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -99,7 +99,6 @@ export const RatingModal = ({ order, onClose }) => {
           <CardTitle>Siparişinizi Değerlendirin</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Courier Rating */}
           {order.courier_id && (
             <div className="space-y-3">
               <h3 className="font-semibold text-lg">Kurye Değerlendirmesi</h3>
@@ -114,7 +113,6 @@ export const RatingModal = ({ order, onClose }) => {
             </div>
           )}
 
-          {/* Business Rating */}
           <div className="space-y-3">
             <h3 className="font-semibold text-lg">İşletme Değerlendirmesi</h3>
             <StarRating rating={businessRating} onRate={setBusinessRating} />
@@ -127,7 +125,6 @@ export const RatingModal = ({ order, onClose }) => {
             />
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3">
             <Button onClick={handleSubmit} disabled={submitting} className="flex-1">
               {submitting ? 'Gönderiliyor...' : 'Değerlendirmeyi Gönder'}

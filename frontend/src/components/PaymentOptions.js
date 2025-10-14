@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Label } from './ui/label';
+import React from 'react';
+import { Card, CardContent } from './ui/card.jsx';
 import { CreditCard, Banknote, Smartphone } from 'lucide-react';
 
 export const PaymentOptions = ({ selectedMethod, onMethodSelect }) => {
