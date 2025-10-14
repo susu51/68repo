@@ -183,8 +183,10 @@ async def get_my_orders(
                 business_name=order.get("business_name", "Unknown Business"),
                 items=[OrderItem(**item) for item in order["items"]],
                 total_amount=order["total_amount"],
+                delivery_fee=order.get("delivery_fee", 10.0),
                 delivery_address=DeliveryAddress(**order["delivery_address"]),
                 payment_method=order["payment_method"],
+                payment_status=order.get("payment_status", "pending"),
                 status=OrderStatus(order["status"]),
                 estimated_delivery=estimated_time,
                 created_at=order["created_at"]
