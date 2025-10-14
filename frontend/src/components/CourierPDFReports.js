@@ -140,16 +140,16 @@ export const CourierPDFReports = () => {
         {/* Report Type Selection */}
         <div className="space-y-2">
           <Label htmlFor="reportType">Rapor Tipi</Label>
-          <Select value={reportType} onValueChange={handleReportTypeChange}>
-            <SelectTrigger id="reportType">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="daily">Günlük Rapor</SelectItem>
-              <SelectItem value="weekly">Haftalık Rapor</SelectItem>
-              <SelectItem value="monthly">Aylık Rapor</SelectItem>
-            </SelectContent>
-          </Select>
+          <select
+            id="reportType"
+            value={reportType}
+            onChange={(e) => handleReportTypeChange(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="daily">Günlük Rapor</option>
+            <option value="weekly">Haftalık Rapor</option>
+            <option value="monthly">Aylık Rapor</option>
+          </select>
         </div>
 
         {/* Date Range */}
