@@ -5929,6 +5929,9 @@ from routes.debug import router as debug_router
 from routes.courier_reports import router as courier_reports_router
 from routes.courier_ready_orders import router as courier_ready_orders_router
 
+# Phase 2 - Customer Profile & Ratings
+from routes.customer_profile import router as customer_profile_router
+
 # Cookie-based authentication router (PRIORITY - include first)
 api_router.include_router(auth_router)
 
