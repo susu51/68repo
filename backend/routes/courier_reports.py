@@ -387,7 +387,7 @@ async def update_courier_profile(
         
         # Update in database
         result = await db.users.update_one(
-            {"_id": courier_id, "role": "courier"},
+            {"id": courier_id, "role": "courier"},
             {"$set": update_data}
         )
         
@@ -395,7 +395,7 @@ async def update_courier_profile(
             raise HTTPException(status_code=404, detail="Courier not found")
         
         # Fetch updated profile
-        updated_courier = await db.users.find_one({"_id": courier_id})
+        updated_courier = await db.users.find_one({"id": courier_id})
         
         return {
             "success": True,
