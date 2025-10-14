@@ -42,22 +42,49 @@ console.log('Frontend connecting to:', API_BASE);
 // Modern Login Component with OAuth Integration
 const LoginForm = ({ onRegisterClick }) => {
   const { checkAuthStatus } = useCookieAuth();
+  const [showLogin, setShowLogin] = useState(true);
   
   const handleLogin = async (loginData) => {
-    // ModernLogin already handled the login request
-    // We just need to refresh the auth state
-    await checkAuthStatus();
+    console.log('🎯 App handleLogin called');
+    // ModernLogin already handled the login request via context
+    // Just refresh auth status
+    const user = await checkAuthStatus();
+    console.log('✅ Auth status refreshed, user:', user);
     
-    // Force page reload to ensure proper state sync
+    // Hide login modal
+    setShowLogin(false);
+    
+    // Force reload after a short delay to ensure state is synced
     setTimeout(() => {
+      console.log('🔄 Reloading page...');
       window.location.reload();
-    }, 500);
+    }, 300);
   };
+
+  const handleClose = () => {
+    console.log('🚪 Login modal close requested');
+    setShowLogin(false);
+  };
+
+  if (!showLogin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ModernLogin 
       onLogin={handleLogin}
+      onClose={handleClose}
       onRegisterClick={onRegisterClick}
+    />
+  );
+};
     />
   );
 };
