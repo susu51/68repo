@@ -7,8 +7,8 @@ import { useCart } from '../../contexts/CartContext';
 import { Button } from '../../components/ui/button';
 import { KuryeciniLogo } from '../../components/KuryeciniLogo';
 import { CustomerProfileEnhanced } from '../../components/CustomerProfileEnhanced';
-import { AddressSelector } from '../../components/AddressSelector';
-import { PaymentOptions } from '../../components/PaymentOptions';
+import { AddressSelectorEnhanced } from '../../components/AddressSelectorEnhanced';
+import { PaymentOptionsEnhanced } from '../../components/PaymentOptionsEnhanced';
 import { RatingModal } from '../../components/RatingModal';
 import { toast } from 'react-hot-toast';
 
