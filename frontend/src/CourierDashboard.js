@@ -1743,6 +1743,41 @@ export const CourierDashboard = ({ user, onLogout }) => {
               <CourierEarningsReport />
             </div>
           )}
+
+          {/* Ready Orders Map Tab - Phase 1 */}
+          {activeTab === 'ready_map' && (
+            <div className="p-6">
+              <CourierReadyOrdersMap />
+            </div>
+          )}
+
+          {/* PDF Reports Tab - Phase 1 */}
+          {activeTab === 'pdf_reports' && (
+            <div className="p-6">
+              <CourierPDFReports />
+            </div>
+          )}
+
+          {/* Availability Tab - Phase 1 */}
+          {activeTab === 'availability' && (
+            <div className="p-6">
+              <CourierAvailability />
+            </div>
+          )}
+
+          {/* Filtered History Tab - Phase 1 */}
+          {activeTab === 'history_filtered' && (
+            <div className="p-6">
+              <CourierOrderHistoryFiltered />
+            </div>
+          )}
+
+          {/* Profile Update Tab - Phase 1 */}
+          {activeTab === 'profile_update' && (
+            <div className="p-6">
+              <CourierProfileUpdate user={user} />
+            </div>
+          )}
         </Tabs>
       </div>
     </div>
