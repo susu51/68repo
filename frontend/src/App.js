@@ -47,6 +47,11 @@ const LoginForm = ({ onRegisterClick }) => {
     // ModernLogin already handled the login request
     // We just need to refresh the auth state
     await checkAuthStatus();
+    
+    // Force page reload to ensure proper state sync
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   return (
