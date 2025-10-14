@@ -431,7 +431,7 @@ async def get_courier_availability(
         
         courier_id = current_user["id"]
         
-        courier = await db.users.find_one({"_id": courier_id, "role": "courier"})
+        courier = await db.users.find_one({"id": courier_id, "role": "courier"})
         if not courier:
             raise HTTPException(status_code=404, detail="Courier not found")
         
