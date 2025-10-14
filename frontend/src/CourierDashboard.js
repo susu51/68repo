@@ -12,6 +12,11 @@ import OpenStreetMap from './components/OpenStreetMap';
 import { toast } from 'sonner';
 import { CourierOrderHistory } from './components/CourierOrderHistory';
 import { CourierEarningsReport } from './components/CourierEarningsReport';
+import { CourierPDFReports } from './components/CourierPDFReports';
+import { CourierProfileUpdate } from './components/CourierProfileUpdate';
+import { CourierAvailability } from './components/CourierAvailability';
+import { CourierReadyOrdersMap } from './components/CourierReadyOrdersMap';
+import { CourierOrderHistoryFiltered } from './components/CourierOrderHistoryFiltered';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://quickship-49.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
