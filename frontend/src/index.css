@@ -41,100 +41,125 @@ code {
 
 @layer base {
   :root {
-        /* Kuryecini Brand Colors */
-        --background: 0 0% 100%;
-        --foreground: 220 9% 46%;
-        --card: 0 0% 100%;
-        --card-foreground: 220 9% 46%;
+        /* ============================================
+           KURYECINI BRAND COLORS - Trendyol Go Style
+           Primary Orange: #FF6000 (Trendyol-inspired)
+           ============================================ */
+        
+        /* Base Colors */
+        --background: 0 0% 98%;              /* Warm light gray #FAFAFA */
+        --foreground: 222 47% 11%;           /* Dark text #1A1F2E */
+        --card: 0 0% 100%;                   /* Pure white cards */
+        --card-foreground: 222 47% 11%;      /* Card text */
         --popover: 0 0% 100%;
-        --popover-foreground: 220 9% 46%;
+        --popover-foreground: 222 47% 11%;
         
-        /* Primary: Orange Brand */
-        --primary: 25 95% 53%; /* Orange 500 */
-        --primary-foreground: 0 0% 98%;
+        /* Primary: Trendyol Orange Brand */
+        --primary: 24 100% 50%;              /* #FF6000 - Signature Orange */
+        --primary-foreground: 0 0% 100%;     /* White text on orange */
+        --primary-hover: 24 100% 45%;        /* Darker orange on hover */
         
-        /* Secondary: Neutral */
-        --secondary: 210 40% 98%;
-        --secondary-foreground: 222 84% 4.9%;
+        /* Secondary: Neutral Gray */
+        --secondary: 220 14% 96%;            /* Light gray #F5F6F7 */
+        --secondary-foreground: 222 47% 11%; /* Dark text */
         
-        /* Muted: Light Gray */
-        --muted: 210 40% 98%;
-        --muted-foreground: 215.4 16.3% 46.9%;
+        /* Muted: Subtle backgrounds */
+        --muted: 220 14% 96%;                /* Very light gray */
+        --muted-foreground: 220 9% 46%;      /* Medium gray text */
         
-        /* Accent: Orange Light */
-        --accent: 25 95% 53%;
-        --accent-foreground: 0 0% 98%;
+        /* Accent: Orange variant for highlights */
+        --accent: 28 100% 55%;               /* Lighter orange #FF8533 */
+        --accent-foreground: 0 0% 100%;
         
-        /* Destructive: Red */
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
+        /* Destructive: Red for errors/delete */
+        --destructive: 0 84% 60%;            /* #E63946 */
+        --destructive-foreground: 0 0% 100%;
         
-        /* Border & Input */
-        --border: 214.3 31.8% 91.4%;
-        --input: 214.3 31.8% 91.4%;
-        --ring: 25 95% 53%;
+        /* Success: Green for confirmations */
+        --success: 142 76% 36%;              /* #16A34A */
+        --success-foreground: 0 0% 100%;
         
-        /* Success: Green */  
-        --success: 142.1 76.2% 36.3%;
-        --success-foreground: 0 0% 98%;
+        /* Warning: Amber for cautions */
+        --warning: 38 92% 50%;               /* #F59E0B */
+        --warning-foreground: 0 0% 100%;
         
-        /* Warning: Yellow */
-        --warning: 45.4 93.4% 47.5%;
-        --warning-foreground: 0 0% 98%;
+        /* Info: Blue for informational */
+        --info: 217 91% 60%;                 /* #3B82F6 */
+        --info-foreground: 0 0% 100%;
         
-        /* Info: Blue */
-        --info: 217.2 91.2% 59.8%;
-        --info-foreground: 0 0% 98%;
+        /* Borders & Inputs */
+        --border: 220 13% 91%;               /* Light border #E5E7EB */
+        --input: 220 13% 91%;
+        --ring: 24 100% 50%;                 /* Orange focus ring */
         
-        /* Border radius */
+        /* Chart colors for analytics */
+        --chart-1: 24 100% 50%;              /* Orange */
+        --chart-2: 173 58% 39%;              /* Teal */
+        --chart-3: 197 37% 24%;              /* Dark blue */
+        --chart-4: 43 74% 66%;               /* Yellow */
+        --chart-5: 27 87% 67%;               /* Light orange */
+        
+        /* Border radius - Trendyol uses slightly rounded */
         --radius: 0.5rem;
   }
   
   .dark {
-        /* Dark Theme Colors */
-        --background: 222.2 84% 4.9%;
-        --foreground: 210 40% 98%;
-        --card: 222.2 84% 4.9%;
+        /* ============================================
+           DARK THEME - Modern dark mode
+           ============================================ */
+        
+        /* Base Colors - Dark */
+        --background: 222 47% 11%;           /* Dark background #1A1F2E */
+        --foreground: 210 40% 98%;           /* Light text */
+        --card: 217 33% 17%;                 /* Card background #242B3D */
         --card-foreground: 210 40% 98%;
-        --popover: 222.2 84% 4.9%;
+        --popover: 217 33% 17%;
         --popover-foreground: 210 40% 98%;
         
-        /* Primary: Orange Brand (same) */
-        --primary: 25 95% 53%;
-        --primary-foreground: 0 0% 98%;
+        /* Primary: Orange stays vibrant in dark mode */
+        --primary: 24 100% 55%;              /* Slightly lighter orange for dark */
+        --primary-foreground: 0 0% 100%;
+        --primary-hover: 24 100% 50%;
         
-        /* Secondary: Dark Gray */
-        --secondary: 217.2 32.6% 17.5%;
+        /* Secondary: Dark gray */
+        --secondary: 215 25% 27%;            /* Medium dark gray */
         --secondary-foreground: 210 40% 98%;
         
-        /* Muted: Dark */
-        --muted: 217.2 32.6% 17.5%;
-        --muted-foreground: 215 20.2% 65.1%;
+        /* Muted: Darker backgrounds */
+        --muted: 215 25% 27%;
+        --muted-foreground: 217 33% 70%;     /* Light gray text */
         
-        /* Accent: Orange (same) */
-        --accent: 25 95% 53%;
-        --accent-foreground: 0 0% 98%;
+        /* Accent: Orange variant (same) */
+        --accent: 28 100% 55%;
+        --accent-foreground: 0 0% 100%;
         
-        /* Destructive: Red (darker) */
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 0% 98%;
+        /* Destructive: Red (adjusted for dark) */
+        --destructive: 0 84% 55%;
+        --destructive-foreground: 0 0% 100%;
         
-        /* Border & Input: Dark */
-        --border: 217.2 32.6% 17.5%;
-        --input: 217.2 32.6% 17.5%;
-        --ring: 25 95% 53%;
+        /* Success: Green (adjusted) */
+        --success: 142 76% 45%;
+        --success-foreground: 0 0% 100%;
         
-        /* Success: Green (darker) */
-        --success: 142.1 70.6% 45.3%;
-        --success-foreground: 0 0% 98%;
+        /* Warning: Amber */
+        --warning: 38 92% 55%;
+        --warning-foreground: 222 47% 11%;   /* Dark text on yellow */
         
-        /* Warning: Yellow (darker) */
-        --warning: 45.4 93.4% 47.5%;
-        --warning-foreground: 0 0% 9%;
+        /* Info: Blue */
+        --info: 217 91% 65%;
+        --info-foreground: 0 0% 100%;
         
-        /* Info: Blue (darker) */
-        --info: 217.2 91.2% 59.8%;
-        --info-foreground: 0 0% 98%;
+        /* Borders & Inputs - Dark */
+        --border: 215 25% 27%;
+        --input: 215 25% 27%;
+        --ring: 24 100% 55%;
+        
+        /* Chart colors - Dark mode adjusted */
+        --chart-1: 24 100% 60%;
+        --chart-2: 173 58% 50%;
+        --chart-3: 197 37% 40%;
+        --chart-4: 43 74% 70%;
+        --chart-5: 27 87% 70%;
   }
 }
 
