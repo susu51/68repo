@@ -197,21 +197,17 @@ export const CustomerApp = ({ user, onLogout }) => {
             </div>
 
             {/* Step 1: Address Selection */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <AddressSelector
-                selectedAddress={selectedAddress}
-                onAddressSelect={setSelectedAddress}
-              />
-            </div>
+            <AddressSelectorEnhanced
+              selectedAddress={selectedAddress}
+              onAddressSelect={setSelectedAddress}
+            />
 
             {/* Step 2: Payment Method (shown only if address selected) */}
             {selectedAddress && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <PaymentOptions
-                  selectedMethod={selectedPaymentMethod}
-                  onMethodSelect={setSelectedPaymentMethod}
-                />
-              </div>
+              <PaymentOptionsEnhanced
+                selectedMethod={selectedPaymentMethod}
+                onMethodSelect={setSelectedPaymentMethod}
+              />
             )}
 
             {/* Order Summary & Confirm */}
