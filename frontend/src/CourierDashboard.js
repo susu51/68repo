@@ -1377,7 +1377,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
               )}
             </div>
             </div>
-          )}
+          </div>
 
           {/* Earnings Content */}
           <div style={{ display: activeTab === 'earnings' ? 'block' : 'none' }}>
