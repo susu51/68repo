@@ -135,8 +135,10 @@ async def create_order(
             business_name=order_doc["business_name"],
             items=[OrderItem(**item) for item in order_doc["items"]],
             total_amount=order_doc["total_amount"],
+            delivery_fee=order_doc["delivery_fee"],
             delivery_address=DeliveryAddress(**order_doc["delivery_address"]),
             payment_method=order_doc["payment_method"],
+            payment_status=order_doc["payment_status"],
             status=OrderStatus(order_doc["status"]),
             estimated_delivery=estimated_delivery.strftime("%H:%M"),
             created_at=order_doc["created_at"]
