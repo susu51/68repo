@@ -247,7 +247,7 @@ export const CustomerApp = ({ user, onLogout }) => {
 
         {/* Profile */}
         {activeView === 'profile' && (
-          <CustomerProfile user={user} />
+          <CustomerProfileEnhanced user={user} onLogout={onLogout} />
         )}
       </main>
 
