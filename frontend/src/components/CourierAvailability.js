@@ -207,24 +207,24 @@ export const CourierAvailability = () => {
                     <Label className="font-medium">{day.name}</Label>
                   </div>
 
-                  {isActive && (
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <input
-                        type="time"
-                        value={times.start}
-                        onChange={(e) => updateSlotTime(day.id, 'start', e.target.value)}
-                        className="border rounded px-2 py-1 text-sm"
-                      />
-                      <span className="text-muted-foreground">-</span>
-                      <input
-                        type="time"
-                        value={times.end}
-                        onChange={(e) => updateSlotTime(day.id, 'end', e.target.value)}
-                        className="border rounded px-2 py-1 text-sm"
-                      />
-                    </div>
-                  )}
+                  <div className={`flex items-center gap-2 ${!isActive ? 'invisible' : ''}`}>
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="time"
+                      value={times.start}
+                      onChange={(e) => updateSlotTime(day.id, 'start', e.target.value)}
+                      disabled={!isActive}
+                      className="border rounded px-2 py-1 text-sm"
+                    />
+                    <span className="text-muted-foreground">-</span>
+                    <input
+                      type="time"
+                      value={times.end}
+                      onChange={(e) => updateSlotTime(day.id, 'end', e.target.value)}
+                      disabled={!isActive}
+                      className="border rounded px-2 py-1 text-sm"
+                    />
+                  </div>
                 </div>
               </div>
             );
