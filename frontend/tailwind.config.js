@@ -84,7 +84,8 @@ module.exports = {
 				800: '#B34300',
 				900: '#993A00',
 			}
-		},  		keyframes: {
+		},
+		keyframes: {
   			'accordion-down': {
   				from: {
   					height: '0'
