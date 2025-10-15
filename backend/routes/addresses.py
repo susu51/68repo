@@ -229,6 +229,23 @@ async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
         il = addr.get("il") or addr.get("city", "")
         ilce = addr.get("ilce") or addr.get("district", "")
         
+        # Convert datetime objects to strings
+        created_at_str = None
+        updated_at_str = None
+        if addr.get("created_at"):
+            created_at_obj = addr.get("created_at")
+            if hasattr(created_at_obj, 'isoformat'):
+                created_at_str = created_at_obj.isoformat()
+            else:
+                created_at_str = str(created_at_obj)
+        
+        if addr.get("updated_at"):
+            updated_at_obj = addr.get("updated_at")
+            if hasattr(updated_at_obj, 'isoformat'):
+                updated_at_str = updated_at_obj.isoformat()
+            else:
+                updated_at_str = str(updated_at_obj)
+        
         result.append(AddressResponse(
             id=addr_id,
             adres_basligi=adres_basligi,
@@ -243,8 +260,8 @@ async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
             lat=lat_val,
             lng=lng_val,
             is_default=addr.get("is_default", False),
-            created_at=addr.get("created_at"),
-            updated_at=addr.get("updated_at"),
+            created_at=created_at_str,
+            updated_at=updated_at_str,
             # Backward compat
             label=adres_basligi,
             full=acik_adres,
