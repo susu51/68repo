@@ -6698,7 +6698,7 @@ async def get_business_financials(current_user: dict = Depends(get_approved_busi
 
 # Business Profile/Settings Endpoints
 @api_router.get("/business/profile")
-async def get_business_profile(current_user: dict = Depends(get_approved_business_user)):
+async def get_business_profile(current_user: dict = Depends(get_approved_business_user_from_cookie)):
     """Get business profile information"""
     try:
         business_id = current_user["id"]
