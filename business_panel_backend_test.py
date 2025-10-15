@@ -309,7 +309,7 @@ class BusinessPanelTester:
             
             if response.status_code in [200, 201]:
                 created_item = response.json()
-                details = f"Created menu item: {created_item.get('title', 'Unknown')}"
+                details = f"Created menu item: {created_item.get('name', 'Unknown')}"
                 self.log_test("POST /api/business/menu", True, details)
                 
                 # Store item ID for cleanup
