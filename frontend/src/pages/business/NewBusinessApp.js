@@ -192,6 +192,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
             stats={stats} 
             loading={loading}
             onRefresh={loadStats}
+            onNavigate={setActiveView}
           />
         </div>
 
