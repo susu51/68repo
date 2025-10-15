@@ -12,6 +12,7 @@ import OpenStreetMap from "./components/OpenStreetMap";
 import { CourierDashboard } from "./CourierDashboard";
 import { BusinessDashboard as EnhancedBusinessDashboard } from "./BusinessDashboard_Enhanced";
 import { BusinessApp } from "./pages/business/BusinessApp";
+import { NewBusinessApp } from "./pages/business/NewBusinessApp";
 import { CustomerApp } from "./pages/customer/CustomerApp";
 import { CartProvider } from "./contexts/CartContext";
 import { AdminDashboardTab } from "./components/AdminDashboard";
