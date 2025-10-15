@@ -90,27 +90,53 @@ export const ModernBusinessSettings = ({ businessInfo, onUpdate }) => {
     }
   };
   
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
-      <h1 className="text-2xl font-bold text-foreground mb-6">İşletme Ayarları</h1>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">İşletme Ayarları</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            İşletmenizin bilgilerini ve çalışma koşullarını yönetin
+          </p>
+        </div>
+        <Button
+          onClick={loadProfile}
+          variant="outline"
+          size="sm"
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Yenile
+        </Button>
+      </div>
       
       <div className="space-y-6">
         {/* Basic Info */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
+              <Store className="h-5 w-5 text-primary" />
               Temel Bilgiler
             </CardTitle>
             <CardDescription>İşletmenizin genel bilgileri</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="name">İşletme Adı</Label>
+              <Label htmlFor="business_name">İşletme Adı *</Label>
               <Input
-                id="name"
-                value={settings.name}
-                onChange={(e) => setSettings({...settings, name: e.target.value})}
+                id="business_name"
+                value={settings.business_name}
+                onChange={(e) => setSettings({...settings, business_name: e.target.value})}
                 placeholder="Restoranım"
               />
             </div>
@@ -130,30 +156,52 @@ export const ModernBusinessSettings = ({ businessInfo, onUpdate }) => {
               </div>
               
               <div>
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  E-posta
+                <Label htmlFor="city" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Şehir
                 </Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={settings.email}
-                  onChange={(e) => setSettings({...settings, email: e.target.value})}
-                  placeholder="info@restaurant.com"
+                  id="city"
+                  value={settings.city}
+                  onChange={(e) => setSettings({...settings, city: e.target.value})}
+                  placeholder="Ankara"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="district">İlçe</Label>
+                <Input
+                  id="district"
+                  value={settings.district}
+                  onChange={(e) => setSettings({...settings, district: e.target.value})}
+                  placeholder="Çankaya"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="address">Adres</Label>
+                <Input
+                  id="address"
+                  value={settings.address}
+                  onChange={(e) => setSettings({...settings, address: e.target.value})}
+                  placeholder="Mahalle, Sokak No:1"
                 />
               </div>
             </div>
             
             <div>
-              <Label htmlFor="address" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Adres
+              <Label htmlFor="description" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Açıklama
               </Label>
-              <Input
-                id="address"
-                value={settings.address}
-                onChange={(e) => setSettings({...settings, address: e.target.value})}
-                placeholder="Ankara, Türkiye"
+              <Textarea
+                id="description"
+                value={settings.description}
+                onChange={(e) => setSettings({...settings, description: e.target.value})}
+                placeholder="İşletmeniz hakkında kısa bir açıklama..."
+                rows={3}
               />
             </div>
           </CardContent>
@@ -170,36 +218,111 @@ export const ModernBusinessSettings = ({ businessInfo, onUpdate }) => {
           </CardHeader>
           <CardContent>
             <div>
-              <Label htmlFor="hours">Çalışma Saatleri</Label>
+              <Label htmlFor="opening_hours">Çalışma Saatleri</Label>
               <Input
-                id="hours"
+                id="opening_hours"
                 value={settings.opening_hours}
                 onChange={(e) => setSettings({...settings, opening_hours: e.target.value})}
-                placeholder="09:00 - 23:00"
+                placeholder="09:00-23:00"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Format: 09:00-23:00 veya 09:00-14:00, 17:00-23:00
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Delivery Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Radius className="h-5 w-5 text-primary" />
+              Teslimat Ayarları
+            </CardTitle>
+            <CardDescription>Teslimat bölgesi ve ücretleri</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="delivery_radius_km">Teslimat Yarıçapı (km)</Label>
+                <Input
+                  id="delivery_radius_km"
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={settings.delivery_radius_km}
+                  onChange={(e) => setSettings({...settings, delivery_radius_km: parseInt(e.target.value) || 10})}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Teslimat yapabileceğiniz maksimum mesafe
+                </p>
+              </div>
+              
+              <div>
+                <Label htmlFor="min_order_amount" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Minimum Sipariş (₺)
+                </Label>
+                <Input
+                  id="min_order_amount"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={settings.min_order_amount}
+                  onChange={(e) => setSettings({...settings, min_order_amount: parseFloat(e.target.value) || 0})}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Minimum sipariş tutarı
+                </p>
+              </div>
+              
+              <div>
+                <Label htmlFor="delivery_fee">Teslimat Ücreti (₺)</Label>
+                <Input
+                  id="delivery_fee"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={settings.delivery_fee}
+                  onChange={(e) => setSettings({...settings, delivery_fee: parseFloat(e.target.value) || 0})}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Sabit teslimat ücreti
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
         
         {/* Save Button */}
-        <Button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full bg-primary hover:bg-primary-hover"
-          size="lg"
-        >
-          {saving ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Kaydediliyor...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              Ayarları Kaydet
-            </>
-          )}
-        </Button>
+        <div className="flex justify-end gap-3">
+          <Button
+            onClick={loadProfile}
+            variant="outline"
+            disabled={saving}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Sıfırla
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={saving || !settings.business_name}
+            className="bg-primary hover:bg-primary-hover min-w-[200px]"
+            size="lg"
+          >
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Kaydediliyor...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Ayarları Kaydet
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
