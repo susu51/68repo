@@ -9,15 +9,10 @@ import { toast } from 'react-hot-toast';
 import { get, post, patch, del } from '../../api/http';
 
 const CATEGORIES = [
-  'Başlangıçlar',
-  'Ana Yemekler',
-  'Pizza',
-  'Burger',
-  'Döner & Kebap',
-  'Tatlılar',
-  'İçecekler',
-  'Salata',
-  'Çorba'
+  'Yemek',
+  'Kahvaltı',
+  'İçecek',
+  'Atıştırmalık'
 ];
 
 const VAT_RATES = [
