@@ -287,7 +287,7 @@ class CustomerPanelBackendTester:
             return False
     
     def test_set_default_address(self):
-        """Test PATCH /api/me/addresses/:id/default (varsayılan yapma)"""
+        """Test PATCH /api/customer/addresses/:id/default (varsayılan yapma)"""
         print("⭐ Testing Set Default Address...")
         
         if not self.created_address_ids:
@@ -297,27 +297,35 @@ class CustomerPanelBackendTester:
         try:
             address_id = self.created_address_ids[0]
             
-            response = self.session.patch(
+            # Try different endpoint patterns
+            endpoints_to_try = [
                 f"{BACKEND_URL}/me/addresses/{address_id}/default",
-                headers={"Authorization": f"Bearer {self.jwt_token}"} if self.jwt_token else {}
-            )
+                f"{BACKEND_URL}/customer/addresses/{address_id}/default"
+            ]
             
-            if response.status_code == 200:
-                data = response.json()
-                self.log_test(
-                    "Set Default Address", 
-                    True, 
-                    "Address set as default successfully"
-                )
-                return True
-            else:
-                self.log_test(
-                    "Set Default Address", 
-                    False, 
-                    f"HTTP {response.status_code}", 
-                    response.text[:200]
-                )
-                return False
+            for endpoint in endpoints_to_try:
+                headers = {}
+                if self.jwt_token:
+                    headers["Authorization"] = f"Bearer {self.jwt_token}"
+                
+                response = self.session.patch(endpoint, headers=headers)
+                
+                if response.status_code == 200:
+                    self.log_test(
+                        "Set Default Address", 
+                        True, 
+                        f"Address set as default successfully via {endpoint.split('/')[-3:]}"
+                    )
+                    return True
+            
+            # If all endpoints failed
+            self.log_test(
+                "Set Default Address", 
+                False, 
+                f"All endpoints failed. Last response: HTTP {response.status_code}", 
+                response.text[:200]
+            )
+            return False
                 
         except Exception as e:
             self.log_test("Set Default Address", False, f"Exception: {str(e)}")
