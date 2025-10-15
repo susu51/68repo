@@ -7,7 +7,9 @@ from typing import List, Optional
 import os
 
 # Get environment variables
-NEARBY_RADIUS_M = int(os.environ.get('NEARBY_RADIUS_M', '5000'))
+# Customer requirement: 70km max radius, 10km priority zone
+NEARBY_RADIUS_M = int(os.environ.get('NEARBY_RADIUS_M', '70000'))  # 70km max
+PRIORITY_RADIUS_M = int(os.environ.get('PRIORITY_RADIUS_M', '10000'))  # 10km priority
 
 router = APIRouter(prefix="/catalog", tags=["catalog"])
 
