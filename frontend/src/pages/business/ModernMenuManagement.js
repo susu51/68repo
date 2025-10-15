@@ -384,7 +384,7 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
             </div>
           ))}
         </div>
-      )}
+      </div>
 
       {/* Add/Edit Modal - Always rendered, controlled by display */}
       <div 
