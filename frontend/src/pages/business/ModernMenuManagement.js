@@ -354,9 +354,12 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {/* Add/Edit Modal - Always rendered, controlled by display */}
+      <div 
+        style={{ display: showModal ? 'flex' : 'none' }}
+        className="fixed inset-0 bg-black/50 items-center justify-center z-50 p-4"
+      >
+        {showModal && (
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <div className="flex items-center justify-between">
