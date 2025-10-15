@@ -51,18 +51,21 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
     try {
       setLoading(true);
       console.log('🔄 Fetching menu items...');
-      const result = await get('/business/menu');
-      console.log('📦 Raw result:', result);
-      console.log('📦 Result.data:', result?.data);
+      const response = await get('/business/menu');
+      console.log('📦 Response status:', response.status, response.ok);
       
-      const items = result.data || result || [];
-      console.log('📦 Items after parsing:', items);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const items = await response.json();
+      console.log('📦 Parsed JSON items:', items, 'Length:', items?.length);
       
       const menuArray = Array.isArray(items) ? items : [];
-      console.log('📦 Final menu array:', menuArray, 'Length:', menuArray.length);
+      console.log('📦 Final menu array:', menuArray.length, 'items');
       
       setMenuItems(menuArray);
-      console.log('✅ Menu loaded and state updated:', menuArray.length, 'items');
+      console.log('✅ Menu loaded successfully!', menuArray.length, 'items');
       
       // Also trigger stats update if callback provided
       if (onStatsUpdate) {
@@ -71,8 +74,7 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
       }
     } catch (error) {
       console.error('❌ Menu loading error:', error);
-      console.error('❌ Error details:', error.response || error.message);
-      toast.error('Menü yüklenemedi: ' + (error.response?.data?.detail || error.message));
+      toast.error('Menü yüklenemedi: ' + error.message);
       setMenuItems([]);
     } finally {
       setLoading(false);
