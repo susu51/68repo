@@ -128,7 +128,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "CRITICAL SYSTEM ANALYSIS - Multiple Location & Integration Issues: User reports 4 critical problems: 1) Business Registration City Issue - cities defaulting to İstanbul, 2) Menu Visibility Issue - restaurant menus not showing to customers, 3) Address Registration Issue - city/district saving incorrectly, 4) Discovery Filtering Issue - location-based restaurant filtering not working"
+user_problem_statement: "MÜŞTERİ PANELİ BACKEND TEST - Kapsamlı: Comprehensive customer panel backend testing covering AUTH & USER, ADDRESS SYSTEM (NEW SCHEMA), GEOCODING, ORDERS, and CUSTOMER PROFILE endpoints with test credentials test@kuryecini.com/test123"
 
 backend:
   - task: "FAZ 1 - Business Menu CRUD System"
