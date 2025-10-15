@@ -6696,6 +6696,140 @@ async def get_business_financials(current_user: dict = Depends(get_approved_busi
         print(f"❌ Error getting business financials: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get financials: {str(e)}")
 
+# Business Menu Endpoint
+@api_router.get("/business/menu")
+async def get_business_menu_items(current_user: dict = Depends(get_approved_business_user_from_cookie)):
+    """Get menu items for current business"""
+    try:
+        business_id = current_user["id"]
+        
+        # Get all menu items for this business
+        products = await db.products.find({"business_id": business_id}).to_list(None)
+        
+        menu_items = []
+        for product in products:
+            menu_items.append({
+                "id": product.get("id"),
+                "name": product.get("name"),
+                "description": product.get("description", ""),
+                "price": product.get("price", 0),
+                "category": product.get("category", "uncategorized"),
+                "image_url": product.get("image_url", ""),
+                "is_available": product.get("is_available", True),
+                "business_id": product.get("business_id")
+            })
+        
+        return menu_items
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error getting business menu: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get menu: {str(e)}")
+
+@api_router.post("/business/menu")
+async def create_business_menu_item(
+    item_data: dict,
+    current_user: dict = Depends(get_approved_business_user_from_cookie)
+):
+    """Create a new menu item for current business"""
+    try:
+        import uuid
+        from datetime import datetime, timezone
+        
+        business_id = current_user["id"]
+        
+        # Create menu item
+        menu_item = {
+            "id": str(uuid.uuid4()),
+            "business_id": business_id,
+            "name": item_data.get("name"),
+            "description": item_data.get("description", ""),
+            "price": float(item_data.get("price", 0)),
+            "category": item_data.get("category", "uncategorized"),
+            "image_url": item_data.get("image_url", ""),
+            "is_available": item_data.get("is_available", True),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Insert into database
+        await db.products.insert_one(menu_item)
+        
+        return {
+            "message": "Menu item created successfully",
+            "item": menu_item
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error creating menu item: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create menu item: {str(e)}")
+
+@api_router.patch("/business/menu/{item_id}")
+async def update_business_menu_item(
+    item_id: str,
+    item_data: dict,
+    current_user: dict = Depends(get_approved_business_user_from_cookie)
+):
+    """Update a menu item"""
+    try:
+        from datetime import datetime, timezone
+        
+        business_id = current_user["id"]
+        
+        # Verify ownership
+        existing_item = await db.products.find_one({"id": item_id, "business_id": business_id})
+        if not existing_item:
+            raise HTTPException(status_code=404, detail="Menu item not found")
+        
+        # Update fields
+        update_data = {}
+        for key in ["name", "description", "price", "category", "image_url", "is_available"]:
+            if key in item_data:
+                update_data[key] = item_data[key]
+        
+        update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        await db.products.update_one(
+            {"id": item_id},
+            {"$set": update_data}
+        )
+        
+        return {"message": "Menu item updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error updating menu item: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update menu item: {str(e)}")
+
+@api_router.delete("/business/menu/{item_id}")
+async def delete_business_menu_item(
+    item_id: str,
+    current_user: dict = Depends(get_approved_business_user_from_cookie)
+):
+    """Delete a menu item"""
+    try:
+        business_id = current_user["id"]
+        
+        # Verify ownership
+        existing_item = await db.products.find_one({"id": item_id, "business_id": business_id})
+        if not existing_item:
+            raise HTTPException(status_code=404, detail="Menu item not found")
+        
+        # Delete
+        await db.products.delete_one({"id": item_id})
+        
+        return {"message": "Menu item deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error deleting menu item: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete menu item: {str(e)}")
+
 # Business Profile/Settings Endpoints
 @api_router.get("/business/profile")
 async def get_business_profile(current_user: dict = Depends(get_approved_business_user_from_cookie)):
