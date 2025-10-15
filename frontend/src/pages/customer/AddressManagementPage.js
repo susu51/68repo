@@ -120,7 +120,7 @@ export const AddressManagementPage = ({ onBack }) => {
 
   if (showForm) {
     return (
-      <AddressFormWithMap
+      <SimpleAddressFormWithMap
         address={editingAddress}
         onSave={handleSaveAddress}
         onCancel={() => {
