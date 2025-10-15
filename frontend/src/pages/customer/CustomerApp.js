@@ -109,11 +109,10 @@ export const CustomerApp = ({ user, onLogout }) => {
     setActiveView('cart');
   };
 
-  // Bottom tab navigation - REMOVED: GPS Keşfet, Adresler | ADDED: Profil
+  // Bottom tab navigation - 3 tabs for mobile compatibility
   const tabs = [
     { id: 'discover', label: 'Keşfet', icon: '🔍' },
     { id: 'orders', label: 'Siparişler', icon: '📦' },
-    { id: 'addresses', label: 'Adresler', icon: '📍' },
     { id: 'profile', label: 'Profil', icon: '👤' }
   ];
 
