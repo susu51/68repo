@@ -6696,6 +6696,106 @@ async def get_business_financials(current_user: dict = Depends(get_approved_busi
         print(f"❌ Error getting business financials: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get financials: {str(e)}")
 
+# Business Profile/Settings Endpoints
+@api_router.get("/business/profile")
+async def get_business_profile(current_user: dict = Depends(get_approved_business_user)):
+    """Get business profile information"""
+    try:
+        business_id = current_user["id"]
+        
+        # Get business user data
+        business = await db.users.find_one({"id": business_id})
+        if not business:
+            raise HTTPException(status_code=404, detail="Business not found")
+        
+        return {
+            "id": business.get("id"),
+            "email": business.get("email"),
+            "business_name": business.get("business_name", ""),
+            "phone": business.get("phone", ""),
+            "address": business.get("address", ""),
+            "city": business.get("city", ""),
+            "district": business.get("district", ""),
+            "business_category": business.get("business_category", "gida"),
+            "description": business.get("description", ""),
+            "tax_number": business.get("tax_number", ""),
+            "opening_hours": business.get("opening_hours", "09:00-23:00"),
+            "delivery_radius_km": business.get("delivery_radius_km", 10),
+            "min_order_amount": business.get("min_order_amount", 0),
+            "delivery_fee": business.get("delivery_fee", 0),
+            "is_open": business.get("is_open", True),
+            "rating": business.get("rating", 0),
+            "total_reviews": business.get("total_reviews", 0),
+            "kyc_status": business.get("kyc_status", "pending")
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error getting business profile: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get profile: {str(e)}")
+
+@api_router.patch("/business/profile")
+async def update_business_profile(
+    profile_data: dict,
+    current_user: dict = Depends(get_approved_business_user)
+):
+    """Update business profile information"""
+    try:
+        business_id = current_user["id"]
+        
+        # Allowed fields to update
+        allowed_fields = [
+            "business_name", "phone", "address", "city", "district",
+            "description", "opening_hours", "delivery_radius_km",
+            "min_order_amount", "delivery_fee", "is_open"
+        ]
+        
+        # Filter only allowed fields
+        update_data = {
+            key: value for key, value in profile_data.items() 
+            if key in allowed_fields and value is not None
+        }
+        
+        if not update_data:
+            raise HTTPException(status_code=422, detail="No valid fields to update")
+        
+        # Update business profile
+        result = await db.users.update_one(
+            {"id": business_id},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Business not found or no changes made")
+        
+        # Return updated profile
+        updated_business = await db.users.find_one({"id": business_id})
+        
+        return {
+            "message": "Profile updated successfully",
+            "profile": {
+                "id": updated_business.get("id"),
+                "business_name": updated_business.get("business_name"),
+                "phone": updated_business.get("phone"),
+                "address": updated_business.get("address"),
+                "city": updated_business.get("city"),
+                "district": updated_business.get("district"),
+                "description": updated_business.get("description"),
+                "opening_hours": updated_business.get("opening_hours"),
+                "delivery_radius_km": updated_business.get("delivery_radius_km"),
+                "min_order_amount": updated_business.get("min_order_amount"),
+                "delivery_fee": updated_business.get("delivery_fee"),
+                "is_open": updated_business.get("is_open")
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error updating business profile: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
+
 @api_router.post("/payments/process")
 async def process_payment(
     payment_data: dict,
