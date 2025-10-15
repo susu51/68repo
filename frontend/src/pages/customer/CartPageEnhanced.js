@@ -78,7 +78,7 @@ const CartPageEnhanced = ({ onBack, onProceedToCheckout }) => {
   };
 
   const handleProceed = () => {
-    if (!cart || cart.length === 0) {
+    if (!safeCart || safeCart.length === 0) {
       toast.error('Sepetiniz boş');
       return;
     }
