@@ -199,20 +199,25 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
       return;
     }
 
+    toast.loading('Konumunuz alınıyor...');
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        toast.dismiss();
         const location = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
+        console.log('✅ GPS konum alındı:', location);
         setUserLocation(location);
         setSortMode('location');
-        toast.success('Konum alındı, yakın restoranlar gösteriliyor');
+        toast.success(`Konumunuz: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`);
+        // loadRestaurants will be called by useEffect
       },
       (error) => {
-        console.log('Location error:', error);
-        toast.error('Konum alınamadı, şehir geneli gösteriliyor');
+        toast.dismiss();
+        console.log('❌ GPS konum hatası:', error);
+        toast.error('Konum alınamadı. Lütfen tarayıcı izinlerini kontrol edin.');
         setSortMode('city');
         setLoading(false);
       }
