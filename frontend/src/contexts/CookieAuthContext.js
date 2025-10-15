@@ -14,10 +14,45 @@ export const useCookieAuth = () => {
 
 export const CookieAuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(true);
+  const [loading, setLoading] = useState(true);  // Start with true for initial check
+  const [ready, setReady] = useState(false);  // Start with false
 
-  // Simplified - no auto checks that cause loops
+  // Check auth status on mount
+  useEffect(() => {
+    let mounted = true;
+    
+    const initAuth = async () => {
+      try {
+        console.log('🔍 Checking initial auth status...');
+        const response = await api("/auth/me");
+        
+        if (mounted && response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          console.log('✅ User authenticated on mount:', userData.email, userData.role);
+        } else {
+          console.log('ℹ️ No authenticated user');
+          setUser(null);
+        }
+      } catch (error) {
+        console.log('ℹ️ No auth cookie found');
+        if (mounted) setUser(null);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          setReady(true);
+        }
+      }
+    };
+    
+    initAuth();
+    
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Manual check for refresh
   const checkAuthStatus = async () => {
     try {
       setLoading(true);
