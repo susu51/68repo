@@ -6518,7 +6518,7 @@ async def get_business_active_orders(current_user: dict = Depends(get_approved_b
         raise HTTPException(status_code=500, detail=f"Failed to get active orders: {str(e)}")
 
 @api_router.get("/business/stats")
-async def get_business_statistics(current_user: dict = Depends(get_approved_business_user)):
+async def get_business_statistics(current_user: dict = Depends(get_approved_business_user_from_cookie)):
     """Get real business statistics from orders"""
     try:
         business_id = current_user["id"]
