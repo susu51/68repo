@@ -21,7 +21,7 @@ import { toast } from 'react-hot-toast';
 import { get } from '../../api/http';
 
 // Sub-components
-import { ModernMenuManagementV2 } from './ModernMenuManagementV2';
+import { ModernMenuManagement } from './ModernMenuManagement';
 import { ModernOrdersManagement } from './ModernOrdersManagement';
 import { ModernBusinessSettings } from './ModernBusinessSettings';
 import { ModernDashboard } from './ModernDashboard';
@@ -209,7 +209,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           }}
           className="absolute inset-0"
         >
-          <ModernMenuManagementV2 
+          <ModernMenuManagement 
             key="menu"
             businessId={businessInfo?.id}
             onStatsUpdate={loadStats}
