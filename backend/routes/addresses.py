@@ -32,36 +32,69 @@ def normalize_turkish_slug(text):
     
     return result.lower().replace(' ', '-')
 
-# Pydantic models
+# Pydantic models - Updated for full address system
 class AddressCreate(BaseModel):
-    label: str = Field(..., description="Address label like 'Home', 'Work'")
-    full: str = Field(..., description="Full address text")
-    city: str = Field(..., description="City name (required)")
-    district: str = Field(..., description="District name (required)")
+    adres_basligi: str = Field(..., description="Address title/label like 'Ev', 'İş'")
+    alici_adsoyad: str = Field(..., description="Recipient full name")
+    telefon: str = Field(..., description="Contact phone number")
+    acik_adres: str = Field(..., description="Full open address text")
+    il: str = Field(..., description="Province/City (required, e.g., 'Niğde')")
+    ilce: str = Field(..., description="District (required, e.g., 'Merkez')")
+    mahalle: str = Field(..., description="Neighborhood/Quarter")
+    posta_kodu: Optional[str] = Field(None, description="Postal code")
+    kat_daire: Optional[str] = Field(None, description="Floor/Apartment number")
     lat: float = Field(..., ge=-90, le=90, description="Latitude (required)")
     lng: float = Field(..., ge=-180, le=180, description="Longitude (required)")
     is_default: bool = Field(default=False, description="Set as default address")
+    
+    # Backward compatibility fields (optional)
+    label: Optional[str] = None  # Maps to adres_basligi
+    full: Optional[str] = None   # Maps to acik_adres
+    city: Optional[str] = None   # Maps to il
+    district: Optional[str] = None  # Maps to ilce
 
 class AddressUpdate(BaseModel):
+    adres_basligi: Optional[str] = None
+    alici_adsoyad: Optional[str] = None
+    telefon: Optional[str] = None
+    acik_adres: Optional[str] = None
+    il: Optional[str] = None
+    ilce: Optional[str] = None
+    mahalle: Optional[str] = None
+    posta_kodu: Optional[str] = None
+    kat_daire: Optional[str] = None
+    lat: Optional[float] = Field(None, ge=-90, le=90)
+    lng: Optional[float] = Field(None, ge=-180, le=180)
+    is_default: Optional[bool] = None
+    
+    # Backward compatibility
     label: Optional[str] = None
     full: Optional[str] = None
     city: Optional[str] = None
     district: Optional[str] = None
-    lat: Optional[float] = Field(None, ge=-90, le=90)
-    lng: Optional[float] = Field(None, ge=-180, le=180)
-    is_default: Optional[bool] = None
 
 class AddressResponse(BaseModel):
     id: str
-    label: str
-    full: str
-    city: str
-    district: str
-    city_slug: str
-    district_slug: str
+    adres_basligi: str
+    alici_adsoyad: str
+    telefon: str
+    acik_adres: str
+    il: str
+    ilce: str
+    mahalle: str
+    posta_kodu: Optional[str] = None
+    kat_daire: Optional[str] = None
     lat: float
     lng: float
     is_default: bool
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    
+    # Backward compatibility fields
+    label: Optional[str] = None
+    full: Optional[str] = None
+    city: Optional[str] = None
+    district: Optional[str] = None
 
 router = APIRouter(prefix="/me", tags=["addresses"])
 
