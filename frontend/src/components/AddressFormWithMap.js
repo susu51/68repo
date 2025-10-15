@@ -206,6 +206,7 @@ export const AddressFormWithMap = ({ address, onSave, onCancel }) => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <MapRecenter center={mapCenter} />
               <LocationMarker
                 position={markerPosition}
                 setPosition={setMarkerPosition}
