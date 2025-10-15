@@ -54,7 +54,7 @@ class CustomerPanelBackendTester:
         print("🔐 Testing Customer Authentication...")
         
         try:
-            # Test customer login
+            # Test customer login - cookie-based auth
             login_data = {
                 "email": CUSTOMER_EMAIL,
                 "password": CUSTOMER_PASSWORD
@@ -76,13 +76,17 @@ class CustomerPanelBackendTester:
                             "Authorization": f"Bearer {self.jwt_token}"
                         })
                     
+                    # Check if cookies were set (for cookie-based auth)
+                    if response.cookies:
+                        print(f"   🍪 Cookies received: {list(response.cookies.keys())}")
+                    
                     user_data = data.get("user", {})
                     self.customer_id = user_data.get("id")
                     
                     self.log_test(
                         "Customer Authentication", 
                         True, 
-                        f"Login successful, Customer ID: {self.customer_id}"
+                        f"Login successful, Customer ID: {self.customer_id}, Auth method: {'JWT' if self.jwt_token else 'Cookie'}"
                     )
                     return True
                 else:
