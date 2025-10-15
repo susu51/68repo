@@ -128,8 +128,17 @@ if (typeof window !== 'undefined') {
     if (msg && typeof msg === 'string') {
       const message = msg.toLowerCase();
       if (message.includes('removechild') || 
+          message.includes('insertbefore') ||
+          message.includes('appendchild') ||
           message.includes('removechildfromcontainer') ||
+          message.includes('insertorappendplacementnode') ||
+          message.includes('commitplacement') ||
           message.includes('commitdeletioneffects') ||
+          message.includes('yeni düğüm') ||
+          message.includes('önce gelen düğüm') ||
+          message.includes('çocuğu değil') ||
+          message.includes('çalıştırılamadı') ||
+          message.includes('notfounderror') ||
           message.includes('node')) {
         return true; // Prevent default error reporting
       }
