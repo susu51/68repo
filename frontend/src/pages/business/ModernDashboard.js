@@ -14,7 +14,7 @@ import {
   ArrowDown
 } from 'lucide-react';
 
-export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh }) => {
+export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNavigate }) => {
   const statCards = [
     {
       title: 'Bugünkü Siparişler',
