@@ -559,5 +559,3 @@ async def get_public_business_menu(business_id: str):
             status_code=500,
             detail=f"Error fetching public menu: {str(e)}"
         )
-
-        )
