@@ -87,47 +87,56 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     try {
       setLoading(true);
       
-      // Get all restaurants first
-      const response = await api.get('/businesses');
-      let restaurantsData = response.data || [];
+      let restaurantsData = [];
       
-      console.log(`📍 Loaded ${restaurantsData.length} restaurants`);
-      console.log('🔍 Sort mode:', sortMode, 'Selected address:', selectedAddress);
-      console.log('🌍 User location:', userLocation);
-      
-      if (sortMode === 'location' && userLocation) {
-        // Distance-based sorting (GPS location)
-        restaurantsData = restaurantsData.map(restaurant => {
-          // Get restaurant coordinates - support multiple formats
-          const restaurantLat = restaurant.lat || restaurant.location?.lat || 0;
-          const restaurantLng = restaurant.lng || restaurant.location?.lng || 0;
+      // Priority 1: Use GPS location if available (70km radius with 10km priority)
+      if (userLocation && userLocation.lat && userLocation.lng) {
+        console.log('🎯 Loading restaurants by GPS location (70km radius, 10km priority)');
+        console.log('📍 User GPS:', userLocation);
+        
+        try {
+          // Use city-nearby endpoint with GPS coordinates
+          const city = selectedAddress?.il || selectedAddress?.city || 'ankara'; // Fallback to ankara
+          const district = selectedAddress?.ilce || selectedAddress?.district || '';
           
-          const distance = calculateDistance(
-            userLocation.lat,
-            userLocation.lng,
-            restaurantLat,
-            restaurantLng
+          const params = new URLSearchParams({
+            lat: userLocation.lat,
+            lng: userLocation.lng,
+            city: city.toLowerCase(),
+            limit: 50
+          });
+          
+          if (district) {
+            params.append('district', district.toLowerCase());
+          }
+          
+          const response = await api.get(`/catalog/city-nearby?${params.toString()}`);
+          restaurantsData = response.data || [];
+          
+          console.log(`✅ Loaded ${restaurantsData.length} restaurants within 70km`);
+          console.log('📊 Distance range:', restaurantsData.length > 0 ? 
+            `${(restaurantsData[0].distance / 1000).toFixed(1)}km - ${(restaurantsData[restaurantsData.length - 1].distance / 1000).toFixed(1)}km` : 
+            'No restaurants'
           );
           
-          return {
+          // Format distance for display
+          restaurantsData = restaurantsData.map(restaurant => ({
             ...restaurant,
-            distance: distance,
-            distanceText: distance < 1 ? 
-              `${Math.round(distance * 1000)}m` : 
-              `${distance.toFixed(1)}km`
-          };
-        });
-        
-        // Sort by distance (closest first)
-        restaurantsData.sort((a, b) => a.distance - b.distance);
-        
-        console.log(`🎯 Sorted ${restaurantsData.length} restaurants by GPS distance`);
-        console.log('📊 Closest restaurants:', restaurantsData.slice(0, 3).map(r => 
-          `${r.business_name || r.name}: ${r.distanceText}`
-        ));
-        
-        toast.success(`${restaurantsData.length} restoran mesafeye göre sıralandı`);
-      } else if (selectedAddress && selectedAddress.city) {
+            distanceText: restaurant.distance < 1000 ? 
+              `${Math.round(restaurant.distance)}m` : 
+              `${(restaurant.distance / 1000).toFixed(1)}km`
+          }));
+          
+          toast.success(`${restaurantsData.length} restoran bulundu (70km içinde)`);
+        } catch (gpsError) {
+          console.error('❌ GPS-based loading failed:', gpsError);
+          toast.error('GPS konumuna göre restoranlar yüklenemedi');
+          // Fall back to address-based loading
+        }
+      }
+      
+      // Priority 2: Use selected address if GPS failed or not available
+      if (restaurantsData.length === 0 && selectedAddress && selectedAddress.city) {
         // Address-based smart sorting: District → City → All
         console.log('🏘️ Implementing smart city/district-based sorting...');
         console.log('📍 Customer address:', selectedAddress.city, selectedAddress.district);
