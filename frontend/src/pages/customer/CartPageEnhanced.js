@@ -18,6 +18,8 @@ const CartPageEnhanced = ({ onBack, onProceedToCheckout }) => {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
+  // Safety check for cart
+  const safeCart = Array.isArray(cart) ? cart : [];
   const cartSummary = getCartSummary ? getCartSummary() : { itemCount: 0, total: 0 };
   
   // Calculate totals
