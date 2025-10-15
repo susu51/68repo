@@ -270,27 +270,30 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
         </CardContent>
       </Card>
 
-      {/* Menu Items by Category */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      ) : Object.keys(groupedItems).length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Henüz ürün eklemediniz</h3>
-            <p className="text-muted-foreground mb-6">
-              İlk ürününüzü ekleyerek başlayın
-            </p>
-            <Button onClick={() => setShowModal(true)} className="bg-primary hover:bg-primary-hover">
-              <Plus className="h-4 w-4 mr-2" />
-              İlk Ürünü Ekle
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
+      {/* Menu Items by Category - All states always rendered */}
+      
+      {/* Loading State */}
+      <div style={{ display: loading ? 'flex' : 'none' }} className="justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+
+      {/* Empty State */}
+      <Card style={{ display: !loading && Object.keys(groupedItems).length === 0 ? 'block' : 'none' }}>
+        <CardContent className="text-center py-12">
+          <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Henüz ürün eklemediniz</h3>
+          <p className="text-muted-foreground mb-6">
+            İlk ürününüzü ekleyerek başlayın
+          </p>
+          <Button onClick={() => setShowModal(true)} className="bg-primary hover:bg-primary-hover">
+            <Plus className="h-4 w-4 mr-2" />
+            İlk Ürünü Ekle
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Menu Items List */}
+      <div style={{ display: !loading && Object.keys(groupedItems).length > 0 ? 'block' : 'none' }} className="space-y-6">
           {Object.entries(groupedItems).map(([category, items]) => (
             <div key={category}>
               <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
