@@ -219,10 +219,13 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     );
   };
 
-  // Reload restaurants when sort mode changes or selected address changes
+  // Reload restaurants when GPS location or selected address changes
   useEffect(() => {
-    loadRestaurants();
-  }, [sortMode, userLocation, selectedAddress]);
+    if (userLocation) {
+      console.log('🔄 GPS location changed, reloading restaurants...');
+      loadRestaurants();
+    }
+  }, [userLocation, selectedAddress]);
 
   const handleRestaurantClick = async (restaurant) => {
     // Call parent component's handler to navigate to restaurant menu page
