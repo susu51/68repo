@@ -60,16 +60,19 @@ class BusinessPanelTester:
                 data = response.json()
                 self.business_user = data.get('user', {})
                 
-                # Check if cookies are set (cookie-based auth)
-                if 'access_token' in [cookie.name for cookie in self.session.cookies]:
-                    self.log_test("Business Login (Cookie Auth)", True, 
-                                f"User ID: {self.business_user.get('id')}, Role: {self.business_user.get('role')}")
-                else:
-                    # JWT token auth
-                    self.business_token = data.get('access_token')
+                # Extract JWT token from response (cookie-based login returns JWT token too)
+                self.business_token = data.get('access_token')
+                if self.business_token:
                     self.session.headers.update({'Authorization': f'Bearer {self.business_token}'})
-                    self.log_test("Business Login (JWT Auth)", True, 
-                                f"Token length: {len(self.business_token) if self.business_token else 0} chars")
+                    self.log_test("Business Login (JWT Token)", True, 
+                                f"Token length: {len(self.business_token)} chars, User ID: {self.business_user.get('id')}")
+                else:
+                    # Check if cookies are set (fallback)
+                    if 'access_token' in [cookie.name for cookie in self.session.cookies]:
+                        self.log_test("Business Login (Cookie Auth)", True, 
+                                    f"User ID: {self.business_user.get('id')}, Role: {self.business_user.get('role')}")
+                    else:
+                        self.log_test("Business Login", False, error="No access token or cookies found")
                 
                 # Check KYC status
                 kyc_status = self.business_user.get('kyc_status', 'unknown')
