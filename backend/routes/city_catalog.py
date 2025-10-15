@@ -71,9 +71,10 @@ async def get_city_nearby_businesses(
             },
             {
                 "$addFields": {
-                    "district_match": {
-                        "$eq": ["$address.district_slug", district] if district else False
-                    },
+                    "district_match": (
+                        {"$eq": ["$address.district_slug", district]} if district 
+                        else {"$literal": False}
+                    ),
                     "is_priority_zone": {
                         "$lte": ["$dist", PRIORITY_RADIUS_M]  # Within 10km priority zone
                     }
