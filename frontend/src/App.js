@@ -5028,7 +5028,7 @@ const AuthRouter = () => {
         <Route path="/" element={
           user.role === 'admin' ? <AdminDashboard user={user} /> :
           user.role === 'courier' ? <CourierDashboard user={user} onLogout={logout} /> :
-          user.role === 'business' ? <EnhancedBusinessDashboard user={user} onLogout={logout} /> :
+          user.role === 'business' ? <BusinessApp user={user} onLogout={logout} /> :
           <CustomerApp user={user} onLogout={logout} />
         } />
         <Route path="*" element={<Navigate to="/" />} />
