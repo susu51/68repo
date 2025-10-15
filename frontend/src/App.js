@@ -4960,7 +4960,7 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
       case 'customer':
         return <CustomerApp user={user} onLogout={handleLogout} />;
       case 'business':
-        return <EnhancedBusinessDashboard user={user} onLogout={handleLogout} />;
+        return <NewBusinessApp user={user} onLogout={handleLogout} />;
       case 'courier':
         return <CourierDashboard user={user} onLogout={handleLogout} />;
       case 'admin':
