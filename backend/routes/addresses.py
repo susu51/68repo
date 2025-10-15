@@ -110,13 +110,35 @@ async def create_address(
     address_data: AddressCreate,
     current_user = Depends(get_current_user_from_cookie)
 ):
-    """Create new address with city-strict validation"""
+    """
+    Create new address with full Turkish address system
+    Requires: il, ilçe, mahalle, lat/lng validation
+    NO DEFAULT TO ISTANBUL - all fields must be explicitly provided
+    """
     
-    # Validate required fields
-    if not address_data.city or not address_data.district:
+    # Map backward compatibility fields
+    il = address_data.il or address_data.city
+    ilce = address_data.ilce or address_data.district
+    adres_basligi = address_data.adres_basligi or address_data.label
+    acik_adres = address_data.acik_adres or address_data.full
+    
+    # Validate REQUIRED fields
+    if not il or not ilce or not adres_basligi or not acik_adres:
         raise HTTPException(
             status_code=422, 
-            detail="city and district are required fields"
+            detail="il (city), ilçe (district), adres_basligi (label), and acik_adres (full address) are required"
+        )
+    
+    if not address_data.mahalle:
+        raise HTTPException(
+            status_code=422,
+            detail="mahalle (neighborhood) is required"
+        )
+    
+    if not address_data.alici_adsoyad or not address_data.telefon:
+        raise HTTPException(
+            status_code=422,
+            detail="alici_adsoyad (recipient name) and telefon (phone) are required"
         )
     
     if address_data.lat is None or address_data.lng is None:
@@ -125,9 +147,12 @@ async def create_address(
             detail="lat and lng coordinates are required"
         )
     
-    # Generate slugs
-    city_slug = normalize_turkish_slug(address_data.city)
-    district_slug = normalize_turkish_slug(address_data.district)
+    # CRITICAL: Prevent Istanbul default - explicitly check
+    if il.lower().strip() in ['istanbul', 'İstanbul'] and not address_data.lat:
+        raise HTTPException(
+            status_code=422,
+            detail="İstanbul adresi için konum koordinatları zorunludur"
+        )
     
     # If setting as default, unset other defaults
     if address_data.is_default:
@@ -136,16 +161,22 @@ async def create_address(
             {"$set": {"is_default": False}}
         )
     
-    # Create address document
+    # Create address document with NEW schema
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).isoformat()
+    
     address_doc = {
         "_id": str(uuid.uuid4()),
         "user_id": current_user["id"],
-        "label": address_data.label,
-        "full": address_data.full,
-        "city": address_data.city,
-        "district": address_data.district,
-        "city_slug": city_slug,
-        "district_slug": district_slug,
+        "adres_basligi": adres_basligi,
+        "alici_adsoyad": address_data.alici_adsoyad,
+        "telefon": address_data.telefon,
+        "acik_adres": acik_adres,
+        "il": il,
+        "ilce": ilce,
+        "mahalle": address_data.mahalle,
+        "posta_kodu": address_data.posta_kodu,
+        "kat_daire": address_data.kat_daire,
         "location": {
             "type": "Point",
             "coordinates": [address_data.lng, address_data.lat]  # [lng, lat]
