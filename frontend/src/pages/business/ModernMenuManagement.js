@@ -386,12 +386,13 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
         </div>
       </div>
 
-      {/* Modal */}
-      <div 
-        style={{ display: showModal ? 'flex' : 'none' }}
-        className="fixed inset-0 bg-black/50 items-center justify-center z-50 p-4"
-      >
-        <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      {/* Modal - Moved inside parent */}
+      {showModal && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowModal(false)}
+        >
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>
