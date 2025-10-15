@@ -67,7 +67,9 @@ export const NewBusinessApp = ({ user, onLogout }) => {
       setLoading(true);
       // Load real stats from backend
       const menuResult = await get('/business/menu');
-      const menuItems = Array.isArray(menuResult?.data) ? menuResult.data : [];
+      const menuItems = Array.isArray(menuResult?.data) ? menuResult.data : (Array.isArray(menuResult) ? menuResult : []);
+      
+      console.log('📊 Menu items loaded:', menuItems.length);
       
       setStats(prev => ({
         ...prev,
