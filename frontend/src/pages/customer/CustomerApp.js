@@ -251,7 +251,11 @@ export const CustomerApp = ({ user, onLogout }) => {
 
         {/* Profile */}
         {activeView === 'profile' && (
-          <CustomerProfileEnhanced user={user} onLogout={onLogout} />
+          <CustomerProfileEnhanced 
+            user={user} 
+            onLogout={onLogout}
+            onNavigateToAddresses={() => setActiveView('addresses')}
+          />
         )}
       </main>
 
