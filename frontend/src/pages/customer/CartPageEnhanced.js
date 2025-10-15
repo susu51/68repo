@@ -113,7 +113,7 @@ const CartPageEnhanced = ({ onBack, onProceedToCheckout }) => {
           </Button>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Sepetim</h1>
         </div>
-        {cart.length > 0 && (
+        {safeCart.length > 0 && (
           <Button 
             onClick={() => {
               clearCart();
