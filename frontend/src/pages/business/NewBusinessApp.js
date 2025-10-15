@@ -177,9 +177,16 @@ export const NewBusinessApp = ({ user, onLogout }) => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 relative">
-        {/* Dashboard */}
-        <div style={{ display: activeView === 'dashboard' ? 'block' : 'none' }}>
+      <main className="flex-1 relative overflow-hidden">
+        {/* Dashboard - Always rendered, controlled by display */}
+        <div 
+          style={{ 
+            display: activeView === 'dashboard' ? 'block' : 'none',
+            height: '100%',
+            overflow: 'auto'
+          }}
+          className="absolute inset-0"
+        >
           <ModernDashboard 
             businessInfo={businessInfo} 
             stats={stats} 
@@ -188,21 +195,42 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           />
         </div>
 
-        {/* Menu Management */}
-        <div style={{ display: activeView === 'menu' ? 'block' : 'none' }}>
+        {/* Menu Management - Always rendered, controlled by display */}
+        <div 
+          style={{ 
+            display: activeView === 'menu' ? 'block' : 'none',
+            height: '100%',
+            overflow: 'auto'
+          }}
+          className="absolute inset-0"
+        >
           <ModernMenuManagement 
             businessId={businessInfo?.id}
             onStatsUpdate={loadStats}
           />
         </div>
 
-        {/* Orders Management */}
-        <div style={{ display: activeView === 'orders' ? 'block' : 'none' }}>
+        {/* Orders Management - Always rendered, controlled by display */}
+        <div 
+          style={{ 
+            display: activeView === 'orders' ? 'block' : 'none',
+            height: '100%',
+            overflow: 'auto'
+          }}
+          className="absolute inset-0"
+        >
           <ModernOrdersManagement businessId={businessInfo?.id} />
         </div>
 
-        {/* Settings */}
-        <div style={{ display: activeView === 'settings' ? 'block' : 'none' }}>
+        {/* Settings - Always rendered, controlled by display */}
+        <div 
+          style={{ 
+            display: activeView === 'settings' ? 'block' : 'none',
+            height: '100%',
+            overflow: 'auto'
+          }}
+          className="absolute inset-0"
+        >
           <ModernBusinessSettings 
             businessInfo={businessInfo}
             onUpdate={setBusinessInfo}
