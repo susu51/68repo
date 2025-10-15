@@ -13,9 +13,18 @@ window.addEventListener('error', (event) => {
     if (message.includes('removechild') || 
         message.includes('appendchild') ||
         message.includes('insertbefore') ||
+        message.includes('insertorappendplacementnode') ||
+        message.includes('commitplacement') ||
+        message.includes('commitreconciliationeffects') ||
+        message.includes('commitmutationeffectsonfiber') ||
         message.includes('removechildfromcontainer') ||
         message.includes('commitdeletioneffects') ||
         message.includes('recursivelytraversedeletioneffects') ||
+        message.includes('yeni düğüm') ||
+        message.includes('önce gelen düğüm') ||
+        message.includes('çocuğu değil') ||
+        message.includes('çalıştırılamadı') ||
+        message.includes('notfounderror') ||
         (message.includes('node') && (message.includes('child') || message.includes('removed'))) ||
         (message.includes('failed to execute') && message.includes('node'))) {
       
