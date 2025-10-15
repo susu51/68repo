@@ -10,6 +10,7 @@ import { CustomerProfileEnhanced } from '../../components/CustomerProfileEnhance
 import { AddressSelectorEnhanced } from '../../components/AddressSelectorEnhanced';
 import { PaymentOptionsEnhanced } from '../../components/PaymentOptionsEnhanced';
 import { RatingModal } from '../../components/RatingModal';
+import { AddressManagementPage } from './AddressManagementPage';
 import { toast } from 'react-hot-toast';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://express-track-2.preview.emergentagent.com';
