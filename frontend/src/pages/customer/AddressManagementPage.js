@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { MapPin, Plus, Edit, Trash2, Home, Briefcase, CheckCircle } from 'lucide-react';
-import { AddressFormWithMap } from '../../components/AddressFormWithMap';
+import { SimpleAddressFormWithMap } from '../../components/SimpleAddressFormWithMap';
 import { toast } from 'react-hot-toast';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://express-track-2.preview.emergentagent.com';
