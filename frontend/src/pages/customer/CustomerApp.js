@@ -163,32 +163,34 @@ export const CustomerApp = ({ user, onLogout }) => {
       {/* Main Content */}
       <main className="flex-1">
         {/* Discover/Restaurant List */}
-        {activeView === 'discover' && (
+        <div style={{ display: activeView === 'discover' ? 'block' : 'none' }}>
           <DiscoverPage
             onRestaurantSelect={handleRestaurantSelect}
             user={user}
           />
-        )}
+        </div>
 
         {/* Restaurant Menu */}
-        {activeView === 'restaurant' && selectedRestaurant && (
-          <RestaurantMenu
-            restaurant={selectedRestaurant}
-            onBack={handleBackToDiscover}
-            onGoToCart={handleGoToCart}
-          />
-        )}
+        <div style={{ display: activeView === 'restaurant' ? 'block' : 'none' }}>
+          {selectedRestaurant && (
+            <RestaurantMenu
+              restaurant={selectedRestaurant}
+              onBack={handleBackToDiscover}
+              onGoToCart={handleGoToCart}
+            />
+          )}
+        </div>
 
         {/* Cart */}
-        {activeView === 'cart' && (
+        <div style={{ display: activeView === 'cart' ? 'block' : 'none' }}>
           <CartPageEnhanced
             onBack={handleBackToDiscover}
             onProceedToCheckout={handleProceedToCheckout}
           />
-        )}
+        </div>
 
         {/* Checkout Flow */}
-        {activeView === 'checkout' && (
+        <div style={{ display: activeView === 'checkout' ? 'block' : 'none' }}>
           <div className="max-w-4xl mx-auto p-6 space-y-6">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold">Ödeme</h1>
@@ -235,28 +237,28 @@ export const CustomerApp = ({ user, onLogout }) => {
               </div>
             )}
           </div>
-        )}
+        </div>
 
         {/* Orders */}
-        {activeView === 'orders' && (
+        <div style={{ display: activeView === 'orders' ? 'block' : 'none' }}>
           <OrdersPage user={user} />
-        )}
+        </div>
 
         {/* Addresses Management */}
-        {activeView === 'addresses' && (
+        <div style={{ display: activeView === 'addresses' ? 'block' : 'none' }}>
           <AddressManagementPage 
             onBack={() => setActiveView('discover')}
           />
-        )}
+        </div>
 
         {/* Profile */}
-        {activeView === 'profile' && (
+        <div style={{ display: activeView === 'profile' ? 'block' : 'none' }}>
           <CustomerProfileEnhanced 
             user={user} 
             onLogout={onLogout}
             onNavigateToAddresses={() => setActiveView('addresses')}
           />
-        )}
+        </div>
       </main>
 
       {/* Bottom Navigation - Trendyol Go Style */}
