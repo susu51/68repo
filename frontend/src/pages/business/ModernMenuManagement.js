@@ -542,7 +542,8 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
               </form>
             </CardContent>
           </Card>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
