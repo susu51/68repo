@@ -217,7 +217,8 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+    <>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
