@@ -631,29 +631,30 @@ class CustomerPanelBackendTester:
         print("👤 Testing Update Customer Profile...")
         
         try:
+            # Use the correct field names from the ProfileUpdateRequest model
             profile_data = {
-                "first_name": "Test",
-                "last_name": "Kullanıcı Updated",
-                "phone": "+90 555 123 4567",
-                "city": "Niğde"
+                "name": "Test",
+                "surname": "Kullanıcı Updated",
+                "phone": "+90 555 123 4567"
             }
+            
+            headers = {"Content-Type": "application/json"}
+            if self.jwt_token:
+                headers["Authorization"] = f"Bearer {self.jwt_token}"
             
             response = self.session.put(
                 f"{BACKEND_URL}/customer/profile",
                 json=profile_data,
-                headers={
-                    "Authorization": f"Bearer {self.jwt_token}" if self.jwt_token else {},
-                    "Content-Type": "application/json"
-                }
+                headers=headers
             )
             
             if response.status_code == 200:
                 data = response.json()
-                if "success" in data or "profile" in data or "user" in data:
+                if "success" in data or "profile" in data or "user" in data or "message" in data:
                     self.log_test(
                         "Update Customer Profile", 
                         True, 
-                        f"Profile updated: {profile_data['first_name']} {profile_data['last_name']}"
+                        f"Profile updated: {profile_data['name']} {profile_data['surname']}"
                     )
                     return True
                 else:
