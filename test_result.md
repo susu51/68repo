@@ -1522,9 +1522,10 @@ frontend:
 
 test_plan:
   current_focus:
-    - "FAZ 1 - Complete Admin Panel Implementation"
+    - "Customer Panel Backend System - Comprehensive Testing"
+    - "JWT Authentication Issue Resolution"
   stuck_tasks: 
-    - "FAZ 1 - Complete Admin Panel Implementation"
+    - "JWT-based endpoint authentication (orders, profile)"
   test_all: false
   test_priority: "high_first"
 
