@@ -50,14 +50,29 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
+      console.log('🔄 Fetching menu items...');
       const result = await get('/business/menu');
+      console.log('📦 Raw result:', result);
+      console.log('📦 Result.data:', result?.data);
+      
       const items = result.data || result || [];
+      console.log('📦 Items after parsing:', items);
+      
       const menuArray = Array.isArray(items) ? items : [];
+      console.log('📦 Final menu array:', menuArray, 'Length:', menuArray.length);
+      
       setMenuItems(menuArray);
-      console.log('✅ Menu loaded:', menuArray.length);
+      console.log('✅ Menu loaded and state updated:', menuArray.length, 'items');
+      
+      // Also trigger stats update if callback provided
+      if (onStatsUpdate) {
+        console.log('🔄 Triggering stats update...');
+        onStatsUpdate();
+      }
     } catch (error) {
       console.error('❌ Menu loading error:', error);
-      toast.error('Menü yüklenemedi');
+      console.error('❌ Error details:', error.response || error.message);
+      toast.error('Menü yüklenemedi: ' + (error.response?.data?.detail || error.message));
       setMenuItems([]);
     } finally {
       setLoading(false);
