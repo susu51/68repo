@@ -148,19 +148,35 @@ export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNav
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col gap-2 hover:bg-primary hover:text-white transition-colors"
+              onClick={() => onNavigate && onNavigate('menu')}
+            >
               <Package className="h-6 w-6" />
               <span className="text-xs">Yeni Ürün</span>
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col gap-2 hover:bg-primary hover:text-white transition-colors"
+              onClick={() => onNavigate && onNavigate('orders')}
+            >
               <ShoppingBag className="h-6 w-6" />
               <span className="text-xs">Siparişler</span>
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col gap-2 hover:bg-primary hover:text-white transition-colors"
+              onClick={() => onNavigate && onNavigate('settings')}
+            >
               <Clock className="h-6 w-6" />
               <span className="text-xs">Çalışma Saati</span>
             </Button>
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex flex-col gap-2 hover:bg-primary hover:text-white transition-colors"
+              onClick={() => onNavigate && onNavigate('orders')}
+            >
               <Star className="h-6 w-6" />
               <span className="text-xs">Yorumlar</span>
             </Button>
