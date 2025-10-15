@@ -140,3 +140,4 @@ zipp==3.23.0
 sentry-sdk[fastapi]==1.38.0
 emergentintegrations==0.1.0
 reportlab
+httpx==0.28.1
