@@ -181,7 +181,14 @@ async def create_address(
             "type": "Point",
             "coordinates": [address_data.lng, address_data.lat]  # [lng, lat]
         },
-        "is_default": address_data.is_default
+        "is_default": address_data.is_default,
+        "created_at": now,
+        "updated_at": now,
+        # Backward compatibility fields
+        "label": adres_basligi,
+        "full": acik_adres,
+        "city": il,
+        "district": ilce
     }
     
     result = await db.addresses.insert_one(address_doc)
