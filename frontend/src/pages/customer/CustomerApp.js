@@ -113,6 +113,7 @@ export const CustomerApp = ({ user, onLogout }) => {
   const tabs = [
     { id: 'discover', label: 'Keşfet', icon: '🔍' },
     { id: 'orders', label: 'Siparişler', icon: '📦' },
+    { id: 'addresses', label: 'Adresler', icon: '📍' },
     { id: 'profile', label: 'Profil', icon: '👤' }
   ];
 
