@@ -201,7 +201,7 @@ async def create_address(
 
 @router.get("/addresses", response_model=List[AddressResponse])
 async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
-    """Get user addresses, default first"""
+    """Get user addresses, default first - NEW schema with backward compat"""
     
     addresses = await db.addresses.find(
         {"user_id": current_user["id"]}
@@ -223,17 +223,33 @@ async def get_addresses(current_user = Depends(get_current_user_from_cookie)):
             lat_val = float(lat_raw) if lat_raw is not None else 0.0
             lng_val = float(lng_raw) if lng_raw is not None else 0.0
         
+        # Map new schema fields (with backward compat)
+        adres_basligi = addr.get("adres_basligi") or addr.get("label", "")
+        acik_adres = addr.get("acik_adres") or addr.get("full", "")
+        il = addr.get("il") or addr.get("city", "")
+        ilce = addr.get("ilce") or addr.get("district", "")
+        
         result.append(AddressResponse(
             id=addr_id,
-            label=addr.get("label", ""),
-            full=addr.get("full", addr.get("full_address", "")),
-            city=addr.get("city", ""),
-            district=addr.get("district", ""),
-            city_slug=addr.get("city_slug", ""),
-            district_slug=addr.get("district_slug", ""),
+            adres_basligi=adres_basligi,
+            alici_adsoyad=addr.get("alici_adsoyad", ""),
+            telefon=addr.get("telefon", ""),
+            acik_adres=acik_adres,
+            il=il,
+            ilce=ilce,
+            mahalle=addr.get("mahalle", ""),
+            posta_kodu=addr.get("posta_kodu"),
+            kat_daire=addr.get("kat_daire"),
             lat=lat_val,
             lng=lng_val,
-            is_default=addr.get("is_default", False)
+            is_default=addr.get("is_default", False),
+            created_at=addr.get("created_at"),
+            updated_at=addr.get("updated_at"),
+            # Backward compat
+            label=adres_basligi,
+            full=acik_adres,
+            city=il,
+            district=ilce
         ))
     
     return result
