@@ -6425,7 +6425,7 @@ async def set_default_address(
 
 # Business Orders Management Endpoints
 @api_router.get("/business/orders/incoming")
-async def get_business_incoming_orders(current_user: dict = Depends(get_approved_business_user)):
+async def get_business_incoming_orders(current_user: dict = Depends(get_approved_business_user_from_cookie)):
     """Get incoming/pending orders for business"""
     try:
         business_id = current_user["id"]
