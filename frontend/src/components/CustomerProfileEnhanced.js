@@ -143,7 +143,13 @@ export const CustomerProfileEnhanced = ({ user, onLogout, onNavigateToAddresses 
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveSection(item.id)}
+                    onClick={() => {
+                      if (item.id === 'addresses' && onNavigateToAddresses) {
+                        onNavigateToAddresses();
+                      } else {
+                        setActiveSection(item.id);
+                      }
+                    }}
                     className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${
                       isActive 
                         ? 'bg-primary text-primary-foreground shadow-orange' 
