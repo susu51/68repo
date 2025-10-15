@@ -1,29 +1,93 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Settings, Clock, MapPin, Phone, Mail, Save } from 'lucide-react';
+import { Textarea } from '../../components/ui/textarea';
+import { 
+  Settings, 
+  Clock, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Save, 
+  Store,
+  DollarSign,
+  Radius,
+  FileText,
+  RefreshCw
+} from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { get, patch } from '../../api/http';
 
 export const ModernBusinessSettings = ({ businessInfo, onUpdate }) => {
   const [settings, setSettings] = useState({
-    name: businessInfo?.name || '',
-    phone: businessInfo?.phone || '',
-    email: businessInfo?.email || '',
-    address: businessInfo?.address || '',
-    opening_hours: businessInfo?.opening_hours || '09:00 - 23:00'
+    business_name: '',
+    phone: '',
+    address: '',
+    city: '',
+    district: '',
+    description: '',
+    opening_hours: '09:00-23:00',
+    delivery_radius_km: 10,
+    min_order_amount: 0,
+    delivery_fee: 0
   });
   
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+  
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      const result = await get('/business/profile');
+      const profile = result.data || result;
+      
+      setSettings({
+        business_name: profile.business_name || '',
+        phone: profile.phone || '',
+        address: profile.address || '',
+        city: profile.city || '',
+        district: profile.district || '',
+        description: profile.description || '',
+        opening_hours: profile.opening_hours || '09:00-23:00',
+        delivery_radius_km: profile.delivery_radius_km || 10,
+        min_order_amount: profile.min_order_amount || 0,
+        delivery_fee: profile.delivery_fee || 0
+      });
+      
+      console.log('✅ Profile loaded');
+    } catch (error) {
+      console.error('❌ Profile loading error:', error);
+      toast.error('Profil bilgileri yüklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const handleSave = async () => {
-    setSaving(true);
-    // Simulate save
-    setTimeout(() => {
-      toast.success('Ayarlar kaydedildi');
+    try {
+      setSaving(true);
+      
+      const result = await patch('/business/profile', settings);
+      toast.success('Ayarlar başarıyla kaydedildi!');
+      
+      // Update parent component if callback provided
+      if (onUpdate && result.data?.profile) {
+        onUpdate(result.data.profile);
+      }
+      
+      console.log('✅ Settings saved');
+    } catch (error) {
+      console.error('❌ Save error:', error);
+      toast.error(error.response?.data?.detail || 'Ayarlar kaydedilemedi');
+    } finally {
       setSaving(false);
-    }, 1000);
+    }
   };
   
   return (
