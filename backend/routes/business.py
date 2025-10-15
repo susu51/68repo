@@ -510,3 +510,54 @@ async def get_menu_item(item_id: str):
             status_code=500,
             detail=f"Error fetching menu item: {str(e)}"
         )
+
+# ============================================
+# PUBLIC ENDPOINTS FOR CUSTOMERS
+# ============================================
+
+@router.get("/businesses/{business_id}/products", response_model=List[MenuItemResponse])
+async def get_public_business_menu(business_id: str):
+    """
+    Get public menu for a business - accessible by customers
+    Returns only available items
+    """
+    try:
+        from server import db
+        
+        # Get menu items for this business (only available ones)
+        menu_items = await db.menu_items.find({
+            "business_id": business_id,
+            "is_available": True
+        }).to_list(length=None)
+        
+        if not menu_items:
+            return []
+        
+        return [
+            MenuItemResponse(
+                id=str(item["_id"]),
+                business_id=item["business_id"],
+                name=item.get("name", item.get("title", "")),
+                description=item.get("description", ""),
+                price=item.get("price", 0),
+                currency=item.get("currency", "TRY"),
+                category=item.get("category", "Yemek"),
+                tags=item.get("tags", []),
+                image_url=item.get("image_url", item.get("photo_url")),
+                is_available=True,  # Only showing available items
+                vat_rate=item.get("vat_rate", 0.10),
+                options=item.get("options", []),
+                preparation_time=item.get("preparation_time", 15),
+                created_at=item["created_at"],
+                updated_at=item.get("updated_at")
+            )
+            for item in menu_items
+        ]
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching public menu: {str(e)}"
+        )
+
+        )
