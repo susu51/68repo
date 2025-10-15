@@ -6738,7 +6738,7 @@ async def get_business_profile(current_user: dict = Depends(get_approved_busines
 @api_router.patch("/business/profile")
 async def update_business_profile(
     profile_data: dict,
-    current_user: dict = Depends(get_approved_business_user)
+    current_user: dict = Depends(get_approved_business_user_from_cookie)
 ):
     """Update business profile information"""
     try:
