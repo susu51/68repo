@@ -6473,7 +6473,7 @@ async def get_business_incoming_orders(current_user: dict = Depends(get_approved
         raise HTTPException(status_code=500, detail=f"Failed to get incoming orders: {str(e)}")
 
 @api_router.get("/business/orders/active")
-async def get_business_active_orders(current_user: dict = Depends(get_approved_business_user)):
+async def get_business_active_orders(current_user: dict = Depends(get_approved_business_user_from_cookie)):
     """Get active orders (preparing, ready) for business"""
     try:
         business_id = current_user["id"]
