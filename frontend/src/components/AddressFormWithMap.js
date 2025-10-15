@@ -30,9 +30,20 @@ const orangeIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+// Component to recenter map when marker position changes
+function MapRecenter({ center }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.setView(center, map.getZoom());
+    }
+  }, [center, map]);
+  return null;
+}
+
 // Component to handle map clicks
 function LocationMarker({ position, setPosition, onLocationChange }) {
-  useMapEvents({
+  const map = useMapEvents({
     click(e) {
       setPosition(e.latlng);
       onLocationChange(e.latlng);
