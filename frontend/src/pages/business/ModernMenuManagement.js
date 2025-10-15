@@ -27,7 +27,7 @@ const VAT_RATES = [
   { value: 0.18, label: 'Standart (%18)' }
 ];
 
-export const MenuManagement = () => {
+export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
