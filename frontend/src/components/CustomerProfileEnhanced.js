@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://express-track-2.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
-export const CustomerProfileEnhanced = ({ user, onLogout }) => {
+export const CustomerProfileEnhanced = ({ user, onLogout, onNavigateToAddresses }) => {
   const [activeSection, setActiveSection] = useState('profile'); // profile, addresses, settings
   const [profile, setProfile] = useState({
     name: '',
