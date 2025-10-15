@@ -328,6 +328,36 @@ async def update_address(
     
     return {"success": True, "message": "Address updated successfully"}
 
+@router.patch("/addresses/{address_id}/default")
+async def set_default_address(
+    address_id: str,
+    current_user = Depends(get_current_user_from_cookie)
+):
+    """Set address as default"""
+    
+    # Check if address exists and belongs to user
+    address = await db.addresses.find_one({
+        "_id": address_id,
+        "user_id": current_user["id"]
+    })
+    
+    if not address:
+        raise HTTPException(status_code=404, detail="Address not found")
+    
+    # Unset all other defaults for this user
+    await db.addresses.update_many(
+        {"user_id": current_user["id"]},
+        {"$set": {"is_default": False}}
+    )
+    
+    # Set this address as default
+    await db.addresses.update_one(
+        {"_id": address_id},
+        {"$set": {"is_default": True}}
+    )
+    
+    return {"success": True, "message": "Default address updated"}
+
 @router.delete("/addresses/{address_id}")
 async def delete_address(
     address_id: str,
