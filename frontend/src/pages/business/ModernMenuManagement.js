@@ -151,24 +151,32 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
     }
 
     try {
-      await del(`/business/menu/${id}`);
+      const response = await del(`/business/menu/${id}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP ${response.status}`);
+      }
       toast.success('Ürün silindi');
       await fetchMenuItems();
     } catch (error) {
-      toast.error('Silme hatası');
+      toast.error('Silme hatası: ' + error.message);
     }
   };
 
   const handleToggleAvailability = async (item) => {
     try {
-      await patch(`/business/menu/${item.id}`, {
+      const response = await patch(`/business/menu/${item.id}`, {
         ...item,
         is_available: !item.is_available
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP ${response.status}`);
+      }
       toast.success(item.is_available ? 'Ürün stokta yok olarak işaretlendi' : 'Ürün tekrar stokta');
       await fetchMenuItems();
     } catch (error) {
-      toast.error('Güncelleme hatası');
+      toast.error('Güncelleme hatası: ' + error.message);
     }
   };
 
