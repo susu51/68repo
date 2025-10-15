@@ -191,6 +191,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           className="absolute inset-0"
         >
           <ModernDashboard 
+            key="dashboard"
             businessInfo={businessInfo} 
             stats={stats} 
             loading={loading}
@@ -199,7 +200,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           />
         </div>
 
-        {/* Menu Management - Always rendered, controlled by display */}
+        {/* Menu Management - Force mounted after initial load */}
         <div 
           style={{ 
             display: activeView === 'menu' ? 'block' : 'none',
@@ -208,13 +209,16 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           }}
           className="absolute inset-0"
         >
-          <ModernMenuManagement 
-            businessId={businessInfo?.id}
-            onStatsUpdate={loadStats}
-          />
+          {(allComponentsMounted || activeView === 'menu') && (
+            <ModernMenuManagement 
+              key="menu"
+              businessId={businessInfo?.id}
+              onStatsUpdate={loadStats}
+            />
+          )}
         </div>
 
-        {/* Orders Management - Always rendered, controlled by display */}
+        {/* Orders Management - Force mounted after initial load */}
         <div 
           style={{ 
             display: activeView === 'orders' ? 'block' : 'none',
@@ -223,10 +227,15 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           }}
           className="absolute inset-0"
         >
-          <ModernOrdersManagement businessId={businessInfo?.id} />
+          {(allComponentsMounted || activeView === 'orders') && (
+            <ModernOrdersManagement 
+              key="orders"
+              businessId={businessInfo?.id} 
+            />
+          )}
         </div>
 
-        {/* Settings - Always rendered, controlled by display */}
+        {/* Settings - Force mounted after initial load */}
         <div 
           style={{ 
             display: activeView === 'settings' ? 'block' : 'none',
@@ -235,10 +244,13 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           }}
           className="absolute inset-0"
         >
-          <ModernBusinessSettings 
-            businessInfo={businessInfo}
-            onUpdate={setBusinessInfo}
-          />
+          {(allComponentsMounted || activeView === 'settings') && (
+            <ModernBusinessSettings 
+              key="settings"
+              businessInfo={businessInfo}
+              onUpdate={setBusinessInfo}
+            />
+          )}
         </div>
       </main>
 
