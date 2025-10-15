@@ -38,10 +38,13 @@ export const NewBusinessApp = ({ user, onLogout }) => {
     totalCustomers: 0
   });
   const [loading, setLoading] = useState(true);
+  const [allComponentsMounted, setAllComponentsMounted] = useState(false);
 
   useEffect(() => {
     loadBusinessInfo();
     loadStats();
+    // Mount all components after initial load
+    setTimeout(() => setAllComponentsMounted(true), 100);
   }, []);
 
   const loadBusinessInfo = async () => {
