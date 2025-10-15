@@ -200,7 +200,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           />
         </div>
 
-        {/* Menu Management - Force mounted after initial load */}
+        {/* Menu Management - Always mounted */}
         <div 
           style={{ 
             display: activeView === 'menu' ? 'block' : 'none',
@@ -209,16 +209,14 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           }}
           className="absolute inset-0"
         >
-          {(allComponentsMounted || activeView === 'menu') && (
-            <ModernMenuManagement 
-              key="menu"
-              businessId={businessInfo?.id}
-              onStatsUpdate={loadStats}
-            />
-          )}
+          <ModernMenuManagement 
+            key="menu"
+            businessId={businessInfo?.id}
+            onStatsUpdate={loadStats}
+          />
         </div>
 
-        {/* Orders Management - Force mounted after initial load */}
+        {/* Orders Management - Always mounted */}
         <div 
           style={{ 
             display: activeView === 'orders' ? 'block' : 'none',
@@ -227,15 +225,13 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           }}
           className="absolute inset-0"
         >
-          {(allComponentsMounted || activeView === 'orders') && (
-            <ModernOrdersManagement 
-              key="orders"
-              businessId={businessInfo?.id} 
-            />
-          )}
+          <ModernOrdersManagement 
+            key="orders"
+            businessId={businessInfo?.id} 
+          />
         </div>
 
-        {/* Settings - Force mounted after initial load */}
+        {/* Settings - Always mounted */}
         <div 
           style={{ 
             display: activeView === 'settings' ? 'block' : 'none',
@@ -244,13 +240,11 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           }}
           className="absolute inset-0"
         >
-          {(allComponentsMounted || activeView === 'settings') && (
-            <ModernBusinessSettings 
-              key="settings"
-              businessInfo={businessInfo}
-              onUpdate={setBusinessInfo}
-            />
-          )}
+          <ModernBusinessSettings 
+            key="settings"
+            businessInfo={businessInfo}
+            onUpdate={setBusinessInfo}
+          />
         </div>
       </main>
 
