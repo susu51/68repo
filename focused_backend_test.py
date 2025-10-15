@@ -9,7 +9,7 @@ import time
 
 def test_specific_issues():
     """Test specific issues found in comprehensive testing"""
-    base_url = "https://express-track-2.preview.emergentagent.com"
+    base_url = "https://biz-panel.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("🔍 FOCUSED TESTING OF IDENTIFIED ISSUES")

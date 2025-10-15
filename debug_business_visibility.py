@@ -7,7 +7,7 @@ Detailed investigation of the business visibility pipeline
 import requests
 import json
 
-BACKEND_URL = "https://express-track-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://biz-panel.preview.emergentagent.com/api"
 
 # Get admin token
 admin_creds = {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}

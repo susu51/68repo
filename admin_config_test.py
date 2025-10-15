@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://express-track-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://biz-panel.preview.emergentagent.com/api"
 ADMIN_PASSWORD = "6851"
 
 class AdminConfigTester:

@@ -21,7 +21,7 @@ import time
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://express-track-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://biz-panel.preview.emergentagent.com/api"
 
 # Test credentials (corrected)
 TEST_CREDENTIALS = {

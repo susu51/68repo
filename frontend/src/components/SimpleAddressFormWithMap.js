@@ -6,7 +6,7 @@ import { Label } from './ui/label';
 import { Home, Briefcase, MapPin, Navigation, Loader2, Map } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://express-track-2.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://biz-panel.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const SimpleAddressFormWithMap = ({ address, onSave, onCancel }) => {

@@ -9,7 +9,7 @@ import aiohttp
 import json
 
 async def test_with_fresh_token():
-    base_url = "https://express-track-2.preview.emergentagent.com/api"
+    base_url = "https://biz-panel.preview.emergentagent.com/api"
     test_email = "admin@kuryecini.com"
     current_password = "KuryeciniAdmin2024!"
     new_password = "NewSecurePassword123!"

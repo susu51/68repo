@@ -1,0 +1,86 @@
+<analysis>
+The AI engineer's work trajectory outlines a phased development approach for the Kuryecini application, moving from a completed Courier Panel (Phase 1) to a detailed Customer Panel (Phase 2), and then an unexpected mid-trajectory pivot to a comprehensive refactor of Address/GPS/Discovery/Order Flow, followed by a Business Panel overhaul. Key challenges included persistent React DOM  errors requiring multiple refactorings (conditional rendering to , replacing Radix UI components with native HTML), authentication issues (, JWT validation), and MongoDB aggregation errors. The engineer systematically addressed these, enhancing backend models for addresses and orders, implementing a geocoding service, and revamping frontend UI for both customer and business panels to a Trendyol Go style. The most recent task involves a complete rebuild of the Business Panel.
+</analysis>
+
+<product_requirements>
+The Kuryecini delivery platform supports Customer, Business, Courier, and Admin roles, prioritizing a modern UI, MongoDB persistence, and secure authentication.
+
+**Implemented (Initial Phase 1 & 2A):** Courier PDF reports, profile updates, availability, order history filtering, real-time map, and initial customer panel UI with a Trendyol Go style (orange accent, dark mode, responsive grid, updated navigation, enhanced profile page).
+
+**Refactored & Ongoing (User's New Detailed Plan - Chat Message 173):**
+*   **Address Management:** CRUD for addresses with title, full address, city, district, neighborhood, postal code, phone, recipient name, and WGS84 coordinates. Map component with draggable pin, reverse geocoding (Leaflet + OpenStreetMap/Mapbox) with city-strict validation (no default to Istanbul, reject invalid geo results). Default address visible in Keşfet dropdown, linked to restaurant filtering.
+*   **GPS & Location Accuracy:** Initial location permission, temporary location display, conversion to address. Strict city/district validation to prevent incorrect defaults.
+*   **Discovery/Restaurants:** Smart sorting removed; simple sorting by distance, rating, delivery time. Restaurants listed based on selected address's  within a 70km radius (10km prioritized).
+*   **Order Flow:** Product → Cart → Address Select → Payment Type (mock online/cash/POS) → Order. Status pipeline:  →  →  →  →  →  →  (or ). Real-time status updates via WebSocket/polling. Business panel must confirm  orders before next steps.
+*   **Business Panel (New Refactor Focus):** Menu creation/editing, order management (filter by status), status update buttons, working region setup.
+*   **General UI/UX:** Full Turkish text, accessibility, modern styling.
+</product_requirements>
+
+<key_technical_concepts>
+-   **Full-stack Architecture**: React frontend, FastAPI backend, MongoDB.
+-   **Authentication**: JWT, secure cookies, role-based access control.
+-   **Data Persistence**: MongoDB with  indexing for geospatial queries, UUIDs instead of ObjectIDs.
+-   **Mapping/Geocoding**: Leaflet, OpenStreetMap, Mapbox Places (for reverse geocoding).
+-   **Real-time Communication**: WebSocket (with polling fallback).
+-   **UI/Styling**: Tailwind CSS, CSS variables,  for DOM stability.
+</key_technical_concepts>
+
+<code_architecture>
+The application uses a React frontend, FastAPI backend, and MongoDB database.
+
+**Directory Structure:**
+
+
+**Key Files and Changes:**
+*   ****: Integrated new  router. Fixed lint errors and  in JWT payload by using .
+*   ****: Refactored Address models to include , , , . Rewrote CREATE, GET, and DELETE endpoints, adding a PATCH  endpoint, with city-strict validation and ISO string conversion for .
+*   ** (New)**: Implemented a reverse geocoding service endpoint using external APIs (Mapbox/Nominatim proxy).
+*   ****: Added  and  fields to order models and GET endpoints.
+*   ****: Updated restaurant discovery logic to use  (70km) and  (10km). Fixed MongoDB aggregation error ( with ). Added test business data.
+*   ****: Added  endpoint for customer-facing menu display. Fixed syntax errors. Updated business user creation/login.
+*   ****: (Implicitly debugged/verified) Related to JWT validation issues.
+*   ****: Refactored routing for customer and business roles. Integrated new  and  components.
+*   ****: Updated with Trendyol Go brand color system ( orange), dark mode, and utility classes.
+*   ****: Configured to use the new  color palette.
+*   ****: Verified login flow and reload logic.
+*   ****: Added  on initial load/reload to ensure persistent user state after authentication.
+*   ****: Underwent significant refactoring to use CSS  properties for view switching instead of conditional rendering (), resolving persistent React  DOM errors. Integrated , , , , . Reduced bottom navigation tabs to three (Keşfet, Siparişler, Profil).
+*   ****: Updated  to use  endpoint with GPS coordinates for filtered restaurant discovery.
+*   ** (New)**: Rewritten for a modern Trendyol Go style cart page. Added early return for  cart.
+*   ** (New)**: Created for the detailed customer profile with sidebar navigation to Profile Information, My Addresses, and Settings.
+*   ** (New)**: Rewritten for improved address selection UI/UX.
+*   ** (New)**: Rewritten for modern payment options UI/UX.
+*   ** (New)**: Component for adding/editing addresses, originally intended to use React Leaflet MapContainer.
+*   ** (New)**: Page for CRUD operations on user addresses.
+*   ** (New)**: A simplified map component, replacing  to resolve React Leaflet  render errors.
+*   ****: Verified Leaflet CSS link.
+*   ** (New)**: Main entry component for the new business panel.
+*   ****: Copied/adapted for business menu management.
+*   ** (New)**: A further iteration of the business panel main entry.
+*   ** (New)**, ** (New)**, ** (New Stub)**, ** (New Stub)**: Created for the complete rebuild of the business panel.
+</code_architecture>
+
+<pending_tasks>
+-   Complete order tracking features with real-time updates and map view (PHASE 2C).
+-   Integrate customer rating modal post-delivery (PHASE 2C).
+-   Implement Business/Restaurant analytics and settings (PHASE 2D, or as part of current business panel rebuild).
+-   Add unit and E2E tests for all new features (PHASE 2D).
+-   Refine the Restoran bulunamadı issue on DiscoverPage after GPS activation.
+-   Continue with the complete rebuild of the Business Panel, specifically implementing the , , and  fully.
+</pending_tasks>
+
+<current_work>
+Immediately before this summary, the AI engineer was tasked by the user to **İşletme panelini yeniden yap** (Rebuild the business panel). This instruction came after successfully fixing authentication and all  DOM errors, and confirming that the Customer Panel's GPS-based restaurant discovery and menu viewing (after a public menu endpoint was added) were functional, along with business menu CRUD.
+
+The AI engineer has just initiated this rebuild, creating the foundational structure for the new business panel:
+-   A new main entry component: .
+-   A new dashboard component: .
+-   A new menu management component:  (copied and adapted from the existing ).
+-   Stubs for other sections:  and .
+
+The next step in this current work is to integrate  into the main  to ensure the new business panel structure is rendered for business users.
+</current_work>
+
+<optional_next_step>
+Integrate  into  to display the new business panel structure for business users.
+</optional_next_step>
