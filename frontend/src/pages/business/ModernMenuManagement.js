@@ -101,11 +101,20 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
         preparation_time: parseInt(formData.preparation_time) || 15
       };
 
+      let response;
       if (editingItem) {
-        await patch(`/business/menu/${editingItem.id}`, data);
+        response = await patch(`/business/menu/${editingItem.id}`, data);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || `HTTP ${response.status}`);
+        }
         toast.success('Ürün güncellendi!');
       } else {
-        await post('/business/menu', data);
+        response = await post('/business/menu', data);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || `HTTP ${response.status}`);
+        }
         toast.success('Ürün eklendi!');
       }
 
