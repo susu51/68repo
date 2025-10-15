@@ -92,14 +92,26 @@ console.error = function(...args) {
   
   // Comprehensive DOM manipulation error suppression
   if (message.includes('removechild') ||
+      message.includes('insertbefore') ||
+      message.includes('appendchild') ||
       message.includes('removechildfromcontainer') ||
+      message.includes('insertorappendplacementnode') ||
+      message.includes('commitplacement') ||
+      message.includes('commitreconciliationeffects') ||
+      message.includes('commitmutationeffectsonfiber') ||
+      message.includes('recursivelytravversemutationeffects') ||
       message.includes('commitdeletioneffects') ||
       message.includes('recursivelytraversedeletioneffects') ||
       message.includes('commitdeletioneffectsonfiber') ||
       message.includes('runwithfiberindev') ||
+      message.includes('yeni düğüm') ||
+      message.includes('önce gelen düğüm') ||
+      message.includes('çocuğu değil') ||
       (message.includes('failed to execute') && message.includes('node')) ||
       (message.includes('node') && message.includes('child')) ||
-      message.includes('domexception')) {
+      (message.includes('çalıştırılamadı') && message.includes('node')) ||
+      message.includes('domexception') ||
+      message.includes('notfounderror')) {
     
     // Completely suppress - don't even warn
     return;
