@@ -5932,6 +5932,9 @@ from routes.courier_ready_orders import router as courier_ready_orders_router
 # Phase 2 - Customer Profile & Ratings
 from routes.customer_profile import router as customer_profile_router
 
+# Geocoding Service
+from routes.geocoding import router as geocoding_router
+
 # Cookie-based authentication router (PRIORITY - include first)
 api_router.include_router(auth_router)
 
