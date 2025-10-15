@@ -105,10 +105,12 @@ class CustomerPanelBackendTester:
         print("👤 Testing Get Profile...")
         
         try:
-            response = self.session.get(
-                f"{BACKEND_URL}/me",
-                headers={"Authorization": f"Bearer {self.jwt_token}"} if self.jwt_token else {}
-            )
+            # Try both cookie-based and JWT-based auth
+            headers = {}
+            if self.jwt_token:
+                headers["Authorization"] = f"Bearer {self.jwt_token}"
+            
+            response = self.session.get(f"{BACKEND_URL}/me", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
