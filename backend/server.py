@@ -6624,7 +6624,7 @@ async def get_business_statistics(current_user: dict = Depends(get_approved_busi
         raise HTTPException(status_code=500, detail=f"Failed to get statistics: {str(e)}")
 
 @api_router.get("/business/financials")
-async def get_business_financials(current_user: dict = Depends(get_approved_business_user)):
+async def get_business_financials(current_user: dict = Depends(get_approved_business_user_from_cookie)):
     """Get real business financial data"""
     try:
         business_id = current_user["id"]
