@@ -297,7 +297,7 @@ class BusinessPanelTester:
         # Test POST /api/business/menu (create test item)
         try:
             test_menu_item = {
-                "title": "Test Menu Item",  # Note: API expects 'title' not 'name'
+                "name": "Test Menu Item",  # Note: API expects 'name' field
                 "description": "Test description for backend testing",
                 "price": 25.50,
                 "category": "Yemek",
