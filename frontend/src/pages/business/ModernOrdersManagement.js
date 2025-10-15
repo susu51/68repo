@@ -386,12 +386,13 @@ export const ModernOrdersManagement = ({ businessId }) => {
         </div>
       )}
 
-      {/* Order Details Modal */}
-      {selectedOrder && (
-        <div 
-          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-          onClick={() => setSelectedOrder(null)}
-        >
+      {/* Order Details Modal - Always rendered but hidden */}
+      <div 
+        style={{ display: selectedOrder ? 'flex' : 'none' }}
+        className="fixed inset-0 bg-black/50 items-center justify-center p-4 z-50"
+        onClick={() => setSelectedOrder(null)}
+      >
+        {selectedOrder && (
           <Card 
             className="max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
@@ -459,8 +460,8 @@ export const ModernOrdersManagement = ({ businessId }) => {
               )}
             </CardContent>
           </Card>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
