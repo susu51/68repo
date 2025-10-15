@@ -11,6 +11,7 @@ import { LocationControls } from "./components/LocationControls";
 import OpenStreetMap from "./components/OpenStreetMap";
 import { CourierDashboard } from "./CourierDashboard";
 import { BusinessDashboard as EnhancedBusinessDashboard } from "./BusinessDashboard_Enhanced";
+import { BusinessApp } from "./pages/business/BusinessApp";
 import { CustomerApp } from "./pages/customer/CustomerApp";
 import { CartProvider } from "./contexts/CartContext";
 import { AdminDashboardTab } from "./components/AdminDashboard";
