@@ -243,6 +243,13 @@ export const CustomerApp = ({ user, onLogout }) => {
           <OrdersPage user={user} />
         )}
 
+        {/* Addresses Management */}
+        {activeView === 'addresses' && (
+          <AddressManagementPage 
+            onBack={() => setActiveView('discover')}
+          />
+        )}
+
         {/* Profile */}
         {activeView === 'profile' && (
           <CustomerProfileEnhanced user={user} onLogout={onLogout} />
