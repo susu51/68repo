@@ -135,7 +135,14 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         }
       }
       
-      // Priority 2: Use selected address if GPS failed or not available
+      // Priority 2: Fallback to all businesses endpoint (NOT RECOMMENDED)
+      // Only if GPS and address both unavailable
+      if (restaurantsData.length === 0 && !selectedAddress) {
+        console.log('⚠️ No GPS, no address - showing limited results');
+        toast.error('Lütfen GPS konumunuzu açın veya adres seçin');
+      }
+      
+      // Priority 3: Use selected address if GPS failed
       if (restaurantsData.length === 0 && selectedAddress && selectedAddress.city) {
         // Address-based smart sorting: District → City → All
         console.log('🏘️ Implementing smart city/district-based sorting...');
