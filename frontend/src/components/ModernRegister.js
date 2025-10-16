@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { getCityNames, getDistrictsByCity } from '../data/turkeyLocations';
 
@@ -32,16 +32,20 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     business_photo: null
   });
 
-  const cities = getCityNames();
-  const districts = formData.city ? getDistrictsByCity(formData.city) : [];
+  // Memoize cities and districts to prevent re-renders
+  const cities = useMemo(() => getCityNames(), []);
+  const districts = useMemo(() => 
+    formData.city ? getDistrictsByCity(formData.city) : [], 
+    [formData.city]
+  );
 
-  const handleFileChange = (field, file) => {
+  const handleFileChange = useCallback((field, file) => {
     if (file && file.size > 5 * 1024 * 1024) {
       toast.error('Dosya boyutu 5MB\'dan küçük olmalıdır');
       return;
     }
-    setFormData({ ...formData, [field]: file });
-  };
+    setFormData(prev => ({ ...prev, [field]: file }));
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
