@@ -84,46 +84,90 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
+    // 1) Basit validasyon
     if (!formData.name || !formData.price) {
       toast.error('Ürün adı ve fiyat zorunludur');
       return;
     }
 
+    // 2) Backend'in beklediği formata dönüştür + tip düzeltmeleri
+    const payload = {
+      name: formData.name.trim(),
+      description: formData.description || '',
+      category: formData.category || 'Yemek',
+      price: Number(formData.price),
+      currency: formData.currency || 'TRY',
+      vat_rate: Number(formData.vat_rate) || 0.10,
+      preparation_time: Number(formData.preparation_time) || 15,
+      tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      image_url: formData.image_url || '',
+      is_available: formData.is_available !== undefined ? formData.is_available : true
+    };
+
+    setLoading(true);
     try {
-      setLoading(true);
-
-      const data = {
-        ...formData,
-        price: parseFloat(formData.price),
-        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-        vat_rate: parseFloat(formData.vat_rate),
-        preparation_time: parseInt(formData.preparation_time) || 15
-      };
-
       let response;
+      
       if (editingItem) {
-        response = await patch(`/business/menu/${editingItem.id}`, data);
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.detail || `HTTP ${response.status}`);
-        }
-        toast.success('Ürün güncellendi!');
+        // Güncelleme
+        response = await patch(`/business/menu/${editingItem.id}`, payload);
       } else {
-        response = await post('/business/menu', data);
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.detail || `HTTP ${response.status}`);
-        }
-        toast.success('Ürün eklendi!');
+        // Yeni ekleme
+        response = await post('/business/menu', payload);
       }
 
-      await fetchMenuItems();
+      // 3) Hata yönetimi: response.ok değilse loading'i kapat + mesaj göster
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        let errorMessage = `Kaydetme başarısız (HTTP ${response.status})`;
+        
+        try {
+          const errorData = JSON.parse(errText);
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          if (errText) errorMessage += `: ${errText}`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const savedItem = await response.json();
+      console.log('✅ Item saved:', savedItem);
+
+      // 4) Optimistic UI: Listeyi anında güncelle
+      setMenuItems(prevItems => {
+        const items = Array.isArray(prevItems) ? prevItems.slice() : [];
+        
+        if (editingItem) {
+          // Güncelleme: mevcut item'ı değiştir
+          const index = items.findIndex(x => x.id === savedItem.id);
+          if (index >= 0) {
+            items[index] = savedItem;
+          } else {
+            items.unshift(savedItem);
+          }
+        } else {
+          // Yeni ekleme: başa ekle
+          items.unshift(savedItem);
+        }
+        
+        return items;
+      });
+
+      toast.success(editingItem ? 'Ürün güncellendi!' : 'Ürün eklendi!');
+      
+      // 5) Modal'ı kapat ve formu temizle
       handleCloseModal();
+      
+      // Stats'ı güncelle
+      if (onStatsUpdate) {
+        onStatsUpdate();
+      }
     } catch (error) {
-      console.error('Save error:', error);
-      toast.error(error.response?.data?.detail || 'Kaydetme hatası');
+      console.error('❌ Save error:', error);
+      toast.error(error.message || 'Kaydetme hatası: Lütfen tekrar deneyin');
     } finally {
+      // 6) Her durumda loading'i kapat
       setLoading(false);
     }
   };
