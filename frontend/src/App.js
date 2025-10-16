@@ -3019,6 +3019,11 @@ const BusinessDashboard = ({ user }) => {
             <AdminKYC />
           </TabsContent>
 
+          {/* Advertisements Tab */}
+          <TabsContent value="advertisements" className="space-y-6">
+            <AdminAdvertisements />
+          </TabsContent>
+
           <TabsContent value="settings" className="space-y-6">
             <PlatformSettings />
           </TabsContent>
