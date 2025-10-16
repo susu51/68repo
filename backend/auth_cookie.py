@@ -306,7 +306,7 @@ async def register(
     hashed_pw = hash_password(password)
     
     # Create uploads directory if not exists
-    uploads_dir = Path("/app/uploads")
+    uploads_dir = Path("/app/backend/uploads")
     uploads_dir.mkdir(exist_ok=True)
     
     user_uploads_dir = uploads_dir / user_id
