@@ -385,24 +385,38 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                 type="submit" 
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 disabled:opacity-50 flex items-center justify-center space-x-2"
-                onClick={(e) => {
-                  // Ensure form submission on button click
-                  if (!loading && formData.email && formData.password) {
-                    e.currentTarget.form.requestSubmit();
-                  }
-                }}
               >
                 <KuryeciniLogo size="small" className="opacity-90" />
-                <span>Kuryecini'ye Giriş Yap</span>
+                <span>{isRegisterMode ? "Kuryecini'ye Kayıt Ol" : "Kuryecini'ye Giriş Yap"}</span>
               </button>
               
-              <div className="text-center">
+              <div className="text-center space-y-2">
+                {!isRegisterMode && (
+                  <button
+                    type="button"
+                    onClick={() => window.showForgotPassword && window.showForgotPassword()}
+                    className="text-sm text-orange-600 hover:text-orange-800 hover:underline transition-colors block w-full"
+                  >
+                    Şifremi Unuttum?
+                  </button>
+                )}
+                
                 <button
                   type="button"
-                  onClick={() => window.showForgotPassword && window.showForgotPassword()}
-                  className="text-sm text-orange-600 hover:text-orange-800 hover:underline transition-colors"
+                  onClick={() => {
+                    setIsRegisterMode(!isRegisterMode);
+                    setError('');
+                    setFormData({
+                      email: '',
+                      password: '',
+                      first_name: '',
+                      last_name: '',
+                      role: 'customer'
+                    });
+                  }}
+                  className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
                 >
-                  Şifremi Unuttum?
+                  {isRegisterMode ? '← Giriş Yap' : 'Hesabınız yok mu? Kayıt Ol →'}
                 </button>
               </div>
             </form>
