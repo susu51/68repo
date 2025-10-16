@@ -5934,9 +5934,13 @@ from routes.customer_profile import router as customer_profile_router
 
 # Geocoding Service
 from routes.geocoding import router as geocoding_router
+from routes.admin_kyc import router as admin_kyc_router
 
 # Cookie-based authentication router (PRIORITY - include first)
 api_router.include_router(auth_router)
+
+# Admin KYC Management
+api_router.include_router(admin_kyc_router, prefix="/admin", tags=["Admin KYC"])
 
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
