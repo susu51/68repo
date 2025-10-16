@@ -161,7 +161,7 @@ async def seed_database():
             {
                 "_id": "product-e2e-001",
                 "id": "product-e2e-001",
-                "business_id": "business-e2e-rest-001",
+                "business_id": "business-e2e-001",
                 "name": "Adana Kebap",
                 "description": "Acılı kıyma kebap, lavaş ekmek, közlenmiş domates ve biber ile",
                 "category": "Yemek",
@@ -179,7 +179,7 @@ async def seed_database():
             {
                 "_id": "product-e2e-002",
                 "id": "product-e2e-002",
-                "business_id": "business-e2e-rest-001",
+                "business_id": "business-e2e-001",
                 "name": "Mantı",
                 "description": "El açması mantı, yoğurt ve tereyağlı sos ile",
                 "category": "Yemek",
@@ -197,7 +197,7 @@ async def seed_database():
             {
                 "_id": "product-e2e-003",
                 "id": "product-e2e-003",
-                "business_id": "business-e2e-rest-001",
+                "business_id": "business-e2e-001",
                 "name": "Lahmacun",
                 "description": "İnce hamur, baharatlı kıyma ile",
                 "category": "Yemek",
@@ -215,7 +215,7 @@ async def seed_database():
             {
                 "_id": "product-e2e-004",
                 "id": "product-e2e-004",
-                "business_id": "business-e2e-rest-001",
+                "business_id": "business-e2e-001",
                 "name": "Ayran",
                 "description": "Soğuk, taze ayran",
                 "category": "İçecek",
@@ -233,7 +233,7 @@ async def seed_database():
             {
                 "_id": "product-e2e-005",
                 "id": "product-e2e-005",
-                "business_id": "business-e2e-rest-001",
+                "business_id": "business-e2e-001",
                 "name": "Baklava",
                 "description": "Antep fıstıklı, taze baklava",
                 "category": "Atıştırmalık",
