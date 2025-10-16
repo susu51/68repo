@@ -10,7 +10,7 @@ import asyncio
 import aiohttp
 import json
 
-BACKEND_URL = "https://biz-panel.preview.emergentagent.com/api"
+BACKEND_URL = "https://order-system-44.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 async def test_address_fixes():

@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://biz-panel.preview.emergentagent.com/api"
+BACKEND_URL = "https://order-system-44.preview.emergentagent.com/api"
 
 class AddressAuthDebugTester:
     def __init__(self):

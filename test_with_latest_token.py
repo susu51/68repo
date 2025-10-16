@@ -8,7 +8,7 @@ import asyncio
 import aiohttp
 
 async def test_latest_token():
-    base_url = "https://biz-panel.preview.emergentagent.com/api"
+    base_url = "https://order-system-44.preview.emergentagent.com/api"
     test_email = "admin@kuryecini.com"
     current_password = "KuryeciniAdmin2024!"
     new_password = "NewSecurePassword123!"

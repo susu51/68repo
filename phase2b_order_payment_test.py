@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import time
 
 # Configuration
-BACKEND_URL = "https://biz-panel.preview.emergentagent.com/api"
+BACKEND_URL = "https://order-system-44.preview.emergentagent.com/api"
 CUSTOMER_EMAIL = "test@kuryecini.com"
 CUSTOMER_PASSWORD = "test123"
 

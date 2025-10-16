@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://biz-panel.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://order-system-44.preview.emergentagent.com/api';
 
 console.log('Minimal App loaded, API_BASE:', API_BASE);
 

@@ -9,7 +9,7 @@ import aiohttp
 import json
 
 async def test_regular_user():
-    base_url = "https://biz-panel.preview.emergentagent.com/api"
+    base_url = "https://order-system-44.preview.emergentagent.com/api"
     test_email = "testuser@example.com"
     test_password = "TestPassword123!"
     new_password = "NewTestPassword456!"
