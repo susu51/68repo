@@ -328,47 +328,47 @@ const AdminAdvertisements = () => {
 
               {/* City */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                   Şehir <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                   placeholder="Örn: İstanbul"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">Bu şehirdeki müşterilere reklam gösterilecek</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">Bu şehirdeki müşterilere reklam gösterilecek</p>
               </div>
 
               {/* Title/Slogan */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                   Reklam Başlığı/Slogan (Opsiyonel)
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                   placeholder="Örn: Yılın En İyi Pizzası!"
                 />
               </div>
 
               {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                   Reklam Görseli <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
                   Yatay banner için ideal boyut: 1200x400px (Maksimum 5MB)
                 </p>
                 {formData.image && (
@@ -376,18 +376,18 @@ const AdminAdvertisements = () => {
                     <img
                       src={URL.createObjectURL(formData.image)}
                       alt="Preview"
-                      className="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
+                      className="w-full h-24 sm:h-32 object-cover rounded-lg border-2 border-gray-200"
                     />
                   </div>
                 )}
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end space-x-3 pt-4">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
+                  className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 order-2 sm:order-1"
                 >
                   İptal
                 </button>
