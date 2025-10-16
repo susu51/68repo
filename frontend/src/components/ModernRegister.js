@@ -258,11 +258,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <select
           value={formData.city}
-          onChange={(e) => {
-            handleInputChange('city', e.target.value);
-            handleInputChange('district', '');
-            handleInputChange('neighborhood', '');
-          }}
+          onChange={(e) => handleCityChange(e.target.value)}
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         >
