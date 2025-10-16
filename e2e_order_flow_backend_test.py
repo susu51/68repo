@@ -252,7 +252,7 @@ class E2EOrderFlowTester:
             }
             
             order_payload = {
-                "business_id": "business-e2e-rest-001",
+                "business_id": "business-e2e-001",
                 "items": [
                     {
                         "product_id": "product-e2e-001",
