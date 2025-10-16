@@ -288,6 +288,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
 
         <input
           type="text"
+          name="neighborhood"
           placeholder="Mahalle/Köy *"
           value={formData.neighborhood}
           onChange={(e) => handleInputChange('neighborhood', e.target.value)}
