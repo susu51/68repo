@@ -84,13 +84,9 @@ async def process_kyc_action(
     }
 
 @router.get("/kyc/stats")
-async def get_kyc_stats(current_user: dict = Depends(lambda: {"role": "admin"})):
+async def get_kyc_stats(current_user: dict = Depends(get_admin_user)):
     """Get KYC statistics"""
     from server import db
-    
-    # Only admin can access
-    if current_user.get("role") != "admin":
-        raise HTTPException(403, "Admin access required")
     
     pending_count = await db.users.count_documents({"kyc_status": "pending"})
     approved_count = await db.users.count_documents({"kyc_status": "approved"})
