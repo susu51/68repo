@@ -14,13 +14,19 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
   const [loginMethod, setLoginMethod] = useState('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isRegisterMode, setIsRegisterMode] = useState(false);  // Track if showing register form
+  const [isRegisterMode, setIsRegisterMode] = useState(false);  // Track if showing register flow
+  const [registerStep, setRegisterStep] = useState('role-selection');  // 'role-selection' or 'form'
+  const [selectedRole, setSelectedRole] = useState(null);  // 'customer', 'courier', 'business'
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     first_name: '',
     last_name: '',
-    role: 'customer'
+    role: 'customer',
+    phone: '',
+    vehicle_type: '',  // for courier
+    business_name: '',  // for business
+    address: ''  // for business
   });
   const [theme, setTheme] = useState('light');
 
