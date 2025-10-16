@@ -56,7 +56,7 @@ export const CookieAuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       setLoading(true);
-      const response = await api("/auth/me");
+      const response = await api("/me");  // Use /api/me instead of /api/auth/me
       const userData = await response.json();
       
       setUser(userData);
