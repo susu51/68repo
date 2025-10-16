@@ -39,6 +39,7 @@ async def get_pending_kyc_requests(current_user: dict = Depends(lambda: {"role":
             "phone": user.get("phone"),
             "city": user.get("city"),
             "district": user.get("district"),
+            "neighborhood": user.get("neighborhood"),
             "vehicle_type": user.get("vehicle_type"),
             "business_name": user.get("business_name"),
             "business_tax_id": user.get("business_tax_id"),
