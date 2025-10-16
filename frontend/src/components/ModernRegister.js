@@ -414,15 +414,15 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     const progress = (step / maxStep) * 100;
     
     return (
-      <div className="mb-8">
+      <div className="mb-4 sm:mb-6 md:mb-8">
         <div className="flex justify-between mb-2">
           {['Rol', 'Bilgiler', 'Konum', role !== 'customer' && 'Belgeler'].filter(Boolean).map((label, i) => (
-            <div key={i} className={`text-sm font-medium ${step > i + 1 ? 'text-green-600' : step === i + 1 ? 'text-orange-600' : 'text-gray-400'}`}>
+            <div key={i} className={`text-[10px] sm:text-xs md:text-sm font-medium ${step > i + 1 ? 'text-green-600' : step === i + 1 ? 'text-orange-600' : 'text-gray-400'}`}>
               {label}
             </div>
           ))}
         </div>
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-orange-500 to-orange-600 transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -433,8 +433,8 @@ const ModernRegister = ({ onSuccess, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12">
         {step > 1 && <ProgressBar />}
         
         {step === 1 && <RoleSelection />}
@@ -443,10 +443,10 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         {step === 4 && <DocumentsUpload />}
 
         {step === 1 && onBack && (
-          <div className="text-center mt-6">
+          <div className="text-center mt-4 sm:mt-6">
             <button
               onClick={onBack}
-              className="text-gray-600 hover:text-gray-800 underline"
+              className="text-xs sm:text-sm md:text-base text-gray-600 hover:text-gray-800 underline"
             >
               ← Giriş sayfasına dön
             </button>
