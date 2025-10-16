@@ -133,20 +133,20 @@ const ModernRegister = ({ onSuccess, onBack }) => {
 
   // Step 2: Personal Info
   const PersonalInfo = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Kişisel Bilgiler</h2>
-          <p className="text-gray-600">Adınız ve iletişim bilgilerinizi girin</p>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Kişisel Bilgiler</h2>
+          <p className="text-xs sm:text-sm md:text-base text-gray-600">Adınız ve iletişim bilgilerinizi girin</p>
         </div>
-        <div className="text-4xl">
+        <div className="text-2xl sm:text-3xl md:text-4xl">
           {role === 'customer' && '🛒'}
           {role === 'courier' && '🏍️'}
           {role === 'business' && '🏪'}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         {role === 'business' && (
           <>
             <input
@@ -154,7 +154,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
               placeholder="İşletme/Restoran Adı *"
               value={formData.business_name}
               onChange={(e) => setFormData({...formData, business_name: e.target.value})}
-              className="col-span-2 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               required
             />
             <input
@@ -162,10 +162,10 @@ const ModernRegister = ({ onSuccess, onBack }) => {
               placeholder="Vergi Numarası *"
               value={formData.business_tax_id}
               onChange={(e) => setFormData({...formData, business_tax_id: e.target.value})}
-              className="col-span-2 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               required
             />
-            <div className="col-span-2 text-sm text-gray-600 font-medium">Yetkili Kişi Bilgileri:</div>
+            <div className="col-span-1 md:col-span-2 text-xs sm:text-sm text-gray-600 font-medium">Yetkili Kişi Bilgileri:</div>
           </>
         )}
         
@@ -174,7 +174,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           placeholder="Adınız *"
           value={formData.first_name}
           onChange={(e) => setFormData({...formData, first_name: e.target.value})}
-          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
@@ -182,7 +182,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           placeholder="Soyadınız *"
           value={formData.last_name}
           onChange={(e) => setFormData({...formData, last_name: e.target.value})}
-          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
@@ -190,7 +190,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           placeholder="Telefon (05XX XXX XX XX) *"
           value={formData.phone}
           onChange={(e) => setFormData({...formData, phone: e.target.value})}
-          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
@@ -198,7 +198,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           placeholder="E-posta *"
           value={formData.email}
           onChange={(e) => setFormData({...formData, email: e.target.value})}
-          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
