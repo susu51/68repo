@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/http';
 import toast from 'react-hot-toast';
+import { TURKEY_CITIES } from '../data/turkeyLocations';
 
 const AdminAdvertisements = () => {
   const [advertisements, setAdvertisements] = useState([]);
   const [businesses, setBusinesses] = useState([]);
+  const [filteredBusinesses, setFilteredBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedAd, setSelectedAd] = useState(null);
@@ -15,8 +17,12 @@ const AdminAdvertisements = () => {
     business_name: '',
     title: '',
     city: '',
+    district: '',
     image: null
   });
+
+  // Get cities list
+  const cities = Object.keys(TURKEY_CITIES).sort();
 
   useEffect(() => {
     fetchAdvertisements();
