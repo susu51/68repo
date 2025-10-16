@@ -84,7 +84,12 @@ class AdvertisementTester:
             
             if response.status_code == 200:
                 data = response.json()
-                businesses = data.get("businesses", [])
+                # Handle both possible response formats
+                if isinstance(data, list):
+                    businesses = data
+                else:
+                    businesses = data.get("businesses", [])
+                
                 approved_businesses = [b for b in businesses if b.get("kyc_status") == "approved"]
                 
                 self.log_test(
