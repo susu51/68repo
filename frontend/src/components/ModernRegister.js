@@ -313,29 +313,29 @@ const ModernRegister = ({ onSuccess, onBack }) => {
 
   // Step 4: Documents (Courier & Business only)
   const DocumentsUpload = () => (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Belgeler</h2>
-        <p className="text-gray-600">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="mb-4 sm:mb-6">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Belgeler</h2>
+        <p className="text-xs sm:text-sm md:text-base text-gray-600">
           {role === 'courier' ? 'Ehliyet, kimlik ve araç ruhsatınızı yükleyin' : 'İşletme fotoğrafınızı yükleyin'}
         </p>
       </div>
 
       {role === 'courier' && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {[
             { field: 'license_photo', label: '📄 Ehliyet Fotoğrafı', icon: '🪪' },
             { field: 'id_photo', label: '🪪 Kimlik Fotoğrafı', icon: '👤' },
             { field: 'vehicle_photo', label: '🚗 Araç Ruhsat Fotoğrafı', icon: '📋' }
           ].map(item => (
-            <div key={item.field} className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-orange-500 transition-colors">
-              <label className="flex items-center justify-between cursor-pointer">
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">{item.icon}</span>
-                  <div>
-                    <div className="font-medium text-gray-900">{item.label} *</div>
+            <div key={item.field} className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 hover:border-orange-500 transition-colors">
+              <label className="flex items-center justify-between cursor-pointer gap-2">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                  <span className="text-xl sm:text-2xl md:text-3xl flex-shrink-0">{item.icon}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-gray-900 text-xs sm:text-sm md:text-base">{item.label} *</div>
                     {formData[item.field] && (
-                      <div className="text-sm text-green-600">✓ {formData[item.field].name}</div>
+                      <div className="text-[10px] sm:text-xs md:text-sm text-green-600 truncate">✓ {formData[item.field].name}</div>
                     )}
                   </div>
                 </div>
@@ -346,7 +346,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
                   className="hidden"
                   required
                 />
-                <span className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200">
+                <span className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 whitespace-nowrap flex-shrink-0">
                   {formData[item.field] ? 'Değiştir' : 'Seç'}
                 </span>
               </label>
@@ -356,15 +356,15 @@ const ModernRegister = ({ onSuccess, onBack }) => {
       )}
 
       {role === 'business' && (
-        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-orange-500 transition-colors">
+        <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 hover:border-orange-500 transition-colors">
           <label className="flex flex-col items-center cursor-pointer">
-            <span className="text-6xl mb-4">🏪</span>
+            <span className="text-4xl sm:text-5xl md:text-6xl mb-2 sm:mb-3 md:mb-4">🏪</span>
             <div className="text-center">
-              <div className="font-medium text-gray-900 mb-2">İşletme Fotoğrafı *</div>
+              <div className="font-medium text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">İşletme Fotoğrafı *</div>
               {formData.business_photo && (
-                <div className="text-sm text-green-600 mb-2">✓ {formData.business_photo.name}</div>
+                <div className="text-xs sm:text-sm text-green-600 mb-1 sm:mb-2 truncate max-w-[200px]">✓ {formData.business_photo.name}</div>
               )}
-              <span className="px-6 py-3 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 inline-block">
+              <span className="px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 inline-block">
                 {formData.business_photo ? 'Değiştir' : 'Fotoğraf Seç'}
               </span>
             </div>
@@ -379,20 +379,20 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         </div>
       )}
 
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <div className="flex items-start space-x-2">
-          <span className="text-xl">ℹ️</span>
-          <div className="text-sm text-blue-800">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+        <div className="flex items-start gap-2">
+          <span className="text-base sm:text-lg md:text-xl flex-shrink-0">ℹ️</span>
+          <div className="text-xs sm:text-sm text-blue-800 min-w-0">
             <p className="font-medium mb-1">Önemli Bilgi:</p>
             <p>Yüklediğiniz belgeler admin tarafından incelenecektir. Onay sonrası hesabınız aktif olacaktır.</p>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 pt-3 sm:pt-4">
         <button
           onClick={() => setStep(3)}
-          className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50"
+          className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl text-gray-700 hover:bg-gray-50 disabled:opacity-50 order-2 sm:order-1"
           disabled={loading}
         >
           ← Geri
