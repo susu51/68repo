@@ -48,12 +48,27 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     
     try {
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== '') {
+      
+      // Add text fields
+      const textFields = ['first_name', 'last_name', 'email', 'password', 'phone', 'city', 'district', 'neighborhood', 'vehicle_type', 'business_name', 'business_tax_id'];
+      textFields.forEach(key => {
+        if (formData[key] && formData[key] !== '') {
           formDataToSend.append(key, formData[key]);
         }
       });
+      
+      // Add file fields - check if they're File objects
+      const fileFields = ['license_photo', 'id_photo', 'vehicle_photo', 'business_photo'];
+      fileFields.forEach(key => {
+        if (formData[key] && formData[key] instanceof File) {
+          formDataToSend.append(key, formData[key]);
+          console.log(`📎 Uploading ${key}:`, formData[key].name);
+        }
+      });
+      
       formDataToSend.append('role', role);
+      
+      console.log('📤 Submitting registration for role:', role);
 
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || ''}/api/auth/register`, {
         method: 'POST',
