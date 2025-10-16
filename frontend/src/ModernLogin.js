@@ -18,15 +18,27 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
   const [registerStep, setRegisterStep] = useState('role-selection');  // 'role-selection' or 'form'
   const [selectedRole, setSelectedRole] = useState(null);  // 'customer', 'courier', 'business'
   const [formData, setFormData] = useState({
+    // Genel alanlar
     email: '',
     password: '',
     first_name: '',
     last_name: '',
     role: 'customer',
     phone: '',
-    vehicle_type: '',  // for courier
-    business_name: '',  // for business
-    address: ''  // for business
+    city: '',
+    district: '',
+    
+    // Kurye için
+    vehicle_type: '',
+    license_photo: null,
+    id_photo: null,
+    vehicle_photo: null,
+    
+    // İşletme için
+    business_name: '',
+    business_tax_id: '',
+    business_photo: null,
+    address: ''
   });
   const [theme, setTheme] = useState('light');
 
