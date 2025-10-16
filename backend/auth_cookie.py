@@ -108,11 +108,11 @@ async def get_current_user_from_cookie_or_bearer(request: Request):
         raise HTTPException(401, "No authentication cookie or token")
     
     payload = verify_token(token)
-    user_id = payload["sub"]
+    email = payload["sub"]  # Changed: sub contains email, not user_id
     
-    # Get user from database
-    db = db_client["kuryecini"]
-    user = await db.users.find_one({"id": user_id})
+    # Get user from database - import from server.py
+    from server import db
+    user = await db.users.find_one({"email": email})  # Changed: lookup by email
     
     if not user:
         raise HTTPException(404, "User not found")
