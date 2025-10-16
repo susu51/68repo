@@ -123,7 +123,13 @@ const AdminAdvertisements = () => {
       const formDataToSend = new FormData();
       formDataToSend.append('business_id', formData.business_id);
       formDataToSend.append('business_name', formData.business_name);
-      formDataToSend.append('city', formData.city);
+      
+      // Combine city and district for better targeting
+      const locationStr = formData.district 
+        ? `${formData.city} - ${formData.district}` 
+        : formData.city;
+      formDataToSend.append('city', locationStr);
+      
       if (formData.title) {
         formDataToSend.append('title', formData.title);
       }
