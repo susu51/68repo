@@ -348,6 +348,14 @@ backend:
     stuck_count: 2
     priority: "critical"
     needs_retesting: false
+    
+  - task: "Admin Advertisements Tab Functionality"
+    implemented: true
+    working: false
+    file: "components/AdminAdvertisements.js, App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
     status_history:
         - working: true
           agent: "testing"
