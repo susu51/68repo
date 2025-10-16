@@ -122,15 +122,15 @@ const AdvertisementBanner = ({ userCity }) => {
 
       {/* Dots Indicator */}
       {advertisements.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+        <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2">
           {advertisements.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={`rounded-full transition-all ${
                 index === currentIndex
-                  ? 'bg-orange-600 w-8 h-2'
-                  : 'bg-white/60 hover:bg-white/80 w-2 h-2'
+                  ? 'bg-orange-600 w-6 sm:w-8 h-1.5 sm:h-2'
+                  : 'bg-white/60 hover:bg-white/80 w-1.5 sm:w-2 h-1.5 sm:h-2'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -140,7 +140,7 @@ const AdvertisementBanner = ({ userCity }) => {
 
       {/* Slide Counter */}
       {advertisements.length > 1 && (
-        <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black/50 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs md:text-sm">
           {currentIndex + 1} / {advertisements.length}
         </div>
       )}
