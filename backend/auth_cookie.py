@@ -200,6 +200,35 @@ async def me(user = Depends(get_current_user_from_cookie)):
         role=user.get("role", "customer")
     )
 
+@auth_router.get("/me")
+async def get_current_user(request: Request):
+    """Get current authenticated user from cookie"""
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        raise HTTPException(401, "Not authenticated")
+    
+    try:
+        payload = verify_token(access_token)
+        email = payload["sub"]
+        
+        # Get user from database
+        db = get_db()
+        user = await db.users.find_one({"email": email})
+        
+        if not user:
+            raise HTTPException(401, "User not found")
+        
+        return {
+            "id": user.get("id") or user.get("_id"),
+            "email": user.get("email"),
+            "role": user.get("role", "customer"),
+            "first_name": user.get("first_name", ""),
+            "last_name": user.get("last_name", ""),
+            "name": user.get("name", "")
+        }
+    except Exception as e:
+        raise HTTPException(401, f"Invalid token: {str(e)}")
+
 @auth_router.post("/refresh")
 async def refresh(request: Request, response: Response):
     refresh_token = request.cookies.get("refresh_token")
