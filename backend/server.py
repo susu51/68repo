@@ -5935,12 +5935,20 @@ from routes.customer_profile import router as customer_profile_router
 # Geocoding Service
 from routes.geocoding import router as geocoding_router
 from routes.admin_kyc import router as admin_kyc_router
+from routes.admin_advertisements import router as admin_ads_router
+from routes.customer_advertisements import router as customer_ads_router
 
 # Cookie-based authentication router (PRIORITY - include first)
 api_router.include_router(auth_router)
 
 # Admin KYC Management
 api_router.include_router(admin_kyc_router, prefix="/admin", tags=["Admin KYC"])
+
+# Admin Advertisements Management
+api_router.include_router(admin_ads_router, prefix="/admin", tags=["Admin Advertisements"])
+
+# Customer Advertisements
+api_router.include_router(customer_ads_router, prefix="/advertisements", tags=["Customer Advertisements"])
 
 api_router.include_router(business_router)
 api_router.include_router(nearby_router)
