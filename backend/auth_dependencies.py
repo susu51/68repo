@@ -34,11 +34,11 @@ async def get_current_user(
         secret_key = os.environ.get("JWT_SECRET", "kuryecini_secret_key_2024")
         payload = jwt.decode(token, secret_key, algorithms=["HS256"])
         
-        user_id = payload.get("sub")
+        email = payload.get("sub")
         
         # Get user from database (no test users)
         from server import db
-        user = await db.users.find_one({"id": user_id})
+        user = await db.users.find_one({"email": email})
         
         if not user:
             raise HTTPException(
