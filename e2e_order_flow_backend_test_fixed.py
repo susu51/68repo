@@ -68,12 +68,15 @@ class E2EOrderFlowTester:
                     if data.get("success") and "user" in data:
                         # Store the session with cookies for this role
                         self.sessions[role] = session
+                        # Also store JWT token if available
+                        if "access_token" in data:
+                            self.tokens[role] = data["access_token"]
                         user_data = data.get("user", {})
                         
                         self.log_test(
                             f"Authentication - {role.title()}", 
                             True, 
-                            f"Cookie auth successful, User: {user_data.get('email')}, ID: {user_data.get('id')}"
+                            f"Cookie auth successful, User: {user_data.get('email')}, ID: {user_data.get('id')}, JWT: {'Yes' if role in self.tokens else 'No'}"
                         )
                     else:
                         self.log_test(f"Authentication - {role.title()}", False, "No success or user in response", data)
