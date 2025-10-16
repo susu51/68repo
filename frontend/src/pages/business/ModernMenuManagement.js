@@ -196,14 +196,36 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
 
     try {
       const response = await del(`/business/menu/${id}`);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || `HTTP ${response.status}`);
+        const errText = await response.text().catch(() => '');
+        let errorMessage = `Silme başarısız (HTTP ${response.status})`;
+        
+        try {
+          const errorData = JSON.parse(errText);
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          if (errText) errorMessage += `: ${errText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
+      
+      // Optimistic UI: Listeden hemen kaldır
+      setMenuItems(prevItems => {
+        const items = Array.isArray(prevItems) ? prevItems : [];
+        return items.filter(item => item.id !== id);
+      });
+      
       toast.success('Ürün silindi');
-      await fetchMenuItems();
+      
+      // Stats'ı güncelle
+      if (onStatsUpdate) {
+        onStatsUpdate();
+      }
     } catch (error) {
-      toast.error('Silme hatası: ' + error.message);
+      console.error('❌ Delete error:', error);
+      toast.error(error.message || 'Silme hatası: Lütfen tekrar deneyin');
     }
   };
 
