@@ -151,8 +151,8 @@ async def login(body: LoginRequest, response: Response):
     user_data = user
     
     # Generate tokens
-    access_token = make_token(user_id, ACCESS_TTL)
-    refresh_token = make_token(user_id, REFRESH_TTL)
+    access_token = make_token(user.get("email"), ACCESS_TTL)
+    refresh_token = make_token(user.get("email"), REFRESH_TTL)
     
     # For development: also return token in response body
     response_data = {
