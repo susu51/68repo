@@ -233,14 +233,14 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     <div className="space-y-4 sm:space-y-6">
       <div className="mb-4 sm:mb-6">
         <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Konum Bilgileri</h2>
-        <p className="text-gray-600">Şehir, ilçe ve mahalle bilgilerinizi girin</p>
+        <p className="text-xs sm:text-sm md:text-base text-gray-600">Şehir, ilçe ve mahalle bilgilerinizi girin</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <select
           value={formData.city}
           onChange={(e) => setFormData({...formData, city: e.target.value, district: '', neighborhood: ''})}
-          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         >
           <option value="">İl Seçin *</option>
@@ -252,7 +252,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         <select
           value={formData.district}
           onChange={(e) => setFormData({...formData, district: e.target.value})}
-          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
           disabled={!formData.city}
         >
@@ -267,7 +267,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           placeholder="Mahalle/Köy *"
           value={formData.neighborhood}
           onChange={(e) => setFormData({...formData, neighborhood: e.target.value})}
-          className="col-span-2 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
 
@@ -275,7 +275,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           <select
             value={formData.vehicle_type}
             onChange={(e) => setFormData({...formData, vehicle_type: e.target.value})}
-            className="col-span-2 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             required
           >
             <option value="">Araç Tipi Seçin *</option>
@@ -287,10 +287,10 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         )}
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 pt-3 sm:pt-4">
         <button
           onClick={() => setStep(2)}
-          className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50"
+          className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl text-gray-700 hover:bg-gray-50 order-2 sm:order-1"
         >
           ← Geri
         </button>
@@ -302,7 +302,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
               setStep(4);
             }
           }}
-          className="px-8 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700"
+          className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base bg-orange-600 text-white rounded-lg sm:rounded-xl hover:bg-orange-700 disabled:opacity-50 order-1 sm:order-2"
           disabled={loading}
         >
           {loading ? 'Kaydediliyor...' : role === 'customer' ? 'Kaydı Tamamla ✓' : 'İleri →'}
