@@ -49,11 +49,38 @@ const AdminAdvertisements = () => {
       const response = await api('/admin/businesses');
       const data = await response.json();
       if (data.success || data.businesses) {
-        setBusinesses(data.businesses || []);
+        const businessList = data.businesses || [];
+        setBusinesses(businessList);
+        setFilteredBusinesses(businessList);
       }
     } catch (error) {
       console.error('Error fetching businesses:', error);
     }
+  };
+
+  const handleCityChange = (e) => {
+    const selectedCity = e.target.value;
+    setFormData({
+      ...formData,
+      city: selectedCity,
+      district: '',
+      business_id: '',
+      business_name: ''
+    });
+
+    // Filter businesses by selected city
+    if (selectedCity) {
+      const filtered = businesses.filter(b => 
+        b.city && b.city.toLowerCase() === selectedCity.toLowerCase()
+      );
+      setFilteredBusinesses(filtered);
+    } else {
+      setFilteredBusinesses(businesses);
+    }
+  };
+
+  const handleDistrictChange = (e) => {
+    setFormData({ ...formData, district: e.target.value });
   };
 
   const handleBusinessChange = (e) => {
