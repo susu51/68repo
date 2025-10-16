@@ -24,7 +24,7 @@ export const CookieAuthProvider = ({ children }) => {
     const initAuth = async () => {
       try {
         console.log('🔍 Checking initial auth status...');
-        const response = await api("/auth/me");
+        const response = await api("/me");  // Use /api/me instead of /api/auth/me
         
         if (mounted && response.ok) {
           const userData = await response.json();
