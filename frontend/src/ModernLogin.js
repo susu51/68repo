@@ -29,6 +29,7 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
   const [loginMethod, setLoginMethod] = useState('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showRegisterWizard, setShowRegisterWizard] = useState(false);  // Show modern register wizard
   const [isRegisterMode, setIsRegisterMode] = useState(false);  // Track if showing register flow
   const [registerStep, setRegisterStep] = useState('role-selection');  // 'role-selection' or 'form'
   const [selectedRole, setSelectedRole] = useState(null);  // 'customer', 'courier', 'business'
