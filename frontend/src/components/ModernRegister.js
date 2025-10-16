@@ -399,7 +399,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         </button>
         <button
           onClick={handleSubmit}
-          className="px-8 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50"
+          className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 disabled:opacity-50 order-1 sm:order-2"
           disabled={loading || (role === 'courier' && (!formData.license_photo || !formData.id_photo || !formData.vehicle_photo)) || (role === 'business' && !formData.business_photo)}
         >
           {loading ? 'Kaydediliyor...' : 'Kaydı Tamamla ✓'}
