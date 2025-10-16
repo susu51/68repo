@@ -348,8 +348,84 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
             </div>
           )}
 
+          {/* Role Selection for Registration */}
+          {!loading && loginMethod === 'email' && isRegisterMode && registerStep === 'role-selection' && (
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Nasıl Kayıt Olmak İstersiniz?</h3>
+                <p className="text-sm text-gray-600">Rolünüzü seçin</p>
+              </div>
+
+              {/* Role Cards */}
+              <div className="grid grid-cols-1 gap-3">
+                {/* Customer */}
+                <button
+                  type="button"
+                  onClick={() => handleRoleSelect('customer')}
+                  className="p-4 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="text-3xl">🛒</div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900 group-hover:text-orange-600">Müşteri</div>
+                      <div className="text-xs text-gray-500">Sipariş vermek için kayıt olun</div>
+                    </div>
+                    <div className="text-orange-500">→</div>
+                  </div>
+                </button>
+
+                {/* Courier */}
+                <button
+                  type="button"
+                  onClick={() => handleRoleSelect('courier')}
+                  className="p-4 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="text-3xl">🏍️</div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900 group-hover:text-orange-600">Kurye</div>
+                      <div className="text-xs text-gray-500">Teslimat yapmak için kayıt olun</div>
+                    </div>
+                    <div className="text-orange-500">→</div>
+                  </div>
+                </button>
+
+                {/* Business */}
+                <button
+                  type="button"
+                  onClick={() => handleRoleSelect('business')}
+                  className="p-4 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="text-3xl">🏪</div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900 group-hover:text-orange-600">İşletme</div>
+                      <div className="text-xs text-gray-500">Restoran/İşletme olarak kayıt olun</div>
+                    </div>
+                    <div className="text-orange-500">→</div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Back to Login */}
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegisterMode(false);
+                    setRegisterStep('role-selection');
+                    setSelectedRole(null);
+                  }}
+                  className="text-sm text-gray-600 hover:text-gray-800"
+                >
+                  ← Giriş Yap
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Email Login/Register Form */}
-          {!loading && loginMethod === 'email' && (
+          {!loading && loginMethod === 'email' && (!isRegisterMode || (isRegisterMode && registerStep === 'form')) && (
             <form onSubmit={isRegisterMode ? handleRegister : handleEmailLogin} className="space-y-4">
               {/* Error Message */}
               {error && (
