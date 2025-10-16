@@ -50,14 +50,10 @@ async def get_pending_kyc_requests(current_user: dict = Depends(get_admin_user))
 @router.post("/kyc/action")
 async def process_kyc_action(
     request: KYCApprovalRequest,
-    current_user: dict = Depends(lambda: {"role": "admin"})
+    current_user: dict = Depends(get_admin_user)
 ):
     """Approve or reject KYC request"""
     from server import db
-    
-    # Only admin can access
-    if current_user.get("role") != "admin":
-        raise HTTPException(403, "Admin access required")
     
     if request.action not in ["approve", "reject"]:
         raise HTTPException(400, "Invalid action. Must be 'approve' or 'reject'")
