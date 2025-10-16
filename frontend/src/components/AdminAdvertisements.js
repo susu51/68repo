@@ -237,53 +237,53 @@ const AdminAdvertisements = () => {
           ) : (
             <div className="divide-y divide-gray-200">
               {advertisements.map((ad) => (
-                <div key={ad.id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start space-x-4">
+                <div key={ad.id} className="p-3 sm:p-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                     {/* Image Preview */}
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 w-full sm:w-auto">
                       <img
                         src={`${process.env.REACT_APP_BACKEND_URL || ''}${ad.image_url}`}
                         alt={ad.title || ad.business_name}
-                        className="w-32 h-20 object-cover rounded-lg border-2 border-gray-200"
+                        className="w-full sm:w-32 h-32 sm:h-20 object-cover rounded-lg border-2 border-gray-200"
                       />
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{ad.business_name}</h3>
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">{ad.business_name}</h3>
+                        <span className={`px-2 py-1 text-xs font-medium rounded whitespace-nowrap ${
                           ad.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {ad.is_active ? 'Aktif' : 'Pasif'}
                         </span>
                       </div>
                       {ad.title && (
-                        <p className="text-sm text-gray-600 mb-2">📝 {ad.title}</p>
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2 break-words">📝 {ad.title}</p>
                       )}
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>📍 {ad.city}</span>
-                        <span>🆔 {ad.business_id}</span>
-                        <span>📅 {new Date(ad.created_at).toLocaleDateString('tr-TR')}</span>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
+                        <span className="whitespace-nowrap">📍 {ad.city}</span>
+                        <span className="break-all text-[10px] sm:text-xs">🆔 {ad.business_id.slice(0, 8)}...</span>
+                        <span className="whitespace-nowrap">📅 {new Date(ad.created_at).toLocaleDateString('tr-TR')}</span>
                       </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-col space-y-2">
+                    <div className="flex sm:flex-col gap-2 w-full sm:w-auto">
                       <button
                         onClick={() => handleToggleStatus(ad.id, ad.is_active)}
-                        className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
+                        className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm ${
                           ad.is_active
                             ? 'bg-yellow-600 text-white hover:bg-yellow-700'
                             : 'bg-green-600 text-white hover:bg-green-700'
                         }`}
                       >
                         <span>{ad.is_active ? '⏸️' : '▶️'}</span>
-                        <span>{ad.is_active ? 'Pasif Yap' : 'Aktif Yap'}</span>
+                        <span className="whitespace-nowrap">{ad.is_active ? 'Pasif' : 'Aktif'}</span>
                       </button>
                       <button
                         onClick={() => handleDelete(ad.id)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+                        className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
                       >
                         <span>🗑️</span>
                         <span>Sil</span>
