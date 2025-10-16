@@ -100,6 +100,53 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setLoading(false);
   };
 
+  // Handle registration
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    // Validation
+    if (!formData.email || !formData.password || !formData.first_name || !formData.last_name) {
+      setError('Tüm alanları doldurun');
+      toast.error('❌ Tüm alanları doldurun');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await contextRegister({
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        role: formData.role || 'customer'
+      });
+
+      if (result?.success) {
+        toast.success('✅ Kayıt başarılı! Hoş geldiniz!');
+        
+        if (onLogin) {
+          onLogin(result);
+        }
+        
+        if (onClose) {
+          onClose();
+        }
+      } else {
+        const errorMsg = result?.error || 'Kayıt başarısız';
+        setError(errorMsg);
+        toast.error(`❌ ${errorMsg}`);
+      }
+    } catch (error) {
+      console.error('❌ Register error:', error);
+      const errorMsg = error.message || 'Kayıt hatası';
+      setError(errorMsg);
+      toast.error(`❌ ${errorMsg}`);
+    }
+    setLoading(false);
+  };
+
   // Handle Google OAuth
   const handleGoogleLogin = () => {
     setLoading(true);
