@@ -10,13 +10,17 @@ import { api } from './api/http';  // Use cookie-aware API client
 import { useCookieAuth } from './contexts/CookieAuthContext';  // Use auth context
 
 export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
-  const { login: contextLogin, checkAuthStatus } = useCookieAuth();
+  const { login: contextLogin, register: contextRegister, checkAuthStatus } = useCookieAuth();
   const [loginMethod, setLoginMethod] = useState('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isRegisterMode, setIsRegisterMode] = useState(false);  // Track if showing register form
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    first_name: '',
+    last_name: '',
+    role: 'customer'
   });
   const [theme, setTheme] = useState('light');
 
