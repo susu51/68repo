@@ -20,6 +20,7 @@ import { UserReport } from "./components/UserReport";
 import { CategoryAnalytics } from "./components/CategoryAnalytics";
 import { PlatformSettings } from "./components/PlatformSettings";
 import AdminKYC from "./components/AdminKYC";
+import AdminAdvertisements from "./components/AdminAdvertisements";
 import UserProfileWithDocuments from "./components/UserProfileWithDocuments";
 import { AdminMessages } from "./components/AdminMessages";
 import { BannerManager } from "./components/BannerManager";
