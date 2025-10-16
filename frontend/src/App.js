@@ -3010,6 +3010,11 @@ const BusinessDashboard = ({ user }) => {
           </TabsContent>
 
           {/* Settings Tab */}
+          {/* KYC Tab */}
+          <TabsContent value="kyc" className="space-y-6">
+            <AdminKYC />
+          </TabsContent>
+
           <TabsContent value="settings" className="space-y-6">
             <PlatformSettings />
           </TabsContent>
