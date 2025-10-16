@@ -160,6 +160,12 @@ const AdminKYC = () => {
                             <div className="text-sm font-medium text-gray-900">{request.district}</div>
                           </div>
                         )}
+                        {request.neighborhood && (
+                          <div>
+                            <div className="text-xs text-gray-500">Mahalle/Köy</div>
+                            <div className="text-sm font-medium text-gray-900">{request.neighborhood}</div>
+                          </div>
+                        )}
                         {request.vehicle_type && (
                           <div>
                             <div className="text-xs text-gray-500">Araç Tipi</div>
