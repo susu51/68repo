@@ -106,8 +106,8 @@ async def seed_database():
         print("\n🏪 Seeding business/restaurant...")
         
         business = {
-            "_id": "business-e2e-rest-001",
-            "id": "business-e2e-rest-001",
+            "_id": "business-e2e-001",
+            "id": "business-e2e-001",
             "owner_user_id": "business-e2e-001",
             "name": "Niğde Lezzet",
             "email": "business@demo.com",
