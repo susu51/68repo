@@ -329,6 +329,20 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     ? 'bg-gray-800/70 border-gray-700/50 backdrop-blur-xl'
     : 'bg-white/70 border-white/50 backdrop-blur-xl';
 
+  // Show Modern Register Wizard
+  if (showRegisterWizard) {
+    return (
+      <ModernRegister 
+        onSuccess={(data) => {
+          setShowRegisterWizard(false);
+          if (onLogin) onLogin(data);
+          if (onClose) onClose();
+        }}
+        onBack={() => setShowRegisterWizard(false)}
+      />
+    );
+  }
+
   return (
     <div className={`${backgroundClass} flex items-center justify-center p-4 relative overflow-hidden max-w-md w-full`} style={{ minHeight: '500px' }}>
       {/* Background Decorations */}
