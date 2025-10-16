@@ -416,16 +416,6 @@ const AdminAdvertisements = () => {
                 )}
               </div>
 
-              {/* City - REMOVED, now using dropdown */}
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                  placeholder="Örn: İstanbul"
-                  required
-                />
-                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">Bu şehirdeki müşterilere reklam gösterilecek</p>
-              </div>
-
               {/* Title/Slogan */}
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
