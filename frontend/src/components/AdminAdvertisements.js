@@ -346,6 +346,46 @@ const AdminAdvertisements = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+              {/* City Selection */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  İl Seçin <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.city}
+                  onChange={handleCityChange}
+                  className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  required
+                >
+                  <option value="">-- İl Seçin --</option>
+                  {cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* District Selection */}
+              {formData.city && (
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    İlçe Seçin (Opsiyonel)
+                  </label>
+                  <select
+                    value={formData.district}
+                    onChange={handleDistrictChange}
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="">-- Tüm İlçeler (İl geneli) --</option>
+                    {TURKEY_CITIES[formData.city]?.map(district => (
+                      <option key={district} value={district}>{district}</option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                    İlçe seçmezseniz il genelinde gösterilir
+                  </p>
+                </div>
+              )}
+
               {/* Business Selection */}
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
@@ -356,23 +396,27 @@ const AdminAdvertisements = () => {
                   onChange={handleBusinessChange}
                   className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                   required
+                  disabled={!formData.city}
                 >
-                  <option value="">-- Restoran Seçin --</option>
-                  {businesses.map(business => (
+                  <option value="">
+                    {formData.city 
+                      ? `-- ${formData.city} İlindeki Restoranlar --` 
+                      : '-- Önce İl Seçin --'}
+                  </option>
+                  {filteredBusinesses.map(business => (
                     <option key={business.id} value={business.id}>
-                      {business.business_name || business.name} - {business.city}
+                      {business.business_name || business.name}
                     </option>
                   ))}
                 </select>
+                {formData.city && filteredBusinesses.length === 0 && (
+                  <p className="text-[10px] sm:text-xs text-red-500 mt-1">
+                    ⚠️ {formData.city} ilinde kayıtlı restoran bulunamadı
+                  </p>
+                )}
               </div>
 
-              {/* City */}
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                  Şehir <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
+              {/* City - REMOVED, now using dropdown */}
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                   className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
