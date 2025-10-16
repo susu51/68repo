@@ -32,6 +32,25 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     district: ''
   });
 
+  // Form data state for controlled inputs
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    phone: '',
+    city: '',
+    district: '',
+    neighborhood: '',
+    vehicle_type: '',
+    business_name: '',
+    business_tax_id: '',
+    license_photo: null,
+    id_photo: null,
+    vehicle_photo: null,
+    business_photo: null
+  });
+
   // Memoize cities and districts to prevent re-renders
   const cities = useMemo(() => getCityNames(), []);
   const districts = useMemo(() => 
