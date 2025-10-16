@@ -482,21 +482,7 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
             </div>
           )}
 
-          {/* Register Link */}
-          {!loading && (
-            <div className="text-center pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                Hesabınız yok mu?{' '}
-                <button
-                  onClick={onRegisterClick}
-                  className="inline-flex items-center space-x-1 text-orange-600 hover:text-orange-700 font-medium underline transition-colors"
-                >
-                  <KuryeciniLogo size="small" className="opacity-80" />
-                  <span>Kuryecini'ye Kayıt Ol</span>
-                </button>
-              </p>
-            </div>
-          )}
+          {/* Register Link removed - now handled in email form toggle */}
 
           {/* Features */}
           <div className="grid grid-cols-3 gap-4 pt-4">
