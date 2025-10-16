@@ -289,6 +289,10 @@ async def register(
     """
     Register new user with role-specific data and file uploads
     """
+    import os
+    import shutil
+    from pathlib import Path
+    
     # Import db from server.py
     from server import db
     
@@ -300,6 +304,13 @@ async def register(
     # Create user
     user_id = str(uuid.uuid4())
     hashed_pw = hash_password(password)
+    
+    # Create uploads directory if not exists
+    uploads_dir = Path("/app/uploads")
+    uploads_dir.mkdir(exist_ok=True)
+    
+    user_uploads_dir = uploads_dir / user_id
+    user_uploads_dir.mkdir(exist_ok=True)
     
     user_data = {
         "_id": user_id,
@@ -316,28 +327,59 @@ async def register(
         "updated_at": datetime.now(timezone.utc),
         "is_active": True,
         "is_verified": False,
-        "kyc_status": "pending" if role in ["business", "courier"] else None
+        "kyc_status": "pending" if role in ["business", "courier"] else "approved",
+        "kyc_documents": []
     }
     
-    # Role-specific data
+    # Role-specific data and file saving
     if role == "courier":
         user_data["district"] = district
         user_data["vehicle_type"] = vehicle_type
         
-        # Save uploaded files (simplified - in production, use cloud storage)
-        if license_photo:
-            user_data["license_photo_filename"] = license_photo.filename
-        if id_photo:
-            user_data["id_photo_filename"] = id_photo.filename
-        if vehicle_photo:
-            user_data["vehicle_photo_filename"] = vehicle_photo.filename
+        # Save uploaded files
+        if license_photo and license_photo.filename:
+            license_path = user_uploads_dir / f"license_{license_photo.filename}"
+            with license_path.open("wb") as buffer:
+                shutil.copyfileobj(license_photo.file, buffer)
+            user_data["kyc_documents"].append({
+                "type": "license",
+                "filename": license_photo.filename,
+                "path": f"/uploads/{user_id}/license_{license_photo.filename}"
+            })
+        
+        if id_photo and id_photo.filename:
+            id_path = user_uploads_dir / f"id_{id_photo.filename}"
+            with id_path.open("wb") as buffer:
+                shutil.copyfileobj(id_photo.file, buffer)
+            user_data["kyc_documents"].append({
+                "type": "id_card",
+                "filename": id_photo.filename,
+                "path": f"/uploads/{user_id}/id_{id_photo.filename}"
+            })
+        
+        if vehicle_photo and vehicle_photo.filename:
+            vehicle_path = user_uploads_dir / f"vehicle_{vehicle_photo.filename}"
+            with vehicle_path.open("wb") as buffer:
+                shutil.copyfileobj(vehicle_photo.file, buffer)
+            user_data["kyc_documents"].append({
+                "type": "vehicle_registration",
+                "filename": vehicle_photo.filename,
+                "path": f"/uploads/{user_id}/vehicle_{vehicle_photo.filename}"
+            })
     
     if role == "business":
         user_data["business_name"] = business_name
         user_data["business_tax_id"] = business_tax_id
         
-        if business_photo:
-            user_data["business_photo_filename"] = business_photo.filename
+        if business_photo and business_photo.filename:
+            business_path = user_uploads_dir / f"business_{business_photo.filename}"
+            with business_path.open("wb") as buffer:
+                shutil.copyfileobj(business_photo.file, buffer)
+            user_data["kyc_documents"].append({
+                "type": "business_photo",
+                "filename": business_photo.filename,
+                "path": f"/uploads/{user_id}/business_{business_photo.filename}"
+            })
     
     await db.users.insert_one(user_data)
     
