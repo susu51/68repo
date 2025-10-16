@@ -47,6 +47,11 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     setFormData(prev => ({ ...prev, [field]: file }));
   }, []);
 
+  // Generic input change handler to prevent re-renders
+  const handleInputChange = useCallback((field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
   const handleSubmit = async () => {
     setLoading(true);
     
