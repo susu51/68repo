@@ -162,7 +162,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
               type="text"
               placeholder="İşletme/Restoran Adı *"
               value={formData.business_name}
-              onChange={(e) => setFormData({...formData, business_name: e.target.value})}
+              onChange={(e) => handleInputChange('business_name', e.target.value)}
               className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               required
             />
@@ -170,7 +170,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
               type="text"
               placeholder="Vergi Numarası *"
               value={formData.business_tax_id}
-              onChange={(e) => setFormData({...formData, business_tax_id: e.target.value})}
+              onChange={(e) => handleInputChange('business_tax_id', e.target.value)}
               className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               required
             />
@@ -182,7 +182,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           type="text"
           placeholder="Adınız *"
           value={formData.first_name}
-          onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+          onChange={(e) => handleInputChange('first_name', e.target.value)}
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
@@ -190,7 +190,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           type="text"
           placeholder="Soyadınız *"
           value={formData.last_name}
-          onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+          onChange={(e) => handleInputChange('last_name', e.target.value)}
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
@@ -198,7 +198,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           type="tel"
           placeholder="Telefon (05XX XXX XX XX) *"
           value={formData.phone}
-          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+          onChange={(e) => handleInputChange('phone', e.target.value)}
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
@@ -206,7 +206,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           type="email"
           placeholder="E-posta *"
           value={formData.email}
-          onChange={(e) => setFormData({...formData, email: e.target.value})}
+          onChange={(e) => handleInputChange('email', e.target.value)}
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
