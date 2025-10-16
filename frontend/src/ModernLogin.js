@@ -106,6 +106,13 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setLoading(false);
   };
 
+  // Handle role selection
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+    setFormData({ ...formData, role });
+    setRegisterStep('form');
+  };
+
   // Handle registration
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -120,17 +127,49 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
       return;
     }
 
+    // Role-specific validation
+    if (selectedRole === 'courier' && !formData.vehicle_type) {
+      setError('Araç tipi seçiniz');
+      toast.error('❌ Araç tipi seçiniz');
+      setLoading(false);
+      return;
+    }
+
+    if (selectedRole === 'business' && !formData.business_name) {
+      setError('İşletme adı giriniz');
+      toast.error('❌ İşletme adı giriniz');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const result = await contextRegister({
+      const registerData = {
         email: formData.email,
         password: formData.password,
         first_name: formData.first_name,
         last_name: formData.last_name,
-        role: formData.role || 'customer'
-      });
+        role: selectedRole || 'customer'
+      };
+
+      // Add role-specific data
+      if (selectedRole === 'courier') {
+        registerData.vehicle_type = formData.vehicle_type;
+      }
+      
+      if (selectedRole === 'business') {
+        registerData.business_name = formData.business_name;
+        registerData.address = formData.address;
+      }
+
+      const result = await contextRegister(registerData);
 
       if (result?.success) {
-        toast.success('✅ Kayıt başarılı! Hoş geldiniz!');
+        const roleNames = {
+          customer: 'Müşteri',
+          courier: 'Kurye',
+          business: 'İşletme'
+        };
+        toast.success(`✅ ${roleNames[selectedRole]} kaydı başarılı! Hoş geldiniz!`);
         
         if (onLogin) {
           onLogin(result);
