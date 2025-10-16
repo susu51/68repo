@@ -3,7 +3,7 @@ HttpOnly Cookie-based Authentication System
 NO localStorage support - production ready
 """
 
-from fastapi import APIRouter, Request, Response, HTTPException, Depends
+from fastapi import APIRouter, Request, Response, HTTPException, Depends, Form, File, UploadFile
 from pydantic import BaseModel, EmailStr
 import jwt
 import time
