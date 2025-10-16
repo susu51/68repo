@@ -597,23 +597,44 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                   </button>
                 )}
                 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsRegisterMode(!isRegisterMode);
-                    setError('');
-                    setFormData({
-                      email: '',
-                      password: '',
-                      first_name: '',
-                      last_name: '',
-                      role: 'customer'
-                    });
-                  }}
-                  className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
-                >
-                  {isRegisterMode ? '← Giriş Yap' : 'Hesabınız yok mu? Kayıt Ol →'}
-                </button>
+                {!isRegisterMode && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRegisterMode(true);
+                      setRegisterStep('role-selection');
+                      setSelectedRole(null);
+                      setError('');
+                      setFormData({
+                        email: '',
+                        password: '',
+                        first_name: '',
+                        last_name: '',
+                        role: 'customer',
+                        phone: '',
+                        vehicle_type: '',
+                        business_name: '',
+                        address: ''
+                      });
+                    }}
+                    className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                  >
+                    Hesabınız yok mu? Kayıt Ol →
+                  </button>
+                )}
+                
+                {isRegisterMode && registerStep === 'form' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRegisterStep('role-selection');
+                      setSelectedRole(null);
+                    }}
+                    className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                  >
+                    ← Rol Seçimine Dön
+                  </button>
+                )}
               </div>
             </form>
           )}
