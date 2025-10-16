@@ -472,10 +472,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                   </span>
                 </div>
                 
-                {/* Register Mode: Show first_name and last_name */}
+                {/* Register Mode: Role-specific forms */}
                 {isRegisterMode && (
                   <>
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mb-2 flex items-center space-x-2">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mb-3 flex items-center space-x-2">
                       <span className="text-xl">
                         {selectedRole === 'customer' && '🛒'}
                         {selectedRole === 'courier' && '🏍️'}
@@ -497,43 +497,108 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                         Değiştir
                       </button>
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-2 mb-2">
-                      <Input
-                        type="text"
-                        placeholder="Adınız"
-                        value={formData.first_name}
-                        onChange={(e) => {
-                          setFormData({...formData, first_name: e.target.value});
-                          setError('');
-                        }}
-                        required
-                        className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
-                      />
-                      <Input
-                        type="text"
-                        placeholder="Soyadınız"
-                        value={formData.last_name}
-                        onChange={(e) => {
-                          setFormData({...formData, last_name: e.target.value});
-                          setError('');
-                        }}
-                        required
-                        className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
-                      />
-                    </div>
 
-                    {/* Courier-specific fields */}
+                    {/* MÜŞTERI FORMU */}
+                    {selectedRole === 'customer' && (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            type="text"
+                            placeholder="Adınız"
+                            value={formData.first_name}
+                            onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                            required
+                            className="bg-white/80 backdrop-blur-sm"
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Soyadınız"
+                            value={formData.last_name}
+                            onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                            required
+                            className="bg-white/80 backdrop-blur-sm"
+                          />
+                        </div>
+                        <Input
+                          type="tel"
+                          placeholder="Telefon Numarası (05XX XXX XX XX)"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          required
+                          className="bg-white/80 backdrop-blur-sm"
+                        />
+                        <select
+                          value={formData.city}
+                          onChange={(e) => setFormData({...formData, city: e.target.value})}
+                          required
+                          className="w-full px-3 py-2 border rounded-lg bg-white/80"
+                        >
+                          <option value="">Şehir Seçin</option>
+                          {TURKISH_CITIES.map(city => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* KURYE FORMU */}
                     {selectedRole === 'courier' && (
-                      <div className="mb-2">
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            type="text"
+                            placeholder="Adınız"
+                            value={formData.first_name}
+                            onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                            required
+                            className="bg-white/80 backdrop-blur-sm"
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Soyadınız"
+                            value={formData.last_name}
+                            onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                            required
+                            className="bg-white/80 backdrop-blur-sm"
+                          />
+                        </div>
+                        
+                        <Input
+                          type="tel"
+                          placeholder="Telefon Numarası"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          required
+                          className="bg-white/80 backdrop-blur-sm"
+                        />
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                          <select
+                            value={formData.city}
+                            onChange={(e) => setFormData({...formData, city: e.target.value})}
+                            required
+                            className="w-full px-3 py-2 border rounded-lg bg-white/80"
+                          >
+                            <option value="">Şehir</option>
+                            {TURKISH_CITIES.map(city => (
+                              <option key={city} value={city}>{city}</option>
+                            ))}
+                          </select>
+                          <Input
+                            type="text"
+                            placeholder="İlçe"
+                            value={formData.district}
+                            onChange={(e) => setFormData({...formData, district: e.target.value})}
+                            required
+                            className="bg-white/80 backdrop-blur-sm"
+                          />
+                        </div>
+
                         <select
                           value={formData.vehicle_type}
-                          onChange={(e) => {
-                            setFormData({...formData, vehicle_type: e.target.value});
-                            setError('');
-                          }}
+                          onChange={(e) => setFormData({...formData, vehicle_type: e.target.value})}
                           required
-                          className={`w-full px-3 py-2 border rounded-lg ${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80 border-gray-300'}`}
+                          className="w-full px-3 py-2 border rounded-lg bg-white/80"
                         >
                           <option value="">Araç Tipi Seçin</option>
                           <option value="bicycle">🚲 Bisiklet</option>
@@ -541,67 +606,180 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                           <option value="car">🚗 Araba</option>
                           <option value="van">🚚 Minivan</option>
                         </select>
+
+                        {/* Dosya Yüklemeleri */}
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">📄 Ehliyet Fotoğrafı</label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setFormData({...formData, license_photo: e.target.files[0]})}
+                              required
+                              className="w-full text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">🪪 Kimlik Fotoğrafı</label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setFormData({...formData, id_photo: e.target.files[0]})}
+                              required
+                              className="w-full text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">🚗 Araç Ruhsat Fotoğrafı</label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setFormData({...formData, vehicle_photo: e.target.files[0]})}
+                              required
+                              className="w-full text-sm"
+                            />
+                          </div>
+                        </div>
                       </div>
                     )}
 
-                    {/* Business-specific fields */}
+                    {/* İŞLETME FORMU */}
                     {selectedRole === 'business' && (
-                      <>
-                        <div className="mb-2">
+                      <div className="space-y-3">
+                        <Input
+                          type="text"
+                          placeholder="İşletme/Restoran Adı"
+                          value={formData.business_name}
+                          onChange={(e) => setFormData({...formData, business_name: e.target.value})}
+                          required
+                          className="bg-white/80 backdrop-blur-sm"
+                        />
+                        
+                        <Input
+                          type="text"
+                          placeholder="Vergi Numarası"
+                          value={formData.business_tax_id}
+                          onChange={(e) => setFormData({...formData, business_tax_id: e.target.value})}
+                          required
+                          className="bg-white/80 backdrop-blur-sm"
+                        />
+
+                        <div className="grid grid-cols-2 gap-2">
                           <Input
                             type="text"
-                            placeholder="İşletme/Restoran Adı"
-                            value={formData.business_name}
-                            onChange={(e) => {
-                              setFormData({...formData, business_name: e.target.value});
-                              setError('');
-                            }}
+                            placeholder="Yetkili Adı"
+                            value={formData.first_name}
+                            onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                             required
-                            className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                            className="bg-white/80 backdrop-blur-sm"
                           />
-                        </div>
-                        <div className="mb-2">
                           <Input
                             type="text"
-                            placeholder="İşletme Adresi"
-                            value={formData.address}
-                            onChange={(e) => {
-                              setFormData({...formData, address: e.target.value});
-                              setError('');
-                            }}
-                            className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                            placeholder="Yetkili Soyadı"
+                            value={formData.last_name}
+                            onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                            required
+                            className="bg-white/80 backdrop-blur-sm"
                           />
                         </div>
-                      </>
+
+                        <Input
+                          type="tel"
+                          placeholder="Telefon Numarası"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          required
+                          className="bg-white/80 backdrop-blur-sm"
+                        />
+
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">🏪 İşletme Fotoğrafı</label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setFormData({...formData, business_photo: e.target.files[0]})}
+                            required
+                            className="w-full text-sm"
+                          />
+                        </div>
+                      </div>
                     )}
                   </>
                 )}
+
+                {/* Email ve Şifre - Tüm roller için (Müşteri için ekstra, diğerleri için ana) */}
+                {!isRegisterMode && (
+                  <Input
+                    type="email"
+                    placeholder="ornek@email.com"
+                    value={formData.email}
+                    onChange={(e) => {
+                      setFormData({...formData, email: e.target.value});
+                      setError('');
+                    }}
+                    required
+                    className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm ${error ? 'border-red-300' : ''}`}
+                  />
+                )}
                 
-                <Input
-                  type="email"
-                  placeholder="ornek@email.com"
-                  value={formData.email}
-                  onChange={(e) => {
-                    setFormData({...formData, email: e.target.value});
-                    setError(''); // Clear error on input change
-                  }}
-                  required
-                  className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm ${error ? 'border-red-300' : ''}`}
-                />
+                {isRegisterMode && selectedRole !== 'customer' && (
+                  <div className="space-y-2 mt-3 pt-3 border-t border-gray-200">
+                    <Input
+                      type="email"
+                      placeholder="E-posta"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required
+                      className="bg-white/80 backdrop-blur-sm"
+                    />
+                    <Input
+                      type="password"
+                      placeholder="Şifre"
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      required
+                      className="bg-white/80 backdrop-blur-sm"
+                    />
+                  </div>
+                )}
+
+                {isRegisterMode && selectedRole === 'customer' && (
+                  <div className="space-y-2 mt-3 pt-3 border-t border-gray-200">
+                    <Input
+                      type="email"
+                      placeholder="E-posta"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required
+                      className="bg-white/80 backdrop-blur-sm"
+                    />
+                    <Input
+                      type="password"
+                      placeholder="Şifre"
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      required
+                      className="bg-white/80 backdrop-blur-sm"
+                    />
+                  </div>
+                )}
               </div>
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Şifreniz"
-                  value={formData.password}
-                  onChange={(e) => {
-                    setFormData({...formData, password: e.target.value});
-                    setError(''); // Clear error on input change
-                  }}
-                  required
-                  className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm ${error ? 'border-red-300' : ''}`}
-                />
-              </div>
+              
+              {!isRegisterMode && (
+                <div>
+                  <Input
+                    type="password"
+                    placeholder="Şifreniz"
+                    value={formData.password}
+                    onChange={(e) => {
+                      setFormData({...formData, password: e.target.value});
+                      setError('');
+                    }}
+                    required
+                    className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm ${error ? 'border-red-300' : ''}`}
+                  />
+                </div>
+              )}
               
               <button 
                 type="submit" 
