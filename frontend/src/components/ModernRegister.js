@@ -64,11 +64,13 @@ const ModernRegister = ({ onSuccess, onBack }) => {
       return;
     }
     formRef.current[field] = file;
+    setFormData(prev => ({ ...prev, [field]: file }));
   }, []);
 
   // Generic input change handler to prevent re-renders
   const handleInputChange = useCallback((field, value) => {
     formRef.current[field] = value;
+    setFormData(prev => ({ ...prev, [field]: value }));
     // Update location state for dropdowns
     if (field === 'city' || field === 'district') {
       setLocationState(prev => ({ ...prev, [field]: value }));
@@ -80,6 +82,12 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     formRef.current.city = value;
     formRef.current.district = '';
     formRef.current.neighborhood = '';
+    setFormData(prev => ({
+      ...prev,
+      city: value,
+      district: '',
+      neighborhood: ''
+    }));
     setLocationState({ city: value, district: '' });
   }, []);
 
