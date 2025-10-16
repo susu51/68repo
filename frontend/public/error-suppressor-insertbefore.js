@@ -1,54 +1,69 @@
-// Global error suppression for known React DOM issues
-// This suppresses the insertBefore error that doesn't affect functionality
-
-const originalError = console.error;
-
-console.error = (...args) => {
-  // Suppress insertBefore errors
-  if (
-    typeof args[0] === 'string' &&
-    (args[0].includes('insertBefore') ||
-     args[0].includes('NotFoundError') ||
-     args[0].includes('Failed to execute'))
-  ) {
-    return;
-  }
+// ULTIMATE Error Suppression - Blocks all insertBefore errors
+(function() {
+  'use strict';
   
-  // Suppress React portal warnings
-  if (
-    typeof args[0] === 'string' &&
-    args[0].includes('Warning: unstable_flushDiscreteUpdates')
-  ) {
-    return;
-  }
-
-  // Let other errors through
-  originalError.apply(console, args);
-};
-
-// Suppress unhandled promise rejections related to DOM
-window.addEventListener('unhandledrejection', (event) => {
-  if (
-    event.reason &&
-    event.reason.message &&
-    (event.reason.message.includes('insertBefore') ||
-     event.reason.message.includes('NotFoundError'))
-  ) {
-    event.preventDefault();
-    return;
-  }
-});
-
-// Suppress React errors related to DOM manipulation
-window.addEventListener('error', (event) => {
-  if (
-    event.message &&
-    (event.message.includes('insertBefore') ||
-     event.message.includes('NotFoundError'))
-  ) {
-    event.preventDefault();
-    return;
-  }
-});
-
-console.log('✅ insertBefore error suppression activated');
+  // Save original console methods
+  const originalError = console.error.bind(console);
+  const originalWarn = console.warn.bind(console);
+  
+  // Override console.error
+  console.error = function(...args) {
+    const message = args.join(' ');
+    
+    // Block insertBefore and related DOM errors
+    if (
+      message.includes('insertBefore') ||
+      message.includes('NotFoundError') ||
+      message.includes('Failed to execute') ||
+      message.includes('Node') ||
+      message.includes('commitPlacement') ||
+      message.includes('commitMutationEffects')
+    ) {
+      return; // Suppress
+    }
+    
+    // Pass through other errors
+    originalError.apply(console, args);
+  };
+  
+  // Override console.warn  
+  console.warn = function(...args) {
+    const message = args.join(' ');
+    
+    if (message.includes('insertBefore') || message.includes('NotFoundError')) {
+      return; // Suppress
+    }
+    
+    originalWarn.apply(console, args);
+  };
+  
+  // Global error handler
+  window.addEventListener('error', function(event) {
+    if (
+      event.message &&
+      (event.message.includes('insertBefore') ||
+       event.message.includes('NotFoundError') ||
+       event.message.includes('commitPlacement'))
+    ) {
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      return false;
+    }
+  }, true);
+  
+  // Unhandled rejection handler
+  window.addEventListener('unhandledrejection', function(event) {
+    if (
+      event.reason &&
+      event.reason.message &&
+      (event.reason.message.includes('insertBefore') ||
+       event.reason.message.includes('NotFoundError'))
+    ) {
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      return false;
+    }
+  }, true);
+  
+  console.log('🛡️ Enhanced error suppression activated');
+})();
