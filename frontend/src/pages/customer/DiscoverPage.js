@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { toast } from 'react-hot-toast';
 import api from '../../api/http';
+import AdvertisementBanner from '../../components/AdvertisementBanner';
 
 const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
   const [restaurants, setRestaurants] = useState([]);
