@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { getCityNames, getDistrictsByCity } from '../data/turkeyLocations';
 
@@ -7,36 +7,36 @@ const ModernRegister = ({ onSuccess, onBack }) => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  const [formData, setFormData] = useState({
-    // Personal
+  // Use refs for form data to prevent re-renders
+  const formRef = useRef({
     first_name: '',
     last_name: '',
     email: '',
     password: '',
     phone: '',
-    
-    // Location
     city: '',
     district: '',
     neighborhood: '',
-    
-    // Courier specific
     vehicle_type: '',
     license_photo: null,
     id_photo: null,
     vehicle_photo: null,
-    
-    // Business specific
     business_name: '',
     business_tax_id: '',
     business_photo: null
+  });
+  
+  // Keep city/district in state for dropdown dependencies
+  const [locationState, setLocationState] = useState({
+    city: '',
+    district: ''
   });
 
   // Memoize cities and districts to prevent re-renders
   const cities = useMemo(() => getCityNames(), []);
   const districts = useMemo(() => 
-    formData.city ? getDistrictsByCity(formData.city) : [], 
-    [formData.city]
+    locationState.city ? getDistrictsByCity(locationState.city) : [], 
+    [locationState.city]
   );
 
   const handleFileChange = useCallback((field, file) => {
