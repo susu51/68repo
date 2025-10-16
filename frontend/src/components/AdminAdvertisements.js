@@ -85,13 +85,12 @@ const AdminAdvertisements = () => {
 
   const handleBusinessChange = (e) => {
     const businessId = e.target.value;
-    const business = businesses.find(b => b.id === businessId);
+    const business = filteredBusinesses.find(b => b.id === businessId);
     
     setFormData({
       ...formData,
       business_id: businessId,
-      business_name: business?.business_name || business?.name || '',
-      city: business?.city || ''
+      business_name: business?.business_name || business?.name || ''
     });
   };
 
