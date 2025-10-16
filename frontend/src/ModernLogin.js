@@ -145,49 +145,93 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
     setLoading(true);
     setError('');
 
-    // Validation
-    if (!formData.email || !formData.password || !formData.first_name || !formData.last_name) {
-      setError('Tüm alanları doldurun');
-      toast.error('❌ Tüm alanları doldurun');
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setError('E-posta ve şifre zorunludur');
+      toast.error('❌ E-posta ve şifre zorunludur');
       setLoading(false);
       return;
     }
 
     // Role-specific validation
-    if (selectedRole === 'courier' && !formData.vehicle_type) {
-      setError('Araç tipi seçiniz');
-      toast.error('❌ Araç tipi seçiniz');
-      setLoading(false);
-      return;
+    if (selectedRole === 'customer') {
+      if (!formData.first_name || !formData.last_name || !formData.phone || !formData.city) {
+        setError('Tüm alanları doldurun');
+        toast.error('❌ Tüm alanları doldurun');
+        setLoading(false);
+        return;
+      }
     }
 
-    if (selectedRole === 'business' && !formData.business_name) {
-      setError('İşletme adı giriniz');
-      toast.error('❌ İşletme adı giriniz');
-      setLoading(false);
-      return;
+    if (selectedRole === 'courier') {
+      if (!formData.first_name || !formData.last_name || !formData.phone || !formData.city || !formData.district || !formData.vehicle_type) {
+        setError('Tüm alanları doldurun');
+        toast.error('❌ Tüm alanları doldurun');
+        setLoading(false);
+        return;
+      }
+      if (!formData.license_photo || !formData.id_photo || !formData.vehicle_photo) {
+        setError('Tüm fotoğrafları yükleyin');
+        toast.error('❌ Ehliyet, kimlik ve araç ruhsat fotoğraflarını yükleyin');
+        setLoading(false);
+        return;
+      }
+    }
+
+    if (selectedRole === 'business') {
+      if (!formData.business_name || !formData.business_tax_id || !formData.first_name || !formData.last_name || !formData.phone) {
+        setError('Tüm alanları doldurun');
+        toast.error('❌ Tüm alanları doldurun');
+        setLoading(false);
+        return;
+      }
+      if (!formData.business_photo) {
+        setError('İşletme fotoğrafı yükleyin');
+        toast.error('❌ İşletme fotoğrafını yükleyin');
+        setLoading(false);
+        return;
+      }
     }
 
     try {
-      const registerData = {
-        email: formData.email,
-        password: formData.password,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        role: selectedRole || 'customer'
-      };
+      // FormData ile dosya yükleme için
+      const formDataToSend = new FormData();
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('first_name', formData.first_name || '');
+      formDataToSend.append('last_name', formData.last_name || '');
+      formDataToSend.append('role', selectedRole);
+      formDataToSend.append('phone', formData.phone || '');
+      formDataToSend.append('city', formData.city || '');
 
-      // Add role-specific data
+      // Role-specific data
       if (selectedRole === 'courier') {
-        registerData.vehicle_type = formData.vehicle_type;
-      }
-      
-      if (selectedRole === 'business') {
-        registerData.business_name = formData.business_name;
-        registerData.address = formData.address;
+        formDataToSend.append('district', formData.district);
+        formDataToSend.append('vehicle_type', formData.vehicle_type);
+        if (formData.license_photo) formDataToSend.append('license_photo', formData.license_photo);
+        if (formData.id_photo) formDataToSend.append('id_photo', formData.id_photo);
+        if (formData.vehicle_photo) formDataToSend.append('vehicle_photo', formData.vehicle_photo);
       }
 
-      const result = await contextRegister(registerData);
+      if (selectedRole === 'business') {
+        formDataToSend.append('business_name', formData.business_name);
+        formDataToSend.append('business_tax_id', formData.business_tax_id);
+        if (formData.business_photo) formDataToSend.append('business_photo', formData.business_photo);
+      }
+
+      // API call with FormData
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || ''}/api/auth/register`, {
+        method: 'POST',
+        body: formDataToSend,
+        credentials: 'include' // for cookies
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Kayıt başarısız');
+      }
+
+      const result = await response.json();
 
       if (result?.success) {
         const roleNames = {
@@ -195,7 +239,10 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
           courier: 'Kurye',
           business: 'İşletme'
         };
-        toast.success(`✅ ${roleNames[selectedRole]} kaydı başarılı! Hoş geldiniz!`);
+        toast.success(`✅ ${roleNames[selectedRole]} kaydı başarılı! ${selectedRole === 'courier' || selectedRole === 'business' ? 'Onay bekliyor.' : 'Hoş geldiniz!'}`);
+        
+        // Reload to trigger auth check
+        await checkAuthStatus();
         
         if (onLogin) {
           onLogin(result);
