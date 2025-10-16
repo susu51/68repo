@@ -25,6 +25,7 @@ TEST_CREDENTIALS = {
 class E2EOrderFlowTester:
     def __init__(self):
         self.sessions = {}  # Store separate sessions for each role (for cookies)
+        self.tokens = {}    # Store JWT tokens for each role
         self.test_results = []
         self.created_order_id = None
         
