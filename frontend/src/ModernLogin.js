@@ -868,21 +868,7 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      setIsRegisterMode(true);
-                      setRegisterStep('role-selection');
-                      setSelectedRole(null);
-                      setError('');
-                      setFormData({
-                        email: '',
-                        password: '',
-                        first_name: '',
-                        last_name: '',
-                        role: 'customer',
-                        phone: '',
-                        vehicle_type: '',
-                        business_name: '',
-                        address: ''
-                      });
+                      setShowRegisterWizard(true);
                     }}
                     className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
                   >
