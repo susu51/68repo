@@ -268,8 +268,9 @@ async def logout(response: Response):
     return {"success": True, "message": "Logged out"}
 
 @auth_router.post("/register")
-async def register(body: RegisterRequest):
-    db = get_db()
+async def register(body: RegisterRequest, response: Response):
+    # Import db from server.py
+    from server import db
     
     # Check if user exists
     existing = await db.users.find_one({"email": body.email})
@@ -281,19 +282,54 @@ async def register(body: RegisterRequest):
     hashed_pw = hash_password(body.password)
     
     user_data = {
-        "id": user_id,
+        "_id": user_id,  # MongoDB _id
+        "id": user_id,   # Also add id field for compatibility
         "email": body.email,
         "password": hashed_pw,
         "first_name": body.first_name,
         "last_name": body.last_name,
+        "name": f"{body.first_name} {body.last_name}".strip(),  # Add full name
         "role": body.role,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "is_active": True
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+        "is_active": True,
+        "is_verified": False,  # Email verification pending
+        "kyc_status": "pending" if body.role in ["business", "courier"] else None
     }
     
     await db.users.insert_one(user_data)
     
-    return {"success": True, "message": "Registration successful", "user_id": user_id}
+    # Auto-login after registration - generate tokens
+    access_token = make_token(body.email, ACCESS_TTL)
+    refresh_token = make_token(body.email, REFRESH_TTL)
+    
+    # Set cookies
+    response.set_cookie(
+        "access_token",
+        access_token,
+        max_age=ACCESS_TTL,
+        **COOKIE_CONFIG
+    )
+    response.set_cookie(
+        "refresh_token",
+        refresh_token,
+        max_age=REFRESH_TTL,
+        **COOKIE_CONFIG
+    )
+    
+    return {
+        "success": True, 
+        "message": "Registration successful", 
+        "user_id": user_id,
+        "access_token": access_token,
+        "user": {
+            "id": user_id,
+            "email": body.email,
+            "role": body.role,
+            "first_name": body.first_name,
+            "last_name": body.last_name
+        }
+    }
 
 # Additional dependency for business users with KYC approval
 async def get_approved_business_user_from_cookie(request: Request):
