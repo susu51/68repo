@@ -44,22 +44,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
       toast.error('Dosya boyutu 5MB\'dan küçük olmalıdır');
       return;
     }
-    setFormData(prev => ({ ...prev, [field]: file }));
-  }, []);
-
-  // Generic input change handler to prevent re-renders
-  const handleInputChange = useCallback((field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
-
-  // Special handler for city change (resets district and neighborhood)
-  const handleCityChange = useCallback((value) => {
-    setFormData(prev => ({
-      ...prev,
-      city: value,
-      district: '',
-      neighborhood: ''
-    }));
+    formRef.current[field] = file;
   }, []);
 
   const handleSubmit = async () => {
@@ -68,20 +53,23 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     try {
       const formDataToSend = new FormData();
       
+      // Get form data from ref
+      const data = formRef.current;
+      
       // Add text fields
       const textFields = ['first_name', 'last_name', 'email', 'password', 'phone', 'city', 'district', 'neighborhood', 'vehicle_type', 'business_name', 'business_tax_id'];
       textFields.forEach(key => {
-        if (formData[key] && formData[key] !== '') {
-          formDataToSend.append(key, formData[key]);
+        if (data[key] && data[key] !== '') {
+          formDataToSend.append(key, data[key]);
         }
       });
       
       // Add file fields - check if they're File objects
       const fileFields = ['license_photo', 'id_photo', 'vehicle_photo', 'business_photo'];
       fileFields.forEach(key => {
-        if (formData[key] && formData[key] instanceof File) {
-          formDataToSend.append(key, formData[key]);
-          console.log(`📎 Uploading ${key}:`, formData[key].name);
+        if (data[key] && data[key] instanceof File) {
+          formDataToSend.append(key, data[key]);
+          console.log(`📎 Uploading ${key}:`, data[key].name);
         }
       });
       
