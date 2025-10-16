@@ -98,22 +98,22 @@ const ModernRegister = ({ onSuccess, onBack }) => {
       const formDataToSend = new FormData();
       
       // Get form data from ref
-      const data = formRef.current;
+      const formValues = formRef.current;
       
       // Add text fields
       const textFields = ['first_name', 'last_name', 'email', 'password', 'phone', 'city', 'district', 'neighborhood', 'vehicle_type', 'business_name', 'business_tax_id'];
       textFields.forEach(key => {
-        if (data[key] && data[key] !== '') {
-          formDataToSend.append(key, data[key]);
+        if (formValues[key] && formValues[key] !== '') {
+          formDataToSend.append(key, formValues[key]);
         }
       });
       
       // Add file fields - check if they're File objects
       const fileFields = ['license_photo', 'id_photo', 'vehicle_photo', 'business_photo'];
       fileFields.forEach(key => {
-        if (data[key] && data[key] instanceof File) {
-          formDataToSend.append(key, data[key]);
-          console.log(`📎 Uploading ${key}:`, data[key].name);
+        if (formValues[key] && formValues[key] instanceof File) {
+          formDataToSend.append(key, formValues[key]);
+          console.log(`📎 Uploading ${key}:`, formValues[key].name);
         }
       });
       
