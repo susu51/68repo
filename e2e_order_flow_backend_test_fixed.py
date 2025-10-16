@@ -508,12 +508,13 @@ class E2EOrderFlowTester:
         """Test customer → GET /api/orders/my (verify order appears)"""
         print("📋 Testing Customer My Orders...")
         
-        if "customer" not in self.sessions:
-            self.log_test("Customer My Orders", False, "Customer session not available")
+        if "customer" not in self.tokens:
+            self.log_test("Customer My Orders", False, "Customer JWT token not available")
             return False
         
         try:
-            response = self.sessions["customer"].get(f"{BACKEND_URL}/orders/my")
+            headers = {"Authorization": f"Bearer {self.tokens['customer']}"}
+            response = requests.get(f"{BACKEND_URL}/orders/my", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
