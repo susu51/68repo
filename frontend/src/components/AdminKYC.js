@@ -144,65 +144,147 @@ const AdminKYC = () => {
                         </div>
                       </div>
 
-                      {/* Details Grid */}
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                        <div>
-                          <div className="text-xs text-gray-500">Telefon</div>
-                          <div className="text-sm font-medium text-gray-900">{request.phone}</div>
+                      {/* İletişim Bilgileri */}
+                      <div className="mb-6">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                          <span>📞</span>
+                          <span>İletişim Bilgileri</span>
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="text-xs text-gray-500 mb-1">📧 E-posta</div>
+                            <div className="text-sm font-medium text-gray-900 break-all">{request.email}</div>
+                          </div>
+                          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="text-xs text-gray-500 mb-1">📱 Telefon</div>
+                            <div className="text-sm font-medium text-gray-900">{request.phone || '-'}</div>
+                          </div>
+                          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="text-xs text-gray-500 mb-1">👤 Ad Soyad</div>
+                            <div className="text-sm font-medium text-gray-900">{request.name}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="text-xs text-gray-500">Şehir</div>
-                          <div className="text-sm font-medium text-gray-900">{request.city}</div>
-                        </div>
-                        {request.district && (
-                          <div>
-                            <div className="text-xs text-gray-500">İlçe</div>
-                            <div className="text-sm font-medium text-gray-900">{request.district}</div>
-                          </div>
-                        )}
-                        {request.neighborhood && (
-                          <div>
-                            <div className="text-xs text-gray-500">Mahalle/Köy</div>
-                            <div className="text-sm font-medium text-gray-900">{request.neighborhood}</div>
-                          </div>
-                        )}
-                        {request.vehicle_type && (
-                          <div>
-                            <div className="text-xs text-gray-500">Araç Tipi</div>
-                            <div className="text-sm font-medium text-gray-900">{request.vehicle_type}</div>
-                          </div>
-                        )}
-                        {request.business_name && (
-                          <div>
-                            <div className="text-xs text-gray-500">İşletme Adı</div>
-                            <div className="text-sm font-medium text-gray-900">{request.business_name}</div>
-                          </div>
-                        )}
-                        {request.business_tax_id && (
-                          <div>
-                            <div className="text-xs text-gray-500">Vergi No</div>
-                            <div className="text-sm font-medium text-gray-900">{request.business_tax_id}</div>
-                          </div>
-                        )}
                       </div>
 
-                      {/* Documents */}
-                      {request.kyc_documents && request.kyc_documents.length > 0 && (
-                        <div className="mb-4">
-                          <div className="text-xs text-gray-500 mb-2">Yüklenen Belgeler</div>
-                          <div className="flex flex-wrap gap-2">
+                      {/* Konum Bilgileri */}
+                      <div className="mb-6">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                          <span>📍</span>
+                          <span>Konum Bilgileri</span>
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="text-xs text-gray-500 mb-1">İl</div>
+                            <div className="text-sm font-medium text-gray-900">{request.city || '-'}</div>
+                          </div>
+                          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="text-xs text-gray-500 mb-1">İlçe</div>
+                            <div className="text-sm font-medium text-gray-900">{request.district || '-'}</div>
+                          </div>
+                          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="text-xs text-gray-500 mb-1">Mahalle/Köy</div>
+                            <div className="text-sm font-medium text-gray-900">{request.neighborhood || '-'}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Rol Bazlı Bilgiler */}
+                      {(request.vehicle_type || request.business_name) && (
+                        <div className="mb-6">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                            <span>{request.role === 'courier' ? '🏍️' : '🏪'}</span>
+                            <span>{request.role === 'courier' ? 'Kurye Bilgileri' : 'İşletme Bilgileri'}</span>
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {request.vehicle_type && (
+                              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <div className="text-xs text-gray-500 mb-1">Araç Tipi</div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {request.vehicle_type === 'bicycle' && '🚲 Bisiklet'}
+                                  {request.vehicle_type === 'motorbike' && '🏍️ Motosiklet'}
+                                  {request.vehicle_type === 'car' && '🚗 Araba'}
+                                  {request.vehicle_type === 'van' && '🚚 Minivan'}
+                                </div>
+                              </div>
+                            )}
+                            {request.business_name && (
+                              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <div className="text-xs text-gray-500 mb-1">İşletme Adı</div>
+                                <div className="text-sm font-medium text-gray-900">{request.business_name}</div>
+                              </div>
+                            )}
+                            {request.business_tax_id && (
+                              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <div className="text-xs text-gray-500 mb-1">Vergi Numarası</div>
+                                <div className="text-sm font-medium text-gray-900">{request.business_tax_id}</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Yüklenen Belgeler - Büyük ve Görsel */}
+                      {request.kyc_documents && request.kyc_documents.length > 0 ? (
+                        <div className="mb-6">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                            <span>📄</span>
+                            <span>Yüklenen Belgeler ({request.kyc_documents.length})</span>
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {request.kyc_documents.map((doc, index) => (
                               <a
                                 key={index}
                                 href={`${process.env.REACT_APP_BACKEND_URL || ''}${doc.path}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center space-x-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                                className="group relative bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all duration-200"
                               >
-                                <span>📄</span>
-                                <span className="text-sm">{doc.type === 'license' ? 'Ehliyet' : doc.type === 'id_card' ? 'Kimlik' : doc.type === 'vehicle_registration' ? 'Ruhsat' : 'İşletme Fotoğrafı'}</span>
+                                <div className="flex flex-col items-center text-center space-y-3">
+                                  <div className="text-5xl transform group-hover:scale-110 transition-transform">
+                                    {doc.type === 'license' && '🪪'}
+                                    {doc.type === 'id_card' && '👤'}
+                                    {doc.type === 'vehicle_registration' && '📋'}
+                                    {doc.type === 'business_photo' && '🏪'}
+                                  </div>
+                                  <div className="w-full">
+                                    <div className="font-semibold text-gray-900 mb-1">
+                                      {doc.type === 'license' && 'Ehliyet'}
+                                      {doc.type === 'id_card' && 'Kimlik'}
+                                      {doc.type === 'vehicle_registration' && 'Araç Ruhsatı'}
+                                      {doc.type === 'business_photo' && 'İşletme Fotoğrafı'}
+                                    </div>
+                                    <div className="text-xs text-gray-600 break-all">{doc.filename}</div>
+                                  </div>
+                                  <div className="flex items-center space-x-1 text-blue-600 text-sm font-medium">
+                                    <span>Görüntüle</span>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                  </div>
+                                </div>
+                                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                  ✓
+                                </div>
                               </a>
                             ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mb-6">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                            <span>📄</span>
+                            <span>Yüklenen Belgeler</span>
+                          </h4>
+                          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                            <div className="flex items-start space-x-3">
+                              <span className="text-2xl">⚠️</span>
+                              <div>
+                                <p className="font-semibold text-red-900">Belge Yüklenmemiş!</p>
+                                <p className="text-sm text-red-700 mt-1">
+                                  Bu kullanıcı kayıt sırasında gerekli belgeleri yüklememiş. Başvuruyu reddetmeyi veya kullanıcıdan belge istemegi düşünün.
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}
