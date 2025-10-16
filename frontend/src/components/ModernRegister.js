@@ -214,7 +214,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           type="password"
           placeholder="Şifre (min. 6 karakter) *"
           value={formData.password}
-          onChange={(e) => setFormData({...formData, password: e.target.value})}
+          onChange={(e) => handleInputChange('password', e.target.value)}
           className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
