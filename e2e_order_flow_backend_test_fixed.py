@@ -260,8 +260,8 @@ class E2EOrderFlowTester:
         """Test critical order creation with specific payload"""
         print("🛒 Testing Order Creation (CRITICAL)...")
         
-        if "customer" not in self.sessions:
-            self.log_test("Order Creation", False, "Customer session not available")
+        if "customer" not in self.tokens:
+            self.log_test("Order Creation", False, "Customer JWT token not available")
             return False
         
         try:
@@ -291,10 +291,15 @@ class E2EOrderFlowTester:
                 "notes": "E2E test order"
             }
             
-            response = self.sessions["customer"].post(
+            # Use JWT token for order creation
+            headers = {
+                "Authorization": f"Bearer {self.tokens['customer']}",
+                "Content-Type": "application/json"
+            }
+            response = requests.post(
                 f"{BACKEND_URL}/orders",
                 json=order_payload,
-                headers={"Content-Type": "application/json"}
+                headers=headers
             )
             
             if response.status_code in [201, 200]:
