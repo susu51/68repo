@@ -1245,6 +1245,11 @@ const AdminDashboard = ({ user }) => {
             </Card>
           </TabsContent>
 
+          {/* Advertisements Tab */}
+          <TabsContent value="advertisements" className="space-y-6">
+            <AdminAdvertisements />
+          </TabsContent>
+
           {/* Map Tab */}
           <TabsContent value="map">
             <Card>
