@@ -128,7 +128,7 @@ class E2EOrderFlowTester:
         print("📋 Testing Business Menu Endpoint...")
         
         try:
-            response = self.session.get(f"{BACKEND_URL}/business/business-e2e-rest-001/menu")
+            response = self.session.get(f"{BACKEND_URL}/business/business-e2e-001/menu")
             
             if response.status_code == 200:
                 data = response.json()
