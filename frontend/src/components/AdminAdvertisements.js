@@ -393,7 +393,7 @@ const AdminAdvertisements = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+                  className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-orange-600 text-white rounded-lg hover:bg-orange-700 order-1 sm:order-2"
                 >
                   Reklam Oluştur
                 </button>
