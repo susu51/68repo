@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Configuration
-BACKEND_URL = "https://order-system-44.preview.emergentagent.com"
+BACKEND_URL = "https://deliverypro.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials from the review request

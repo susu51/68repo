@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BASE_URL = "https://order-system-44.preview.emergentagent.com"
+BASE_URL = "https://deliverypro.preview.emergentagent.com"
 AUTH_BASE_URL = f"{BASE_URL}/api/auth"
 
 async def test_logout_debug():

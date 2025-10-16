@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { MapPin, Navigation, Package, Store, Clock, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://order-system-44.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://deliverypro.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierReadyOrdersMap = () => {

@@ -9,7 +9,7 @@ import time
 
 def test_specific_issues():
     """Test specific issues found in comprehensive testing"""
-    base_url = "https://order-system-44.preview.emergentagent.com"
+    base_url = "https://deliverypro.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("🔍 FOCUSED TESTING OF IDENTIFIED ISSUES")
