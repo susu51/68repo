@@ -1437,8 +1437,8 @@ async def upload_file(file: UploadFile = File(...)):
 
 # Get current user info
 @api_router.get("/me")
-async def get_current_user_info(current_user: dict = Depends(get_current_user)):
-    """Get current user information"""
+async def get_current_user_info(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Get current user information - supports both cookie and bearer token"""
     # Convert ObjectId to string if present (for database users)
     if "_id" in current_user:
         current_user["id"] = str(current_user["_id"])
