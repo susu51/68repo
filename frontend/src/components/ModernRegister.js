@@ -52,6 +52,16 @@ const ModernRegister = ({ onSuccess, onBack }) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   }, []);
 
+  // Special handler for city change (resets district and neighborhood)
+  const handleCityChange = useCallback((value) => {
+    setFormData(prev => ({
+      ...prev,
+      city: value,
+      district: '',
+      neighborhood: ''
+    }));
+  }, []);
+
   const handleSubmit = async () => {
     setLoading(true);
     
