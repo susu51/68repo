@@ -1562,9 +1562,10 @@ frontend:
 
 test_plan:
   current_focus:
+    - "Admin Advertisements Tab Functionality"
     - "Customer Panel Backend System - Comprehensive Testing"
-    - "JWT Authentication Issue Resolution"
   stuck_tasks: 
+    - "Admin Advertisements Tab Functionality"
     - "JWT-based endpoint authentication (orders, profile)"
   test_all: false
   test_priority: "high_first"
