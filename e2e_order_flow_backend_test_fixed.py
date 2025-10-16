@@ -445,12 +445,16 @@ class E2EOrderFlowTester:
         total_rbac_tests = 3
         
         # Test 1: Customer tries to update order status
-        if "customer" in self.sessions and self.created_order_id:
+        if "customer" in self.tokens and self.created_order_id:
             try:
-                response = self.sessions["customer"].patch(
+                headers = {
+                    "Authorization": f"Bearer {self.tokens['customer']}",
+                    "Content-Type": "application/json"
+                }
+                response = requests.patch(
                     f"{BACKEND_URL}/orders/{self.created_order_id}/status",
                     json={"from": "ready_for_pickup", "to": "delivered"},
-                    headers={"Content-Type": "application/json"}
+                    headers=headers
                 )
                 
                 if response.status_code == 403:
