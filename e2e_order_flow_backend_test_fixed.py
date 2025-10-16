@@ -297,7 +297,7 @@ class E2EOrderFlowTester:
                 "Content-Type": "application/json"
             }
             response = requests.post(
-                f"{BACKEND_URL}/orders",
+                f"{BACKEND_URL}/orders/",
                 json=order_payload,
                 headers=headers
             )
