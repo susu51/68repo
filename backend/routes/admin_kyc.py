@@ -15,13 +15,9 @@ class KYCApprovalRequest(BaseModel):
     reason: Optional[str] = None
 
 @router.get("/kyc/pending")
-async def get_pending_kyc_requests(current_user: dict = Depends(lambda: {"role": "admin"})):
+async def get_pending_kyc_requests(current_user: dict = Depends(get_admin_user)):
     """Get all pending KYC requests"""
     from server import db
-    
-    # Only admin can access
-    if current_user.get("role") != "admin":
-        raise HTTPException(403, "Admin access required")
     
     # Get all users with pending KYC
     pending_users = await db.users.find({
