@@ -200,8 +200,10 @@ const AdminAdvertisements = () => {
       business_name: '',
       title: '',
       city: '',
+      district: '',
       image: null
     });
+    setFilteredBusinesses(businesses);
   };
 
   const openModal = () => {
