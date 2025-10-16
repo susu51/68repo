@@ -484,12 +484,16 @@ class E2EOrderFlowTester:
                 self.log_test("RBAC - Business Cross-Access", False, f"Exception: {str(e)}")
         
         # Test 3: Courier tries to update order not assigned to them
-        if "courier" in self.sessions and self.created_order_id:
+        if "courier" in self.tokens and self.created_order_id:
             try:
-                response = self.sessions["courier"].patch(
+                headers = {
+                    "Authorization": f"Bearer {self.tokens['courier']}",
+                    "Content-Type": "application/json"
+                }
+                response = requests.patch(
                     f"{BACKEND_URL}/orders/{self.created_order_id}/status",
                     json={"from": "ready_for_pickup", "to": "picked_up"},
-                    headers={"Content-Type": "application/json"}
+                    headers=headers
                 )
                 
                 if response.status_code == 403:
