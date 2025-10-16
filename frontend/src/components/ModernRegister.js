@@ -170,6 +170,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           <>
             <input
               type="text"
+              name="business_name"
               placeholder="İşletme/Restoran Adı *"
               value={formData.business_name}
               onChange={(e) => handleInputChange('business_name', e.target.value)}
@@ -178,6 +179,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
             />
             <input
               type="text"
+              name="business_tax_id"
               placeholder="Vergi Numarası *"
               value={formData.business_tax_id}
               onChange={(e) => handleInputChange('business_tax_id', e.target.value)}
