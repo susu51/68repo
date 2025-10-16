@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./com
 import { Badge } from "./components/ui/badge";
 import { KuryeciniLogo, KuryeciniTextLogo } from "./components/KuryeciniLogo";
 import PhoneAuth from "./PhoneAuth";
+import ModernRegister from './components/ModernRegister';
 import toast from 'react-hot-toast';
 import { api } from './api/http';  // Use cookie-aware API client
 import { useCookieAuth } from './contexts/CookieAuthContext';  // Use auth context
