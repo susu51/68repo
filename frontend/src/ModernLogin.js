@@ -449,6 +449,29 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                 {/* Register Mode: Show first_name and last_name */}
                 {isRegisterMode && (
                   <>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 mb-2 flex items-center space-x-2">
+                      <span className="text-xl">
+                        {selectedRole === 'customer' && '🛒'}
+                        {selectedRole === 'courier' && '🏍️'}
+                        {selectedRole === 'business' && '🏪'}
+                      </span>
+                      <span className="text-sm font-medium text-orange-800">
+                        {selectedRole === 'customer' && 'Müşteri Kaydı'}
+                        {selectedRole === 'courier' && 'Kurye Kaydı'}
+                        {selectedRole === 'business' && 'İşletme Kaydı'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRegisterStep('role-selection');
+                          setSelectedRole(null);
+                        }}
+                        className="ml-auto text-xs text-orange-600 hover:text-orange-800"
+                      >
+                        Değiştir
+                      </button>
+                    </div>
+                    
                     <div className="grid grid-cols-2 gap-2 mb-2">
                       <Input
                         type="text"
@@ -473,6 +496,58 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
                         className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
                       />
                     </div>
+
+                    {/* Courier-specific fields */}
+                    {selectedRole === 'courier' && (
+                      <div className="mb-2">
+                        <select
+                          value={formData.vehicle_type}
+                          onChange={(e) => {
+                            setFormData({...formData, vehicle_type: e.target.value});
+                            setError('');
+                          }}
+                          required
+                          className={`w-full px-3 py-2 border rounded-lg ${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80 border-gray-300'}`}
+                        >
+                          <option value="">Araç Tipi Seçin</option>
+                          <option value="bicycle">🚲 Bisiklet</option>
+                          <option value="motorbike">🏍️ Motosiklet</option>
+                          <option value="car">🚗 Araba</option>
+                          <option value="van">🚚 Minivan</option>
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Business-specific fields */}
+                    {selectedRole === 'business' && (
+                      <>
+                        <div className="mb-2">
+                          <Input
+                            type="text"
+                            placeholder="İşletme/Restoran Adı"
+                            value={formData.business_name}
+                            onChange={(e) => {
+                              setFormData({...formData, business_name: e.target.value});
+                              setError('');
+                            }}
+                            required
+                            className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                          />
+                        </div>
+                        <div className="mb-2">
+                          <Input
+                            type="text"
+                            placeholder="İşletme Adresi"
+                            value={formData.address}
+                            onChange={(e) => {
+                              setFormData({...formData, address: e.target.value});
+                              setError('');
+                            }}
+                            className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                          />
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
                 
