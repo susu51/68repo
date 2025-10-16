@@ -268,40 +268,82 @@ async def logout(response: Response):
     return {"success": True, "message": "Logged out"}
 
 @auth_router.post("/register")
-async def register(body: RegisterRequest, response: Response):
+async def register(
+    response: Response,
+    email: str = Form(...),
+    password: str = Form(...),
+    first_name: str = Form(""),
+    last_name: str = Form(""),
+    role: str = Form("customer"),
+    phone: str = Form(""),
+    city: str = Form(""),
+    district: str = Form(""),
+    vehicle_type: str = Form(""),
+    business_name: str = Form(""),
+    business_tax_id: str = Form(""),
+    license_photo: UploadFile = File(None),
+    id_photo: UploadFile = File(None),
+    vehicle_photo: UploadFile = File(None),
+    business_photo: UploadFile = File(None)
+):
+    """
+    Register new user with role-specific data and file uploads
+    """
     # Import db from server.py
     from server import db
     
     # Check if user exists
-    existing = await db.users.find_one({"email": body.email})
+    existing = await db.users.find_one({"email": email})
     if existing:
         raise HTTPException(400, "User already exists")
     
     # Create user
     user_id = str(uuid.uuid4())
-    hashed_pw = hash_password(body.password)
+    hashed_pw = hash_password(password)
     
     user_data = {
-        "_id": user_id,  # MongoDB _id
-        "id": user_id,   # Also add id field for compatibility
-        "email": body.email,
+        "_id": user_id,
+        "id": user_id,
+        "email": email,
         "password": hashed_pw,
-        "first_name": body.first_name,
-        "last_name": body.last_name,
-        "name": f"{body.first_name} {body.last_name}".strip(),  # Add full name
-        "role": body.role,
+        "first_name": first_name,
+        "last_name": last_name,
+        "name": f"{first_name} {last_name}".strip(),
+        "role": role,
+        "phone": phone,
+        "city": city,
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc),
         "is_active": True,
-        "is_verified": False,  # Email verification pending
-        "kyc_status": "pending" if body.role in ["business", "courier"] else None
+        "is_verified": False,
+        "kyc_status": "pending" if role in ["business", "courier"] else None
     }
+    
+    # Role-specific data
+    if role == "courier":
+        user_data["district"] = district
+        user_data["vehicle_type"] = vehicle_type
+        
+        # Save uploaded files (simplified - in production, use cloud storage)
+        if license_photo:
+            user_data["license_photo_filename"] = license_photo.filename
+        if id_photo:
+            user_data["id_photo_filename"] = id_photo.filename
+        if vehicle_photo:
+            user_data["vehicle_photo_filename"] = vehicle_photo.filename
+    
+    if role == "business":
+        user_data["business_name"] = business_name
+        user_data["business_tax_id"] = business_tax_id
+        
+        if business_photo:
+            user_data["business_photo_filename"] = business_photo.filename
     
     await db.users.insert_one(user_data)
     
     # Auto-login after registration - generate tokens
-    access_token = make_token(body.email, ACCESS_TTL)
-    refresh_token = make_token(body.email, REFRESH_TTL)
+    access_token = make_token(email, ACCESS_TTL)
+    refresh_token = make_token(email, REFRESH_TTL)
     
     # Set cookies
     response.set_cookie(
@@ -319,15 +361,16 @@ async def register(body: RegisterRequest, response: Response):
     
     return {
         "success": True, 
-        "message": "Registration successful", 
+        "message": f"{role.title()} registration successful", 
         "user_id": user_id,
         "access_token": access_token,
         "user": {
             "id": user_id,
-            "email": body.email,
-            "role": body.role,
-            "first_name": body.first_name,
-            "last_name": body.last_name
+            "email": email,
+            "role": role,
+            "first_name": first_name,
+            "last_name": last_name,
+            "kyc_status": user_data.get("kyc_status")
         }
     }
 
