@@ -211,8 +211,8 @@ async def get_current_user(request: Request):
         payload = verify_token(access_token)
         email = payload["sub"]
         
-        # Get user from database
-        db = get_db()
+        # Get user from database - import from server.py
+        from server import db
         user = await db.users.find_one({"email": email})
         
         if not user:
