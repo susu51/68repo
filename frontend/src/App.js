@@ -4997,6 +4997,10 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
             <ModernLogin 
               onClose={onCloseLogin}
               onLogin={onLoginSuccess}
+              onRegisterClick={() => {
+                setShowLogin(false);
+                onAuthStart(); // Navigate to auth page with registration flow
+              }}
             />
           </div>
         </div>
