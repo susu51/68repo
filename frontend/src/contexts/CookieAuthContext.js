@@ -84,7 +84,7 @@ export const CookieAuthProvider = ({ children }) => {
       }
 
       // Get user data after successful login
-      const meResponse = await api("/auth/me");
+      const meResponse = await api("/me");  // Use /api/me instead of /api/auth/me
       const userData = await meResponse.json();
       
       setUser(userData);
