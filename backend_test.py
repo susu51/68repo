@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 """
-🚀 PHASE 1 COURIER BACKEND QUICK TEST
-Testing 5 newly added courier endpoints with authentication
+Advertisement System Backend Testing
+Test all advertisement endpoints as specified in the review request
 """
 
 import requests
 import json
+import os
 import sys
-from datetime import datetime, timezone
-import time
+from datetime import datetime
+import tempfile
+from io import BytesIO
 
-# Configuration
+# Backend URL from frontend .env
 BACKEND_URL = "https://deliverypro.preview.emergentagent.com/api"
-COURIER_EMAIL = "testkurye@example.com"
-COURIER_PASSWORD = "test123"
+
+# Test credentials
+ADMIN_EMAIL = "admin@kuryecini.com"
+ADMIN_PASSWORD = "admin123"
 
 class CourierBackendTester:
     def __init__(self):
