@@ -124,11 +124,11 @@ class E2EOrderFlowTester:
             return False
     
     def test_business_menu_endpoint(self):
-        """Test GET /api/businesses/business-e2e-rest-001/menu (verify 5 products)"""
+        """Test GET /api/business/business-e2e-rest-001/menu (verify 5 products)"""
         print("📋 Testing Business Menu Endpoint...")
         
         try:
-            response = self.session.get(f"{BACKEND_URL}/businesses/business-e2e-rest-001/menu")
+            response = self.session.get(f"{BACKEND_URL}/business/business-e2e-rest-001/menu")
             
             if response.status_code == 200:
                 data = response.json()
