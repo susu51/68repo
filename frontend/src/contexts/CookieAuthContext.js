@@ -125,10 +125,16 @@ export const CookieAuthProvider = ({ children }) => {
       const result = await response.json();
       console.log('✅ Registration successful');
       
-      return result;
+      // Auto-login after registration - get user data
+      if (result.success && result.user) {
+        setUser(result.user);
+        console.log('✅ User auto-logged in after registration');
+      }
+      
+      return { success: true, user: result.user };
     } catch (error) {
       console.error('❌ Registration failed:', error);
-      throw error;
+      return { success: false, error: error.message || 'Registration failed' };
     }
   };
 
