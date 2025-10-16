@@ -180,17 +180,17 @@ const AdminAdvertisements = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Reklam Yönetimi</h1>
-            <p className="text-gray-600 mt-2">Müşteri panelinde gösterilecek restoran reklamlarını yönetin</p>
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Reklam Yönetimi</h1>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Müşteri panelinde gösterilecek restoran reklamlarını yönetin</p>
           </div>
           <button
             onClick={openModal}
-            className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base"
           >
             <span>➕</span>
             <span>Yeni Reklam</span>
