@@ -102,13 +102,13 @@ const ModernRegister = ({ onSuccess, onBack }) => {
 
   // Step 1: Role Selection
   const RoleSelection = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Nasıl Kayıt Olmak İstersiniz?</h2>
-        <p className="text-gray-600">Rolünüzü seçerek başlayın</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="text-center mb-4 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">Nasıl Kayıt Olmak İstersiniz?</h2>
+        <p className="text-sm sm:text-base text-gray-600">Rolünüzü seçerek başlayın</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {[
           { id: 'customer', icon: '🛒', title: 'Müşteri', desc: 'Sipariş vermek için' },
           { id: 'courier', icon: '🏍️', title: 'Kurye', desc: 'Teslimat yapmak için' },
@@ -120,11 +120,11 @@ const ModernRegister = ({ onSuccess, onBack }) => {
               setRole(item.id);
               setStep(2);
             }}
-            className="group p-8 border-2 border-gray-200 rounded-2xl hover:border-orange-500 hover:shadow-xl transition-all duration-300 text-center bg-white"
+            className="group p-4 sm:p-6 md:p-8 border-2 border-gray-200 rounded-xl sm:rounded-2xl hover:border-orange-500 hover:shadow-xl transition-all duration-300 text-center bg-white"
           >
-            <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform">{item.icon}</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-orange-600">{item.title}</h3>
-            <p className="text-gray-600">{item.desc}</p>
+            <div className="text-4xl sm:text-5xl md:text-6xl mb-2 sm:mb-3 md:mb-4 transform group-hover:scale-110 transition-transform">{item.icon}</div>
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-orange-600">{item.title}</h3>
+            <p className="text-xs sm:text-sm md:text-base text-gray-600">{item.desc}</p>
           </button>
         ))}
       </div>
