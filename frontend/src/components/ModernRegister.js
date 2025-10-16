@@ -206,21 +206,21 @@ const ModernRegister = ({ onSuccess, onBack }) => {
           placeholder="Şifre (min. 6 karakter) *"
           value={formData.password}
           onChange={(e) => setFormData({...formData, password: e.target.value})}
-          className="col-span-2 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
       </div>
 
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 pt-3 sm:pt-4">
         <button
           onClick={() => setStep(1)}
-          className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50"
+          className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl text-gray-700 hover:bg-gray-50 order-2 sm:order-1"
         >
           ← Geri
         </button>
         <button
           onClick={() => setStep(3)}
-          className="px-8 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700"
+          className="px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base bg-orange-600 text-white rounded-lg sm:rounded-xl hover:bg-orange-700 order-1 sm:order-2"
         >
           İleri →
         </button>
@@ -230,9 +230,9 @@ const ModernRegister = ({ onSuccess, onBack }) => {
 
   // Step 3: Location
   const LocationInfo = () => (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Konum Bilgileri</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="mb-4 sm:mb-6">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Konum Bilgileri</h2>
         <p className="text-gray-600">Şehir, ilçe ve mahalle bilgilerinizi girin</p>
       </div>
 
