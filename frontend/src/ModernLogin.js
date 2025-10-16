@@ -303,15 +303,15 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
             </div>
           )}
 
-          {/* Email Login Form */}
+          {/* Email Login/Register Form */}
           {!loading && loginMethod === 'email' && (
-            <form onSubmit={handleEmailLogin} className="space-y-4">
+            <form onSubmit={isRegisterMode ? handleRegister : handleEmailLogin} className="space-y-4">
               {/* Error Message */}
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start space-x-2">
                   <span className="text-red-600 text-lg">⚠️</span>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-red-800">Giriş Hatası</p>
+                    <p className="text-sm font-medium text-red-800">{isRegisterMode ? 'Kayıt Hatası' : 'Giriş Hatası'}</p>
                     <p className="text-sm text-red-600">{error}</p>
                   </div>
                 </div>
@@ -320,8 +320,41 @@ export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
               <div>
                 <div className="flex items-center space-x-2 mb-2">
                   <KuryeciniLogo size="small" />
-                  <span className="text-sm font-medium text-gray-700">E-posta ile Giriş</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {isRegisterMode ? 'E-posta ile Kayıt Ol' : 'E-posta ile Giriş'}
+                  </span>
                 </div>
+                
+                {/* Register Mode: Show first_name and last_name */}
+                {isRegisterMode && (
+                  <>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <Input
+                        type="text"
+                        placeholder="Adınız"
+                        value={formData.first_name}
+                        onChange={(e) => {
+                          setFormData({...formData, first_name: e.target.value});
+                          setError('');
+                        }}
+                        required
+                        className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                      />
+                      <Input
+                        type="text"
+                        placeholder="Soyadınız"
+                        value={formData.last_name}
+                        onChange={(e) => {
+                          setFormData({...formData, last_name: e.target.value});
+                          setError('');
+                        }}
+                        required
+                        className={`${theme === 'dark' ? 'bg-gray-700/50 border-gray-600 text-white' : 'bg-white/80'} backdrop-blur-sm`}
+                      />
+                    </div>
+                  </>
+                )}
+                
                 <Input
                   type="email"
                   placeholder="ornek@email.com"
