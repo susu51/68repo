@@ -190,6 +190,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         
         <input
           type="text"
+          name="first_name"
           placeholder="Adınız *"
           value={formData.first_name}
           onChange={(e) => handleInputChange('first_name', e.target.value)}
@@ -198,6 +199,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         />
         <input
           type="text"
+          name="last_name"
           placeholder="Soyadınız *"
           value={formData.last_name}
           onChange={(e) => handleInputChange('last_name', e.target.value)}
@@ -206,6 +208,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         />
         <input
           type="tel"
+          name="phone"
           placeholder="Telefon (05XX XXX XX XX) *"
           value={formData.phone}
           onChange={(e) => handleInputChange('phone', e.target.value)}
@@ -214,6 +217,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         />
         <input
           type="email"
+          name="email"
           placeholder="E-posta *"
           value={formData.email}
           onChange={(e) => handleInputChange('email', e.target.value)}
@@ -222,6 +226,7 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         />
         <input
           type="password"
+          name="password"
           placeholder="Şifre (min. 6 karakter) *"
           value={formData.password}
           onChange={(e) => handleInputChange('password', e.target.value)}
