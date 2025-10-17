@@ -96,7 +96,7 @@ class FocusedProductionTest:
         # Feature 3: Environment variables and CORS configuration
         try:
             headers = {
-                'Origin': 'https://deliverypro.preview.emergentagent.com',
+                'Origin': 'https://kuryecini-admin-1.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type,Authorization'
             }

@@ -22,7 +22,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://deliverypro.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-admin-1.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 class IntegrationTester:

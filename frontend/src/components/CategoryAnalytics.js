@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://deliverypro.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-admin-1.preview.emergentagent.com/api';
 
 export const CategoryAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState(null);

@@ -1,92 +1,71 @@
 <analysis>
-The AI engineer's work on the Kuryecini application began with a comprehensive Business Panel rebuild, addressing persistent React DOM errors with  and an enhanced error suppressor. Critical fixes included backend authentication for business endpoints, strict category validation, and rectifying  to parse JSON responses, which resolved silent data fetching failures. Subsequent efforts focused on resolving a  in  related to JSX Fragments, followed by implementing a user-provided, more robust  function with optimistic UI updates and improved error handling, extended to  and . A major refactor of the registration flow was undertaken, introducing a modern, wizard-style form with role-specific fields, city/district selection, and multi-part file uploads for KYC documents. Backend  and  endpoints were debugged and updated to support cookie-based authentication and file persistence. The Admin KYC panel was integrated to display pending requests and uploaded documents. The immediate focus is on enhancing the Admin KYC panel to show detailed contact information and documents.
+The AI engineer's work on the Kuryecini application began with enhancing the Admin KYC panel, involving backend and frontend analysis. This was interrupted by a significant user request for an advertisement management system. The AI successfully implemented backend advertisement routes, new frontend components (, ), integrated them into  and , added city-based targeting, and ensured mobile responsiveness.
+
+Major debugging efforts addressed conflicting  implementations, which prevented the new advertisement tab from rendering. The AI also fixed critical frontend issues: mobile responsiveness for the registration form and a persistent keyboard closing bug in  caused by re-renders and variable redeclarations. The registration flow was refactored into a separate page, necessitating significant routing changes and  integration.
+
+The user then provided iterative feedback on the login experience, requesting specific modern login styles (with tabs, OAuth, phone options) and separate registration pages. The most recent task involves a comprehensive UI/UX update: a new gradient login design, removing the register button from the login view, activating OAuth/phone login, and implementing a site-wide dark/light mode while excluding the customer panel from dark mode. The AI has initiated the theme context and styling for this.
 </analysis>
 
 <product_requirements>
-The Kuryecini platform supports Customer, Business, Courier, and Admin roles, emphasizing a modern UI, MongoDB, and secure authentication. The current phase focuses on a refactor and expansion. Key features include CRUD for addresses with geocoding, distance-based restaurant discovery, and a real-time order flow ( to ). A completely rebuilt Business Panel includes menu management, order management, and region setup. The user also explicitly requested comprehensive E2E tests for the entire order flow, address switching, role guards, product CRUD, and real-time updates. Detailed role-specific registration forms (Customer, Courier, Business) with city/district/neighborhood selection and file uploads for KYC documents (license, vehicle, business photos) are required. The uploaded KYC documents and contact information must be viewable in the Admin KYC panel and on the user's own profile page.
+The Kuryecini platform requires supporting Customer, Business, Courier, and Admin roles with a modern UI, MongoDB, and secure authentication. Core features include address CRUD with geocoding, distance-based restaurant discovery, and a real-time order flow. A rebuilt Business Panel handles menu, order, and region management. Comprehensive E2E tests are needed for the order flow, address switching, role guards, product CRUD, and real-time updates.
+
+Recent additions include:
+-   **Detailed Registration:** Role-specific multi-step forms (Customer, Courier, Business) with city/district/neighborhood selection and multi-part file uploads for KYC documents.
+-   **KYC Management:** Uploaded KYC documents and contact information must be viewable in an Admin KYC panel and on the user's own profile page.
+-   **Advertisement System:** A sliding banner advertisement system on the customer's Discover page, displaying restaurant ads. These advertisements must be manageable from an Admin panel, include a 7-second auto-slide feature, and be dynamically filtered based on the customer's city. The ad creation process in the Admin panel should allow selection of provinces, districts, and associated restaurants.
+-   **Login/Registration UX Refinement:** Iterative requests for specific modern login modal designs, with options for email/password, phone, and OAuth logins. The registration flow should be a separate, dedicated page.
+-   **Global Theme & UI:** Implementation of a site-wide dark/light mode, with specific instructions to exclude the customer panel from the dark theme, alongside general login UI beautification.
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-stack Architecture**: React frontend, FastAPI backend, MongoDB.
-- **Authentication**: JWT, secure cookies, role-based access control, fixed  mismatch.
-- **Data Persistence**: MongoDB with  indexing, UUIDs.
-- **Mapping/Geocoding**: Leaflet, OpenStreetMap, Mapbox Places.
-- **Real-time Communication**: WebSocket (with polling fallback) planned for order updates.
-- **UI/Styling**: Tailwind CSS, CSS variables,  for stable DOM rendering.
+-   **Full-stack Architecture**: React frontend, FastAPI backend, MongoDB.
+-   **Authentication**: JWT, secure cookies, role-based access control.
+-   **Data Persistence**: MongoDB with UUIDs,  indexing.
+-   **Mapping/Geocoding**: Leaflet, OpenStreetMap, Mapbox Places.
+-   **UI/Styling**: Tailwind CSS, CSS variables,  for DOM stability.
+-   **Routing**: React Router DOM (, , , ).
+-   **State Management**: React , , ,  (for authentication and theming).
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a React frontend, FastAPI backend, and MongoDB database.
+The application employs a React frontend, a FastAPI backend, and a MongoDB database, organized as follows:
 
-**Directory Structure:**
 
 
 **Key Files and Changes:**
-*   ****:
-    *   **Importance**: Main FastAPI application.
-    *   **Changes**: Included  router. Modified  endpoint to use  for cookie-based authentication and return KYC documents. Ensured  is correctly mounted for static file serving.
-*   ****:
-    *   **Importance**: Handles JWT and cookie-based authentication.
-    *   **Changes**: Added  endpoint. Fixed  mismatch. Corrected MongoDB client import. Modified  to correctly extract  from token payload and use proper DB client. Updated  endpoint to accept  for file uploads, store files in , and set .
-*   ****:
-    *   **Importance**: New file for Admin KYC management endpoints.
-    *   **Changes**: Implemented endpoints to fetch pending KYC requests, approve/reject users, and retrieve user details including documents and neighborhood info.
-*   ****:
-    *   **Importance**: New script for seeding database with E2E test data.
-    *   **Changes**: Populates admin, business, courier, and customer accounts with specific details (e.g., restaurant location, customer address, courier vehicle type, menu items).
-*   ****:
-    *   **Importance**: Primary application routing and context provider.
-    *   **Changes**: Integrated . Added  for KYC in the . Imported .
-*   ****:
-    *   **Importance**: Custom script to suppress specific React DOM errors.
-    *   **Changes**: Enhanced error suppression.
-*   ****:
-    *   **Importance**: Utility for making API calls.
-    *   **Changes**: Behavior (returning raw Response) was the root cause of frontend data loading issues, necessitating modifications in components like .
-*   ****:
-    *   **Importance**: Handles user login and registration entry point.
-    *   **Changes**: Refactored to manage  and  states. Now conditionally renders  for the multi-step registration flow. Old inline register form removed.
-*   ****:
-    *   **Importance**: CRUD operations for business menu items.
-    *   **Changes**: Corrected JSX Fragment structure to resolve . Replaced existing  with a user-provided, more robust version to handle field name mapping ( -> ), type coercion (price, prep_minutes), comprehensive error handling with toasts, optimistic UI updates, and loading state management. Similar improvements applied to  and .
-*   ****:
-    *   **Importance**: Manages user authentication state and session.
-    *   **Changes**: Updated  to call . Ensured  function sets user data upon successful registration.
-*   ****:
-    *   **Importance**: NEW component for the multi-step, role-specific registration wizard.
-    *   **Changes**: Implemented steps for role selection, personal/business details, location (city/district/neighborhood), and document uploads. Uses . Handles  for file uploads, ensuring only non-null files are appended.
-*   ****:
-    *   **Importance**: Admin panel UI.
-    *   **Changes**: Added a KYC Requests tab to navigate to the  component.
-*   ****:
-    *   **Importance**: NEW component for Admin to review and manage KYC requests.
-    *   **Changes**: Displays pending user requests. It will be further enhanced to show contact information and documents for each user.
-*   ****:
-    *   **Importance**: NEW component to display a user's profile including their contact information and uploaded KYC documents.
-    *   **Changes**: Created, and integrated into  for each user role.
-*   ****:
-    *   **Importance**: NEW file containing Turkish city, district, and neighborhood data.
-    *   **Changes**: Provides structured location data for registration forms.
-*   ****:
-    *   **Importance**: NEW documentation for E2E testing procedures.
-    *   **Changes**: Created to outline testing steps and seed data information.
-
+*   ****: Includes  and  routers.
+*   ****: New file for Admin advertisement CRUD endpoints, including city/district/restaurant selection.
+*   ****: New file for fetching city-filtered customer advertisements.
+*   ****: New script to seed test users with pending KYC.
+*   ****: Integrated . Added Reklamlar tab and  component to the main . Defined  route. Removed  route.
+*   ****: Wrapped the  component with .
+*   ****: New Admin UI for ad management; includes forms, image uploads, location/restaurant filtering, and mobile responsiveness.
+*   ****: New Customer UI for displaying auto-sliding, city-filtered ads; includes mobile responsiveness.
+*   ****: Refactored for mobile responsiveness, attempted fixes for keyboard closing issues with  and unified  handlers, and fixed a  variable redeclaration syntax error.
+*   ****: Repeatedly refactored to align with user's evolving login UI requests, from basic to a full-featured modern design with tabs, OAuth, and phone options. Currently being updated to a new gradient design.
+*   ****: Updated buttons to trigger  modal or navigate to  page; removed  references.
+*   ****: New dedicated page for the registration wizard.
+*   ****: Integrated the  component.
+*   ****: New context for site-wide dark/light mode management.
+*   ****: Updated for stronger React DOM error suppression.
 </code_architecture>
 
 <pending_tasks>
-- Complete order tracking features with real-time updates and map view (PHASE 2C).
-- Integrate customer rating modal post-delivery (PHASE 2C).
-- Implement Business/Restaurant analytics (PHASE 2D).
-- Add unit and E2E tests for all new features (PHASE 2D).
-- Refine the Restoran bulunamadı issue on DiscoverPage after GPS activation.
-- Fix Dashboard's Menü Ürünleri: 0 count not reflecting actual menu items.
-- Enhance Admin KYC panel to show detailed contact information and uploaded documents.
+-   Complete order tracking features with real-time updates and map view (PHASE 2C).
+-   Integrate customer rating modal post-delivery (PHASE 2C).
+-   Implement Business/Restaurant analytics (PHASE 2D).
+-   Add unit and E2E tests for all new features (PHASE 2D).
+-   Refine the Restoran bulunamadı issue on DiscoverPage after GPS activation.
+-   Fix Dashboard's Menü Ürünleri: 0 count not reflecting actual menu items.
+-   Enhance Admin KYC panel to show detailed contact information and uploaded documents.
+-   Activate OAuth and Phone authentication options in the  component.
+-   Ensure the customer panel is excluded from the site-wide dark theme.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was addressing a critical user request concerning the visibility of KYC documents and contact information in the Admin KYC panel. Previously, it was confirmed that file uploads via the  wizard successfully store documents in the backend, and the  endpoint returns KYC document metadata. A  component was created and integrated into  for user-side display. The admin  component could fetch pending requests, but the actual images and detailed contact information were not visually represented or fully detailed. The current task is to enhance  to properly display uploaded documents (likely as clickable links to the static files) and the comprehensive contact details of the user.
+The AI engineer is currently implementing a significant UI/UX overhaul of the application's login and theming based on the user's latest requests. This involves: creating a new, visually enhanced gradient login in  as depicted in the user's screenshot; removing the Register button from the login view (as registration is now on a separate page); activating and enabling the OAuth and phone login options within ; establishing a site-wide dark/light mode mechanism by setting up  and adding global dark mode styles in ; and crucially, ensuring the customer-facing panels remain in a light theme, overriding the global dark mode. The  has been created,  updated, a new  is being written, and  is integrated into .
 </current_work>
 
 <optional_next_step>
-Update the  component to display contact information and uploaded documents with their filenames and links.
+Complete the  implementation, activate OAuth/phone logins, and ensure the customer panel is excluded from dark theme.
 </optional_next_step>

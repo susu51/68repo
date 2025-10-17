@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 import time
 
 # Configuration
-BACKEND_URL = "https://deliverypro.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-admin-1.preview.emergentagent.com/api"
 
 # Test Credentials
 TEST_CREDENTIALS = {

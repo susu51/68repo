@@ -40,7 +40,7 @@ import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
 // Use REACT_APP environment variable with fallback
-const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://deliverypro.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://kuryecini-admin-1.preview.emergentagent.com/api';
 
 // Console log for debugging
 console.log('Frontend connecting to:', API_BASE);

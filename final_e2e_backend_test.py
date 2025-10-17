@@ -19,7 +19,7 @@ import time
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://deliverypro.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-admin-1.preview.emergentagent.com/api"
 
 # Test Users
 BUSINESS_EMAIL = "testbusiness@example.com"
