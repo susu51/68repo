@@ -4932,14 +4932,16 @@ function App() {
   };
 
   return (
-    <CookieAuthProvider>
-      <AppContent 
-        showLogin={showLogin}
-        onAuthStart={handleAuthStart}
-        onLoginSuccess={handleLoginSuccess}
-        onCloseLogin={() => setShowLogin(false)}
-      />
-    </CookieAuthProvider>
+    <ThemeProvider>
+      <CookieAuthProvider>
+        <AppContent 
+          showLogin={showLogin}
+          onAuthStart={handleAuthStart}
+          onLoginSuccess={handleLoginSuccess}
+          onCloseLogin={() => setShowLogin(false)}
+        />
+      </CookieAuthProvider>
+    </ThemeProvider>
   );
 }
 
