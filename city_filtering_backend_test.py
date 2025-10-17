@@ -85,12 +85,12 @@ class CityFilteringTester:
             self.log_test("Business Login", False, "", f"Exception: {str(e)}")
             return False
     
-    def test_ankara_city_filtering(self):
-        """Test 2: Test city filtering with Ankara coordinates - should only return Ankara businesses"""
+    def test_aksaray_city_filtering(self):
+        """Test 2: Test city filtering with Aksaray (where testbusiness@example.com is located)"""
         try:
             params = {
-                "city": "ankara",
-                "lat": ANKARA_COORDS["lat"],
+                "city": "aksaray",
+                "lat": ANKARA_COORDS["lat"],  # Using Ankara coords to test cross-city
                 "lng": ANKARA_COORDS["lng"],
                 "radius_km": 50
             }
@@ -103,38 +103,38 @@ class CityFilteringTester:
                 data = response.json()
                 businesses = data if isinstance(data, list) else []
                 
-                # Verify all businesses are from Ankara
-                ankara_businesses = []
-                non_ankara_businesses = []
+                # Verify all businesses are from Aksaray
+                aksaray_businesses = []
+                non_aksaray_businesses = []
                 
                 for business in businesses:
                     business_city = business.get("address", {}).get("city_slug", "").lower()
-                    if business_city == "ankara":
-                        ankara_businesses.append(business)
+                    if business_city == "aksaray":
+                        aksaray_businesses.append(business)
                     else:
-                        non_ankara_businesses.append(business)
+                        non_aksaray_businesses.append(business)
                 
-                if len(non_ankara_businesses) == 0:
+                if len(non_aksaray_businesses) == 0:
                     self.log_test(
-                        "Ankara City Filtering (STRICT)", 
+                        "Aksaray City Filtering (STRICT)", 
                         True, 
-                        f"✅ STRICT FILTERING WORKING: Found {len(ankara_businesses)} Ankara businesses, 0 from other cities"
+                        f"✅ STRICT FILTERING WORKING: Found {len(aksaray_businesses)} Aksaray businesses, 0 from other cities"
                     )
                 else:
                     self.log_test(
-                        "Ankara City Filtering (STRICT)", 
+                        "Aksaray City Filtering (STRICT)", 
                         False, 
                         "", 
-                        f"❌ CITY FILTER VIOLATION: Found {len(non_ankara_businesses)} businesses from other cities: {[b.get('address', {}).get('city_slug') for b in non_ankara_businesses]}"
+                        f"❌ CITY FILTER VIOLATION: Found {len(non_aksaray_businesses)} businesses from other cities: {[b.get('address', {}).get('city_slug') for b in non_aksaray_businesses]}"
                     )
                 
-                return ankara_businesses
+                return aksaray_businesses
             else:
-                self.log_test("Ankara City Filtering", False, "", f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Aksaray City Filtering", False, "", f"HTTP {response.status_code}: {response.text}")
                 return []
                 
         except Exception as e:
-            self.log_test("Ankara City Filtering", False, "", f"Exception: {str(e)}")
+            self.log_test("Aksaray City Filtering", False, "", f"Exception: {str(e)}")
             return []
     
     def test_ankara_district_filtering(self):
