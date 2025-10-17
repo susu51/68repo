@@ -42,6 +42,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
   });
   const [loading, setLoading] = useState(true);
   const [allComponentsMounted, setAllComponentsMounted] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     loadBusinessInfo();
