@@ -564,7 +564,7 @@ async def get_public_business_menu(business_id: str):
 # PUBLIC ENDPOINTS - For Customers
 # ============================================
 
-@router.get("/public/{business_id}/menu", response_model=List[MenuItem])
+@router.get("/public/{business_id}/menu")
 async def get_business_public_menu(business_id: str):
     """
     Get public menu of a business - NO AUTH REQUIRED
