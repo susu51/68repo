@@ -51,6 +51,61 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
     fetchMenuItems();
   }, []);
 
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Lütfen sadece resim dosyası yükleyin');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Resim boyutu 5MB\'dan küçük olmalı');
+        return;
+      }
+      
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!imageFile) return null;
+    
+    try {
+      setUploadingImage(true);
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/upload`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Resim yüklenemedi');
+      }
+      
+      const data = await response.json();
+      return data.file_url; // Returns /uploads/filename.jpg
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast.error('Resim yüklenirken hata oluştu');
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
