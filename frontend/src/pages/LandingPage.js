@@ -260,9 +260,9 @@ const LandingPage = () => {
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
-                <h3 className="font-semibold text-lg text-[#0F172A] mb-2">Elektrikli Bisiklet/Scooter</h3>
+                <h3 className="font-semibold text-lg text-[#0F172A] mb-2">Motosiklet</h3>
                 <p className="text-sm text-slate-600">
-                  Hız ve konfor bir arada. Uzun mesafeler için mükemmel denge.
+                  Hız ve konfor bir arada. Uzun mesafeler için mükemmel seçim.
                 </p>
               </div>
             </div>
