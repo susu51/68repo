@@ -4983,10 +4983,15 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
     }
   }
 
-  // If not authenticated, show router with landing page and register
+  // If not authenticated, show landing page or register page based on route
   return (
     <div className="App">
-      <AuthRouter />
+      <Routes>
+        <Route path="/" element={<LandingPage onAuthStart={onAuthStart} />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
       
       {showLogin && (
         <div style={{
