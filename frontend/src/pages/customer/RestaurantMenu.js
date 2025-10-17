@@ -21,22 +21,24 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
   }, [restaurant, setRestaurant]);
 
   const fetchMenuItems = useCallback(async () => {
+    if (!restaurant || !restaurant.id) return;
+    
     try {
       setLoading(true);
-      console.log(`Loading menu for business ID: ${restaurant.id}`);
+      console.log('Fetching menu for restaurant:', restaurant.id);
       
-      // Use the correct customer endpoint for business products
-      const response = await axios.get(`${BACKEND_URL}/api/businesses/${restaurant.id}/products`);
+      // Use new public menu endpoint
+      const response = await api.get(`/business/public/${restaurant.id}/menu`);
       
-      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+      if (response.data && Array.isArray(response.data)) {
         setMenuItems(response.data.map(item => ({
-          id: item.id || item._id,
-          name: item.name || item.title,
-          description: item.description || 'Lezzetli ürün',
+          id: item.id,
+          name: item.name,
+          description: item.description || '',
           price: parseFloat(item.price) || 0,
           category: item.category || 'main',
-          image: item.image || 'https://via.placeholder.com/300x200?text=Yemek',
-          availability: item.availability !== false
+          image: item.image_url || 'https://via.placeholder.com/300x200?text=Yemek',
+          availability: item.is_available !== false
         })));
         console.log(`Loaded ${response.data.length} real menu items`);
       } else {
