@@ -132,7 +132,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "MÜŞTERİ PANELİ BACKEND TEST - Kapsamlı: Comprehensive customer panel backend testing covering AUTH & USER, ADDRESS SYSTEM (NEW SCHEMA), GEOCODING, ORDERS, and CUSTOMER PROFILE endpoints with test credentials test@kuryecini.com/test123"
+user_problem_statement: "MODERN LOGIN UI & DARK MODE IMPLEMENTATION: Implement new gradient login design with OAuth/Phone options, site-wide dark/light theme toggle, and ensure customer panel remains in light mode only."
 
 backend:
   - task: "FAZ 1 - Business Menu CRUD System"
