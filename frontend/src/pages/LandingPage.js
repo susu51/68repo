@@ -255,7 +255,7 @@ const LandingPage = () => {
                 EN POPÜLER
               </div>
               <img 
-                src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg" 
+                src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/e4pkye7g_1760692232542.jpg" 
                 alt="Motor Kurye - Kuryecini" 
                 className="w-full h-48 object-cover"
               />
@@ -273,7 +273,7 @@ const LandingPage = () => {
               style={{boxShadow: '0 10px 30px rgba(16,24,40,.08)'}}
             >
               <img 
-                src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/e4pkye7g_1760692232542.jpg" 
+                src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg" 
                 alt="Van Kurye - Kuryecini" 
                 className="w-full h-48 object-cover"
               />
