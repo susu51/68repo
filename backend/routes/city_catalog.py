@@ -38,11 +38,13 @@ async def get_city_nearby_businesses(
     lng: float = Query(..., description="Longitude (required)"), 
     city: str = Query(..., description="City slug (required)"),
     district: Optional[str] = Query(None, description="District slug (optional)"),
+    radius_km: int = Query(10, description="Search radius in kilometers (default: 10km with GPS, 50km without)"),
     limit: int = Query(30, le=100, description="Max results")
 ):
     """
     Get nearby businesses in SAME CITY ONLY
     CRITICAL: Cross-city results are FORBIDDEN
+    Dynamic radius: 10km with GPS, 50km without GPS
     """
     
     # Validate required parameters
@@ -52,7 +54,11 @@ async def get_city_nearby_businesses(
             detail="lat, lng, and city are required parameters"
         )
     
-    print(f"🎯 City-strict search: city={city}, district={district}, radius={NEARBY_RADIUS_M}m")
+    # Convert radius_km to meters
+    radius_m = radius_km * 1000
+    max_radius_m = min(radius_m, NEARBY_RADIUS_M)  # Cap at 70km max
+    
+    print(f"🎯 City-strict search: city={city}, district={district}, radius={radius_km}km ({max_radius_m}m)")
     
     try:
         # MongoDB aggregation pipeline
@@ -62,7 +68,7 @@ async def get_city_nearby_businesses(
                     "near": {"type": "Point", "coordinates": [lng, lat]},
                     "spherical": True,
                     "distanceField": "dist",
-                    "maxDistance": NEARBY_RADIUS_M,
+                    "maxDistance": max_radius_m,
                     "query": {
                         "is_active": True,
                         "address.city_slug": city  # CRITICAL: City filter
