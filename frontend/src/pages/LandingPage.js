@@ -56,12 +56,14 @@ const LandingPage = () => {
               >
                 Giriş Yap
               </button>
-              <button 
-                onClick={() => navigate('/register')}
-                className="bg-[#FF7A00] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#e66d00] transition shadow-lg"
+              <a 
+                href="/register"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#FF7A00] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#e66d00] transition shadow-lg inline-block"
               >
                 Kayıt Ol
-              </button>
+              </a>
             </div>
           </div>
         </div>
