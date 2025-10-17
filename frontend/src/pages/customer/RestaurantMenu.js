@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useCart } from '../../contexts/CartContext';
 import axios from 'axios';
+import api from '../../api/http';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
