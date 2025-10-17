@@ -363,6 +363,184 @@ const LandingPage = () => {
         </section>
       </main>
 
+      {/* Terms Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-[#0F172A]">Kullanım Şartları</h2>
+              <button onClick={() => setShowTermsModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div className="px-6 py-6 space-y-6 text-gray-700">
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">1. Amaç ve Kapsam</h3>
+                <p>Bu metin, Kuryecini uygulamasını kullanan müşteri, kurye ve işletmelerin hak ve yükümlülüklerini düzenler.</p>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">2. Hizmetin Tanımı</h3>
+                <p>Kuryecini, kullanıcıların yemek siparişi vermesine, işletmelerin menü yayınlamasına ve kuryelerin teslimat yapmasına imkân tanıyan çevrimiçi bir platformdur.</p>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">3. Kullanıcı Yükümlülükleri</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Kayıt sırasında doğru ve güncel bilgi verilmesi.</li>
+                  <li>Hesap bilgilerinin gizliliğinin korunması.</li>
+                  <li>Platformun yasa dışı amaçlarla kullanılmaması.</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">4. Sorumluluk Reddi</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Teslimat süreleri, restoran yoğunluğu ve trafik koşullarına bağlı olarak değişebilir.</li>
+                  <li>Kuryecini, restoranlar tarafından sunulan ürünlerin kalitesi ve içeriğinden sorumlu değildir.</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">5. Ücretlendirme ve Ödeme</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Ürün fiyatları, restoranlar tarafından belirlenir.</li>
+                  <li>Teslimat ücreti ve komisyon oranları Kuryecini tarafından belirlenip güncellenebilir.</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">6. Hesabın Askıya Alınması</h3>
+                <p>Kurallara aykırı davranışlar tespit edilirse, hesap geçici veya kalıcı olarak askıya alınabilir.</p>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">7. Uygulanacak Hukuk ve Yetki</h3>
+                <p>Bu şartlar Türkiye Cumhuriyeti kanunlarına tabidir. Uyuşmazlıklarda İstanbul Mahkemeleri ve İcra Daireleri yetkilidir.</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Privacy Modal */}
+      {showPrivacyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-[#0F172A]">🔒 Gizlilik Politikası</h2>
+              <button onClick={() => setShowPrivacyModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div className="px-6 py-6 space-y-6 text-gray-700">
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">1. Toplanan Veriler</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Kimlik bilgileri (ad, soyad, telefon, e-posta)</li>
+                  <li>Konum ve adres bilgileri</li>
+                  <li>Sipariş geçmişi ve ödeme bilgileri</li>
+                  <li>Cihaz bilgileri (IP, tarayıcı, işletim sistemi)</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">2. Veri Kullanım Amaçları</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Siparişlerin işlenmesi ve teslim edilmesi</li>
+                  <li>Kullanıcı deneyimini geliştirme (kişiselleştirme, öneriler)</li>
+                  <li>Güvenlik ve dolandırıcılık önleme</li>
+                  <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">3. Veri Paylaşımı</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Restoran ve kuryeler, siparişin yerine getirilmesi için gerekli kullanıcı bilgilerini görür.</li>
+                  <li>Yasal zorunluluklar halinde resmi makamlarla paylaşım yapılabilir.</li>
+                  <li>Üçüncü taraf hizmet sağlayıcılar (ödeme, harita, bildirim servisleri) ile sınırlı paylaşım yapılabilir.</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">4. Veri Saklama Süresi</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Kullanıcı hesabı aktif olduğu sürece veriler saklanır.</li>
+                  <li>Yasal yükümlülükler kapsamında belirlenen süre sonunda silinir veya anonimleştirilir.</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">5. Kullanıcı Hakları</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Kendi verilerini görme, güncelleme, silme talebi</li>
+                  <li>Açık rıza verilen işlemlerden vazgeçme</li>
+                  <li>KVKK kapsamındaki tüm başvuru hakları</li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* KVKK Modal */}
+      {showKVKKModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-[#0F172A]">🛡️ KVKK Aydınlatma Metni</h2>
+              <button onClick={() => setShowKVKKModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div className="px-6 py-6 space-y-6 text-gray-700">
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">Veri Sorumlusu</h3>
+                <p className="font-medium">Kuryecini Yazılım ve Teknoloji A.Ş.</p>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">İşlenen Kişisel Veriler</h3>
+                <p>Kimlik bilgileri, iletişim bilgileri, adres, konum, sipariş bilgileri, ödeme bilgileri, cihaz bilgileri.</p>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">İşleme Amaçları</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Siparişlerin oluşturulması ve teslim edilmesi</li>
+                  <li>Kullanıcı destek hizmetleri</li>
+                  <li>Sistem güvenliğinin sağlanması</li>
+                  <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">Hukuki Sebepler</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Sözleşmenin ifası (KVKK m.5/2-c)</li>
+                  <li>Hukuki yükümlülük (KVKK m.5/2-ç)</li>
+                  <li>Açık rıza (KVKK m.5/1)</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">Veri Aktarımı</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Restoranlar ve kuryeler</li>
+                  <li>Ödeme kuruluşları</li>
+                  <li>Yasal merciler</li>
+                </ul>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">Haklarınız</h3>
+                <p>KVKK m.11 kapsamında; kişisel verilerinize erişme, düzeltme, silme, işlenmesini kısıtlama, itiraz etme ve veri taşınabilirliği hakkınız vardır.</p>
+              </section>
+              
+              <section>
+                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">Başvuru Yolu</h3>
+                <p>Bu haklarınızı kullanmak için <a href="mailto:destek@kuryecini.com" className="text-blue-600 hover:underline">destek@kuryecini.com</a> adresine yazılı başvuruda bulunabilirsiniz.</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <footer className="bg-[#0F172A] text-slate-200 py-12 mt-20">
         <div className="max-w-[1200px] mx-auto px-4 lg:px-0">
