@@ -87,7 +87,12 @@ class PublicMenuTester:
             
             if response.status_code == 200:
                 data = response.json()
-                menu_items = data.get("menu_items", [])
+                
+                # Handle both list and object responses
+                if isinstance(data, list):
+                    menu_items = data
+                else:
+                    menu_items = data.get("menu_items", [])
                 
                 if len(menu_items) > 0:
                     available_items = [item for item in menu_items if item.get("is_available", False)]
