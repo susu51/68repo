@@ -594,19 +594,26 @@ async def get_business_public_menu(business_id: str):
             "is_available": True
         }).sort("created_at", -1).to_list(length=None)
         
-        return [
-            MenuItem(
-                business_id=item["business_id"],
-                title=item.get("name", item.get("title", "")),  # Use name or title field
-                description=item.get("description", ""),
-                price=item["price"],
-                is_available=item.get("is_available", True),
-                photo_url=item.get("image_url"),
-                category=item.get("category"),
-                created_at=item["created_at"]
-            )
-            for item in menu_items
-        ]
+        # Convert to dict format for better compatibility
+        result = []
+        for item in menu_items:
+            menu_item = {
+                "id": item.get("id", str(item.get("_id", ""))),
+                "business_id": item["business_id"],
+                "name": item.get("name", item.get("title", "")),
+                "title": item.get("name", item.get("title", "")),  # Include both for compatibility
+                "description": item.get("description", ""),
+                "price": item["price"],
+                "is_available": item.get("is_available", True),
+                "image_url": item.get("image_url", ""),
+                "photo_url": item.get("image_url", ""),  # Include both for compatibility
+                "category": item.get("category", ""),
+                "preparation_time": item.get("preparation_time", 15),
+                "created_at": item["created_at"].isoformat() if item.get("created_at") else ""
+            }
+            result.append(menu_item)
+        
+        return result
         
     except HTTPException:
         raise
