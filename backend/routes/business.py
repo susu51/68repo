@@ -576,7 +576,7 @@ async def get_business_public_menu(business_id: str):
         
         # Verify business exists and is approved
         business = await db.users.find_one({
-            "_id": business_id,
+            "id": business_id,
             "role": "business",
             "kyc_status": "approved",
             "is_active": True
