@@ -62,7 +62,7 @@ class GPSAddressTester:
                 if data.get("success") and "access_token" in data:
                     self.admin_token = data["access_token"]
                     # Check if cookies were set
-                    cookies_info = f"Cookies: {len(self.session.cookies)} set" if self.session.cookies else "No cookies set"
+                    cookies_info = f"Cookies: {len(self.admin_session.cookies)} set" if self.admin_session.cookies else "No cookies set"
                     self.log_test(
                         "Admin Login", 
                         True, 
