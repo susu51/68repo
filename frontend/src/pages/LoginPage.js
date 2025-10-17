@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useCookieAuth } from './contexts/CookieAuthContext';
+import { useCookieAuth } from '../contexts/CookieAuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
