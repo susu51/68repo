@@ -596,21 +596,14 @@ async def get_business_public_menu(business_id: str):
         
         return [
             MenuItem(
-                id=item["_id"],
                 business_id=item["business_id"],
-                name=item["name"],
+                title=item.get("name", item.get("title", "")),  # Use name or title field
                 description=item.get("description", ""),
                 price=item["price"],
-                currency=item.get("currency", "TRY"),
-                category=item["category"],
-                tags=item.get("tags", []),
-                image_url=item.get("image_url"),
                 is_available=item.get("is_available", True),
-                vat_rate=item.get("vat_rate", 0.10),
-                options=item.get("options", []),
-                preparation_time=item.get("preparation_time", 15),
-                created_at=item["created_at"],
-                updated_at=item.get("updated_at")
+                photo_url=item.get("image_url"),
+                category=item.get("category"),
+                created_at=item["created_at"]
             )
             for item in menu_items
         ]
