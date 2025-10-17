@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import KuryeciniLogo from '../components/KuryeciniLogo';
+import { ModernLogin } from '../ModernLogin';
 
-const LandingPage = ({ onAuthStart }) => {
+const LandingPage = () => {
   const [locationInput, setLocationInput] = useState('');
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
 
   return (
