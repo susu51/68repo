@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import KuryeciniLogo from '../components/KuryeciniLogo';
 
 const LandingPage = ({ onAuthStart }) => {
   const [locationInput, setLocationInput] = useState('');
-  
-  // Replace navigate with simple function since we removed router
-  const navigate = (path) => {
-    console.log('Navigate to:', path);
-    if (onAuthStart) onAuthStart();
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#F5F7FB]">
