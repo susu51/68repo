@@ -131,6 +131,8 @@ const CitySelector = ({ value, onChange, required = false }) => {
 // Admin Dashboard - Simple Working Version with Theme
 const AdminDashboard = ({ user }) => {
   const { logout } = useCookieAuth();
+  const { theme, toggleTheme } = useTheme(); // Use global theme context
+  const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState('dashboard');
   const [reportSubTab, setReportSubTab] = useState('financial');
   const [users, setUsers] = useState([]);
@@ -160,12 +162,6 @@ const AdminDashboard = ({ user }) => {
     tax_number: '',
     address: '',
     business_category: 'gida'
-  });
-  
-  // Theme state
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // CI GATE 0 COMPLIANCE - NO localStorage usage
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   const fetchUsers = async () => {
