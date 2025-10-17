@@ -384,9 +384,9 @@ class CityFilteringTester:
         
         print()
         print("📋 REVIEW REQUEST COMPLIANCE:")
-        print("   • Ankara city filtering tested: ✅" if any("Ankara City Filtering" in r["test"] and r["success"] for r in self.test_results) else "   • Ankara city filtering tested: ❌")
-        print("   • Çankaya district filtering tested: ✅" if any("District Filtering" in r["test"] and r["success"] for r in self.test_results) else "   • Çankaya district filtering tested: ❌")
-        print("   • Cross-city test (Istanbul vs Ankara): ✅" if any("Cross-City Test" in r["test"] and r["success"] for r in self.test_results) else "   • Cross-city test (Istanbul vs Ankara): ❌")
+        print("   • City filtering tested (Aksaray): ✅" if any("Aksaray City Filtering" in r["test"] and r["success"] for r in self.test_results) else "   • City filtering tested (Aksaray): ❌")
+        print("   • Multiple city filtering tested (Niğde): ✅" if any("Niğde City Filtering" in r["test"] and r["success"] for r in self.test_results) else "   • Multiple city filtering tested (Niğde): ❌")
+        print("   • Cross-city test (Istanbul vs others): ✅" if any("Cross-City Test" in r["test"] and r["success"] for r in self.test_results) else "   • Cross-city test (Istanbul vs others): ❌")
         print("   • Business city/district data verified: ✅" if any("Business City" in r["test"] and r["success"] for r in self.test_results) else "   • Business city/district data verified: ❌")
         
         print()
