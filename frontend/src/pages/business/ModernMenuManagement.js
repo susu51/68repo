@@ -149,22 +149,35 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
       return;
     }
 
-    // 2) Backend'in beklediği formata dönüştür + tip düzeltmeleri
-    const payload = {
-      name: formData.name.trim(),
-      description: formData.description || '',
-      category: formData.category || 'Yemek',
-      price: Number(formData.price),
-      currency: formData.currency || 'TRY',
-      vat_rate: Number(formData.vat_rate) || 0.10,
-      preparation_time: Number(formData.preparation_time) || 15,
-      tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-      image_url: formData.image_url || '',
-      is_available: formData.is_available !== undefined ? formData.is_available : true
-    };
-
     setLoading(true);
     try {
+      // 2) Upload image if selected
+      let imageUrl = formData.image_url;
+      if (imageFile) {
+        toast('Resim yükleniyor...', { icon: '📤' });
+        const uploadedUrl = await uploadImage();
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+          toast.success('Resim yüklendi!');
+        } else {
+          toast.error('Resim yüklenemedi, URL ile devam ediliyor');
+        }
+      }
+
+      // 3) Backend'in beklediği formata dönüştür + tip düzeltmeleri
+      const payload = {
+        name: formData.name.trim(),
+        description: formData.description || '',
+        category: formData.category || 'Yemek',
+        price: Number(formData.price),
+        currency: formData.currency || 'TRY',
+        vat_rate: Number(formData.vat_rate) || 0.10,
+        preparation_time: Number(formData.preparation_time) || 15,
+        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+        image_url: imageUrl || '',
+        is_available: formData.is_available !== undefined ? formData.is_available : true
+      };
+
       let response;
       
       if (editingItem) {
@@ -175,7 +188,7 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
         response = await post('/business/menu', payload);
       }
 
-      // 3) Hata yönetimi: response.ok değilse loading'i kapat + mesaj göster
+      // 4) Hata yönetimi: response.ok değilse loading'i kapat + mesaj göster
       if (!response.ok) {
         const errText = await response.text().catch(() => '');
         let errorMessage = `Kaydetme başarısız (HTTP ${response.status})`;
