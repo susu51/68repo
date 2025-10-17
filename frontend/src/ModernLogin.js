@@ -215,9 +215,6 @@ export const ModernLogin = ({ onLogin, onClose }) => {
                 href="/register"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
-                  if (onClose) onClose();
-                }}
                 className="text-white font-semibold underline hover:text-white/90 transition-colors cursor-pointer"
               >
                 Kayıt Ol
