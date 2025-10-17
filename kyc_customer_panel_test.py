@@ -493,6 +493,9 @@ class KYCCustomerPanelTester:
         # Test 4: Customer Profile Access
         self.test_customer_profile_access()
         
+        # Test 4.5: Customer Addresses
+        self.test_customer_addresses()
+        
         # Test 5: Catalog City Nearby
         restaurants = self.test_catalog_city_nearby()
         
