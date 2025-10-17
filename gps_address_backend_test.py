@@ -249,7 +249,11 @@ class GPSAddressTester:
             
             if response.status_code == 200:
                 data = response.json()
-                addresses = data.get("addresses", [])
+                # Handle both possible response formats
+                if isinstance(data, list):
+                    addresses = data
+                else:
+                    addresses = data.get("addresses", [])
                 
                 if addresses:
                     # Check first address for required fields
