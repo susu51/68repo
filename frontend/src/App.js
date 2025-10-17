@@ -308,13 +308,6 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
-  // Theme functions
-  const toggleTheme = () => {
-    const newTheme = !isDarkMode;
-    setIsDarkMode(newTheme);
-    // CI GATE 0 COMPLIANCE - NO localStorage persistence
-  };
-
   const getThemeClass = () => {
     return isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900';
   };
