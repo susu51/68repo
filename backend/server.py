@@ -7590,4 +7590,179 @@ async def get_public_content(page: str):
     
     return blocks
 
+# ============================================================
+# UTILITY ENDPOINTS - GPS Coordinate Updates
+# ============================================================
+
+@api_router.post("/admin/utils/update-business-gps")
+async def update_business_gps_coordinates(current_user: dict = Depends(get_admin_user)):
+    """
+    Utility endpoint to update GPS coordinates for businesses that don't have them
+    Uses city/district information to get coordinates from Turkish cities database
+    """
+    from utils.city_normalize import normalize_city_name
+    from utils.turkish_cities_coordinates import get_city_coordinates
+    
+    try:
+        # Find businesses without GPS coordinates
+        businesses_without_gps = await db.users.find({
+            "role": "business",
+            "$or": [
+                {"lat": {"$exists": False}},
+                {"lng": {"$exists": False}},
+                {"lat": None},
+                {"lng": None}
+            ]
+        }).to_list(length=None)
+        
+        updated_count = 0
+        failed_count = 0
+        results = []
+        
+        for business in businesses_without_gps:
+            business_id = business.get("id")
+            business_name = business.get("business_name", "Unknown")
+            city = business.get("city")
+            district = business.get("district")
+            
+            if not city:
+                results.append({
+                    "business_id": business_id,
+                    "business_name": business_name,
+                    "status": "failed",
+                    "reason": "No city information"
+                })
+                failed_count += 1
+                continue
+            
+            # Normalize city name
+            city_normalized = normalize_city_name(city)
+            
+            # Get GPS coordinates
+            coordinates = get_city_coordinates(city, district)
+            
+            if coordinates:
+                # Update business with GPS coordinates
+                update_result = await db.users.update_one(
+                    {"id": business_id},
+                    {
+                        "$set": {
+                            "lat": coordinates["lat"],
+                            "lng": coordinates["lng"],
+                            "city_normalized": city_normalized,
+                            "updated_at": datetime.now(timezone.utc)
+                        }
+                    }
+                )
+                
+                if update_result.modified_count > 0:
+                    results.append({
+                        "business_id": business_id,
+                        "business_name": business_name,
+                        "city": city,
+                        "district": district,
+                        "lat": coordinates["lat"],
+                        "lng": coordinates["lng"],
+                        "status": "success"
+                    })
+                    updated_count += 1
+                else:
+                    results.append({
+                        "business_id": business_id,
+                        "business_name": business_name,
+                        "status": "failed",
+                        "reason": "Database update failed"
+                    })
+                    failed_count += 1
+            else:
+                results.append({
+                    "business_id": business_id,
+                    "business_name": business_name,
+                    "city": city,
+                    "district": district,
+                    "status": "failed",
+                    "reason": "No GPS coordinates found for location"
+                })
+                failed_count += 1
+        
+        return {
+            "message": "GPS coordinate update completed",
+            "summary": {
+                "total_businesses_processed": len(businesses_without_gps),
+                "updated": updated_count,
+                "failed": failed_count
+            },
+            "details": results
+        }
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error updating GPS coordinates: {str(e)}"
+        )
+
+@api_router.get("/admin/utils/check-business-gps")
+async def check_business_gps_status(current_user: dict = Depends(get_admin_user)):
+    """
+    Check how many businesses have GPS coordinates
+    """
+    try:
+        # Total businesses
+        total_businesses = await db.users.count_documents({"role": "business"})
+        
+        # Businesses with GPS
+        with_gps = await db.users.count_documents({
+            "role": "business",
+            "lat": {"$exists": True, "$ne": None},
+            "lng": {"$exists": True, "$ne": None}
+        })
+        
+        # Businesses without GPS
+        without_gps = await db.users.count_documents({
+            "role": "business",
+            "$or": [
+                {"lat": {"$exists": False}},
+                {"lng": {"$exists": False}},
+                {"lat": None},
+                {"lng": None}
+            ]
+        })
+        
+        # Get sample of businesses without GPS
+        businesses_without_gps = await db.users.find({
+            "role": "business",
+            "$or": [
+                {"lat": {"$exists": False}},
+                {"lng": {"$exists": False}},
+                {"lat": None},
+                {"lng": None}
+            ]
+        }).limit(10).to_list(length=10)
+        
+        sample = []
+        for business in businesses_without_gps:
+            sample.append({
+                "id": business.get("id"),
+                "business_name": business.get("business_name"),
+                "city": business.get("city"),
+                "district": business.get("district"),
+                "kyc_status": business.get("kyc_status")
+            })
+        
+        return {
+            "summary": {
+                "total_businesses": total_businesses,
+                "with_gps": with_gps,
+                "without_gps": without_gps,
+                "gps_coverage_percentage": round((with_gps / total_businesses * 100) if total_businesses > 0 else 0, 2)
+            },
+            "sample_without_gps": sample
+        }
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error checking GPS status: {str(e)}"
+        )
+
 app.include_router(api_router)
