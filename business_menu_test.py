@@ -20,12 +20,12 @@ BUSINESS_CREDENTIALS = {
     "password": "test123"
 }
 
-# Test payload from review request - Exact payload as specified
+# Test payload from review request - Fixed category to match API validation
 TEST_MENU_ITEM = {
     "name": "Test Pizza",
     "description": "Delicious test pizza",
     "price": 89.99,
-    "category": "Ana Yemek",
+    "category": "Yemek",  # Fixed: API only accepts: Yemek, Kahvaltı, İçecek, Atıştırmalık
     "is_available": True,
     "preparation_time": 20
 }
