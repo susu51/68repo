@@ -33,7 +33,7 @@ const LandingPage = () => {
             {/* Auth Buttons */}
             <div className="flex items-center space-x-3">
               <button 
-                onClick={() => navigate('/login')}
+                onClick={() => setShowLoginModal(true)}
                 className="text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-100 transition"
               >
                 Giriş Yap
@@ -48,6 +48,11 @@ const LandingPage = () => {
           </div>
         </div>
       </nav>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <ModernLogin onClose={() => setShowLoginModal(false)} />
+      )}
 
       {/* Main Content */}
       <main className="max-w-[1200px] mx-auto px-4 lg:px-0 space-y-20 py-10">
