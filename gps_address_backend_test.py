@@ -204,8 +204,8 @@ class GPSAddressTester:
     def test_verify_gps_coordinates_in_database(self):
         """Test 5: Verify businesses now have lat/lng fields in database"""
         try:
-            headers = {"Authorization": f"Bearer {self.admin_token}"}
-            response = self.session.get(f"{BACKEND_URL}/admin/businesses", headers=headers)
+            # Use session cookies from login instead of Bearer token
+            response = self.session.get(f"{BACKEND_URL}/admin/businesses")
             
             if response.status_code == 200:
                 data = response.json()
