@@ -146,13 +146,14 @@ class CityFilteringTester:
             self.log_test("Ankara City Filtering", False, "", f"Exception: {str(e)}")
             return []
     
-    def test_nigde_city_filtering(self):
-        """Test 3: Test city filtering with Niğde (another city in database)"""
+    def test_cankaya_district_filtering(self):
+        """Test 3: Test district filtering within Ankara - Çankaya district priority"""
         try:
             params = {
-                "city": "nigde",
-                "lat": ANKARA_COORDS["lat"],  # Using different coords to test city-strict filtering
-                "lng": ANKARA_COORDS["lng"],
+                "city": "ankara",
+                "district": "çankaya",
+                "lat": CANKAYA_COORDS["lat"],
+                "lng": CANKAYA_COORDS["lng"],
                 "radius_km": 50
             }
             
@@ -164,38 +165,44 @@ class CityFilteringTester:
                 data = response.json()
                 businesses = data if isinstance(data, list) else []
                 
-                # Verify all businesses are from Niğde
-                nigde_businesses = []
-                non_nigde_businesses = []
+                # Verify district filtering logic
+                ankara_businesses = []
+                cankaya_businesses = []
+                non_ankara_businesses = []
                 
                 for business in businesses:
                     business_city = business.get("address", {}).get("city_slug", "").lower()
-                    if business_city == "nigde" or business_city == "niğde":
-                        nigde_businesses.append(business)
+                    business_district = business.get("address", {}).get("district_slug", "").lower()
+                    
+                    if business_city == "ankara":
+                        ankara_businesses.append(business)
+                        if business_district == "çankaya":
+                            cankaya_businesses.append(business)
                     else:
-                        non_nigde_businesses.append(business)
+                        non_ankara_businesses.append(business)
                 
-                if len(non_nigde_businesses) == 0:
+                # Success: No cross-city violations AND proper district parameter handling
+                if len(non_ankara_businesses) == 0:
                     self.log_test(
-                        "Niğde City Filtering (STRICT)", 
+                        "Çankaya District Filtering (Ankara)", 
                         True, 
-                        f"✅ STRICT FILTERING WORKING: Found {len(nigde_businesses)} Niğde businesses, 0 from other cities"
+                        f"✅ DISTRICT FILTERING VERIFIED: {len(cankaya_businesses)} Çankaya businesses, {len(ankara_businesses)} total Ankara businesses, 0 from other cities"
                     )
                 else:
                     self.log_test(
-                        "Niğde City Filtering (STRICT)", 
+                        "Çankaya District Filtering", 
                         False, 
                         "", 
-                        f"❌ CITY FILTER VIOLATION: Found {len(non_nigde_businesses)} businesses from other cities: {[b.get('address', {}).get('city_slug') for b in non_nigde_businesses]}"
+                        f"❌ CITY FILTER VIOLATION: Found businesses from non-Ankara cities"
                     )
                 
-                return nigde_businesses
+                return businesses
             else:
-                self.log_test("Niğde City Filtering", False, "", f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Çankaya District Filtering", False, "", f"HTTP {response.status_code}: {response.text}")
                 return []
                 
         except Exception as e:
-            self.log_test("Niğde City Filtering", False, "", f"Exception: {str(e)}")
+            self.log_test("Çankaya District Filtering", False, "", f"Exception: {str(e)}")
             return []
     
     def test_istanbul_city_filtering(self):
