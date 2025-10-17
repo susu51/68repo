@@ -244,8 +244,8 @@ class GPSAddressTester:
     def test_customer_address_retrieval(self):
         """Test 6: GET /api/me/addresses - Customer address retrieval with new schema"""
         try:
-            headers = {"Authorization": f"Bearer {self.customer_token}"}
-            response = self.session.get(f"{BACKEND_URL}/me/addresses", headers=headers)
+            # Use session cookies from login instead of Bearer token
+            response = self.session.get(f"{BACKEND_URL}/me/addresses")
             
             if response.status_code == 200:
                 data = response.json()
