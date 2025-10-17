@@ -183,16 +183,6 @@ export const NewBusinessApp = ({ user, onLogout }) => {
                 </div>
               </div>
 
-              {/* Theme Toggle */}
-              <Button 
-                onClick={toggleTheme} 
-                variant="ghost" 
-                size="sm"
-                className="hidden sm:flex"
-              >
-                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-
               {/* User Email */}
               <span className="text-sm text-muted-foreground hidden sm:inline">
                 {user?.email}
