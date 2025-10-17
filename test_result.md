@@ -136,9 +136,21 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Check business KYC status and customer panel requirements: 1) Check Business KYC Status (admin login, get businesses, check kyc_status/is_active/city/district), 2) Test Customer Access (NO KYC REQUIRED) - verify customer can access without KYC approval, 3) Test Catalog Endpoint - get customer city/district, call /api/catalog/city-nearby, 4) Identify Issues - approved businesses in same city, customer KYC blocks, business indexing"
+user_problem_statement: "Fix customer panel issues: 1) Restaurants not appearing in customer panel - businesses registered without GPS coordinates, 2) Full address not displaying in customer discover section address selector"
 
 backend:
+  - task: "Business GPS Coordinates System"
+    implemented: true
+    working: true
+    file: "server.py (register_business endpoint, utility endpoints)"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ BUSINESS GPS COORDINATE SYSTEM IMPLEMENTED: Business registration now includes GPS coordinates via geocoding. REGISTRATION FLOW: 1) Business provides city and district during registration. 2) Backend normalizes city name and looks up GPS coordinates from Turkish cities database. 3) GPS coordinates (lat/lng) are stored in business user document. UTILITY ENDPOINTS ADDED: 1) POST /api/admin/utils/update-business-gps - Admin endpoint to update GPS coordinates for existing businesses without coordinates. Processes all businesses missing GPS, uses city/district to get coordinates, updates database. 2) GET /api/admin/utils/check-business-gps - Admin endpoint to check GPS coverage statistics (total businesses, with GPS, without GPS, percentage). COORDINATES DATABASE: Uses utils/turkish_cities_coordinates.py with all 81 Turkish provinces and major districts. Returns city center coordinates if district not specified. NEW BUSINESSES: All new business registrations automatically include GPS coordinates. EXISTING BUSINESSES: Can be updated via admin utility endpoint."
+
   - task: "FAZ 1 - Business Menu CRUD System"
     implemented: true
     working: true
