@@ -211,16 +211,17 @@ export const ModernLogin = ({ onLogin, onClose }) => {
           <div className="mt-6 text-center">
             <p className="text-white/80 text-sm">
               Henüz hesabınız yok mu?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  window.open('/register', '_blank');
+              <a
+                href="/register"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
                   if (onClose) onClose();
                 }}
-                className="text-white font-semibold underline hover:text-white/90 transition-colors"
+                className="text-white font-semibold underline hover:text-white/90 transition-colors cursor-pointer"
               >
                 Kayıt Ol
-              </button>
+              </a>
             </p>
           </div>
 
