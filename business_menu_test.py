@@ -16,8 +16,8 @@ API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials from review request
 BUSINESS_CREDENTIALS = {
-    "email": "business@kuryecini.com",
-    "password": "business123"
+    "email": "testbusiness@example.com",
+    "password": "test123"
 }
 
 # Test payload from review request - Updated to match API schema
