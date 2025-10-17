@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -9,6 +9,21 @@ const LandingPage = () => {
   const [locationInput, setLocationInput] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
+
+  // Force light mode for landing page
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    
+    // Cleanup: restore dark mode preference when unmounting
+    return () => {
+      const savedTheme = localStorage.getItem('kuryecini-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F5F7FB]">
