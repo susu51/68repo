@@ -336,6 +336,24 @@ class KYCCustomerPanelTester:
                 else:
                     print(f"   Public endpoint also failed: HTTP {public_response.status_code}: {public_response.text}")
                 
+                # Try alternative endpoints
+                print("   Trying alternative restaurant endpoints...")
+                alt_endpoints = [
+                    "/menus/public",
+                    "/restaurants/public", 
+                    "/businesses/public"
+                ]
+                
+                for alt_endpoint in alt_endpoints:
+                    alt_response = requests.get(f"{BACKEND_URL}{alt_endpoint}")
+                    if alt_response.status_code == 200:
+                        alt_data = alt_response.json()
+                        restaurants = alt_data.get("restaurants", []) if isinstance(alt_data, dict) else alt_data
+                        print(f"   ✅ Alternative endpoint {alt_endpoint} returned {len(restaurants)} restaurants")
+                        return restaurants
+                    else:
+                        print(f"   {alt_endpoint}: HTTP {alt_response.status_code}")
+                
                 return []
                 
         except Exception as e:
