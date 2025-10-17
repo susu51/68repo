@@ -80,13 +80,17 @@ export const ModernLogin = ({ onLogin, onClose }) => {
 
   // Handle OAuth login (placeholder - will be activated later)
   const handleOAuthLogin = (provider) => {
-    toast.info(`${provider} ile giriş yakında aktif olacak!`);
+    toast(`${provider} ile giriş yakında aktif olacak!`, {
+      icon: 'ℹ️',
+    });
     // TODO: Implement OAuth login
   };
 
   // Handle phone login (placeholder - will be activated later)
   const handlePhoneLogin = () => {
-    toast.info('Telefon ile giriş yakında aktif olacak!');
+    toast('Telefon ile giriş yakında aktif olacak!', {
+      icon: 'ℹ️',
+    });
     // TODO: Implement phone login
   };
 
