@@ -44,6 +44,21 @@ export const NewBusinessApp = ({ user, onLogout }) => {
   const [allComponentsMounted, setAllComponentsMounted] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
+  // Force light mode for business panel
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    
+    // Cleanup: restore dark mode preference when unmounting
+    return () => {
+      const savedTheme = localStorage.getItem('kuryecini-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+      }
+    };
+  }, []);
+
   useEffect(() => {
     loadBusinessInfo();
     loadStats();
