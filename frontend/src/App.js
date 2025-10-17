@@ -1064,6 +1064,19 @@ const AdminDashboard = ({ user }) => {
                           </Badge>
                         </div>
 
+                        {/* KYC Status for Business */}
+                        {user.role === 'business' && (
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              KYC:
+                            </span>
+                            <Badge className={getKYCStatusColor(user.kyc_status || 'pending')} size="sm">
+                              {user.kyc_status === 'approved' ? '✅ Onaylı' :
+                               user.kyc_status === 'rejected' ? '❌ Red' : '⏳ Bekliyor'}
+                            </Badge>
+                          </div>
+                        )}
+
                         {user.city && (
                           <div className="flex items-center justify-between">
                             <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -1071,6 +1084,17 @@ const AdminDashboard = ({ user }) => {
                             </span>
                             <span className={`text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                               {user.city}
+                            </span>
+                          </div>
+                        )}
+
+                        {user.business_name && (
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              İşletme:
+                            </span>
+                            <span className={`text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'} truncate max-w-[150px]`}>
+                              {user.business_name}
                             </span>
                           </div>
                         )}
@@ -1092,6 +1116,42 @@ const AdminDashboard = ({ user }) => {
                             {new Date(user.created_at).toLocaleDateString('tr-TR')}
                           </span>
                         </div>
+
+                        {/* Business KYC Approval Button */}
+                        {user.role === 'business' && user.kyc_status === 'pending' && (
+                          <div className="pt-3 mt-3 border-t">
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  setLoading(true);
+                                  const response = await axios.post(
+                                    `${API_BASE}/admin/kyc/action`,
+                                    {
+                                      user_id: user.id,
+                                      action: 'approve'
+                                    }
+                                  );
+                                  
+                                  if (response.data && response.data.success) {
+                                    toast.success(`${user.business_name || user.email} KYC onayı başarılı!`);
+                                    // Refresh users list
+                                    await loadUsers();
+                                  }
+                                } catch (error) {
+                                  console.error('KYC Approval Error:', error);
+                                  toast.error('KYC onayı başarısız');
+                                } finally {
+                                  setLoading(false);
+                                }
+                              }}
+                              className="w-full bg-green-600 hover:bg-green-700 text-white text-xs"
+                              size="sm"
+                              disabled={loading}
+                            >
+                              {loading ? '⏳ İşleniyor...' : '✅ KYC Onayla'}
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
