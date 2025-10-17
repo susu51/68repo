@@ -22,7 +22,8 @@ CUSTOMER_PASSWORD = "test123"
 
 class GPSAddressTester:
     def __init__(self):
-        self.session = requests.Session()
+        self.admin_session = requests.Session()
+        self.customer_session = requests.Session()
         self.admin_token = None
         self.customer_token = None
         self.test_results = []
