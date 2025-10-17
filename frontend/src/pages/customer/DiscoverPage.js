@@ -438,10 +438,11 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
                   {selectedAddress ? (
                     <div>
                       <div className="text-sm font-medium text-gray-800">
-                        {selectedAddress.label || 'Adresim'} • {selectedAddress.city}
+                        {selectedAddress.adres_basligi || selectedAddress.label || 'Adresim'}
                       </div>
-                      <div className="text-xs text-gray-600">
-                        {selectedAddress.description}
+                      <div className="text-xs text-gray-600 line-clamp-2">
+                        {selectedAddress.acik_adres || selectedAddress.full || 
+                         `${selectedAddress.mahalle || ''}, ${selectedAddress.ilce || selectedAddress.district || ''}, ${selectedAddress.il || selectedAddress.city || ''}`}
                       </div>
                     </div>
                   ) : (
