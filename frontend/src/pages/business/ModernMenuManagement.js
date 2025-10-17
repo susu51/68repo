@@ -670,15 +670,52 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
                   />
                 </div>
 
-                {/* Image URL */}
-                <div>
-                  <Label htmlFor="image_url">Görsel URL</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://..."
-                  />
+                {/* Image Upload */}
+                <div className="space-y-2">
+                  <Label htmlFor="image_file">Ürün Görseli</Label>
+                  
+                  {/* Preview */}
+                  {(imagePreview || formData.image_url) && (
+                    <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-gray-200 mb-2">
+                      <img
+                        src={imagePreview || (formData.image_url.startsWith('http') ? formData.image_url : `${process.env.REACT_APP_BACKEND_URL}${formData.image_url}`)}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview('');
+                          setFormData({ ...formData, image_url: '' });
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* File Input */}
+                  <div className="flex flex-col gap-2">
+                    <Input
+                      id="image_file"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="cursor-pointer"
+                    />
+                    <p className="text-xs text-gray-500">
+                      veya görsel URL'si girin:
+                    </p>
+                    <Input
+                      id="image_url"
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                      placeholder="https://..."
+                      disabled={!!imageFile}
+                    />
+                  </div>
                 </div>
 
                 {/* Available */}
