@@ -6,6 +6,8 @@ import "./App.css";
 import { ModernLogin } from "./ModernLogin";
 import { KuryeciniTextLogo, KuryeciniLogo } from "./components/KuryeciniLogo";
 import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import { CookieAuthProvider, useCookieAuth } from "./contexts/CookieAuthContext";
 import { LocationControls } from "./components/LocationControls";
 import OpenStreetMap from "./components/OpenStreetMap";
