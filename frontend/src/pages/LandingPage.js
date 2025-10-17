@@ -392,9 +392,9 @@ const LandingPage = () => {
             <div>
               <h4 className="font-semibold text-white mb-4">Yasal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-slate-300 hover:text-white transition">Kullanım Şartları</a></li>
-                <li><a href="#" className="text-slate-300 hover:text-white transition">Gizlilik Politikası</a></li>
-                <li><a href="#" className="text-slate-300 hover:text-white transition">KVKK</a></li>
+                <li><button onClick={() => setShowTermsModal(true)} className="text-slate-300 hover:text-white transition">Kullanım Şartları</button></li>
+                <li><button onClick={() => setShowPrivacyModal(true)} className="text-slate-300 hover:text-white transition">Gizlilik Politikası</button></li>
+                <li><button onClick={() => setShowKVKKModal(true)} className="text-slate-300 hover:text-white transition">KVKK</button></li>
               </ul>
             </div>
             
