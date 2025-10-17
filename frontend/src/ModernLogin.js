@@ -226,7 +226,9 @@ export const ModernLogin = ({ onLogin, onClose }) => {
           <div className="mt-4 text-center">
             <button
               type="button"
-              onClick={() => toast.info('Şifre sıfırlama özelliği yakında eklenecek')}
+              onClick={() => toast('Şifre sıfırlama özelliği yakında eklenecek', {
+                icon: 'ℹ️',
+              })}
               className="text-white/80 hover:text-white text-xs underline transition-colors"
             >
               Şifrenizi mi unuttunuz?
