@@ -258,6 +258,8 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
       vat_rate: item.vat_rate || 0.10,
       preparation_time: item.preparation_time || 15
     });
+    setImageFile(null);
+    setImagePreview(''); // Will use formData.image_url for preview
     setShowModal(true);
   };
 
