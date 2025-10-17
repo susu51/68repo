@@ -165,68 +165,7 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Why Us - Features Grid */}
-        <section>
-          <h2 className="text-2xl lg:text-3xl font-semibold text-[#0F172A] text-center mb-12">
-            Neden Kuryecini?
-          </h2>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Hızlı Teslimat */}
-            <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
-                <img 
-                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/2nu7nag2_1760692093757.jpg"
-                  alt="Bisiklet Kurye"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="font-semibold text-[#0F172A] mb-2">Hızlı Teslimat</h3>
-              <p className="text-sm text-slate-600">15 dakikada kapınızda</p>
-            </div>
-            
-            {/* Güvenilir */}
-            <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
-                <img 
-                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/e4pkye7g_1760692232542.jpg"
-                  alt="Motor Kurye"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="font-semibold text-[#0F172A] mb-2">Güvenilir</h3>
-              <p className="text-sm text-slate-600">7/24 güvenli teslimat</p>
-            </div>
-            
-            {/* Uygun Fiyat */}
-            <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
-                <img 
-                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg"
-                  alt="Van Kurye"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="font-semibold text-[#0F172A] mb-2">Uygun Fiyat</h3>
-              <p className="text-sm text-slate-600"><strong>Sadece %5 komisyon</strong></p>
-            </div>
-            
-            {/* Esnek Çalışma */}
-            <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
-                <img 
-                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/2nu7nag2_1760692093757.jpg"
-                  alt="Bisiklet Kurye"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="font-semibold text-[#0F172A] mb-2">Esnek Çalışma</h3>
-              <p className="text-sm text-slate-600">İstediğin zaman çalış</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Vehicles Grid */}
+        {/* Vehicles Grid - MOVED UP */}
         <section>
           <h2 className="text-2xl lg:text-3xl font-semibold text-[#0F172A] text-center mb-3">
             Bisiklet, Scooter veya Araba: <span className="text-[#FF7A00]">Seçim Senin!</span>
@@ -291,6 +230,67 @@ const LandingPage = () => {
                   Büyük siparişler, her hava şartında. Tam kontrol sizde.
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Us - Features Grid - MOVED DOWN */}
+        <section>
+          <h2 className="text-2xl lg:text-3xl font-semibold text-[#0F172A] text-center mb-12">
+            Neden Kuryecini?
+          </h2>
+          
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Hızlı Teslimat */}
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/2nu7nag2_1760692093757.jpg"
+                  alt="Bisiklet Kurye"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="font-semibold text-[#0F172A] mb-2">Hızlı Teslimat</h3>
+              <p className="text-sm text-slate-600">15 dakikada kapınızda</p>
+            </div>
+            
+            {/* Güvenilir */}
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/e4pkye7g_1760692232542.jpg"
+                  alt="Motor Kurye"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="font-semibold text-[#0F172A] mb-2">Güvenilir</h3>
+              <p className="text-sm text-slate-600">7/24 güvenli teslimat</p>
+            </div>
+            
+            {/* Uygun Fiyat */}
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg"
+                  alt="Van Kurye"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="font-semibold text-[#0F172A] mb-2">Uygun Fiyat</h3>
+              <p className="text-sm text-slate-600"><strong>Sadece %5 komisyon</strong></p>
+            </div>
+            
+            {/* Esnek Çalışma */}
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/2nu7nag2_1760692093757.jpg"
+                  alt="Bisiklet Kurye"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="font-semibold text-[#0F172A] mb-2">Esnek Çalışma</h3>
+              <p className="text-sm text-slate-600">İstediğin zaman çalış</p>
             </div>
           </div>
         </section>
