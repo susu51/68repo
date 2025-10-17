@@ -111,8 +111,8 @@ class GPSAddressTester:
     def test_check_business_gps_coverage(self):
         """Test 3: GET /api/admin/utils/check-business-gps - Check GPS coverage statistics"""
         try:
-            headers = {"Authorization": f"Bearer {self.admin_token}"}
-            response = self.session.get(f"{BACKEND_URL}/admin/utils/check-business-gps", headers=headers)
+            # Use session cookies from login instead of Bearer token
+            response = self.session.get(f"{BACKEND_URL}/admin/utils/check-business-gps")
             
             if response.status_code == 200:
                 data = response.json()
