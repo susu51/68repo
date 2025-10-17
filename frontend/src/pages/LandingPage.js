@@ -239,7 +239,7 @@ const LandingPage = () => {
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
-                <h3 className="font-semibold text-lg text-[#0F172A] mb-2">Klasik Bisiklet</h3>
+                <h3 className="font-semibold text-lg text-[#0F172A] mb-2">Bisiklet</h3>
                 <p className="text-sm text-slate-600">
                   Çevreci, ekonomik ve trafikte özgür. Şehir içi teslimatlar için ideal.
                 </p>
