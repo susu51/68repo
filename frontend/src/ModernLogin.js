@@ -93,8 +93,8 @@ export const ModernLogin = ({ onLogin, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <Card className="relative w-full max-w-md mx-4 shadow-2xl border-0 overflow-hidden">
-        {/* New Professional Gradient Background - Blue to Purple */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 opacity-95"></div>
+        {/* Blue to Orange Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-orange-500 opacity-95"></div>
         
         {/* Close Button */}
         <button
@@ -113,10 +113,10 @@ export const ModernLogin = ({ onLogin, onClose }) => {
           </div>
 
           {/* Title */}
-          <h2 className="text-3xl font-bold text-white text-center mb-2">
+          <h2 className="text-2xl font-bold text-white text-center mb-2">
             Hoş Geldiniz
           </h2>
-          <p className="text-white/80 text-center mb-8">
+          <p className="text-white/80 text-center mb-6 text-sm">
             Hesabınıza giriş yapın
           </p>
 
@@ -155,21 +155,32 @@ export const ModernLogin = ({ onLogin, onClose }) => {
               </div>
             )}
 
-            {/* Login Button */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-white text-orange-600 hover:bg-white/90 font-semibold py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-orange-600/30 border-t-orange-600 rounded-full animate-spin"></div>
-                  <span>Giriş yapılıyor...</span>
-                </div>
-              ) : (
-                'Giriş Yap'
-              )}
-            </Button>
+            {/* Login and Register Buttons - Side by Side */}
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-white text-blue-600 hover:bg-white/90 font-semibold py-2.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                    <span>Giriş...</span>
+                  </div>
+                ) : (
+                  'Giriş Yap'
+                )}
+              </Button>
+              
+              <a
+                href="/register"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl text-sm flex items-center justify-center"
+              >
+                Kayıt Ol
+              </a>
+            </div>
           </form>
 
           {/* Divider */}
@@ -177,49 +188,34 @@ export const ModernLogin = ({ onLogin, onClose }) => {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-white/20"></div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-gradient-to-br from-orange-500/50 via-pink-500/50 to-purple-600/50 backdrop-blur-sm text-white/80 rounded-full">
+            <div className="relative flex justify-center text-xs">
+              <span className="px-4 bg-gradient-to-br from-blue-500/50 via-blue-600/50 to-orange-500/50 backdrop-blur-sm text-white/80 rounded-full">
                 veya
               </span>
             </div>
           </div>
 
           {/* OAuth & Phone Login Options */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             {/* Google OAuth - Placeholder */}
             <button
               type="button"
               onClick={() => handleOAuthLogin('Google')}
-              className="w-full flex items-center justify-center gap-3 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white font-medium py-3 rounded-xl transition-all duration-200"
+              className="w-full flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white font-medium py-2.5 rounded-lg transition-all duration-200 text-sm"
             >
-              <Chrome className="w-5 h-5" />
-              <span>Google ile Giriş Yap</span>
+              <Chrome className="w-4 h-4" />
+              <span>Google ile Giriş</span>
             </button>
 
             {/* Phone Login - Placeholder */}
             <button
               type="button"
               onClick={handlePhoneLogin}
-              className="w-full flex items-center justify-center gap-3 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white font-medium py-3 rounded-xl transition-all duration-200"
+              className="w-full flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white font-medium py-2.5 rounded-lg transition-all duration-200 text-sm"
             >
-              <Smartphone className="w-5 h-5" />
-              <span>Telefon ile Giriş Yap</span>
+              <Smartphone className="w-4 h-4" />
+              <span>Telefon ile Giriş</span>
             </button>
-          </div>
-
-          {/* Register Link */}
-          <div className="mt-6 text-center">
-            <p className="text-white/80 text-sm">
-              Henüz hesabınız yok mu?{' '}
-              <a
-                href="/register"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white font-semibold underline hover:text-white/90 transition-colors cursor-pointer"
-              >
-                Kayıt Ol
-              </a>
-            </p>
           </div>
 
           {/* Forgot Password */}
@@ -227,7 +223,7 @@ export const ModernLogin = ({ onLogin, onClose }) => {
             <button
               type="button"
               onClick={() => toast.info('Şifre sıfırlama özelliği yakında eklenecek')}
-              className="text-white/80 hover:text-white text-sm underline transition-colors"
+              className="text-white/80 hover:text-white text-xs underline transition-colors"
             >
               Şifrenizi mi unuttunuz?
             </button>
