@@ -43,6 +43,10 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
     preparation_time: 15
   });
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   useEffect(() => {
     fetchMenuItems();
   }, []);
