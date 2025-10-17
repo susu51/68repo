@@ -652,19 +652,17 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
                           <div className="flex-1">
                             <div className="flex items-center space-x-2">
                               <p className="font-semibold text-gray-800">
-                                {address.label}
+                                {address.adres_basligi || address.label}
                               </p>
-                              <span className="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded">
-                                {address.city}
-                              </span>
                               {address.is_default && (
                                 <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                                   Varsayılan
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {address.description}
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                              {address.acik_adres || address.full || 
+                               `${address.mahalle || ''}, ${address.ilce || address.district || ''}, ${address.il || address.city || ''}`}
                             </p>
                           </div>
                           {selectedAddress?.id === address.id && (
