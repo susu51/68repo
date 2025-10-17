@@ -8,6 +8,9 @@ import { ModernLogin } from '../ModernLogin';
 const LandingPage = () => {
   const [locationInput, setLocationInput] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showKVKKModal, setShowKVKKModal] = useState(false);
   const navigate = useNavigate();
 
   // Force light mode for landing page
