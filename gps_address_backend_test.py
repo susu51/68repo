@@ -429,6 +429,9 @@ class GPSAddressTester:
         if not self.test_customer_login():
             print("❌ CRITICAL: Customer login failed - cannot test customer endpoints")
         
+        # Debug: Check admin user info
+        self.debug_admin_user_info()
+        
         # Test 3: Check Business GPS Coverage Statistics
         gps_stats = self.test_check_business_gps_coverage()
         
