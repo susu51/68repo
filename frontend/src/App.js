@@ -9,7 +9,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { CookieAuthProvider, useCookieAuth } from "./contexts/CookieAuthContext";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { LocationControls } from "./components/LocationControls";
 import OpenStreetMap from "./components/OpenStreetMap";
 import { CourierDashboard } from "./CourierDashboard";
