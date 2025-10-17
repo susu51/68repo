@@ -234,8 +234,8 @@ const LandingPage = () => {
               style={{boxShadow: '0 10px 30px rgba(16,24,40,.08)'}}
             >
               <img 
-                src="https://images.unsplash.com/photo-1620095639773-307ad7f234d6" 
-                alt="Klasik Bisiklet" 
+                src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/2nu7nag2_1760692093757.jpg" 
+                alt="Bisiklet Kurye - Kuryecini" 
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
