@@ -1,53 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
 import { Badge } from "./components/ui/badge";
 import { KuryeciniLogo, KuryeciniTextLogo } from "./components/KuryeciniLogo";
 import PhoneAuth from "./PhoneAuth";
-import ModernRegister from './components/ModernRegister';
 import toast from 'react-hot-toast';
-import { api } from './api/http';  // Use cookie-aware API client
-import { useCookieAuth } from './contexts/CookieAuthContext';  // Use auth context
+import { api } from './api/http';
+import { useCookieAuth } from './contexts/CookieAuthContext';
 
-// Türkiye şehirleri
-const TURKISH_CITIES = [
-  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin',
-  'Aydın', 'Balıkesir', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa',
-  'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Edirne', 'Elazığ', 'Erzincan',
-  'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkâri', 'Hatay', 'Isparta',
-  'Mersin', 'İstanbul', 'İzmir', 'Kars', 'Kastamonu', 'Kayseri', 'Kırklareli', 'Kırşehir',
-  'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Kahramanmaraş', 'Mardin', 'Muğla',
-  'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Rize', 'Sakarya', 'Samsun', 'Siirt',
-  'Sinop', 'Sivas', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Şanlıurfa', 'Uşak',
-  'Van', 'Yozgat', 'Zonguldak', 'Aksaray', 'Bayburt', 'Karaman', 'Kırıkkale', 'Batman',
-  'Şırnak', 'Bartın', 'Ardahan', 'Iğdır', 'Yalova', 'Karabük', 'Kilis', 'Osmaniye', 'Düzce'
-];
-
-export const ModernLogin = ({ onLogin, onRegisterClick, onClose }) => {
-  const { login: contextLogin, register: contextRegister, checkAuthStatus } = useCookieAuth();
+export const ModernLogin = ({ onLogin, onClose }) => {
+  const navigate = useNavigate();
+  const { login: contextLogin, checkAuthStatus } = useCookieAuth();
   const [loginMethod, setLoginMethod] = useState('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showRegisterWizard, setShowRegisterWizard] = useState(false);  // Show modern register wizard
-  const [isRegisterMode, setIsRegisterMode] = useState(false);  // Track if showing register flow
-  const [registerStep, setRegisterStep] = useState('role-selection');  // 'role-selection' or 'form'
-  const [selectedRole, setSelectedRole] = useState(null);  // 'customer', 'courier', 'business'
   const [formData, setFormData] = useState({
-    // Genel alanlar
     email: '',
-    password: '',
-    first_name: '',
-    last_name: '',
-    role: 'customer',
-    phone: '',
-    city: '',
-    district: '',
-    
-    // Kurye için
-    vehicle_type: '',
-    license_photo: null,
-    id_photo: null,
+    password: ''
+  });
     vehicle_photo: null,
     
     // İşletme için
