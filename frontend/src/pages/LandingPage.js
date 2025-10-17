@@ -111,7 +111,7 @@ const LandingPage = () => {
               </p>
               
               <button 
-                onClick={onAuthStart}
+                onClick={() => setShowLoginModal(true)}
                 className="bg-white text-[#FF7A00] font-semibold px-6 py-3 rounded-lg hover:bg-orange-50 transition inline-flex items-center"
               >
                 🚴 Kurye Olarak Başla
