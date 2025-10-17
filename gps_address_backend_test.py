@@ -358,8 +358,8 @@ class GPSAddressTester:
                 "İzmir": {"expected_lat_range": (38.0, 39.0), "expected_lng_range": (26.5, 28.0)}
             }
             
-            headers = {"Authorization": f"Bearer {self.admin_token}"}
-            response = self.session.get(f"{BACKEND_URL}/admin/businesses", headers=headers)
+            # Use session cookies from login instead of Bearer token
+            response = self.session.get(f"{BACKEND_URL}/admin/businesses")
             
             if response.status_code == 200:
                 data = response.json()
