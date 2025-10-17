@@ -205,8 +205,8 @@ class CityFilteringTester:
             self.log_test("Çankaya District Filtering", False, "", f"Exception: {str(e)}")
             return []
     
-    def test_istanbul_city_filtering(self):
-        """Test 4: Cross-city test - Istanbul coordinates should NOT return Aksaray businesses"""
+    def test_istanbul_cross_city_security(self):
+        """Test 4: CRITICAL SECURITY TEST - Istanbul search should NEVER return businesses from other cities"""
         try:
             params = {
                 "city": "istanbul",
@@ -223,41 +223,42 @@ class CityFilteringTester:
                 data = response.json()
                 businesses = data if isinstance(data, list) else []
                 
-                # Verify NO Aksaray businesses appear (where most test businesses are)
+                # CRITICAL: Verify NO businesses from other cities appear
                 istanbul_businesses = []
-                aksaray_businesses = []
-                other_city_businesses = []
+                cross_city_violations = []
                 
                 for business in businesses:
                     business_city = business.get("address", {}).get("city_slug", "").lower()
-                    if business_city == "istanbul" or business_city == "i̇stanbul":
+                    if business_city in ["istanbul", "i̇stanbul"]:
                         istanbul_businesses.append(business)
-                    elif business_city == "aksaray":
-                        aksaray_businesses.append(business)
                     else:
-                        other_city_businesses.append(business)
+                        cross_city_violations.append({
+                            "business": business.get("name", "Unknown"),
+                            "city": business_city
+                        })
                 
-                if len(aksaray_businesses) == 0:
+                # This is a CRITICAL SECURITY TEST
+                if len(cross_city_violations) == 0:
                     self.log_test(
-                        "Istanbul City Filtering (Cross-City Test)", 
+                        "Istanbul Cross-City Security Test", 
                         True, 
-                        f"✅ CROSS-CITY FILTERING WORKING: Found {len(istanbul_businesses)} Istanbul businesses, 0 Aksaray businesses (STRICT separation confirmed)"
+                        f"✅ CRITICAL SECURITY VERIFIED: Found {len(istanbul_businesses)} Istanbul businesses, 0 cross-city violations. City isolation is STRICT."
                     )
                 else:
                     self.log_test(
-                        "Istanbul City Filtering (Cross-City Test)", 
+                        "Istanbul Cross-City Security Test", 
                         False, 
                         "", 
-                        f"❌ CRITICAL SECURITY VIOLATION: Found {len(aksaray_businesses)} Aksaray businesses in Istanbul search - CROSS-CITY DATA LEAK!"
+                        f"❌ CRITICAL SECURITY VIOLATION: Found {len(cross_city_violations)} businesses from other cities: {cross_city_violations}"
                     )
                 
                 return businesses
             else:
-                self.log_test("Istanbul City Filtering", False, "", f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Istanbul Cross-City Security Test", False, "", f"HTTP {response.status_code}: {response.text}")
                 return []
                 
         except Exception as e:
-            self.log_test("Istanbul City Filtering", False, "", f"Exception: {str(e)}")
+            self.log_test("Istanbul Cross-City Security Test", False, "", f"Exception: {str(e)}")
             return []
     
     def test_business_city_verification(self):
