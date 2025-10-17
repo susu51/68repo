@@ -559,3 +559,69 @@ async def get_public_business_menu(business_id: str):
             status_code=500,
             detail=f"Error fetching public menu: {str(e)}"
         )
+
+# ============================================
+# PUBLIC ENDPOINTS - For Customers
+# ============================================
+
+@router.get("/public/{business_id}/menu", response_model=List[MenuItem])
+async def get_business_public_menu(business_id: str):
+    """
+    Get public menu of a business - NO AUTH REQUIRED
+    Customers can view menus of approved businesses
+    Only returns available items
+    """
+    try:
+        from server import db
+        
+        # Verify business exists and is approved
+        business = await db.users.find_one({
+            "_id": business_id,
+            "role": "business",
+            "kyc_status": "approved",
+            "is_active": True
+        })
+        
+        if not business:
+            raise HTTPException(
+                status_code=404,
+                detail="Business not found or not approved"
+            )
+        
+        # Get all available menu items for this business
+        menu_items = await db.menu_items.find({
+            "business_id": business_id,
+            "is_available": True
+        }).sort("created_at", -1).to_list(length=None)
+        
+        return [
+            MenuItem(
+                id=item["_id"],
+                business_id=item["business_id"],
+                name=item["name"],
+                description=item.get("description", ""),
+                price=item["price"],
+                currency=item.get("currency", "TRY"),
+                category=item["category"],
+                tags=item.get("tags", []),
+                image_url=item.get("image_url"),
+                is_available=item.get("is_available", True),
+                vat_rate=item.get("vat_rate", 0.10),
+                options=item.get("options", []),
+                preparation_time=item.get("preparation_time", 15),
+                created_at=item["created_at"],
+                updated_at=item.get("updated_at")
+            )
+            for item in menu_items
+        ]
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error fetching public menu: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching public menu: {str(e)}"
+        )
+
+        )
