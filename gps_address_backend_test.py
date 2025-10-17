@@ -60,10 +60,12 @@ class GPSAddressTester:
                 data = response.json()
                 if data.get("success") and "access_token" in data:
                     self.admin_token = data["access_token"]
+                    # Check if cookies were set
+                    cookies_info = f"Cookies: {len(self.session.cookies)} set" if self.session.cookies else "No cookies set"
                     self.log_test(
                         "Admin Login", 
                         True, 
-                        f"Successfully logged in as {ADMIN_EMAIL}, token length: {len(self.admin_token)} chars"
+                        f"Successfully logged in as {ADMIN_EMAIL}, token length: {len(self.admin_token)} chars, {cookies_info}"
                     )
                     return True
                 else:
