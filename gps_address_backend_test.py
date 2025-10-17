@@ -158,8 +158,8 @@ class GPSAddressTester:
     def test_update_business_gps_batch(self):
         """Test 4: POST /api/admin/utils/update-business-gps - Batch update businesses without GPS"""
         try:
-            headers = {"Authorization": f"Bearer {self.admin_token}"}
-            response = self.session.post(f"{BACKEND_URL}/admin/utils/update-business-gps", headers=headers)
+            # Use session cookies from login instead of Bearer token
+            response = self.session.post(f"{BACKEND_URL}/admin/utils/update-business-gps")
             
             if response.status_code == 200:
                 data = response.json()
