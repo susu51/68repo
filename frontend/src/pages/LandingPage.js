@@ -255,8 +255,8 @@ const LandingPage = () => {
                 EN POPÜLER
               </div>
               <img 
-                src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc" 
-                alt="Elektrikli Bisiklet/Scooter" 
+                src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg" 
+                alt="Motor Kurye - Kuryecini" 
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
