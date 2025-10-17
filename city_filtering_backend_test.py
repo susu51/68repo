@@ -275,7 +275,7 @@ class CityFilteringTester:
     def test_radius_parameter_validation(self):
         """Test 6: Test radius parameter validation and limits"""
         try:
-            # Test with different radius values
+            # Test with different radius values using Aksaray (where we have businesses)
             test_cases = [
                 {"radius_km": 10, "expected": "success"},
                 {"radius_km": 50, "expected": "success"},
@@ -284,7 +284,7 @@ class CityFilteringTester:
             
             for case in test_cases:
                 params = {
-                    "city": "ankara",
+                    "city": "aksaray",
                     "lat": ANKARA_COORDS["lat"],
                     "lng": ANKARA_COORDS["lng"],
                     "radius_km": case["radius_km"]
