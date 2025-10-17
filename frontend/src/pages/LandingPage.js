@@ -106,7 +106,7 @@ const LandingPage = () => {
             <img 
               src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg" 
               alt="Kuryecini Motor Kurye" 
-              className="absolute bottom-0 right-0 w-64 h-64 object-contain opacity-30 rounded-tl-3xl"
+              className="absolute bottom-0 right-0 w-64 h-64 object-cover opacity-30 rounded-tl-3xl"
             />
           </div>
 
