@@ -161,10 +161,13 @@ if (typeof window !== 'undefined') {
 
 // Import Global Error Boundary
 import GlobalErrorBoundary from './components/ErrorBoundary';
+import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <GlobalErrorBoundary>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </GlobalErrorBoundary>
 );
