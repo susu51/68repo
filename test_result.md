@@ -136,7 +136,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "MODERN LOGIN UI & DARK MODE IMPLEMENTATION: Implement new gradient login design with OAuth/Phone options, site-wide dark/light theme toggle, and ensure customer panel remains in light mode only."
+user_problem_statement: "Check business KYC status and customer panel requirements: 1) Check Business KYC Status (admin login, get businesses, check kyc_status/is_active/city/district), 2) Test Customer Access (NO KYC REQUIRED) - verify customer can access without KYC approval, 3) Test Catalog Endpoint - get customer city/district, call /api/catalog/city-nearby, 4) Identify Issues - approved businesses in same city, customer KYC blocks, business indexing"
 
 backend:
   - task: "FAZ 1 - Business Menu CRUD System"
