@@ -15,9 +15,7 @@ import {
   TrendingUp,
   DollarSign,
   Users,
-  Star,
-  Sun,
-  Moon
+  Star
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { get } from '../../api/http';
