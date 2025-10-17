@@ -273,8 +273,8 @@ const LandingPage = () => {
               style={{boxShadow: '0 10px 30px rgba(16,24,40,.08)'}}
             >
               <img 
-                src="https://images.unsplash.com/photo-1565089420718-8832a9a27d3b" 
-                alt="Kendi Arabanız" 
+                src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/e4pkye7g_1760692232542.jpg" 
+                alt="Van Kurye - Kuryecini" 
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
