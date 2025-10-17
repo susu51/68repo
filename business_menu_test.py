@@ -20,13 +20,14 @@ BUSINESS_CREDENTIALS = {
     "password": "test123"
 }
 
-# Test payload from review request - Updated to match API schema
+# Test payload from review request - Exact payload as specified
 TEST_MENU_ITEM = {
-    "title": "Test Pizza",  # API uses 'title' not 'name'
+    "name": "Test Pizza",
     "description": "Delicious test pizza",
-    "price": 50.00,
-    "category": "food",
-    "is_available": True
+    "price": 89.99,
+    "category": "Ana Yemek",
+    "is_available": True,
+    "preparation_time": 20
 }
 
 class BusinessMenuTester:
