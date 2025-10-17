@@ -15,10 +15,13 @@ import {
   TrendingUp,
   DollarSign,
   Users,
-  Star
+  Star,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { get } from '../../api/http';
+import { useTheme } from '../../contexts/ThemeContext';
 
 // Sub-components
 import { ModernMenuManagement } from './ModernMenuManagement';
