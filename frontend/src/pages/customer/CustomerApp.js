@@ -31,6 +31,21 @@ export const CustomerApp = ({ user, onLogout }) => {
 
   console.log('🚀 CustomerApp FAZ 2 rendered - activeView:', activeView, 'user:', user?.first_name, 'cart:', cart, 'getCartSummary:', typeof getCartSummary);
 
+  // Force light mode for customer panel by removing dark class
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    
+    // Cleanup: restore dark mode preference when unmounting
+    return () => {
+      const savedTheme = localStorage.getItem('kuryecini-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+      }
+    };
+  }, []);
+
   // Navigation handlers
   const handleRestaurantSelect = (restaurant) => {
     setSelectedRestaurant(restaurant);
