@@ -4983,10 +4983,10 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
     }
   }
 
-  // If not authenticated, show landing page
+  // If not authenticated, show router with landing page and register
   return (
     <div className="App">
-      <LandingPage onAuthStart={onAuthStart} />
+      <AuthRouter />
       
       {showLogin && (
         <div style={{
