@@ -110,6 +110,18 @@ class GPSAddressTester:
             self.log_test("Customer Login", False, "", f"Exception: {str(e)}")
             return False
     
+    def debug_admin_user_info(self):
+        """Debug: Check admin user information"""
+        try:
+            response = self.session.get(f"{BACKEND_URL}/me")
+            if response.status_code == 200:
+                data = response.json()
+                print(f"   🔍 Admin user info: role={data.get('role')}, email={data.get('email')}")
+            else:
+                print(f"   🔍 Admin /me endpoint failed: HTTP {response.status_code}")
+        except Exception as e:
+            print(f"   🔍 Admin /me debug failed: {str(e)}")
+    
     def test_check_business_gps_coverage(self):
         """Test 3: GET /api/admin/utils/check-business-gps - Check GPS coverage statistics"""
         try:
