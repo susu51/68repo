@@ -641,7 +641,7 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
                       onClick={() => {
                         setSelectedAddress(address);
                         setShowAddressSelector(false);
-                        toast.success(`Adres değiştirildi: ${address.label}`);
+                        toast.success(`Adres değiştirildi: ${address.adres_basligi || address.label}`);
                       }}
                     >
                       <CardContent className="p-4">
