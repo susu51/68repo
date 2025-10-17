@@ -93,8 +93,8 @@ export const ModernLogin = ({ onLogin, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <Card className="relative w-full max-w-md mx-4 shadow-2xl border-0 overflow-hidden">
-        {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 opacity-90"></div>
+        {/* New Professional Gradient Background - Blue to Purple */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 opacity-95"></div>
         
         {/* Close Button */}
         <button
