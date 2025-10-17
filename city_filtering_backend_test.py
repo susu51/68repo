@@ -190,7 +190,7 @@ class CityFilteringTester:
             return []
     
     def test_istanbul_city_filtering(self):
-        """Test 4: Cross-city test - Istanbul coordinates should NOT return Ankara businesses"""
+        """Test 4: Cross-city test - Istanbul coordinates should NOT return Aksaray businesses"""
         try:
             params = {
                 "city": "istanbul",
@@ -207,32 +207,32 @@ class CityFilteringTester:
                 data = response.json()
                 businesses = data if isinstance(data, list) else []
                 
-                # Verify NO Ankara businesses appear
+                # Verify NO Aksaray businesses appear (where most test businesses are)
                 istanbul_businesses = []
-                ankara_businesses = []
+                aksaray_businesses = []
                 other_city_businesses = []
                 
                 for business in businesses:
                     business_city = business.get("address", {}).get("city_slug", "").lower()
-                    if business_city == "istanbul":
+                    if business_city == "istanbul" or business_city == "i̇stanbul":
                         istanbul_businesses.append(business)
-                    elif business_city == "ankara":
-                        ankara_businesses.append(business)
+                    elif business_city == "aksaray":
+                        aksaray_businesses.append(business)
                     else:
                         other_city_businesses.append(business)
                 
-                if len(ankara_businesses) == 0:
+                if len(aksaray_businesses) == 0:
                     self.log_test(
                         "Istanbul City Filtering (Cross-City Test)", 
                         True, 
-                        f"✅ CROSS-CITY FILTERING WORKING: Found {len(istanbul_businesses)} Istanbul businesses, 0 Ankara businesses (STRICT separation confirmed)"
+                        f"✅ CROSS-CITY FILTERING WORKING: Found {len(istanbul_businesses)} Istanbul businesses, 0 Aksaray businesses (STRICT separation confirmed)"
                     )
                 else:
                     self.log_test(
                         "Istanbul City Filtering (Cross-City Test)", 
                         False, 
                         "", 
-                        f"❌ CRITICAL SECURITY VIOLATION: Found {len(ankara_businesses)} Ankara businesses in Istanbul search - CROSS-CITY DATA LEAK!"
+                        f"❌ CRITICAL SECURITY VIOLATION: Found {len(aksaray_businesses)} Aksaray businesses in Istanbul search - CROSS-CITY DATA LEAK!"
                     )
                 
                 return businesses
