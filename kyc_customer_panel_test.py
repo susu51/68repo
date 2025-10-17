@@ -230,31 +230,30 @@ class KYCCustomerPanelTester:
     def test_catalog_city_nearby(self):
         """Test 5: Test /api/catalog/city-nearby with customer's location"""
         try:
-            customer_city = self.customer_profile.get("city", "İstanbul")
-            customer_district = self.customer_profile.get("district", "")
+            # Since customer doesn't have city set, test with İstanbul (where we have Test Lokantası)
+            test_city = "istanbul"  # Use lowercase slug format
+            test_lat = 41.0082  # İstanbul coordinates
+            test_lng = 28.9784
             
             # Create customer session
             customer_session = requests.Session()
             customer_session.headers.update({"Authorization": f"Bearer {self.customer_token}"})
             
-            # Test catalog endpoint
+            # Test catalog endpoint with required parameters
             response = customer_session.get(f"{BACKEND_URL}/catalog/city-nearby", params={
-                "city": customer_city,
-                "district": customer_district
+                "lat": test_lat,
+                "lng": test_lng,
+                "city": test_city,
+                "radius_km": 10
             })
             
             if response.status_code == 200:
                 data = response.json()
-                restaurants = data.get("restaurants", [])
+                # The endpoint returns a list directly
+                restaurants = data if isinstance(data, list) else []
                 
-                # Analyze returned restaurants
-                approved_restaurants = [r for r in restaurants if r.get("kyc_status") == "approved"]
-                same_city_restaurants = [r for r in restaurants if r.get("city", "").lower() == customer_city.lower()]
-                
-                details = f"Catalog endpoint returned {len(restaurants)} restaurants for {customer_city}"
-                if customer_district:
-                    details += f"/{customer_district}"
-                details += f". {len(approved_restaurants)} approved, {len(same_city_restaurants)} in same city"
+                details = f"Catalog endpoint returned {len(restaurants)} restaurants for {test_city} "
+                details += f"(lat: {test_lat}, lng: {test_lng}, radius: 10km)"
                 
                 self.log_test("Catalog City Nearby", True, details)
                 
@@ -262,18 +261,38 @@ class KYCCustomerPanelTester:
                 print("🏪 CATALOG RESTAURANTS:")
                 for restaurant in restaurants[:5]:  # Show first 5
                     name = restaurant.get("name", "Unknown")
-                    city = restaurant.get("city", "Unknown")
-                    district = restaurant.get("district", "Unknown")
-                    kyc_status = restaurant.get("kyc_status", "Unknown")
-                    is_active = restaurant.get("is_active", False)
-                    print(f"   • {name} - {city}/{district} - KYC: {kyc_status} - Active: {is_active}")
+                    address = restaurant.get("address", {})
+                    city = address.get("city", "Unknown")
+                    distance = restaurant.get("distance", 0)
+                    menu_snippet = restaurant.get("menu_snippet", [])
+                    print(f"   • {name} - {city} - Distance: {distance:.0f}m - Menu items: {len(menu_snippet)}")
                 if len(restaurants) > 5:
                     print(f"   ... and {len(restaurants) - 5} more restaurants")
                 print()
                 
                 return restaurants
             else:
+                # Try alternative endpoint or check if it's a different path
                 self.log_test("Catalog City Nearby", False, "", f"HTTP {response.status_code}: {response.text}")
+                
+                # Let's also try without authentication (public endpoint)
+                print("   Trying without authentication...")
+                public_response = requests.get(f"{BACKEND_URL}/catalog/city-nearby", params={
+                    "lat": test_lat,
+                    "lng": test_lng,
+                    "city": test_city,
+                    "radius_km": 10
+                })
+                
+                if public_response.status_code == 200:
+                    data = public_response.json()
+                    restaurants = data if isinstance(data, list) else []
+                    details = f"Public catalog endpoint returned {len(restaurants)} restaurants"
+                    self.log_test("Catalog City Nearby (Public)", True, details)
+                    return restaurants
+                else:
+                    print(f"   Public endpoint also failed: HTTP {public_response.status_code}: {public_response.text}")
+                
                 return []
                 
         except Exception as e:
