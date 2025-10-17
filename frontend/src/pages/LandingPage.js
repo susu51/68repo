@@ -102,11 +102,11 @@ const LandingPage = () => {
               Home Delivery
             </div>
             
-            {/* Decorative Image */}
+            {/* Decorative Image - Motor Kurye */}
             <img 
-              src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38" 
-              alt="Delicious food" 
-              className="absolute bottom-0 right-0 w-48 h-48 object-cover opacity-20 rounded-tl-full"
+              src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg" 
+              alt="Kuryecini Motor Kurye" 
+              className="absolute bottom-0 right-0 w-64 h-64 object-cover opacity-30 rounded-tl-3xl"
             />
           </div>
 
