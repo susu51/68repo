@@ -1161,6 +1161,21 @@ backend:
     -agent: "testing"
     -message: "🚨 CRITICAL PHASE 1 COURIER PANEL AUTHENTICATION FAILURE: Comprehensive testing of newly implemented Phase 1 Courier Panel backend endpoints reveals MAJOR AUTHENTICATION SYSTEM BUG (2.8% success rate, 1/36 tests passed). ✅ COURIER REGISTRATION & LOGIN: Test courier testkurye@example.com successfully registered and authenticated via cookie-based auth system (/api/auth/login), JWT token generated correctly, /api/auth/me endpoint working perfectly with same credentials. ❌ CRITICAL AUTHENTICATION BUG: ALL courier endpoints (/api/courier/*) returning 401 'Invalid token' despite successful authentication. Affected endpoints: PDF Reports System (GET /api/courier/earnings/report/pdf), Profile Update System (PUT /api/courier/profile), Availability Management (POST/GET /api/courier/availability), Order History Filters (GET /api/courier/orders/history), Ready Orders System (GET /api/courier/orders/ready). 🔍 ROOT CAUSE ANALYSIS: auth_dependencies.py get_current_user function failing to validate tokens that work perfectly with auth_cookie.py get_current_user_from_cookie function. This suggests circular import issue or database connection problem in auth_dependencies.py when importing 'from server import db' at runtime. Both cookie-based and bearer token authentication failing for courier endpoints. 🔧 URGENT FIX REQUIRED: auth_dependencies.py authentication system needs to be aligned with working auth_cookie.py system OR courier endpoints need to use cookie-based authentication dependency instead of JWT bearer token dependency. This is blocking ALL Phase 1 Courier Panel functionality including PDF generation, profile updates, availability management, order history, and ready orders system."
 frontend:
+  - task: "Customer DiscoverPage - Full Address Display Fix"
+    implemented: true
+    working: true
+    file: "pages/customer/DiscoverPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "USER REPORTED ISSUE: 'Müşteri paneli kesfetteki adres açık adres olarak gözükmüyor' (Full address is not showing in customer panel discover section) - Only city name was visible, full address (acik_adres) was not displayed"
+        - working: "NA"
+          agent: "main"
+          comment: "✅ CUSTOMER DISCOVER PAGE ADDRESS DISPLAY FIXED: Updated address display logic to show full address information. MAIN CHANGES: 1) Address bar display - Now shows adres_basligi (address label) on first line and full address (acik_adres/full) on second line with line-clamp-2 for long addresses. Falls back to formatted address (mahalle, ilce, il) if acik_adres not available. 2) Address selector modal - Updated to display full address (acik_adres/full) instead of just city. Shows address label (adres_basligi) as title and complete address below. Removed redundant city badge. 3) Backward compatibility - Supports both new schema (adres_basligi, acik_adres, il, ilce, mahalle) and old schema (label, full, city, district). IMPLEMENTATION: Modified lines 435-450 (address bar) and 652-668 (address selector modal) in DiscoverPage.js. All address fields now properly displayed with proper formatting and line clamping for better UI/UX."
+
   - task: "Customer Panel New Features - GPS Keşfet & Adresler Tabs"
     implemented: true
     working: true
