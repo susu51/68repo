@@ -133,11 +133,11 @@ const LandingPage = () => {
               </button>
             </div>
             
-            {/* Decorative Image */}
+            {/* Decorative Image - Bisiklet Kurye */}
             <img 
-              src="https://images.unsplash.com/photo-1620095639773-307ad7f234d6" 
-              alt="Courier delivery" 
-              className="absolute bottom-0 right-0 w-48 h-48 object-cover opacity-20 rounded-tl-full"
+              src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/2nu7nag2_1760692093757.jpg" 
+              alt="Kuryecini Bisiklet Kurye" 
+              className="absolute bottom-0 right-0 w-64 h-64 object-cover opacity-30 rounded-tl-3xl"
             />
           </div>
         </section>
