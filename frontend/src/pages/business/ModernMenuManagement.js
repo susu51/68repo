@@ -355,6 +355,8 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
+    setImageFile(null);
+    setImagePreview('');
     setFormData({
       name: '',
       description: '',
