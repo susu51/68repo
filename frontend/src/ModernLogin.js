@@ -207,11 +207,25 @@ export const ModernLogin = ({ onLogin, onClose }) => {
             </button>
           </div>
 
-          {/* Register Link - Removed as per requirement */}
-          {/* Registration is now on separate /register page */}
+          {/* Register Link */}
+          <div className="mt-6 text-center">
+            <p className="text-white/80 text-sm">
+              Henüz hesabınız yok mu?{' '}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onClose) onClose();
+                  navigate('/register');
+                }}
+                className="text-white font-semibold underline hover:text-white/90 transition-colors"
+              >
+                Kayıt Ol
+              </button>
+            </p>
+          </div>
 
           {/* Forgot Password */}
-          <div className="mt-6 text-center">
+          <div className="mt-4 text-center">
             <button
               type="button"
               onClick={() => toast.info('Şifre sıfırlama özelliği yakında eklenecek')}
