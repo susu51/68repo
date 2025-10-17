@@ -214,8 +214,8 @@ export const ModernLogin = ({ onLogin, onClose }) => {
               <button
                 type="button"
                 onClick={() => {
+                  window.open('/register', '_blank');
                   if (onClose) onClose();
-                  navigate('/register');
                 }}
                 className="text-white font-semibold underline hover:text-white/90 transition-colors"
               >
