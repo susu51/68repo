@@ -236,7 +236,7 @@ const LandingPage = () => {
               <img 
                 src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/2nu7nag2_1760692093757.jpg" 
                 alt="Bisiklet Kurye - Kuryecini" 
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-contain bg-gray-50"
               />
               <div className="p-6">
                 <h3 className="font-semibold text-lg text-[#0F172A] mb-2">Bisiklet</h3>
