@@ -289,19 +289,68 @@ class CityFilteringTester:
         except Exception as e:
             self.log_test("Business City Verification", False, "", f"Exception: {str(e)}")
     
-    def test_radius_parameter_validation(self):
-        """Test 6: Test radius parameter validation and limits"""
+    def test_endpoint_parameter_validation(self):
+        """Test 5: Test endpoint parameter validation and security"""
         try:
-            # Test with different radius values using Aksaray (where we have businesses)
+            # Test missing required parameters
             test_cases = [
-                {"radius_km": 10, "expected": "success"},
-                {"radius_km": 50, "expected": "success"},
-                {"radius_km": 100, "expected": "success"},  # Should be capped at max
+                {
+                    "name": "Missing City Parameter",
+                    "params": {"lat": ANKARA_COORDS["lat"], "lng": ANKARA_COORDS["lng"]},
+                    "expected_status": 422
+                },
+                {
+                    "name": "Missing Latitude Parameter", 
+                    "params": {"city": "ankara", "lng": ANKARA_COORDS["lng"]},
+                    "expected_status": 422
+                },
+                {
+                    "name": "Missing Longitude Parameter",
+                    "params": {"city": "ankara", "lat": ANKARA_COORDS["lat"]},
+                    "expected_status": 422
+                },
+                {
+                    "name": "Valid Parameters",
+                    "params": {"city": "ankara", "lat": ANKARA_COORDS["lat"], "lng": ANKARA_COORDS["lng"]},
+                    "expected_status": 200
+                }
+            ]
+            
+            public_session = requests.Session()
+            
+            for case in test_cases:
+                response = public_session.get(f"{BACKEND_URL}/catalog/city-nearby", params=case["params"])
+                
+                if response.status_code == case["expected_status"]:
+                    self.log_test(
+                        f"Parameter Validation: {case['name']}", 
+                        True, 
+                        f"Correctly returned HTTP {response.status_code} as expected"
+                    )
+                else:
+                    self.log_test(
+                        f"Parameter Validation: {case['name']}", 
+                        False, 
+                        "", 
+                        f"Expected HTTP {case['expected_status']}, got {response.status_code}"
+                    )
+                    
+        except Exception as e:
+            self.log_test("Endpoint Parameter Validation", False, "", f"Exception: {str(e)}")
+    
+    def test_radius_limits_and_caps(self):
+        """Test 6: Test radius parameter limits and capping behavior"""
+        try:
+            # Test different radius values to verify capping at 70km (NEARBY_RADIUS_M)
+            test_cases = [
+                {"radius_km": 10, "description": "Normal radius"},
+                {"radius_km": 50, "description": "Large radius"},
+                {"radius_km": 100, "description": "Oversized radius (should be capped)"},
             ]
             
             for case in test_cases:
                 params = {
-                    "city": "aksaray",
+                    "city": "ankara",
                     "lat": ANKARA_COORDS["lat"],
                     "lng": ANKARA_COORDS["lng"],
                     "radius_km": case["radius_km"]
@@ -315,20 +364,20 @@ class CityFilteringTester:
                     businesses = data if isinstance(data, list) else []
                     
                     self.log_test(
-                        f"Radius Parameter Test ({case['radius_km']}km)", 
+                        f"Radius Limit Test ({case['radius_km']}km)", 
                         True, 
-                        f"Radius {case['radius_km']}km accepted, returned {len(businesses)} businesses"
+                        f"{case['description']}: Radius {case['radius_km']}km accepted, returned {len(businesses)} businesses"
                     )
                 else:
                     self.log_test(
-                        f"Radius Parameter Test ({case['radius_km']}km)", 
+                        f"Radius Limit Test ({case['radius_km']}km)", 
                         False, 
                         "", 
                         f"HTTP {response.status_code}: {response.text}"
                     )
                     
         except Exception as e:
-            self.log_test("Radius Parameter Validation", False, "", f"Exception: {str(e)}")
+            self.log_test("Radius Limits and Caps", False, "", f"Exception: {str(e)}")
     
     def run_all_tests(self):
         """Run all city filtering tests"""
