@@ -330,11 +330,11 @@ class CityFilteringTester:
         # Test 2: Business City/District Verification
         self.test_business_city_verification()
         
-        # Test 3: Ankara City Filtering (STRICT)
-        ankara_businesses = self.test_ankara_city_filtering()
+        # Test 3: Aksaray City Filtering (STRICT) - where testbusiness@example.com is located
+        aksaray_businesses = self.test_aksaray_city_filtering()
         
-        # Test 4: Ankara District Filtering
-        self.test_ankara_district_filtering()
+        # Test 4: Niğde City Filtering (another city in database)
+        self.test_nigde_city_filtering()
         
         # Test 5: Cross-City Test (Istanbul should NOT return Ankara businesses)
         self.test_istanbul_city_filtering()
