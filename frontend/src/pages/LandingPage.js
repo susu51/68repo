@@ -275,7 +275,7 @@ const LandingPage = () => {
               <img 
                 src="https://customer-assets.emergentagent.com/job_kuryecini-admin-1/artifacts/al6llh3d_1760691967744.jpg" 
                 alt="Van Kurye - Kuryecini" 
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-contain bg-gray-50"
               />
               <div className="p-6">
                 <h3 className="font-semibold text-lg text-[#0F172A] mb-2">Araç / Van</h3>
