@@ -4,7 +4,7 @@
  */
 
 // HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES
-const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://kuryecini-admin-1.preview.emergentagent.com';
+const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://delivery-nexus-5.preview.emergentagent.com';
 
 class CartAPI {
   // Sepeti backend'den yükle

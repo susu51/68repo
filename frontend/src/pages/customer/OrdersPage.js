@@ -6,7 +6,7 @@ import { Package, MapPin, Clock, Star, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { RatingModal } from '../../components/RatingModal';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-admin-1.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://delivery-nexus-5.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 const STATUS_CONFIG = {

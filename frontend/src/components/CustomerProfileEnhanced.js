@@ -6,7 +6,7 @@ import { Label } from './ui/label.jsx';
 import { User, Phone, Mail, Save, MapPin, Package, Settings, Bell, CreditCard, LogOut, ChevronRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-admin-1.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://delivery-nexus-5.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CustomerProfileEnhanced = ({ user, onLogout, onNavigateToAddresses }) => {

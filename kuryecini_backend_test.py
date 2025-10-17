@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://kuryecini-admin-1.preview.emergentagent.com"
+BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials from review request
@@ -145,7 +145,7 @@ class KuryeciniBackendTest:
         # Test preflight request
         try:
             headers = {
-                'Origin': 'https://kuryecini-admin-1.preview.emergentagent.com',
+                'Origin': 'https://delivery-nexus-5.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type,Authorization'
             }

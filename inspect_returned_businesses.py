@@ -7,7 +7,7 @@ import requests
 import json
 
 # Backend URL
-BACKEND_URL = "https://kuryecini-admin-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
 
 def inspect_businesses():
     """Inspect businesses returned by city catalog endpoint"""

@@ -107,7 +107,7 @@ class FinalComprehensiveTest:
         # Feature 4: Environment variables and CORS configuration
         try:
             headers = {
-                'Origin': 'https://kuryecini-admin-1.preview.emergentagent.com',
+                'Origin': 'https://delivery-nexus-5.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type,Authorization'
             }

@@ -33,7 +33,7 @@ from datetime import datetime
 import time
 
 # Configuration
-BACKEND_URL = "https://kuryecini-admin-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@kuryecini.com"
 ADMIN_PASSWORD = "KuryeciniAdmin2024!"
 

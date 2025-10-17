@@ -18,7 +18,7 @@ import time
 from datetime import datetime, timezone
 
 # Configuration from environment
-BACKEND_URL = "https://kuryecini-admin-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
 
 # Test credentials from review request
 TEST_CREDENTIALS = {

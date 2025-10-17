@@ -20,7 +20,7 @@ import traceback
 from urllib.parse import urljoin
 
 # Test Configuration
-BASE_URL = "https://kuryecini-admin-1.preview.emergentagent.com"
+BASE_URL = "https://delivery-nexus-5.preview.emergentagent.com"
 API_BASE_URL = f"{BASE_URL}/api"
 AUTH_BASE_URL = f"{BASE_URL}/api/auth"
 
