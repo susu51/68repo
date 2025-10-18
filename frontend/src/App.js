@@ -3097,23 +3097,8 @@ const BusinessDashboard = ({ user }) => {
               </CardContent>
             </Card>
           </TabsContent>
-
-          {/* Settings Tab */}
-          {/* KYC Tab */}
-          <TabsContent value="kyc" className="space-y-6">
-            <AdminKYC />
-          </TabsContent>
-
-          {/* Advertisements Tab */}
-          <TabsContent value="advertisements" className="space-y-6">
-            <AdminAdvertisements />
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <AdminSettings />
-          </TabsContent>
-        </Tabs>
-      </div>
+          </Tabs>
+        </div>
     </div>
   );
 };
