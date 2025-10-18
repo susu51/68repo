@@ -1354,6 +1354,11 @@ const AdminDashboard = ({ user }) => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <AdminSettings />
+          </TabsContent>
             </Tabs>
           </div>
         </div>
