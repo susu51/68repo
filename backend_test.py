@@ -1,7 +1,22 @@
 #!/usr/bin/env python3
 """
-CRITICAL TEST: Business Order Display - Check if Orders Appear in Business Panel
-Testing the specific scenario where orders weren't appearing in business panel
+CRITICAL END-TO-END TEST: Customer Order to Business Panel Flow
+Testing the complete flow from customer placing an order to it appearing in the business order management panel.
+
+Test Scenario:
+1. Customer Order Creation:
+   - Login as customer: test@kuryecini.com / test123
+   - Get available businesses: GET /api/businesses?city=Aksaray
+   - Select a business and get menu: GET /api/business/public-menu/{business_id}/products
+   - Create order with proper business_id: POST /api/orders
+   - Verify order created with status "created" or "pending"
+   - Record order_id and business_id
+
+2. Business Panel - Incoming Orders Check:
+   - Login as business with the SAME business_id from order
+   - GET /api/business/orders/incoming
+   - Verify the newly created order appears in response
+   - Check order has correct business_id, customer_name, items array, total_amount, status, delivery_address
 """
 
 import requests
@@ -13,7 +28,7 @@ from datetime import datetime
 BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
 BUSINESS_EMAIL = "testbusiness@example.com"
 BUSINESS_PASSWORD = "test123"
-BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Lezzet Döner
+BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Expected business ID
 CUSTOMER_EMAIL = "test@kuryecini.com"
 CUSTOMER_PASSWORD = "test123"
 
