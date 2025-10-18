@@ -6051,23 +6051,42 @@ async def get_courier_earnings(current_user: dict = Depends(get_courier_user)):
     }
 
 @api_router.get("/businesses")
-async def get_businesses(lat: float = None, lng: float = None, radius: int = 5000):
-    """Get list of active businesses (public endpoint for customers)"""
+async def get_businesses(
+    lat: float = None, 
+    lng: float = None, 
+    radius: int = 5000,
+    city: str = None,
+    district: str = None
+):
+    """Get list of active businesses (public endpoint for customers) - with city/district filtering"""
     try:
         from server import db
         
         # Get active businesses from users collection
         query = {"role": "business", "is_active": True, "kyc_status": "approved"}
         
+        # Add city filter if provided
+        if city:
+            from utils.city_normalize import normalize_city_name
+            city_normalized = normalize_city_name(city)
+            query["city_normalized"] = city_normalized
+            print(f"🔍 Filtering by city: {city} (normalized: {city_normalized})")
+        
+        # Add district filter if provided  
+        if district:
+            query["district"] = district
+            print(f"🔍 Filtering by district: {district}")
+        
         businesses = await db.users.find(query).to_list(length=None)
+        
+        print(f"✅ Found {len(businesses)} businesses (city={city}, district={district})")
         
         formatted_businesses = []
         for business in businesses:
-            # Handle business ID properly - use _id field
-            business_id = business.get("_id")
+            # Handle business ID properly - use id field (not _id)
+            business_id = business.get("id")
             if business_id is None:
-                business_id = business.get("id", "unknown")
-            business_id = str(business_id)
+                business_id = str(business.get("_id", "unknown"))
                 
             formatted_business = {
                 "id": business_id,
@@ -6079,7 +6098,8 @@ async def get_businesses(lat: float = None, lng: float = None, radius: int = 500
                 "description": business.get("description", ""),
                 "rating": 4.5,  # Default rating
                 "delivery_time": "30-45 dk",
-                "is_active": business.get("is_active", True)
+                "is_active": business.get("is_active", True),
+                "kyc_status": business.get("kyc_status", "pending")
             }
             
             # Add GPS coordinates if available (directly from lat/lng fields)
