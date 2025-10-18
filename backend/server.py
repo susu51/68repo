@@ -2218,39 +2218,33 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     # Get business info from first menu item
     if order_data.items:
         product_id = order_data.items[0].product_id
-        print(f"🔍 Looking for product with ID: {product_id}")
+        print(f"🔍 Looking for menu item with ID: {product_id}")
         
-        # Try to find product by 'id' field first (new products)
-        first_item = await db.products.find_one({"id": product_id})
+        # Try to find menu item by '_id' field (menu_items collection uses ObjectId)
+        first_item = None
+        try:
+            from bson import ObjectId
+            first_item = await db.menu_items.find_one({"_id": ObjectId(product_id)})
+        except:
+            pass
         
-        # If not found, try to find by '_id' field (old products)
+        # If not found by ObjectId, try by 'id' field
         if not first_item:
-            try:
-                from bson import ObjectId
-                first_item = await db.products.find_one({"_id": ObjectId(product_id)})
-            except:
-                pass
+            first_item = await db.menu_items.find_one({"id": product_id})
         
-        print(f"🔍 Found product: {first_item}")
+        print(f"🔍 Found menu item: {first_item}")
         if first_item:
             order_doc["business_id"] = first_item["business_id"]
-            print(f"🔍 Business ID from product: {first_item['business_id']}")
+            print(f"🔍 Business ID from menu item: {first_item['business_id']}")
             # Get business name from users collection
             business = await db.users.find_one({"id": first_item["business_id"]})
             print(f"🔍 Found business: {business}")
             order_doc["business_name"] = business.get("business_name", "") if business else ""
         else:
-            print(f"❌ Product not found with ID: {product_id}")
-            # Let's also try to find all products to see what IDs exist
-            all_products = await db.products.find({}).to_list(length=10)
-            print(f"🔍 Available products: {[p.get('id', str(p.get('_id', 'NO_ID'))) for p in all_products]}")
-            
-            # Let's also check if the product exists but with different business_id
-            product_by_id = await db.products.find_one({"id": product_id})
-            if product_by_id:
-                print(f"🔍 Found product by ID but different business: {product_by_id}")
-            else:
-                print(f"🔍 Product with ID {product_id} does not exist in database at all")
+            print(f"❌ Menu item not found with ID: {product_id}")
+            # Let's also try to find all menu items to see what IDs exist
+            all_menu_items = await db.menu_items.find({}).to_list(length=10)
+            print(f"🔍 Available menu items: {[str(item.get('_id', 'NO_ID')) for item in all_menu_items]}")
     
     await db.orders.insert_one(order_doc)
     
