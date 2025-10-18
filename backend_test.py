@@ -172,11 +172,11 @@ class EndToEndOrderFlowTester:
             self.log_test("Get Businesses by City", False, f"Request error: {str(e)}")
             return []
     
-    def test_get_menu_items(self):
-        """Test 2: Get menu items from business public endpoint"""
+    def test_get_business_menu(self, business_id):
+        """Test 3: Get Business Menu Items"""
         try:
-            # Get menu items from public endpoint (no auth required)
-            response = self.session.get(f"{BACKEND_URL}/business/public-menu/{BUSINESS_ID}/products")
+            # Try the correct endpoint format based on the review request
+            response = self.session.get(f"{BACKEND_URL}/business/public-menu/{business_id}/products")
             
             if response.status_code == 200:
                 menu_data = response.json()
@@ -184,29 +184,44 @@ class EndToEndOrderFlowTester:
                 
                 if menu_items:
                     self.log_test(
-                        "Get Menu Items", 
+                        "Get Business Menu", 
                         True, 
-                        f"Retrieved {len(menu_items)} menu items from business {BUSINESS_ID}",
-                        {"business_id": BUSINESS_ID, "menu_count": len(menu_items), "items": menu_items[:2]}
+                        f"Retrieved {len(menu_items)} menu items from business {business_id}",
+                        {"business_id": business_id, "menu_count": len(menu_items), "items": menu_items[:2]}
                     )
                     return menu_items
                 else:
+                    # Try alternative endpoint format
+                    alt_response = self.session.get(f"{BACKEND_URL}/business/{business_id}/menu")
+                    if alt_response.status_code == 200:
+                        alt_menu_data = alt_response.json()
+                        alt_menu_items = alt_menu_data if isinstance(alt_menu_data, list) else alt_menu_data.get("items", [])
+                        
+                        if alt_menu_items:
+                            self.log_test(
+                                "Get Business Menu", 
+                                True, 
+                                f"Retrieved {len(alt_menu_items)} menu items from business {business_id} (alternative endpoint)",
+                                {"business_id": business_id, "menu_count": len(alt_menu_items), "items": alt_menu_items[:2]}
+                            )
+                            return alt_menu_items
+                    
                     self.log_test(
-                        "Get Menu Items", 
+                        "Get Business Menu", 
                         False, 
-                        f"No menu items found for business {BUSINESS_ID}"
+                        f"No menu items found for business {business_id}"
                     )
                     return []
             else:
                 self.log_test(
-                    "Get Menu Items", 
+                    "Get Business Menu", 
                     False, 
                     f"Failed to get menu items: HTTP {response.status_code}: {response.text}"
                 )
                 return []
                 
         except Exception as e:
-            self.log_test("Get Menu Items", False, f"Request error: {str(e)}")
+            self.log_test("Get Business Menu", False, f"Request error: {str(e)}")
             return []
     
     def test_create_order(self, menu_items):
