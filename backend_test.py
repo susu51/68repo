@@ -17,7 +17,7 @@ BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Lezzet Döner
 CUSTOMER_EMAIL = "testcustomer@example.com"
 CUSTOMER_PASSWORD = "test123"
 
-class OrderFlowAuthenticationTester:
+class BusinessOrderDisplayTester:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None
