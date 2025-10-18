@@ -383,12 +383,24 @@ class E2EOrderRestaurantFlowTester:
                 self.log_test("Verify Business Sees Order", False, "No order ID available")
                 return False
             
+            # Debug: Check business user ID
+            me_response = self.business_session.get(f"{BACKEND_URL}/me")
+            if me_response.status_code == 200:
+                me_data = me_response.json()
+                business_user_id = me_data.get("id")
+                print(f"DEBUG: Business user ID from /me: {business_user_id}")
+                print(f"DEBUG: Expected business ID: {self.business_id}")
+            
             # Get business orders
             response = self.business_session.get(f"{BACKEND_URL}/orders")
             
             if response.status_code == 200:
                 orders_data = response.json()
                 orders = orders_data if isinstance(orders_data, list) else orders_data.get("orders", [])
+                
+                print(f"DEBUG: Business retrieved {len(orders)} orders")
+                for order in orders:
+                    print(f"DEBUG: Order {order.get('id')}: business_id={order.get('business_id')}")
                 
                 # Check if our order is in the business's order list
                 found_order = None
@@ -409,7 +421,7 @@ class E2EOrderRestaurantFlowTester:
                     self.log_test(
                         "Verify Business Sees Order", 
                         False, 
-                        f"Order {self.created_order_id} not found in business order list. Found {len(orders)} orders total."
+                        f"Order {self.created_order_id} not found in business order list. Found {len(orders)} orders total. Business ID mismatch detected."
                     )
                     return False
             else:
