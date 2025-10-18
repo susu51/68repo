@@ -57,7 +57,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
       
       // Calculate stats
       const newStats = {
-        pending: allOrders.filter(o => ['pending', 'placed'].includes(o.status)).length,
+        pending: allOrders.filter(o => ['created', 'pending', 'placed'].includes(o.status)).length,
         preparing: allOrders.filter(o => o.status === 'preparing').length,
         ready: allOrders.filter(o => o.status === 'ready').length,
         confirmed: allOrders.filter(o => o.status === 'confirmed').length
