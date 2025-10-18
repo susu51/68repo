@@ -137,7 +137,7 @@ async def get_city_nearby_businesses(
         # Format response
         formatted_businesses = []
         for business in businesses:
-            businesses.append(BusinessNearby(
+            formatted_businesses.append(BusinessNearby(
                 id=business["_id"],
                 name=business["name"],
                 address=business["address"], 
@@ -152,7 +152,7 @@ async def get_city_nearby_businesses(
                 ]
             ))
         
-        return businesses
+        return formatted_businesses
         
     except Exception as e:
         print(f"❌ City-nearby error: {e}")
