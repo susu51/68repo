@@ -14,7 +14,7 @@ BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@kuryecini.com"
 ADMIN_PASSWORD = "admin123"
 
-class CustomerOrderFlowTester:
+class AdminSettingsMaintenanceTester:
     def __init__(self):
         self.session = requests.Session()
         self.auth_token = None
