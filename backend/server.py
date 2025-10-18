@@ -2261,11 +2261,13 @@ async def get_orders(status: Optional[str] = None, current_user: dict = Depends(
         print(f"🔍 GET /orders - Looking for orders with business_id: {current_user['id']}")
         print(f"🔍 GET /orders - Filter query: {filter_query}")
     elif current_user.get("role") == "courier":
-        # Couriers see unassigned orders or orders assigned to them
+        # Couriers see unassigned orders (ready for pickup) or orders assigned to them
         if not status:
             filter_query = {
                 "$or": [
-                    {"status": "created", "courier_id": None},
+                    # Unassigned orders that are ready for courier pickup
+                    {"status": {"$in": ["created", "confirmed", "preparing", "ready"]}, "courier_id": None},
+                    # Orders assigned to this courier
                     {"courier_id": current_user["id"]}
                 ]
             }
