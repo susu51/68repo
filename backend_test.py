@@ -334,60 +334,68 @@ class OrderFlowAuthenticationTester:
             self.log_test("Authentication Consistency", False, f"Request error: {str(e)}")
             return False
     
-    def test_backend_logs_retrieval(self):
-        """Test GET /api/admin/logs/backend"""
+    def test_menu_item_business_association(self):
+        """Test menu item to business_id mapping"""
         try:
-            # Test with default parameters
-            response = self.session.get(f"{BACKEND_URL}/admin/logs/backend")
+            # Login as business
+            business_user = self.business_login()
+            
+            if not business_user:
+                return False
+            
+            business_id = business_user.get("id")
+            
+            # Get menu items
+            response = self.session.get(f"{BACKEND_URL}/business/menu")
             
             if response.status_code == 200:
-                data = response.json()
+                menu_data = response.json()
+                menu_items = menu_data if isinstance(menu_data, list) else menu_data.get("items", [])
                 
-                if "logs" in data and "total_lines" in data:
-                    self.log_test(
-                        "Backend Logs (Default)", 
-                        True, 
-                        f"Retrieved {data['total_lines']} log lines",
-                        {"log_file": data.get("log_file"), "sample_logs": data["logs"][:3] if data["logs"] else []}
-                    )
+                if menu_items:
+                    # Check if menu items have correct business association
+                    correct_associations = 0
+                    for item in menu_items:
+                        if item.get("business_id") == business_id:
+                            correct_associations += 1
                     
-                    # Test with custom parameters
-                    response2 = self.session.get(f"{BACKEND_URL}/admin/logs/backend?lines=50&level=error")
-                    
-                    if response2.status_code == 200:
-                        data2 = response2.json()
-                        
+                    if correct_associations == len(menu_items):
                         self.log_test(
-                            "Backend Logs (Filtered)", 
+                            "Menu Item Business Association", 
                             True, 
-                            f"Retrieved {data2['total_lines']} filtered log lines (level=error)",
-                            {"filtered_logs": len(data2["logs"])}
+                            f"All {len(menu_items)} menu items correctly associated with business {business_id}",
+                            {
+                                "business_id": business_id,
+                                "total_items": len(menu_items),
+                                "correct_associations": correct_associations
+                            }
                         )
                         return True
                     else:
                         self.log_test(
-                            "Backend Logs (Filtered)", 
+                            "Menu Item Business Association", 
                             False, 
-                            f"HTTP {response2.status_code}: {response2.text}"
+                            f"Only {correct_associations}/{len(menu_items)} menu items correctly associated"
                         )
                         return False
                 else:
                     self.log_test(
-                        "Backend Logs (Default)", 
-                        False, 
-                        f"Missing required fields in response: {data}"
+                        "Menu Item Business Association", 
+                        True, 
+                        f"No menu items found (empty menu is valid)",
+                        {"business_id": business_id}
                     )
-                    return False
+                    return True
             else:
                 self.log_test(
-                    "Backend Logs (Default)", 
+                    "Menu Item Business Association", 
                     False, 
-                    f"HTTP {response.status_code}: {response.text}"
+                    f"Failed to get menu: HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("Backend Logs Retrieval", False, f"Request error: {str(e)}")
+            self.log_test("Menu Item Business Association", False, f"Request error: {str(e)}")
             return False
     
     def test_system_button_tests(self):
