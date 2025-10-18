@@ -16,7 +16,7 @@ BUSINESS_PASSWORD = "test123"
 CUSTOMER_EMAIL = "test@kuryecini.com"
 CUSTOMER_PASSWORD = "test123"
 
-class AdminSettingsMaintenanceTester:
+class OrderFlowAuthenticationTester:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None
