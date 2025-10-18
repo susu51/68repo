@@ -96,42 +96,54 @@ class BusinessOrderDisplayTester:
     def test_business_exists(self):
         """Test 1: Verify business exists in system"""
         try:
-            # Get all businesses to verify our test business exists
-            response = self.session.get(f"{BACKEND_URL}/businesses")
+            # First try to login as business to verify account exists
+            business_user = self.business_login()
             
-            if response.status_code == 200:
-                businesses = response.json()
-                business_list = businesses if isinstance(businesses, list) else businesses.get("businesses", [])
+            if business_user and business_user.get("id") == BUSINESS_ID:
+                self.log_test(
+                    "Business Exists", 
+                    True, 
+                    f"Test business account verified: {business_user.get('email')} (ID: {BUSINESS_ID})",
+                    {"business_id": BUSINESS_ID, "email": business_user.get("email"), "role": business_user.get("role")}
+                )
+                return True
+            else:
+                # Fallback: Check public businesses list
+                response = self.session.get(f"{BACKEND_URL}/businesses")
                 
-                # Find our test business
-                test_business = None
-                for business in business_list:
-                    if business.get("id") == BUSINESS_ID:
-                        test_business = business
-                        break
-                
-                if test_business:
-                    self.log_test(
-                        "Business Exists", 
-                        True, 
-                        f"Test business found: {test_business.get('name', 'Lezzet Döner')} (ID: {BUSINESS_ID})",
-                        {"business_id": BUSINESS_ID, "business_name": test_business.get("name")}
-                    )
-                    return True
+                if response.status_code == 200:
+                    businesses = response.json()
+                    business_list = businesses if isinstance(businesses, list) else businesses.get("businesses", [])
+                    
+                    # Find our test business
+                    test_business = None
+                    for business in business_list:
+                        if business.get("id") == BUSINESS_ID:
+                            test_business = business
+                            break
+                    
+                    if test_business:
+                        self.log_test(
+                            "Business Exists", 
+                            True, 
+                            f"Test business found in public list: {test_business.get('name', 'Lezzet Döner')} (ID: {BUSINESS_ID})",
+                            {"business_id": BUSINESS_ID, "business_name": test_business.get("name")}
+                        )
+                        return True
+                    else:
+                        self.log_test(
+                            "Business Exists", 
+                            False, 
+                            f"Test business with ID {BUSINESS_ID} not found (may not be approved for public listing)"
+                        )
+                        return False
                 else:
                     self.log_test(
                         "Business Exists", 
                         False, 
-                        f"Test business with ID {BUSINESS_ID} not found in businesses list"
+                        f"Failed to verify business existence: HTTP {response.status_code}: {response.text}"
                     )
                     return False
-            else:
-                self.log_test(
-                    "Business Exists", 
-                    False, 
-                    f"Failed to get businesses: HTTP {response.status_code}: {response.text}"
-                )
-                return False
                 
         except Exception as e:
             self.log_test("Business Exists", False, f"Request error: {str(e)}")
