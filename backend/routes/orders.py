@@ -122,7 +122,24 @@ async def create_order(
         }
         
         # Insert to database
-        await db.orders.insert_one(order_doc)
+        # Insert order into database
+        try:
+            print(f"📦 [ROUTES/ORDERS] Inserting order: {order_doc.get('id')}")
+            print(f"   Business ID: {order_doc.get('business_id')}")
+            print(f"   Customer ID: {order_doc.get('customer_id')}")
+            print(f"   Status: {order_doc.get('status')}")
+            
+            result = await db.orders.insert_one(order_doc)
+            
+            print(f"✅ Order inserted successfully!")
+            print(f"   Inserted ID: {result.inserted_id}")
+            print(f"   Acknowledged: {result.acknowledged}")
+            
+        except Exception as insert_error:
+            print(f"❌ DB INSERT ERROR: {insert_error}")
+            import traceback
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail=f"Database insert failed: {str(insert_error)}")
         
         # Calculate estimated delivery time (45 minutes from creation)
         estimated_delivery = datetime.now(timezone.utc)
