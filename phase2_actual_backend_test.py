@@ -31,7 +31,7 @@ import random
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_CREDENTIALS = {

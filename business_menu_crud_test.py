@@ -21,7 +21,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
 
 # Test credentials as specified in review request
 BUSINESS_EMAIL = "testbusiness@example.com"

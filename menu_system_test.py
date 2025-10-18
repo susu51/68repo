@@ -18,7 +18,7 @@ import random
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
 
 # Test credentials
 ADMIN_CREDENTIALS = [
@@ -370,7 +370,7 @@ class MenuSystemTester:
                 try:
                     # Use appropriate URL format
                     if endpoint.startswith("/menus"):
-                        url = f"https://delivery-nexus-5.preview.emergentagent.com{endpoint}"
+                        url = f"https://order-flow-debug.preview.emergentagent.com{endpoint}"
                     else:
                         url = f"{BACKEND_URL}{endpoint}"
                         

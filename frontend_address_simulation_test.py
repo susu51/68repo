@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration - Use exact same URL as frontend
-BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
+BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
 
 class FrontendSimulationTester:
     def __init__(self):
@@ -26,8 +26,8 @@ class FrontendSimulationTester:
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Origin': 'https://delivery-nexus-5.preview.emergentagent.com',
-            'Referer': 'https://delivery-nexus-5.preview.emergentagent.com/'
+            'Origin': 'https://order-flow-debug.preview.emergentagent.com',
+            'Referer': 'https://order-flow-debug.preview.emergentagent.com/'
         }
         
         login_data = {
@@ -78,8 +78,8 @@ class FrontendSimulationTester:
             'Accept': 'application/json',
             'Authorization': f'Bearer {self.auth_token}',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Origin': 'https://delivery-nexus-5.preview.emergentagent.com',
-            'Referer': 'https://delivery-nexus-5.preview.emergentagent.com/'
+            'Origin': 'https://order-flow-debug.preview.emergentagent.com',
+            'Referer': 'https://order-flow-debug.preview.emergentagent.com/'
         }
         
         # Test with exact data format from review request
@@ -131,7 +131,7 @@ class FrontendSimulationTester:
         headers = {
             'Access-Control-Request-Method': 'POST',
             'Access-Control-Request-Headers': 'authorization,content-type',
-            'Origin': 'https://delivery-nexus-5.preview.emergentagent.com',
+            'Origin': 'https://order-flow-debug.preview.emergentagent.com',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
         

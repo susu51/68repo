@@ -13,7 +13,7 @@ from datetime import datetime
 
 class CompletePasswordResetTest:
     def __init__(self):
-        self.base_url = "https://delivery-nexus-5.preview.emergentagent.com/api"
+        self.base_url = "https://order-flow-debug.preview.emergentagent.com/api"
         self.session = None
         self.test_email = "admin@kuryecini.com"
         self.current_password = "KuryeciniAdmin2024!"

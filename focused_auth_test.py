@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 class FocusedAuthTester:
-    def __init__(self, base_url="https://delivery-nexus-5.preview.emergentagent.com"):
+    def __init__(self, base_url="https://order-flow-debug.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
