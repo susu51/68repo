@@ -17,429 +17,484 @@ ADMIN_PASSWORD = "admin123"
 class AdminSettingsMaintenanceTester:
     def __init__(self):
         self.session = requests.Session()
-        self.auth_token = None
-        self.customer_id = None
+        self.admin_token = None
         self.test_results = []
         
-    def log_test(self, test_name, success, details="", response_data=None):
-        """Log test results"""
+    def log_test(self, test_name, success, message, details=None):
+        """Log test result"""
         status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        if response_data and not success:
-            print(f"   Response: {response_data}")
+        print(f"{status} {test_name}: {message}")
         
         self.test_results.append({
             "test": test_name,
             "success": success,
+            "message": message,
             "details": details,
-            "response": response_data
+            "timestamp": datetime.now().isoformat()
         })
-        print()
     
-    def test_customer_login(self):
-        """Test customer login functionality"""
-        print("🔐 Testing Customer Login...")
-        
+    def admin_login(self):
+        """Login as admin user"""
         try:
-            # Test login endpoint
             login_data = {
-                "email": CUSTOMER_EMAIL,
-                "password": CUSTOMER_PASSWORD
+                "email": ADMIN_EMAIL,
+                "password": ADMIN_PASSWORD
             }
             
-            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+            response = self.session.post(f"{BACKEND_URL}/auth/login", json=login_data)
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success") and "access_token" in data:
-                    self.auth_token = data["access_token"]
-                    self.customer_id = data.get("user", {}).get("id")
-                    
-                    # Set authorization header for future requests
-                    self.session.headers.update({
-                        "Authorization": f"Bearer {self.auth_token}"
-                    })
-                    
-                    self.log_test(
-                        "Customer Login", 
-                        True, 
-                        f"Successfully logged in as {CUSTOMER_EMAIL}, token length: {len(self.auth_token)}"
-                    )
+                if data.get("success"):
+                    # Cookie-based auth - token stored in cookies
+                    self.log_test("Admin Login", True, f"Admin authenticated successfully via cookies")
                     return True
                 else:
-                    self.log_test(
-                        "Customer Login", 
-                        False, 
-                        "Login response missing required fields",
-                        data
-                    )
+                    self.log_test("Admin Login", False, f"Login failed: {data}")
                     return False
             else:
-                self.log_test(
-                    "Customer Login", 
-                    False, 
-                    f"Login failed with status {response.status_code}",
-                    response.text
-                )
+                self.log_test("Admin Login", False, f"HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("Customer Login", False, f"Exception: {str(e)}")
+            self.log_test("Admin Login", False, f"Login error: {str(e)}")
             return False
     
-    def test_restaurant_discovery(self):
-        """Test /businesses endpoint with city filter"""
-        print("🏪 Testing Restaurant Discovery...")
-        
+    def test_get_system_settings(self):
+        """Test GET /api/admin/settings/system"""
         try:
-            # Test businesses endpoint with city filter
-            response = self.session.get(f"{BASE_URL}/businesses?city={TEST_CITY}")
+            response = self.session.get(f"{BACKEND_URL}/admin/settings/system")
             
             if response.status_code == 200:
                 data = response.json()
-                businesses = data if isinstance(data, list) else data.get("businesses", [])
                 
-                if businesses:
+                # Check required fields
+                required_fields = [
+                    "maintenance_mode", "maintenance_message", "maintenance_eta",
+                    "contact_email", "contact_phone", "social_media", 
+                    "theme_color", "logo_url"
+                ]
+                
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
                     self.log_test(
-                        "Restaurant Discovery", 
+                        "GET System Settings", 
                         True, 
-                        f"Found {len(businesses)} approved businesses in {TEST_CITY}"
+                        f"Retrieved complete system settings with all required fields",
+                        {"settings_keys": list(data.keys())}
                     )
-                    
-                    # Verify business data structure
-                    first_business = businesses[0]
-                    required_fields = ["id", "business_name", "city", "kyc_status"]
-                    missing_fields = [field for field in required_fields if field not in first_business]
-                    
-                    if not missing_fields:
-                        self.log_test(
-                            "Business Data Structure", 
-                            True, 
-                            "All required fields present in business data"
-                        )
-                        return businesses
-                    else:
-                        self.log_test(
-                            "Business Data Structure", 
-                            False, 
-                            f"Missing fields: {missing_fields}",
-                            first_business
-                        )
-                        return businesses
+                    return data
                 else:
                     self.log_test(
-                        "Restaurant Discovery", 
+                        "GET System Settings", 
                         False, 
-                        f"No businesses found in {TEST_CITY}",
-                        data
-                    )
-                    return []
-            else:
-                self.log_test(
-                    "Restaurant Discovery", 
-                    False, 
-                    f"Request failed with status {response.status_code}",
-                    response.text
-                )
-                return []
-                
-        except Exception as e:
-            self.log_test("Restaurant Discovery", False, f"Exception: {str(e)}")
-            return []
-    
-    def test_menu_retrieval(self, businesses):
-        """Test menu retrieval for businesses"""
-        print("📋 Testing Menu Retrieval...")
-        
-        if not businesses:
-            self.log_test("Menu Retrieval", False, "No businesses available for menu testing")
-            return []
-        
-        menu_items = []
-        successful_menus = 0
-        
-        for business in businesses[:3]:  # Test first 3 businesses
-            business_id = business.get("id")
-            business_name = business.get("business_name", "Unknown")
-            
-            try:
-                # Test public menu endpoint
-                response = self.session.get(f"{BASE_URL}/business/public/{business_id}/menu")
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    items = data if isinstance(data, list) else data.get("menu", [])
-                    
-                    if items:
-                        successful_menus += 1
-                        menu_items.extend(items)
-                        
-                        # Verify menu item structure
-                        first_item = items[0]
-                        required_fields = ["id", "name", "price"]
-                        missing_fields = [field for field in required_fields if field not in first_item]
-                        
-                        if not missing_fields:
-                            self.log_test(
-                                f"Menu for {business_name}", 
-                                True, 
-                                f"Retrieved {len(items)} menu items with proper structure"
-                            )
-                        else:
-                            self.log_test(
-                                f"Menu for {business_name}", 
-                                False, 
-                                f"Menu items missing fields: {missing_fields}",
-                                first_item
-                            )
-                    else:
-                        self.log_test(
-                            f"Menu for {business_name}", 
-                            True, 
-                            "Business has empty menu (valid state)"
-                        )
-                elif response.status_code == 404:
-                    self.log_test(
-                        f"Menu for {business_name}", 
-                        True, 
-                        "Business not found or no menu (valid state)"
-                    )
-                else:
-                    self.log_test(
-                        f"Menu for {business_name}", 
-                        False, 
-                        f"Menu request failed with status {response.status_code}",
-                        response.text
-                    )
-                    
-            except Exception as e:
-                self.log_test(f"Menu for {business_name}", False, f"Exception: {str(e)}")
-        
-        if successful_menus > 0:
-            self.log_test(
-                "Overall Menu Retrieval", 
-                True, 
-                f"Successfully retrieved menus from {successful_menus} businesses, total items: {len(menu_items)}"
-            )
-        else:
-            self.log_test(
-                "Overall Menu Retrieval", 
-                False, 
-                "No menus could be retrieved from any business"
-            )
-        
-        return menu_items
-    
-    def test_order_creation(self, menu_items):
-        """Test order creation with proper format"""
-        print("📦 Testing Order Creation...")
-        
-        if not menu_items:
-            self.log_test("Order Creation", False, "No menu items available for order testing")
-            return None
-        
-        if not self.auth_token:
-            self.log_test("Order Creation", False, "No authentication token available")
-            return None
-        
-        try:
-            # Use first available menu item
-            test_item = menu_items[0]
-            
-            # Create order with proper format matching OrderCreate model
-            order_data = {
-                "delivery_address": "Test Address, Aksaray Merkez",
-                "delivery_lat": 38.3687,
-                "delivery_lng": 34.0370,
-                "items": [
-                    {
-                        "product_id": test_item.get("id"),
-                        "product_name": test_item.get("name", "Test Product"),
-                        "product_price": float(test_item.get("price", 25.00)),
-                        "quantity": 2,
-                        "subtotal": float(test_item.get("price", 25.00)) * 2
-                    }
-                ],
-                "total_amount": float(test_item.get("price", 25.00)) * 2,
-                "notes": "Test order from backend testing"
-            }
-            
-            response = self.session.post(f"{BASE_URL}/orders", json=order_data)
-            
-            if response.status_code in [200, 201]:
-                data = response.json()
-                order_id = data.get("id") or data.get("order_id")
-                
-                if order_id:
-                    self.log_test(
-                        "Order Creation", 
-                        True, 
-                        f"Order created successfully with ID: {order_id}, status: {data.get('status', 'unknown')}"
-                    )
-                    return order_id
-                else:
-                    self.log_test(
-                        "Order Creation", 
-                        False, 
-                        "Order created but no ID returned",
-                        data
+                        f"Missing required fields: {missing_fields}",
+                        {"received_data": data}
                     )
                     return None
             else:
                 self.log_test(
-                    "Order Creation", 
+                    "GET System Settings", 
                     False, 
-                    f"Order creation failed with status {response.status_code}",
-                    response.text
+                    f"HTTP {response.status_code}: {response.text}"
                 )
                 return None
                 
         except Exception as e:
-            self.log_test("Order Creation", False, f"Exception: {str(e)}")
+            self.log_test("GET System Settings", False, f"Request error: {str(e)}")
             return None
     
-    def test_order_retrieval(self, created_order_id):
-        """Test customer order list retrieval"""
-        print("📋 Testing Order Retrieval...")
-        
-        if not self.auth_token:
-            self.log_test("Order Retrieval", False, "No authentication token available")
-            return False
-        
+    def test_update_system_settings(self):
+        """Test POST /api/admin/settings/system"""
         try:
-            # Test customer orders endpoint
-            response = self.session.get(f"{BASE_URL}/orders")
+            # Test data with new values
+            update_data = {
+                "maintenance_mode": False,
+                "maintenance_message": "Test maintenance message",
+                "maintenance_eta": "2024-12-31T23:59:59Z",
+                "contact_email": "test@kuryecini.com",
+                "contact_phone": "+90 555 999 88 77",
+                "social_media": {
+                    "instagram": "https://instagram.com/kuryecini_test",
+                    "twitter": "https://twitter.com/kuryecini_test",
+                    "facebook": "https://facebook.com/kuryecini_test"
+                },
+                "theme_color": "#FF0000",
+                "logo_url": "/test-logo.png"
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/admin/settings/system", json=update_data)
             
             if response.status_code == 200:
                 data = response.json()
-                orders = data if isinstance(data, list) else data.get("orders", [])
                 
-                if orders:
-                    # Check if created order appears in list
-                    order_found = False
-                    if created_order_id:
-                        order_found = any(
-                            order.get("id") == created_order_id or 
-                            order.get("order_id") == created_order_id 
-                            for order in orders
-                        )
-                    
-                    # Verify order structure
-                    first_order = orders[0]
-                    required_fields = ["id", "customer_id", "total_amount", "status"]
-                    missing_fields = [field for field in required_fields if field not in first_order]
-                    
-                    if not missing_fields:
-                        success_msg = f"Retrieved {len(orders)} orders with proper structure"
-                        if created_order_id and order_found:
-                            success_msg += f", created order {created_order_id} found in list"
-                        elif created_order_id:
-                            success_msg += f", created order {created_order_id} not found (may be processing)"
-                        
-                        self.log_test("Order Retrieval", True, success_msg)
-                        return True
-                    else:
-                        self.log_test(
-                            "Order Retrieval", 
-                            False, 
-                            f"Orders missing required fields: {missing_fields}",
-                            first_order
-                        )
-                        return False
-                else:
+                if data.get("message") and "updated successfully" in data["message"].lower():
                     self.log_test(
-                        "Order Retrieval", 
+                        "POST System Settings", 
                         True, 
-                        "No orders found for customer (valid state for new customer)"
+                        f"Settings updated successfully: {data['message']}",
+                        {"response": data}
                     )
                     return True
+                else:
+                    self.log_test(
+                        "POST System Settings", 
+                        False, 
+                        f"Unexpected response format: {data}"
+                    )
+                    return False
             else:
                 self.log_test(
-                    "Order Retrieval", 
+                    "POST System Settings", 
                     False, 
-                    f"Order retrieval failed with status {response.status_code}",
-                    response.text
+                    f"HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("Order Retrieval", False, f"Exception: {str(e)}")
+            self.log_test("POST System Settings", False, f"Request error: {str(e)}")
             return False
     
-    def run_complete_flow_test(self):
-        """Run the complete customer order flow test"""
-        print("🚀 Starting Complete Customer Order Flow Test")
-        print("=" * 60)
+    def test_maintenance_mode_toggle(self):
+        """Test POST /api/admin/settings/maintenance-mode"""
+        try:
+            # Test enabling maintenance mode
+            enable_data = {
+                "enabled": True,
+                "message": "Sistem bakımda - Test mesajı",
+                "eta": "2024-12-25T10:00:00Z"
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/admin/settings/maintenance-mode", json=enable_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get("maintenance_mode") == True:
+                    self.log_test(
+                        "Enable Maintenance Mode", 
+                        True, 
+                        f"Maintenance mode enabled: {data['message']}",
+                        {"response": data}
+                    )
+                    
+                    # Test disabling maintenance mode
+                    disable_data = {"enabled": False}
+                    
+                    response2 = self.session.post(f"{BACKEND_URL}/admin/settings/maintenance-mode", json=disable_data)
+                    
+                    if response2.status_code == 200:
+                        data2 = response2.json()
+                        
+                        if data2.get("maintenance_mode") == False:
+                            self.log_test(
+                                "Disable Maintenance Mode", 
+                                True, 
+                                f"Maintenance mode disabled: {data2['message']}",
+                                {"response": data2}
+                            )
+                            return True
+                        else:
+                            self.log_test(
+                                "Disable Maintenance Mode", 
+                                False, 
+                                f"Failed to disable maintenance mode: {data2}"
+                            )
+                            return False
+                    else:
+                        self.log_test(
+                            "Disable Maintenance Mode", 
+                            False, 
+                            f"HTTP {response2.status_code}: {response2.text}"
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Enable Maintenance Mode", 
+                        False, 
+                        f"Failed to enable maintenance mode: {data}"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Enable Maintenance Mode", 
+                    False, 
+                    f"HTTP {response.status_code}: {response.text}"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Maintenance Mode Toggle", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_maintenance_status_public(self):
+        """Test GET /api/maintenance-status (public endpoint)"""
+        try:
+            # Test without authentication (public endpoint)
+            public_session = requests.Session()
+            response = public_session.get(f"{BACKEND_URL}/maintenance-status")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check required fields
+                if "maintenance_mode" in data:
+                    self.log_test(
+                        "Public Maintenance Status", 
+                        True, 
+                        f"Public maintenance status accessible: maintenance_mode={data['maintenance_mode']}",
+                        {"response": data}
+                    )
+                    return True
+                else:
+                    self.log_test(
+                        "Public Maintenance Status", 
+                        False, 
+                        f"Missing maintenance_mode field: {data}"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Public Maintenance Status", 
+                    False, 
+                    f"HTTP {response.status_code}: {response.text}"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Public Maintenance Status", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_backend_logs_retrieval(self):
+        """Test GET /api/admin/logs/backend"""
+        try:
+            # Test with default parameters
+            response = self.session.get(f"{BACKEND_URL}/admin/logs/backend")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "logs" in data and "total_lines" in data:
+                    self.log_test(
+                        "Backend Logs (Default)", 
+                        True, 
+                        f"Retrieved {data['total_lines']} log lines",
+                        {"log_file": data.get("log_file"), "sample_logs": data["logs"][:3] if data["logs"] else []}
+                    )
+                    
+                    # Test with custom parameters
+                    response2 = self.session.get(f"{BACKEND_URL}/admin/logs/backend?lines=50&level=error")
+                    
+                    if response2.status_code == 200:
+                        data2 = response2.json()
+                        
+                        self.log_test(
+                            "Backend Logs (Filtered)", 
+                            True, 
+                            f"Retrieved {data2['total_lines']} filtered log lines (level=error)",
+                            {"filtered_logs": len(data2["logs"])}
+                        )
+                        return True
+                    else:
+                        self.log_test(
+                            "Backend Logs (Filtered)", 
+                            False, 
+                            f"HTTP {response2.status_code}: {response2.text}"
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Backend Logs (Default)", 
+                        False, 
+                        f"Missing required fields in response: {data}"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Backend Logs (Default)", 
+                    False, 
+                    f"HTTP {response.status_code}: {response.text}"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Backend Logs Retrieval", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_system_button_tests(self):
+        """Test POST /api/admin/test-buttons"""
+        try:
+            # Test all button types
+            test_data = {"button_type": "all"}
+            
+            response = self.session.post(f"{BACKEND_URL}/admin/test-buttons", json=test_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "test_results" in data and "overall_status" in data:
+                    test_results = data["test_results"]
+                    overall_status = data["overall_status"]
+                    
+                    self.log_test(
+                        "System Tests (All)", 
+                        True, 
+                        f"System tests completed with status: {overall_status} ({len(test_results)} tests)",
+                        {"test_results": test_results}
+                    )
+                    
+                    # Test specific button types
+                    for button_type in ["api", "auth", "orders"]:
+                        specific_data = {"button_type": button_type}
+                        response2 = self.session.post(f"{BACKEND_URL}/admin/test-buttons", json=specific_data)
+                        
+                        if response2.status_code == 200:
+                            data2 = response2.json()
+                            self.log_test(
+                                f"System Tests ({button_type})", 
+                                True, 
+                                f"Specific test '{button_type}' completed: {data2['overall_status']}",
+                                {"results": data2["test_results"]}
+                            )
+                        else:
+                            self.log_test(
+                                f"System Tests ({button_type})", 
+                                False, 
+                                f"HTTP {response2.status_code}: {response2.text}"
+                            )
+                    
+                    return True
+                else:
+                    self.log_test(
+                        "System Tests (All)", 
+                        False, 
+                        f"Missing required fields in response: {data}"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "System Tests (All)", 
+                    False, 
+                    f"HTTP {response.status_code}: {response.text}"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("System Button Tests", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_admin_authentication_required(self):
+        """Test that admin endpoints require admin authentication"""
+        try:
+            # Test without authentication
+            public_session = requests.Session()
+            
+            admin_endpoints = [
+                "/admin/settings/system",
+                "/admin/logs/backend"
+            ]
+            
+            auth_test_results = []
+            
+            for endpoint in admin_endpoints:
+                response = public_session.get(f"{BACKEND_URL}{endpoint}")
+                
+                if response.status_code in [401, 403]:
+                    auth_test_results.append(f"✅ {endpoint}: Properly secured ({response.status_code})")
+                else:
+                    auth_test_results.append(f"❌ {endpoint}: Not secured ({response.status_code})")
+            
+            # Test POST endpoints
+            post_endpoints = [
+                ("/admin/settings/system", {"test": "data"}),
+                ("/admin/settings/maintenance-mode", {"enabled": True}),
+                ("/admin/test-buttons", {"button_type": "all"})
+            ]
+            
+            for endpoint, data in post_endpoints:
+                response = public_session.post(f"{BACKEND_URL}{endpoint}", json=data)
+                
+                if response.status_code in [401, 403]:
+                    auth_test_results.append(f"✅ {endpoint}: Properly secured ({response.status_code})")
+                else:
+                    auth_test_results.append(f"❌ {endpoint}: Not secured ({response.status_code})")
+            
+            all_secured = all("✅" in result for result in auth_test_results)
+            
+            self.log_test(
+                "Admin Authentication Required", 
+                all_secured, 
+                f"Admin endpoints security check: {'All secured' if all_secured else 'Some endpoints not secured'}",
+                {"security_results": auth_test_results}
+            )
+            
+            return all_secured
+                
+        except Exception as e:
+            self.log_test("Admin Authentication Required", False, f"Request error: {str(e)}")
+            return False
+    
+    def run_all_tests(self):
+        """Run all admin settings and maintenance mode tests"""
+        print("🚀 Starting Admin Settings & Maintenance Mode System Testing")
+        print("=" * 70)
         
-        # Step 1: Customer Login
-        login_success = self.test_customer_login()
-        if not login_success:
-            print("❌ Cannot proceed without successful login")
+        # Step 1: Admin Login
+        if not self.admin_login():
+            print("❌ Cannot proceed without admin authentication")
             return False
         
-        # Step 2: Restaurant Discovery
-        businesses = self.test_restaurant_discovery()
+        print("\n📋 Testing Admin Settings & Maintenance Mode Endpoints:")
+        print("-" * 50)
         
-        # Step 3: Menu Retrieval
-        menu_items = self.test_menu_retrieval(businesses)
+        # Step 2: Test all endpoints
+        tests = [
+            self.test_get_system_settings,
+            self.test_update_system_settings,
+            self.test_maintenance_mode_toggle,
+            self.test_maintenance_status_public,
+            self.test_backend_logs_retrieval,
+            self.test_system_button_tests,
+            self.test_admin_authentication_required
+        ]
         
-        # Step 4: Order Creation
-        order_id = self.test_order_creation(menu_items)
+        passed_tests = 0
+        total_tests = len(tests)
         
-        # Step 5: Order Retrieval
-        retrieval_success = self.test_order_retrieval(order_id)
+        for test in tests:
+            try:
+                if test():
+                    passed_tests += 1
+            except Exception as e:
+                print(f"❌ Test failed with exception: {str(e)}")
         
         # Summary
-        print("=" * 60)
-        print("📊 TEST SUMMARY")
-        print("=" * 60)
+        print("\n" + "=" * 70)
+        print("📊 ADMIN SETTINGS & MAINTENANCE MODE TESTING SUMMARY")
+        print("=" * 70)
         
-        total_tests = len(self.test_results)
-        passed_tests = sum(1 for result in self.test_results if result["success"])
-        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
+        success_rate = (passed_tests / total_tests) * 100
+        print(f"✅ Passed: {passed_tests}/{total_tests} tests ({success_rate:.1f}% success rate)")
         
-        print(f"Total Tests: {total_tests}")
-        print(f"Passed: {passed_tests}")
-        print(f"Failed: {total_tests - passed_tests}")
-        print(f"Success Rate: {success_rate:.1f}%")
-        print()
+        if passed_tests == total_tests:
+            print("🎉 ALL TESTS PASSED - Admin Settings & Maintenance Mode system is working perfectly!")
+        elif passed_tests >= total_tests * 0.8:
+            print("✅ MOSTLY WORKING - Admin Settings & Maintenance Mode system is functional with minor issues")
+        else:
+            print("❌ CRITICAL ISSUES - Admin Settings & Maintenance Mode system needs attention")
         
         # Detailed results
+        print("\n📋 Detailed Test Results:")
+        print("-" * 50)
+        
         for result in self.test_results:
             status = "✅" if result["success"] else "❌"
-            print(f"{status} {result['test']}")
-            if result["details"]:
-                print(f"   {result['details']}")
+            print(f"{status} {result['test']}: {result['message']}")
         
-        print()
-        print("🎯 CUSTOMER ORDER FLOW TEST COMPLETE")
-        
-        # Return overall success
-        critical_tests = ["Customer Login", "Restaurant Discovery", "Overall Menu Retrieval"]
-        critical_passed = sum(1 for result in self.test_results 
-                            if result["test"] in critical_tests and result["success"])
-        
-        return critical_passed >= len(critical_tests) - 1  # Allow 1 critical test to fail
-
-def main():
-    """Main test execution"""
-    print("🧪 Customer Order Flow Backend Testing")
-    print(f"🌐 Backend URL: {BASE_URL}")
-    print(f"👤 Test Customer: {CUSTOMER_EMAIL}")
-    print(f"🏙️ Test City: {TEST_CITY}")
-    print()
-    
-    tester = CustomerOrderFlowTester()
-    success = tester.run_complete_flow_test()
-    
-    if success:
-        print("🎉 Customer Order Flow Test: OVERALL SUCCESS")
-        sys.exit(0)
-    else:
-        print("💥 Customer Order Flow Test: OVERALL FAILURE")
-        sys.exit(1)
+        return passed_tests == total_tests
 
 if __name__ == "__main__":
-    main()
+    tester = AdminSettingsMaintenanceTester()
+    success = tester.run_all_tests()
+    sys.exit(0 if success else 1)
