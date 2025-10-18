@@ -240,23 +240,14 @@ class EndToEndOrderFlowTester:
             
             # Use menu items from the business if available
             if not menu_items:
-                # Create a test order with mock item if no menu items available
-                order_data = {
-                    "delivery_address": "Test Delivery Address, Aksaray, Turkey",
-                    "delivery_lat": 38.3687,
-                    "delivery_lng": 34.0370,
-                    "items": [
-                        {
-                            "product_id": "test-item-id",
-                            "product_name": "Test Döner",
-                            "product_price": 99.99,
-                            "quantity": 1,
-                            "subtotal": 99.99
-                        }
-                    ],
-                    "total_amount": 99.99,
-                    "notes": "E2E Test order for business panel verification"
-                }
+                # If no menu items, we need to create a menu item first or use a different approach
+                # Let's try to create a test menu item for this business first
+                self.log_test(
+                    "Create Order", 
+                    False, 
+                    f"Cannot create order - no menu items available for business {business_id}. Orders require valid menu items to associate with business."
+                )
+                return False, None, None
             else:
                 # Create order with first available menu item
                 menu_item = menu_items[0]
@@ -268,7 +259,7 @@ class EndToEndOrderFlowTester:
                     "items": [
                         {
                             "product_id": menu_item.get("id"),
-                            "product_name": menu_item.get("name", "Test Item"),
+                            "product_name": menu_item.get("name", menu_item.get("title", "Test Item")),
                             "product_price": float(menu_item.get("price", 99.99)),
                             "quantity": 1,
                             "subtotal": float(menu_item.get("price", 99.99))
@@ -290,20 +281,25 @@ class EndToEndOrderFlowTester:
                 expected_statuses = ["created", "pending", "placed"]
                 status_valid = order_status in expected_statuses
                 
+                # Check if business_id was properly set
+                business_id_valid = order_business_id and order_business_id != ""
+                
                 self.log_test(
                     "Create Order", 
-                    True, 
-                    f"Order created: ID={order_id}, business_id={order_business_id}, status={order_status}",
+                    business_id_valid and status_valid, 
+                    f"Order created: ID={order_id}, business_id={order_business_id}, status={order_status}, business_id_valid={business_id_valid}",
                     {
                         "order_id": order_id,
                         "business_id": order_business_id,
                         "expected_business_id": business_id,
                         "status": order_status,
                         "status_valid": status_valid,
-                        "total_amount": order.get("total_amount")
+                        "business_id_valid": business_id_valid,
+                        "total_amount": order.get("total_amount"),
+                        "menu_item_used": menu_item.get("id") if menu_items else None
                     }
                 )
-                return True, order_id, order_business_id
+                return business_id_valid and status_valid, order_id, order_business_id
             else:
                 self.log_test(
                     "Create Order", 
