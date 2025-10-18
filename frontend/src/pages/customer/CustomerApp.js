@@ -29,7 +29,7 @@ export const CustomerApp = ({ user, onLogout }) => {
   const { cart, getCartSummary, clearCart } = useCart();
   const cartSummary = getCartSummary ? getCartSummary() : { itemCount: 0, total: 0 };
 
-  console.log('🚀 CustomerApp FAZ 2 rendered - activeView:', activeView, 'user:', user?.first_name, 'cart:', cart, 'getCartSummary:', typeof getCartSummary);
+  console.log('🚀 CustomerApp - cart:', cart, 'items:', cart?.items?.length, 'cartSummary:', cartSummary);
 
   // Force light mode for customer panel by removing dark class
   useEffect(() => {
