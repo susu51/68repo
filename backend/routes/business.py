@@ -132,15 +132,16 @@ async def create_menu_item(
         # Also insert into products (customer access) with compatible schema
         product_doc = {
             "_id": menu_item_doc["_id"],
+            "id": menu_item_doc["_id"],  # Add id field for public endpoint compatibility
             "business_id": menu_item_doc["business_id"],
             "name": item_data.name,
             "description": item_data.description,
             "price": item_data.price,
             "currency": item_data.currency,
-            "image": item_data.image_url,
+            "image_url": item_data.image_url,  # Use image_url instead of image
             "category": item_data.category,
             "tags": item_data.tags or [],
-            "availability": item_data.is_available,
+            "is_available": item_data.is_available,  # Use is_available instead of availability
             "vat_rate": item_data.vat_rate,
             "options": [opt.dict() for opt in (item_data.options or [])],
             "preparation_time": item_data.preparation_time or 15,
