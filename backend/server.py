@@ -7591,6 +7591,221 @@ async def mark_message_read(
     
     return {"message": "Message marked as read"}
 
+# ============================================================
+# ADMIN SETTINGS & MAINTENANCE MODE SYSTEM
+# ============================================================
+
+@api_router.get("/admin/settings/system")
+async def get_system_settings(current_user: dict = Depends(get_admin_user)):
+    """Get system settings including maintenance mode"""
+    try:
+        settings = await db.settings.find_one({"_id": "system_settings"})
+        
+        if not settings:
+            # Create default settings
+            default_settings = {
+                "_id": "system_settings",
+                "maintenance_mode": False,
+                "maintenance_message": "Sistemimiz bakımda. Kısa süre içinde tekrar hizmetinizdeyiz!",
+                "maintenance_eta": None,
+                "contact_email": "destek@kuryecini.com",
+                "contact_phone": "+90 555 123 45 67",
+                "social_media": {
+                    "instagram": "https://instagram.com/kuryecini",
+                    "twitter": "https://twitter.com/kuryecini",
+                    "facebook": "https://facebook.com/kuryecini"
+                },
+                "theme_color": "#FF6B35",
+                "logo_url": "/logo.png",
+                "updated_at": datetime.now(timezone.utc),
+                "updated_by": current_user["id"]
+            }
+            await db.settings.insert_one(default_settings)
+            settings = default_settings
+        
+        # Remove _id and convert datetime
+        if "_id" in settings:
+            del settings["_id"]
+        if "updated_at" in settings and hasattr(settings["updated_at"], 'isoformat'):
+            settings["updated_at"] = settings["updated_at"].isoformat()
+        
+        return settings
+    except Exception as e:
+        raise HTTPException(500, f"Error fetching settings: {str(e)}")
+
+@api_router.post("/admin/settings/system")
+async def update_system_settings(
+    settings_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Update system settings"""
+    try:
+        settings_data["updated_at"] = datetime.now(timezone.utc)
+        settings_data["updated_by"] = current_user["id"]
+        
+        result = await db.settings.update_one(
+            {"_id": "system_settings"},
+            {"$set": settings_data},
+            upsert=True
+        )
+        
+        return {
+            "message": "Settings updated successfully",
+            "maintenance_mode": settings_data.get("maintenance_mode", False)
+        }
+    except Exception as e:
+        raise HTTPException(500, f"Error updating settings: {str(e)}")
+
+@api_router.post("/admin/settings/maintenance-mode")
+async def toggle_maintenance_mode(
+    mode_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Toggle maintenance mode on/off"""
+    try:
+        enabled = mode_data.get("enabled", False)
+        message = mode_data.get("message", "Sistemimiz bakımda.")
+        eta = mode_data.get("eta")
+        
+        result = await db.settings.update_one(
+            {"_id": "system_settings"},
+            {
+                "$set": {
+                    "maintenance_mode": enabled,
+                    "maintenance_message": message,
+                    "maintenance_eta": eta,
+                    "updated_at": datetime.now(timezone.utc),
+                    "updated_by": current_user["id"]
+                }
+            },
+            upsert=True
+        )
+        
+        status = "açıldı" if enabled else "kapatıldı"
+        return {
+            "message": f"Bakım modu {status}",
+            "maintenance_mode": enabled
+        }
+    except Exception as e:
+        raise HTTPException(500, f"Error toggling maintenance mode: {str(e)}")
+
+@api_router.get("/maintenance-status")
+async def check_maintenance_status():
+    """Public endpoint to check if site is in maintenance mode"""
+    try:
+        settings = await db.settings.find_one({"_id": "system_settings"})
+        
+        if not settings:
+            return {"maintenance_mode": False}
+        
+        return {
+            "maintenance_mode": settings.get("maintenance_mode", False),
+            "message": settings.get("maintenance_message", ""),
+            "eta": settings.get("maintenance_eta")
+        }
+    except Exception as e:
+        return {"maintenance_mode": False}
+
+@api_router.get("/admin/logs/backend")
+async def get_backend_logs(
+    lines: int = 100,
+    level: str = "all",
+    current_user: dict = Depends(get_admin_user)
+):
+    """Get backend logs"""
+    try:
+        import subprocess
+        
+        # Get backend logs from supervisor
+        log_file = "/var/log/supervisor/backend.log"
+        
+        try:
+            with open(log_file, 'r') as f:
+                all_lines = f.readlines()
+                last_lines = all_lines[-lines:] if len(all_lines) > lines else all_lines
+                
+                # Filter by level if specified
+                if level != "all":
+                    filtered_lines = [
+                        line for line in last_lines 
+                        if level.upper() in line.upper() or "ERROR" in line.upper()
+                    ]
+                    last_lines = filtered_lines
+                
+                return {
+                    "logs": last_lines,
+                    "total_lines": len(last_lines),
+                    "log_file": log_file
+                }
+        except FileNotFoundError:
+            return {
+                "logs": ["Log file not found"],
+                "total_lines": 0,
+                "log_file": log_file
+            }
+    except Exception as e:
+        raise HTTPException(500, f"Error reading logs: {str(e)}")
+
+@api_router.post("/admin/test-buttons")
+async def test_button_functionality(
+    test_data: dict,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Test button functionality - returns success/failure for various button actions"""
+    try:
+        button_type = test_data.get("button_type")
+        test_results = []
+        
+        # Test different button types
+        if button_type == "all" or button_type == "api":
+            # Test API connectivity
+            try:
+                test_user = await db.users.find_one({"role": "admin"})
+                test_results.append({
+                    "test": "Database Connection",
+                    "status": "success" if test_user else "warning",
+                    "message": "Database accessible" if test_user else "No admin user found"
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Database Connection",
+                    "status": "error",
+                    "message": str(e)
+                })
+        
+        if button_type == "all" or button_type == "auth":
+            # Test auth system
+            test_results.append({
+                "test": "Authentication System",
+                "status": "success",
+                "message": "Admin authenticated successfully"
+            })
+        
+        if button_type == "all" or button_type == "orders":
+            # Test orders
+            try:
+                orders_count = await db.orders.count_documents({})
+                test_results.append({
+                    "test": "Orders System",
+                    "status": "success",
+                    "message": f"Orders accessible ({orders_count} total orders)"
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Orders System",
+                    "status": "error",
+                    "message": str(e)
+                })
+        
+        return {
+            "test_results": test_results,
+            "overall_status": "success" if all(r["status"] == "success" for r in test_results) else "warning",
+            "tested_at": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(500, f"Error running tests: {str(e)}")
+
+
 # Public Content Endpoint for Landing Page
 @api_router.get("/content/{page}")
 async def get_public_content(page: str):
