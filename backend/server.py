@@ -2244,6 +2244,13 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
             # Let's also try to find all products to see what IDs exist
             all_products = await db.products.find({}).to_list(length=10)
             print(f"🔍 Available products: {[p.get('id', str(p.get('_id', 'NO_ID'))) for p in all_products]}")
+            
+            # Let's also check if the product exists but with different business_id
+            product_by_id = await db.products.find_one({"id": product_id})
+            if product_by_id:
+                print(f"🔍 Found product by ID but different business: {product_by_id}")
+            else:
+                print(f"🔍 Product with ID {product_id} does not exist in database at all")
     
     await db.orders.insert_one(order_doc)
     
