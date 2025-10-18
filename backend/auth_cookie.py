@@ -117,6 +117,10 @@ async def get_current_user_from_cookie_or_bearer(request: Request):
     if not user:
         raise HTTPException(404, "User not found")
     
+    # Ensure consistent user ID format
+    if "_id" in user and "id" not in user:
+        user["id"] = str(user["_id"])
+    
     return user
 
 # Keep original function for backward compatibility
