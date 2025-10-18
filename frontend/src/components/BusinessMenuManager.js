@@ -50,10 +50,20 @@ export const BusinessMenuManager = ({ onMenuItemsChange }) => {
       
       setMenuItems(menuArray);
       console.log('✅ Menu items loaded:', menuArray.length, menuArray);
+      
+      // Notify parent component about menu items change
+      if (onMenuItemsChange) {
+        onMenuItemsChange(menuArray);
+      }
     } catch (error) {
       console.error('❌ Error loading menu:', error);
       toast.error('Menü yüklenirken hata oluştu: ' + (error.message || 'Bilinmeyen hata'));
       setMenuItems([]);
+      
+      // Notify parent component about empty menu
+      if (onMenuItemsChange) {
+        onMenuItemsChange([]);
+      }
     } finally {
       setLoading(false);
     }
