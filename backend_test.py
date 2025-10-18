@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
 """
-Advertisement System Backend Testing
-Test all advertisement endpoints as specified in the review request
+Customer Order Flow Backend Testing
+Testing complete customer order flow from discovering restaurants to placing an order
 """
 
 import requests
 import json
-import os
 import sys
 from datetime import datetime
-import tempfile
-from io import BytesIO
 
-# Backend URL from frontend .env
-BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
-
-# Test credentials
-ADMIN_EMAIL = "admin@kuryecini.com"
-ADMIN_PASSWORD = "admin123"
+# Configuration
+BASE_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
+CUSTOMER_EMAIL = "test@kuryecini.com"
+CUSTOMER_PASSWORD = "test123"
+TEST_CITY = "Aksaray"
 
 class AdvertisementTester:
     def __init__(self):
