@@ -1641,6 +1641,7 @@ async def get_incoming_orders(current_user: dict = Depends(get_approved_business
             formatted_order = {
                 "id": str(order.get("_id", order.get("id", ""))),
                 "order_id": order.get("id", str(order.get("_id", ""))),
+                "business_id": order.get("business_id"),  # Add business_id
                 "customer_name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip() if customer else "Müşteri",
                 "customer_phone": customer.get("phone", "") if customer else "",
                 "customer_email": customer.get("email", "") if customer else "",
