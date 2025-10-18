@@ -75,8 +75,10 @@ class OrderFlowFixTester:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    self.log_test("Business Login", True, f"Business authenticated successfully")
-                    return data.get("user", {})
+                    user = data.get("user", {})
+                    business_id = user.get("id")
+                    self.log_test("Business Login", True, f"Business authenticated successfully (ID: {business_id})")
+                    return user
                 else:
                     self.log_test("Business Login", False, f"Login failed: {data}")
                     return None
