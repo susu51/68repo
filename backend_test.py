@@ -151,53 +151,87 @@ class CustomerOrderFlowTester:
             return []
     
     def test_menu_retrieval(self, businesses):
-        """Test 3: POST /api/admin/advertisements - test endpoint structure and validation (using curl simulation)"""
-        try:
-            # Since this requires FormData with file upload, we'll test the endpoint structure
-            # and validation by making a request without proper file to see validation response
+        """Test menu retrieval for businesses"""
+        print("📋 Testing Menu Retrieval...")
+        
+        if not businesses:
+            self.log_test("Menu Retrieval", False, "No businesses available for menu testing")
+            return []
+        
+        menu_items = []
+        successful_menus = 0
+        
+        for business in businesses[:3]:  # Test first 3 businesses
+            business_id = business.get("id")
+            business_name = business.get("business_name", "Unknown")
             
-            # Test 1: Missing required fields
-            response = self.session.post(f"{BACKEND_URL}/admin/advertisements")
-            
-            if response.status_code in [400, 422]:  # Validation error expected
-                self.log_test(
-                    "Create Advertisement - Validation (Missing Fields)", 
-                    True, 
-                    f"Correctly returned validation error for missing fields: HTTP {response.status_code}"
-                )
-            else:
-                self.log_test(
-                    "Create Advertisement - Validation (Missing Fields)", 
-                    False, 
-                    "", 
-                    f"Expected validation error, got HTTP {response.status_code}: {response.text}"
-                )
-            
-            # Test 2: Test with form data but no file (to test field validation)
-            form_data = {
-                "business_id": "test-business-id",
-                "business_name": "Test Restaurant",
-                "city": "İstanbul",
-                "title": "Test Advertisement"
-            }
-            
-            response = self.session.post(f"{BACKEND_URL}/admin/advertisements", data=form_data)
-            
-            if response.status_code in [400, 422]:  # Should fail due to missing image file
-                self.log_test(
-                    "Create Advertisement - Validation (Missing Image)", 
-                    True, 
-                    f"Correctly requires image file: HTTP {response.status_code}"
-                )
-            else:
-                self.log_test(
-                    "Create Advertisement - Validation (Missing Image)", 
-                    False, 
-                    "", 
-                    f"Expected validation error for missing image, got HTTP {response.status_code}: {response.text}"
-                )
-            
-            # Show curl command structure for manual testing
+            try:
+                # Test public menu endpoint
+                response = self.session.get(f"{BASE_URL}/business/public/{business_id}/menu")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    items = data if isinstance(data, list) else data.get("menu", [])
+                    
+                    if items:
+                        successful_menus += 1
+                        menu_items.extend(items)
+                        
+                        # Verify menu item structure
+                        first_item = items[0]
+                        required_fields = ["id", "name", "price"]
+                        missing_fields = [field for field in required_fields if field not in first_item]
+                        
+                        if not missing_fields:
+                            self.log_test(
+                                f"Menu for {business_name}", 
+                                True, 
+                                f"Retrieved {len(items)} menu items with proper structure"
+                            )
+                        else:
+                            self.log_test(
+                                f"Menu for {business_name}", 
+                                False, 
+                                f"Menu items missing fields: {missing_fields}",
+                                first_item
+                            )
+                    else:
+                        self.log_test(
+                            f"Menu for {business_name}", 
+                            True, 
+                            "Business has empty menu (valid state)"
+                        )
+                elif response.status_code == 404:
+                    self.log_test(
+                        f"Menu for {business_name}", 
+                        True, 
+                        "Business not found or no menu (valid state)"
+                    )
+                else:
+                    self.log_test(
+                        f"Menu for {business_name}", 
+                        False, 
+                        f"Menu request failed with status {response.status_code}",
+                        response.text
+                    )
+                    
+            except Exception as e:
+                self.log_test(f"Menu for {business_name}", False, f"Exception: {str(e)}")
+        
+        if successful_menus > 0:
+            self.log_test(
+                "Overall Menu Retrieval", 
+                True, 
+                f"Successfully retrieved menus from {successful_menus} businesses, total items: {len(menu_items)}"
+            )
+        else:
+            self.log_test(
+                "Overall Menu Retrieval", 
+                False, 
+                "No menus could be retrieved from any business"
+            )
+        
+        return menu_items
             curl_command = f"""
 curl -X POST "{BACKEND_URL}/admin/advertisements" \\
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \\
