@@ -80,20 +80,22 @@ export const CustomerApp = ({ user, onLogout }) => {
         return;
       }
 
-      if (!cart || cart.length === 0) {
+      // Check cart items (cart is object with items array)
+      const cartItems = cart?.items || [];
+      if (!cartItems || cartItems.length === 0) {
         toast.error('Sepetiniz boş');
         return;
       }
 
       // Calculate total
-      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
       const orderData = {
         delivery_address: selectedAddress.acik_adres || selectedAddress.full || 
                          `${selectedAddress.mahalle}, ${selectedAddress.ilce}, ${selectedAddress.il}`,
         delivery_lat: selectedAddress.lat || 0,
         delivery_lng: selectedAddress.lng || 0,
-        items: cart.map(item => ({
+        items: cartItems.map(item => ({
           product_id: item.id,
           product_name: item.name || item.title,
           product_price: item.price,
@@ -104,7 +106,8 @@ export const CustomerApp = ({ user, onLogout }) => {
         notes: `Ödeme yöntemi: ${selectedPaymentMethod}`
       };
 
-      console.log('Creating order:', orderData);
+      console.log('🎉 Creating order:', orderData);
+      console.log('🏪 Restaurant:', cart?.restaurant);
 
       const response = await fetch(`${API}/orders`, {
         method: 'POST',
@@ -115,17 +118,37 @@ export const CustomerApp = ({ user, onLogout }) => {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success('Sipariş başarıyla oluşturuldu!');
+        
+        // Show success message
+        toast.success('🎉 Siparişiniz onaylandı!', {
+          duration: 4000,
+          icon: '✅'
+        });
+        
+        console.log('✅ Order created:', data);
+        console.log('📦 Order ID:', data.id);
+        console.log('🏪 Business ID:', data.business_id);
+        console.log('👤 Business Name:', data.business_name);
+        
+        // Clear cart and navigate
         clearCart();
         setCurrentOrderId(data.id);
+        
+        // Show additional info
+        setTimeout(() => {
+          toast.success(`Siparişiniz ${data.business_name || 'restorana'} iletildi`, {
+            duration: 3000
+          });
+        }, 500);
+        
         setActiveView('orders');
       } else {
         const error = await response.json();
-        console.error('Order creation error:', error);
+        console.error('❌ Order creation error:', error);
         toast.error(error.detail || 'Sipariş oluşturulamadı');
       }
     } catch (error) {
-      console.error('Sipariş oluşturma hatası:', error);
+      console.error('❌ Sipariş oluşturma hatası:', error);
       toast.error('Bir hata oluştu');
     }
   };
