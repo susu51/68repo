@@ -115,18 +115,44 @@ const AdminSettings = () => {
   const runButtonTests = async (buttonType = 'all') => {
     try {
       setLoading(true);
+      
+      // Determine panel from buttonType
+      let panel = 'general';
+      if (buttonType.startsWith('customer-')) {
+        panel = 'customer';
+      } else if (buttonType.startsWith('business-')) {
+        panel = 'business';
+      } else if (buttonType.startsWith('courier-')) {
+        panel = 'courier';
+      }
+      
       const response = await api.post('/admin/test-buttons', { button_type: buttonType });
-      setTestResults(response.data.test_results);
+      
+      // Add panel info to results
+      const resultsWithPanel = response.data.test_results.map(result => ({
+        ...result,
+        panel: panel
+      }));
+      
+      // Merge with existing results from other panels
+      setTestResults(prev => {
+        // Remove old results from this panel
+        const otherPanelResults = prev.filter(r => r.panel !== panel);
+        // Add new results
+        return [...otherPanelResults, ...resultsWithPanel];
+      });
       
       const status = response.data.overall_status;
       if (status === 'success') {
-        toast.success('Tüm testler başarılı!');
+        toast.success(`${panel === 'customer' ? 'Müşteri' : panel === 'business' ? 'İşletme' : panel === 'courier' ? 'Kurye' : 'Tüm'} testleri başarılı!`);
+      } else if (status === 'warning') {
+        toast.warning('Bazı testler uyarı verdi');
       } else {
-        toast.warning('Bazı testler başarısız');
+        toast.error('Bazı testler başarısız');
       }
     } catch (error) {
       console.error('Error running tests:', error);
-      toast.error('Testler çalıştırılamadı');
+      toast.error('Testler çalıştırılamadı: ' + (error.message || 'Bilinmeyen hata'));
     } finally {
       setLoading(false);
     }
