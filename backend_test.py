@@ -32,7 +32,7 @@ BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Expected business ID
 CUSTOMER_EMAIL = "test@kuryecini.com"
 CUSTOMER_PASSWORD = "test123"
 
-class BusinessOrderDisplayTester:
+class EndToEndOrderFlowTester:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None
