@@ -131,73 +131,8 @@ async def get_city_nearby_businesses(
         
         # Execute pipeline
         businesses = await db.businesses.aggregate(pipeline).to_list(length=None)
-            # City/district-based search without GPS (no distance sorting)
-            match_query = {
-                "is_active": True,
-                "address.city_slug": city
-            }
-            
-            if district:
-                match_query["address.district_slug"] = district
-            
-            pipeline = [
-                {"$match": match_query},
-                {
-                    "$addFields": {
-                        "district_match": (
-                            {"$eq": ["$address.district_slug", district]} if district 
-                            else {"$literal": False}
-                        ),
-                        "dist": 0  # No GPS, so distance is 0
-                    }
-                },
-                {
-                    "$sort": {
-                        "district_match": -1,  # Same district first
-                        "name": 1              # Then by name
-                    }
-                },
-                {
-                    "$lookup": {
-                        "from": "menu_items", 
-                        "let": {"bid": "$_id"},
-                        "pipeline": [
-                            {
-                                "$match": {
-                                    "$expr": {"$eq": ["$business_id", "$$bid"]},
-                                    "is_available": True
-                                }
-                            },
-                            {"$project": {"title": 1, "price": 1, "photo_url": 1}},
-                            {"$limit": 3}
-                        ],
-                        "as": "menu_snippet"
-                    }
-                },
-                {
-                    "$project": {
-                        "_id": 1,
-                        "name": 1,
-                        "address": 1,
-                        "dist": 1,
-                        "menu_snippet": 1
-                    }
-                },
-                {"$limit": limit}
-            ]
         
-        # Execute aggregation
-        results = await db.business.aggregate(pipeline).to_list(length=None)
-        
-        # CRITICAL SECURITY CHECK: Verify no cross-city data
-        for business in results:
-            business_city = business.get("address", {}).get("city_slug")
-            if business_city != city:
-                error_msg = f"SECURITY VIOLATION: Cross-city data detected! Expected: {city}, Found: {business_city}"
-                print(f"🚨 {error_msg}")
-                raise HTTPException(status_code=500, detail="City filter violation detected")
-        
-        print(f"✅ Found {len(results)} businesses in {city}, all city-validated")
+        print(f"✅ Found {len(businesses)} businesses")
         
         # Format response
         businesses = []
