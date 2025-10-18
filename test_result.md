@@ -169,9 +169,9 @@ user_problem_statement: "CRITICAL BUG: Business Panel - Orders Not Displaying De
 backend:
   - task: "Business Panel Order Display Fix"
     implemented: true
-    working: true
+    working: false
     file: "server.py (get_incoming_orders endpoint)"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
     needs_retesting: false
     status_history:
