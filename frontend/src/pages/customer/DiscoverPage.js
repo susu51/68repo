@@ -100,55 +100,57 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         console.log(`📍 Loading restaurants by GPS location: ${userLocation.lat}, ${userLocation.lng}`);
         
         try {
-          // Get city from selected address or use generic search
+          // Try to get city from selected address, but GPS search works without it
           const city = selectedAddress?.il || selectedAddress?.city;
           
+          // Build params - lat/lng are required, city is optional
+          const params = new URLSearchParams({
+            lat: userLocation.lat.toString(),
+            lng: userLocation.lng.toString(),
+            radius: '50' // 50km radius for GPS search
+          });
+          
+          // Add city if available for better filtering
           if (city) {
-            // Use catalog/city-nearby endpoint with GPS coordinates
-            const params = new URLSearchParams({
-              city: city,
-              lat: userLocation.lat.toString(),
-              lng: userLocation.lng.toString(),
-              radius: '10' // 10km radius
-            });
-            
-            const response = await api.get(`/catalog/city-nearby?${params.toString()}`);
-            restaurantsData = response.data?.businesses || response.data || [];
-            
-            console.log(`✅ Loaded ${restaurantsData.length} nearby restaurants`);
-            
-            // Calculate and add distance to each restaurant
-            restaurantsData = restaurantsData.map(restaurant => {
-              const distance = restaurant.lat && restaurant.lng 
-                ? calculateDistance(userLocation.lat, userLocation.lng, restaurant.lat, restaurant.lng)
-                : null;
-              return {
-                ...restaurant,
-                distance,
-                business_name: restaurant.name || restaurant.business_name,
-                business_category: restaurant.category || restaurant.business_category
-              };
-            });
-            
-            // Sort by distance
-            restaurantsData.sort((a, b) => {
-              if (!a.distance) return 1;
-              if (!b.distance) return -1;
-              return a.distance - b.distance;
-            });
-            
-            if (restaurantsData.length > 0) {
-              toast.success(`${restaurantsData.length} yakın restoran bulundu`);
-            } else {
-              toast.error('Yakınınızda restoran bulunamadı');
-            }
+            params.append('city', city);
+            console.log(`📍 GPS search in city: ${city}`);
           } else {
-            console.log('⚠️ No city selected for GPS search');
-            toast.error('Lütfen bir şehir seçin');
+            console.log(`📍 GPS search without city filter (nationwide)`);
+          }
+          
+          const response = await api.get(`/catalog/city-nearby?${params.toString()}`);
+          restaurantsData = response.data?.businesses || response.data || [];
+          
+          console.log(`✅ Loaded ${restaurantsData.length} nearby restaurants`);
+          
+          // Calculate and add distance to each restaurant
+          restaurantsData = restaurantsData.map(restaurant => {
+            const distance = restaurant.lat && restaurant.lng 
+              ? calculateDistance(userLocation.lat, userLocation.lng, restaurant.lat, restaurant.lng)
+              : null;
+            return {
+              ...restaurant,
+              distance,
+              business_name: restaurant.name || restaurant.business_name,
+              business_category: restaurant.category || restaurant.business_category
+            };
+          });
+          
+          // Sort by distance
+          restaurantsData.sort((a, b) => {
+            if (!a.distance) return 1;
+            if (!b.distance) return -1;
+            return a.distance - b.distance;
+          });
+          
+          if (restaurantsData.length > 0) {
+            toast.success(`${restaurantsData.length} yakın restoran bulundu`);
+          } else {
+            toast.error('Yakınınızda restoran bulunamadı (50km içinde)');
           }
         } catch (gpsError) {
           console.error('❌ GPS-based loading failed:', gpsError);
-          toast.error('GPS ile restoranlar yüklenemedi');
+          toast.error('GPS ile restoranlar yüklenemedi: ' + gpsError.message);
         }
       }
       // Priority 2: Use selected address (city/district filter)
