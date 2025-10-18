@@ -5081,7 +5081,11 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
 
     switch(user.role) {
       case 'customer':
-        return <CustomerApp user={user} onLogout={handleLogout} />;
+        return (
+          <CartProvider>
+            <CustomerApp user={user} onLogout={handleLogout} />
+          </CartProvider>
+        );
       case 'business':
         return <NewBusinessApp user={user} onLogout={handleLogout} />;
       case 'courier':
