@@ -43,7 +43,7 @@ class E2EOrderRestaurantFlowTester:
         })
     
     def customer_login(self):
-        """Login as customer"""
+        """Login as customer and get JWT token"""
         try:
             login_data = {
                 "email": CUSTOMER_EMAIL,
@@ -55,6 +55,14 @@ class E2EOrderRestaurantFlowTester:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
+                    # Try to get JWT token from response or use cookie auth
+                    access_token = data.get("access_token")
+                    if access_token:
+                        # Set Authorization header for JWT token
+                        self.customer_session.headers.update({
+                            "Authorization": f"Bearer {access_token}"
+                        })
+                    
                     self.log_test("Customer Login", True, f"Customer authenticated successfully: {CUSTOMER_EMAIL}")
                     return True
                 else:
