@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Admin Settings & Maintenance Mode System Backend Testing
-Testing the newly implemented admin settings and maintenance mode functionality
+End-to-End Order Flow Authentication Fix Testing
+Re-testing order flow after authentication fix to verify orders reach the correct restaurant
 """
 
 import requests
@@ -11,8 +11,10 @@ from datetime import datetime
 
 # Configuration
 BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
-ADMIN_EMAIL = "admin@kuryecini.com"
-ADMIN_PASSWORD = "admin123"
+BUSINESS_EMAIL = "testbusiness@example.com"
+BUSINESS_PASSWORD = "test123"
+CUSTOMER_EMAIL = "test@kuryecini.com"
+CUSTOMER_PASSWORD = "test123"
 
 class AdminSettingsMaintenanceTester:
     def __init__(self):
