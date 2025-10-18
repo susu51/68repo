@@ -65,20 +65,30 @@ export const AddressSelectorEnhanced = ({ selectedAddress, onAddressSelect }) =>
         return;
       }
 
-      const response = await fetch(`${API}/user/addresses`, {
+      // Use new schema with backward compatibility fields
+      const addressData = {
+        adres_basligi: formData.label,
+        alici_adsoyad: 'Müşteri', // TODO: Get from user profile
+        telefon: '05551234567', // TODO: Get from user profile
+        acik_adres: formData.full,
+        il: formData.city,
+        ilce: formData.district || 'Merkez',
+        mahalle: formData.district || 'Merkez',
+        lat: formData.lat,
+        lng: formData.lng,
+        is_default: addresses.length === 0,
+        // Backward compatibility
+        label: formData.label,
+        full: formData.full,
+        city: formData.city,
+        district: formData.district
+      };
+
+      const response = await fetch(`${API}/me/addresses`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          label: formData.label,
-          full_address: formData.full,
-          description: formData.full,
-          city: formData.city,
-          district: formData.district,
-          lat: formData.lat,
-          lng: formData.lng,
-          is_default: addresses.length === 0
-        })
+        body: JSON.stringify(addressData)
       });
 
       if (response.ok) {
