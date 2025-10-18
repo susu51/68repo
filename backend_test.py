@@ -220,76 +220,69 @@ class OrderFlowAuthenticationTester:
             self.log_test("Create Test Order", False, f"Request error: {str(e)}")
             return False, None
     
-    def test_maintenance_mode_toggle(self):
-        """Test POST /api/admin/settings/maintenance-mode"""
+    def test_business_order_retrieval(self, business_id, created_order_id):
+        """Test business retrieving orders via GET /orders (CRITICAL TEST)"""
         try:
-            # Test enabling maintenance mode
-            enable_data = {
-                "enabled": True,
-                "message": "Sistem bakımda - Test mesajı",
-                "eta": "2024-12-25T10:00:00Z"
-            }
+            # Re-login as business to ensure fresh authentication
+            business_user = self.business_login()
             
-            response = self.session.post(f"{BACKEND_URL}/admin/settings/maintenance-mode", json=enable_data)
+            if not business_user:
+                return False
+            
+            # Call GET /orders endpoint
+            response = self.session.get(f"{BACKEND_URL}/orders")
             
             if response.status_code == 200:
-                data = response.json()
+                orders_data = response.json()
+                orders = orders_data if isinstance(orders_data, list) else orders_data.get("orders", [])
                 
-                if data.get("maintenance_mode") == True:
-                    self.log_test(
-                        "Enable Maintenance Mode", 
-                        True, 
-                        f"Maintenance mode enabled: {data['message']}",
-                        {"response": data}
-                    )
+                # Check if the created order is in the list
+                found_order = None
+                for order in orders:
+                    if order.get("id") == created_order_id:
+                        found_order = order
+                        break
+                
+                if found_order:
+                    order_business_id = found_order.get("business_id")
                     
-                    # Test disabling maintenance mode
-                    disable_data = {"enabled": False}
-                    
-                    response2 = self.session.post(f"{BACKEND_URL}/admin/settings/maintenance-mode", json=disable_data)
-                    
-                    if response2.status_code == 200:
-                        data2 = response2.json()
-                        
-                        if data2.get("maintenance_mode") == False:
-                            self.log_test(
-                                "Disable Maintenance Mode", 
-                                True, 
-                                f"Maintenance mode disabled: {data2['message']}",
-                                {"response": data2}
-                            )
-                            return True
-                        else:
-                            self.log_test(
-                                "Disable Maintenance Mode", 
-                                False, 
-                                f"Failed to disable maintenance mode: {data2}"
-                            )
-                            return False
+                    if order_business_id == business_id:
+                        self.log_test(
+                            "Business Order Retrieval", 
+                            True, 
+                            f"Business successfully retrieved their order: {created_order_id}",
+                            {
+                                "order_id": created_order_id,
+                                "business_id": order_business_id,
+                                "total_orders": len(orders),
+                                "order_status": found_order.get("status")
+                            }
+                        )
+                        return True
                     else:
                         self.log_test(
-                            "Disable Maintenance Mode", 
+                            "Business Order Retrieval", 
                             False, 
-                            f"HTTP {response2.status_code}: {response2.text}"
+                            f"Order business_id mismatch: expected {business_id}, got {order_business_id}"
                         )
                         return False
                 else:
                     self.log_test(
-                        "Enable Maintenance Mode", 
+                        "Business Order Retrieval", 
                         False, 
-                        f"Failed to enable maintenance mode: {data}"
+                        f"Created order {created_order_id} not found in business orders list (total: {len(orders)})"
                     )
                     return False
             else:
                 self.log_test(
-                    "Enable Maintenance Mode", 
+                    "Business Order Retrieval", 
                     False, 
-                    f"HTTP {response.status_code}: {response.text}"
+                    f"Failed to retrieve orders: HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("Maintenance Mode Toggle", False, f"Request error: {str(e)}")
+            self.log_test("Business Order Retrieval", False, f"Request error: {str(e)}")
             return False
     
     def test_maintenance_status_public(self):
