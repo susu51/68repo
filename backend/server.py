@@ -2182,7 +2182,7 @@ async def delete_product(product_id: str, current_user: dict = Depends(get_busin
 # Order Management Endpoints
 @api_router.post("/orders")
 @limiter.limit("10/minute")  # Prevent order spam
-async def create_order(request: Request, order_data: OrderCreate, current_user: dict = Depends(get_current_user)):
+async def create_order(request: Request, order_data: OrderCreate, current_user: dict = Depends(get_current_user_from_cookie)):
     """Create new order (Customer only)"""
     if current_user.get("role") != "customer":
         raise HTTPException(
@@ -2217,7 +2217,7 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     
     # Get business info from first menu item
     if order_data.items:
-        first_item = await db.menu_items.find_one({"_id": order_data.items[0].product_id})
+        first_item = await db.menu_items.find_one({"id": order_data.items[0].product_id})
         if first_item:
             order_doc["business_id"] = first_item["business_id"]
             # Get business name from users collection
@@ -2233,7 +2233,7 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     return order_doc
 
 @api_router.get("/orders")
-async def get_orders(status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_orders(status: Optional[str] = None, current_user: dict = Depends(get_current_user_from_cookie)):
     """Get orders based on user role"""
     filter_query = {}
     
