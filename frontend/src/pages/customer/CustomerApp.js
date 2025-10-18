@@ -75,22 +75,31 @@ export const CustomerApp = ({ user, onLogout }) => {
         return;
       }
 
+      if (!cart || cart.length === 0) {
+        toast.error('Sepetiniz boş');
+        return;
+      }
+
+      // Calculate total
+      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
       const orderData = {
-        business_id: selectedRestaurant?._id,
+        delivery_address: selectedAddress.acik_adres || selectedAddress.full || 
+                         `${selectedAddress.mahalle}, ${selectedAddress.ilce}, ${selectedAddress.il}`,
+        delivery_lat: selectedAddress.lat || 0,
+        delivery_lng: selectedAddress.lng || 0,
         items: cart.map(item => ({
-          product_id: item._id,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity
+          product_id: item.id,
+          product_name: item.name || item.title,
+          product_price: item.price,
+          quantity: item.quantity,
+          subtotal: item.price * item.quantity
         })),
-        delivery_address: {
-          label: selectedAddress.label,
-          address: selectedAddress.full,
-          lat: selectedAddress.location?.coordinates?.[1] || 0,
-          lng: selectedAddress.location?.coordinates?.[0] || 0
-        },
-        payment_method: selectedPaymentMethod
+        total_amount: totalAmount,
+        notes: `Ödeme yöntemi: ${selectedPaymentMethod}`
       };
+
+      console.log('Creating order:', orderData);
 
       const response = await fetch(`${API}/orders`, {
         method: 'POST',
@@ -101,12 +110,13 @@ export const CustomerApp = ({ user, onLogout }) => {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success('Sipariş oluşturuldu!');
+        toast.success('Sipariş başarıyla oluşturuldu!');
         clearCart();
         setCurrentOrderId(data.id);
         setActiveView('orders');
       } else {
         const error = await response.json();
+        console.error('Order creation error:', error);
         toast.error(error.detail || 'Sipariş oluşturulamadı');
       }
     } catch (error) {
