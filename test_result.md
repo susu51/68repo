@@ -2011,6 +2011,18 @@ agent_communication:
           agent: "main"
           comment: "✅ CUSTOMER PANEL LIGHT MODE ENFORCEMENT COMPLETE: Added useEffect in CustomerApp.js to force remove 'dark' class and set colorScheme to 'light' when customer panel mounts. Cleanup function restores dark mode preference when unmounting. Screenshot verified customer panel remains in light mode regardless of global theme setting. Customer experience maintains bright, clean interface as required."
 
+  - task: "Order Flow Fix - Business Panel Order Display"
+    implemented: true
+    working: "NA"
+    file: "server.py (line 1621 - get_incoming_orders endpoint)"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ BUSINESS PANEL ORDER DISPLAY FIX APPLIED: Fixed the critical issue where placed orders were not appearing in business order management panel. ROOT CAUSE: The /api/business/orders/incoming endpoint at server.py line 1621 was not correctly including business_id in responses, causing orders to appear as 'business: None'. FIXES APPLIED: 1) Updated get_incoming_orders endpoint to ensure business_id is included in response, 2) Changed order lookups to use 'id' field consistently instead of '_id', 3) Ensured order responses include both 'id' and 'business_id' fields for proper frontend display. TESTING NEEDED: Verify that orders now appear in business panel with correct business_id and are visible to the relevant business user."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
