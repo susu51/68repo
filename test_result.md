@@ -1814,7 +1814,8 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Admin Settings Tab Display & Functionality"
+    - "Business Panel Authentication & Routing Fix"
+    - "Business Panel Order Display Fix"
   stuck_tasks: 
     - "Admin Settings Tab Display & Functionality"
   test_all: false
