@@ -341,12 +341,17 @@ class OrderFlowFixTester:
                     
                     missing_fields = []
                     present_fields = []
+                    optional_present = []
                     
                     for field in required_fields:
                         if field in found_order and found_order[field] is not None:
                             present_fields.append(field)
                         else:
                             missing_fields.append(field)
+                    
+                    for field in optional_fields:
+                        if field in found_order and found_order[field] is not None:
+                            optional_present.append(field)
                     
                     # Additional checks
                     has_customer_info = bool(found_order.get("customer_name") or found_order.get("customer_email"))
