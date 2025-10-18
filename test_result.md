@@ -156,7 +156,7 @@ agent_communication:
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Admin paneli ayarlar bölümüne kapsamlı sistem yönetimi ekle: 1) Bakım modu sistemi (toggle, herkes için geçerli, kuryelere özel mesaj, landing page), 2) Website buton test araçları, 3) Console log viewer (frontend + backend logları), 4) Görüntüleme ayarları (tema, logo, renkler), 5) Bakım modu landing page (Kuryecini tanıtımı, görseller, iletişim bilgileri)"
+user_problem_statement: "TEST ORDER FLOW FIX - BUSINESS PANEL ORDER DISPLAY: The previous engineer fixed a critical bug where orders placed by customers were not appearing in the business order management panel. The issue was that orders were showing as business: None because the business_id field was not being correctly included in API responses. Fix Applied: Modified server.py line 1621 (get_incoming_orders endpoint), ensured business_id is included in order responses, changed to use consistent 'id' field instead of '_id' for lookups, backend has been restarted."
 
 backend:
   - task: "Admin Settings & Maintenance Mode System"
