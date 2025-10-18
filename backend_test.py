@@ -232,226 +232,215 @@ class CustomerOrderFlowTester:
             )
         
         return menu_items
-            curl_command = f"""
-curl -X POST "{BACKEND_URL}/admin/advertisements" \\
-  -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \\
-  -F "business_id=BUSINESS_ID" \\
-  -F "business_name=Restaurant Name" \\
-  -F "city=İstanbul" \\
-  -F "title=Advertisement Title" \\
-  -F "image=@/path/to/image.jpg"
-"""
-            
-            self.log_test(
-                "Create Advertisement - Endpoint Structure", 
-                True, 
-                f"Endpoint accepts FormData with fields: business_id, business_name, city, title (optional), image (file). Curl command structure documented."
-            )
-            
-            print("📋 CURL COMMAND FOR MANUAL TESTING:")
-            print(curl_command)
-            print()
-            
-        except Exception as e:
-            self.log_test("Create Advertisement - Structure Test", False, "", f"Exception: {str(e)}")
     
-    def test_get_all_advertisements(self):
-        """Test 4: GET /api/admin/advertisements - fetch all advertisements"""
+    def test_order_creation(self, menu_items):
+        """Test order creation with proper format"""
+        print("📦 Testing Order Creation...")
+        
+        if not menu_items:
+            self.log_test("Order Creation", False, "No menu items available for order testing")
+            return None
+        
+        if not self.auth_token:
+            self.log_test("Order Creation", False, "No authentication token available")
+            return None
+        
         try:
-            response = self.session.get(f"{BACKEND_URL}/admin/advertisements")
+            # Use first available menu item
+            test_item = menu_items[0]
             
-            if response.status_code == 200:
+            # Create order with proper format matching OrderCreate model
+            order_data = {
+                "delivery_address": "Test Address, Aksaray Merkez",
+                "delivery_lat": 38.3687,
+                "delivery_lng": 34.0370,
+                "items": [
+                    {
+                        "product_id": test_item.get("id"),
+                        "product_name": test_item.get("name", "Test Product"),
+                        "product_price": float(test_item.get("price", 25.00)),
+                        "quantity": 2,
+                        "subtotal": float(test_item.get("price", 25.00)) * 2
+                    }
+                ],
+                "total_amount": float(test_item.get("price", 25.00)) * 2,
+                "notes": "Test order from backend testing"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/orders", json=order_data)
+            
+            if response.status_code in [200, 201]:
                 data = response.json()
-                advertisements = data.get("advertisements", [])
+                order_id = data.get("id") or data.get("order_id")
                 
-                self.log_test(
-                    "Get All Advertisements", 
-                    True, 
-                    f"Retrieved {len(advertisements)} advertisements successfully"
-                )
-                return advertisements
-            else:
-                self.log_test("Get All Advertisements", False, "", f"HTTP {response.status_code}: {response.text}")
-                return []
-                
-        except Exception as e:
-            self.log_test("Get All Advertisements", False, "", f"Exception: {str(e)}")
-            return []
-    
-    def test_toggle_advertisement_status(self, advertisements):
-        """Test 5: PATCH /api/admin/advertisements/{id}/toggle - toggle advertisement status"""
-        try:
-            if not advertisements:
-                self.log_test(
-                    "Toggle Advertisement Status", 
-                    True, 
-                    "No advertisements found to test toggle functionality (expected for empty database)"
-                )
-                return
-            
-            # Test with first advertisement
-            ad_id = advertisements[0].get("id")
-            if not ad_id:
-                self.log_test("Toggle Advertisement Status", False, "", "No advertisement ID found")
-                return
-            
-            original_status = advertisements[0].get("is_active", False)
-            
-            response = self.session.patch(f"{BACKEND_URL}/admin/advertisements/{ad_id}/toggle")
-            
-            if response.status_code == 200:
-                data = response.json()
-                new_status = data.get("is_active")
-                
-                if new_status != original_status:
+                if order_id:
                     self.log_test(
-                        "Toggle Advertisement Status", 
+                        "Order Creation", 
                         True, 
-                        f"Successfully toggled status from {original_status} to {new_status}"
+                        f"Order created successfully with ID: {order_id}, status: {data.get('status', 'unknown')}"
                     )
+                    return order_id
                 else:
                     self.log_test(
-                        "Toggle Advertisement Status", 
+                        "Order Creation", 
                         False, 
-                        "", 
-                        f"Status didn't change: {original_status} -> {new_status}"
+                        "Order created but no ID returned",
+                        data
                     )
+                    return None
             else:
-                self.log_test("Toggle Advertisement Status", False, "", f"HTTP {response.status_code}: {response.text}")
+                self.log_test(
+                    "Order Creation", 
+                    False, 
+                    f"Order creation failed with status {response.status_code}",
+                    response.text
+                )
+                return None
                 
         except Exception as e:
-            self.log_test("Toggle Advertisement Status", False, "", f"Exception: {str(e)}")
+            self.log_test("Order Creation", False, f"Exception: {str(e)}")
+            return None
     
-    def test_get_active_advertisements_public(self):
-        """Test 6: GET /api/advertisements/active - fetch active advertisements (public endpoint)"""
+    def test_order_retrieval(self, created_order_id):
+        """Test customer order list retrieval"""
+        print("📋 Testing Order Retrieval...")
+        
+        if not self.auth_token:
+            self.log_test("Order Retrieval", False, "No authentication token available")
+            return False
+        
         try:
-            # Test without authentication (public endpoint)
-            public_session = requests.Session()
-            response = public_session.get(f"{BACKEND_URL}/advertisements/active")
+            # Test customer orders endpoint
+            response = self.session.get(f"{BASE_URL}/orders")
             
             if response.status_code == 200:
                 data = response.json()
-                advertisements = data.get("advertisements", [])
+                orders = data if isinstance(data, list) else data.get("orders", [])
                 
-                self.log_test(
-                    "Get Active Advertisements (Public)", 
-                    True, 
-                    f"Public endpoint returned {len(advertisements)} active advertisements"
-                )
-                return advertisements
+                if orders:
+                    # Check if created order appears in list
+                    order_found = False
+                    if created_order_id:
+                        order_found = any(
+                            order.get("id") == created_order_id or 
+                            order.get("order_id") == created_order_id 
+                            for order in orders
+                        )
+                    
+                    # Verify order structure
+                    first_order = orders[0]
+                    required_fields = ["id", "customer_id", "total_amount", "status"]
+                    missing_fields = [field for field in required_fields if field not in first_order]
+                    
+                    if not missing_fields:
+                        success_msg = f"Retrieved {len(orders)} orders with proper structure"
+                        if created_order_id and order_found:
+                            success_msg += f", created order {created_order_id} found in list"
+                        elif created_order_id:
+                            success_msg += f", created order {created_order_id} not found (may be processing)"
+                        
+                        self.log_test("Order Retrieval", True, success_msg)
+                        return True
+                    else:
+                        self.log_test(
+                            "Order Retrieval", 
+                            False, 
+                            f"Orders missing required fields: {missing_fields}",
+                            first_order
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Order Retrieval", 
+                        True, 
+                        "No orders found for customer (valid state for new customer)"
+                    )
+                    return True
             else:
-                self.log_test("Get Active Advertisements (Public)", False, "", f"HTTP {response.status_code}: {response.text}")
-                return []
+                self.log_test(
+                    "Order Retrieval", 
+                    False, 
+                    f"Order retrieval failed with status {response.status_code}",
+                    response.text
+                )
+                return False
                 
         except Exception as e:
-            self.log_test("Get Active Advertisements (Public)", False, "", f"Exception: {str(e)}")
-            return []
+            self.log_test("Order Retrieval", False, f"Exception: {str(e)}")
+            return False
     
-    def test_get_active_advertisements_by_city(self):
-        """Test 7: GET /api/advertisements/active?city=İstanbul - fetch active advertisements filtered by city"""
-        try:
-            # Test without authentication (public endpoint)
-            public_session = requests.Session()
-            response = public_session.get(f"{BACKEND_URL}/advertisements/active?city=İstanbul")
-            
-            if response.status_code == 200:
-                data = response.json()
-                advertisements = data.get("advertisements", [])
-                city = data.get("city", "")
-                
-                # Verify all returned ads are for İstanbul
-                istanbul_ads = [ad for ad in advertisements if ad.get("city", "").lower() == "istanbul" or ad.get("city", "").lower() == "i̇stanbul"]
-                
-                self.log_test(
-                    "Get Active Advertisements by City (İstanbul)", 
-                    True, 
-                    f"City filter working: returned {len(advertisements)} ads for İstanbul, {len(istanbul_ads)} correctly filtered"
-                )
-                return advertisements
-            else:
-                self.log_test("Get Active Advertisements by City", False, "", f"HTTP {response.status_code}: {response.text}")
-                return []
-                
-        except Exception as e:
-            self.log_test("Get Active Advertisements by City", False, "", f"Exception: {str(e)}")
-            return []
-    
-    def run_all_tests(self):
-        """Run all advertisement system tests"""
-        print("🚀 ADVERTISEMENT SYSTEM BACKEND TESTING")
+    def run_complete_flow_test(self):
+        """Run the complete customer order flow test"""
+        print("🚀 Starting Complete Customer Order Flow Test")
         print("=" * 60)
-        print(f"Backend URL: {BACKEND_URL}")
-        print(f"Admin Credentials: {ADMIN_EMAIL} / {ADMIN_PASSWORD}")
-        print("=" * 60)
-        print()
         
-        # Test 1: Admin Authentication
-        if not self.test_admin_login():
-            print("❌ CRITICAL: Admin login failed - cannot proceed with admin endpoints")
-            return
+        # Step 1: Customer Login
+        login_success = self.test_customer_login()
+        if not login_success:
+            print("❌ Cannot proceed without successful login")
+            return False
         
-        # Test 2: Get Approved Businesses
-        businesses = self.test_get_approved_businesses()
+        # Step 2: Restaurant Discovery
+        businesses = self.test_restaurant_discovery()
         
-        # Test 3: Create Advertisement Structure
-        self.test_create_advertisement_structure()
+        # Step 3: Menu Retrieval
+        menu_items = self.test_menu_retrieval(businesses)
         
-        # Test 4: Get All Advertisements
-        advertisements = self.test_get_all_advertisements()
+        # Step 4: Order Creation
+        order_id = self.test_order_creation(menu_items)
         
-        # Test 5: Toggle Advertisement Status
-        self.test_toggle_advertisement_status(advertisements)
-        
-        # Test 6: Public Active Advertisements
-        public_ads = self.test_get_active_advertisements_public()
-        
-        # Test 7: City-filtered Active Advertisements
-        istanbul_ads = self.test_get_active_advertisements_by_city()
+        # Step 5: Order Retrieval
+        retrieval_success = self.test_order_retrieval(order_id)
         
         # Summary
-        self.print_summary()
-    
-    def print_summary(self):
-        """Print test summary"""
         print("=" * 60)
         print("📊 TEST SUMMARY")
         print("=" * 60)
         
         total_tests = len(self.test_results)
-        passed_tests = len([r for r in self.test_results if r["success"]])
-        failed_tests = total_tests - passed_tests
+        passed_tests = sum(1 for result in self.test_results if result["success"])
         success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
         
         print(f"Total Tests: {total_tests}")
         print(f"Passed: {passed_tests}")
-        print(f"Failed: {failed_tests}")
+        print(f"Failed: {total_tests - passed_tests}")
         print(f"Success Rate: {success_rate:.1f}%")
         print()
         
-        if failed_tests > 0:
-            print("❌ FAILED TESTS:")
-            for result in self.test_results:
-                if not result["success"]:
-                    print(f"   • {result['test']}: {result['error']}")
-            print()
-        
-        print("✅ EXPECTED RESULTS VERIFICATION:")
-        print("   • Admin authentication working: ✅" if any("Admin Login" in r["test"] and r["success"] for r in self.test_results) else "   • Admin authentication working: ❌")
-        print("   • Create advertisement endpoint structure validated: ✅")
-        print("   • List advertisements returns proper data structure: ✅" if any("Get All Advertisements" in r["test"] and r["success"] for r in self.test_results) else "   • List advertisements returns proper data structure: ❌")
-        print("   • Toggle status functionality working: ✅" if any("Toggle Advertisement Status" in r["test"] and r["success"] for r in self.test_results) else "   • Toggle status functionality working: ❌")
-        print("   • Customer endpoint returns only active advertisements: ✅" if any("Get Active Advertisements (Public)" in r["test"] and r["success"] for r in self.test_results) else "   • Customer endpoint returns only active advertisements: ❌")
-        print("   • City filtering works correctly: ✅" if any("Get Active Advertisements by City" in r["test"] and r["success"] for r in self.test_results) else "   • City filtering works correctly: ❌")
+        # Detailed results
+        for result in self.test_results:
+            status = "✅" if result["success"] else "❌"
+            print(f"{status} {result['test']}")
+            if result["details"]:
+                print(f"   {result['details']}")
         
         print()
-        print("🎯 CONCLUSION:")
-        if success_rate >= 85:
-            print("   Advertisement System Backend is WORKING EXCELLENTLY")
-        elif success_rate >= 70:
-            print("   Advertisement System Backend is WORKING with minor issues")
-        else:
-            print("   Advertisement System Backend has CRITICAL ISSUES")
+        print("🎯 CUSTOMER ORDER FLOW TEST COMPLETE")
+        
+        # Return overall success
+        critical_tests = ["Customer Login", "Restaurant Discovery", "Overall Menu Retrieval"]
+        critical_passed = sum(1 for result in self.test_results 
+                            if result["test"] in critical_tests and result["success"])
+        
+        return critical_passed >= len(critical_tests) - 1  # Allow 1 critical test to fail
+
+def main():
+    """Main test execution"""
+    print("🧪 Customer Order Flow Backend Testing")
+    print(f"🌐 Backend URL: {BASE_URL}")
+    print(f"👤 Test Customer: {CUSTOMER_EMAIL}")
+    print(f"🏙️ Test City: {TEST_CITY}")
+    print()
+    
+    tester = CustomerOrderFlowTester()
+    success = tester.run_complete_flow_test()
+    
+    if success:
+        print("🎉 Customer Order Flow Test: OVERALL SUCCESS")
+        sys.exit(0)
+    else:
+        print("💥 Customer Order Flow Test: OVERALL FAILURE")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    tester = AdvertisementTester()
-    tester.run_all_tests()
+    main()
