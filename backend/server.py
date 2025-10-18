@@ -6982,7 +6982,7 @@ async def update_business_profile(
         
         # Allowed fields to update
         allowed_fields = [
-            "business_name", "phone", "address", "city", "district",
+            "first_name", "last_name", "business_name", "phone", "address", "city", "district",
             "description", "opening_hours", "delivery_radius_km",
             "min_order_amount", "delivery_fee", "is_open"
         ]
