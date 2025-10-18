@@ -6825,6 +6825,9 @@ async def create_business_menu_item(
         
         business_id = current_user["id"]
         
+        print(f"📝 Creating menu item for business: {business_id}")
+        print(f"   Item: {item_data.get('name')}")
+        
         # Create menu item
         menu_item = {
             "id": str(uuid.uuid4()),
@@ -6842,10 +6845,14 @@ async def create_business_menu_item(
         # Insert into database
         await db.products.insert_one(menu_item)
         
-        return {
-            "message": "Menu item created successfully",
-            "item": menu_item
-        }
+        print(f"✅ Menu item created: {menu_item.get('id')}")
+        
+        # Remove _id from response
+        if "_id" in menu_item:
+            del menu_item["_id"]
+        
+        # Return the item directly (backward compatibility)
+        return menu_item
         
     except HTTPException:
         raise
