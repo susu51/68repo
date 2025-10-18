@@ -97,7 +97,15 @@ class OrderFlowFixTester:
             if not customer_user:
                 return False, None
             
-            # Get menu items from the specific business
+            # First get the business ID by logging in as business
+            business_user = self.business_login()
+            if not business_user:
+                return False, None
+            
+            global BUSINESS_ID
+            BUSINESS_ID = business_user.get("id")
+            
+            # Get menu items from the business
             response = self.customer_session.get(f"{BACKEND_URL}/business/public/{BUSINESS_ID}/menu")
             
             if response.status_code != 200:
