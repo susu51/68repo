@@ -3082,7 +3082,7 @@ const BusinessDashboard = ({ user }) => {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <PlatformSettings />
+            <AdminSettings />
           </TabsContent>
         </Tabs>
       </div>
