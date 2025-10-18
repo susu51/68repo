@@ -1618,50 +1618,6 @@ async def get_business_stats(current_user: dict = Depends(get_approved_business_
     except Exception:
         raise HTTPException(status_code=500, detail="Stats retrieval failed")
 
-@api_router.get("/business/orders/incoming")
-async def get_incoming_orders(current_user: dict = Depends(get_approved_business_user)):
-    """Get incoming orders for business - real implementation"""
-    try:
-        business_id = current_user["id"]
-        
-        # Get orders for this business with status 'created' or 'confirmed'
-        orders_cursor = db.orders.find({
-            "business_id": business_id,
-            "status": {"$in": ["created", "confirmed", "preparing"]}
-        }).sort("created_at", -1)
-        
-        orders = await orders_cursor.to_list(length=None)
-        
-        # Format orders for business dashboard
-        formatted_orders = []
-        for order in orders:
-            # Get customer details
-            customer = await db.users.find_one({"id": order.get("customer_id")})
-            
-            formatted_order = {
-                "id": str(order.get("_id", order.get("id", ""))),
-                "order_id": order.get("id", str(order.get("_id", ""))),
-                "business_id": order.get("business_id"),  # Add business_id
-                "customer_name": f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip() if customer else "Müşteri",
-                "customer_phone": customer.get("phone", "") if customer else "",
-                "customer_email": customer.get("email", "") if customer else "",
-                "items": order.get("items", []),
-                "total_amount": order.get("total_amount", 0),
-                "delivery_address": order.get("delivery_address", ""),
-                "status": order.get("status", "created"),
-                "created_at": order.get("created_at").isoformat() if order.get("created_at") else "",
-                "notes": order.get("notes", ""),
-                "payment_method": order.get("payment_method", ""),
-                "payment_status": order.get("payment_status", "pending")
-            }
-            formatted_orders.append(formatted_order)
-        
-        return {"orders": formatted_orders}
-        
-    except Exception as e:
-        print(f"Error fetching business orders: {e}")
-        raise HTTPException(status_code=500, detail=f"Orders retrieval failed: {str(e)}")
-
 @api_router.patch("/business/orders/{order_id}/status")
 async def update_business_order_status(
     order_id: str,
