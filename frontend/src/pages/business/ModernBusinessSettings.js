@@ -22,6 +22,8 @@ import { get, patch } from '../../api/http';
 
 export const ModernBusinessSettings = ({ businessInfo, onUpdate }) => {
   const [settings, setSettings] = useState({
+    first_name: '',
+    last_name: '',
     business_name: '',
     phone: '',
     address: '',
@@ -48,6 +50,8 @@ export const ModernBusinessSettings = ({ businessInfo, onUpdate }) => {
       const profile = result.data || result;
       
       setSettings({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
         business_name: profile.business_name || '',
         phone: profile.phone || '',
         address: profile.address || '',
