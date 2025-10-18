@@ -150,7 +150,7 @@ class CustomerOrderFlowTester:
             self.log_test("Restaurant Discovery", False, f"Exception: {str(e)}")
             return []
     
-    def test_create_advertisement_structure(self):
+    def test_menu_retrieval(self, businesses):
         """Test 3: POST /api/admin/advertisements - test endpoint structure and validation (using curl simulation)"""
         try:
             # Since this requires FormData with file upload, we'll test the endpoint structure
