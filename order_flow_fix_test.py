@@ -404,7 +404,7 @@ class OrderFlowFixTester:
         print("🚀 Starting Business Panel Order Display Fix Testing")
         print("=" * 70)
         print("🎯 Testing Fix: Orders placed by customers now appear in business panel")
-        print("🏪 Business: Lezzet Döner (ID: e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed)")
+        print("🏪 Business: testbusiness@example.com")
         print("=" * 70)
         
         # Test 1: Order Creation
