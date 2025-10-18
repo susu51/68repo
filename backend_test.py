@@ -446,7 +446,7 @@ class BusinessOrderDisplayTester:
             return False
     
     def test_order_data_integrity(self, created_order_id):
-        """Test order data integrity and required fields"""
+        """Test 5: Order data integrity and required fields"""
         try:
             # Login as business to get order details
             business_user = self.business_login()
@@ -454,8 +454,80 @@ class BusinessOrderDisplayTester:
             if not business_user:
                 return False
             
-            # Get orders and find the created order
-            response = self.session.get(f"{BACKEND_URL}/orders")
+            # Get orders via business incoming orders endpoint
+            response = self.session.get(f"{BACKEND_URL}/business/orders/incoming")
+            
+            if response.status_code == 200:
+                orders_data = response.json()
+                orders = orders_data.get("orders", []) if isinstance(orders_data, dict) else orders_data
+                
+                found_order = None
+                for order in orders:
+                    if order.get("id") == created_order_id or order.get("order_id") == created_order_id:
+                        found_order = order
+                        break
+                
+                if found_order:
+                    # Check required fields for business panel display
+                    required_fields = [
+                        "id", "business_id", "customer_name", "delivery_address",
+                        "items", "total_amount", "status"
+                    ]
+                    
+                    missing_fields = [field for field in required_fields if field not in found_order]
+                    present_fields = [field for field in required_fields if field in found_order]
+                    
+                    # Check business_id specifically
+                    business_id_correct = found_order.get("business_id") == BUSINESS_ID
+                    
+                    self.log_test(
+                        "Order Data Integrity", 
+                        len(missing_fields) == 0 and business_id_correct, 
+                        f"Order has {len(present_fields)}/{len(required_fields)} required fields, business_id correct: {business_id_correct}",
+                        {
+                            "order_id": created_order_id,
+                            "business_id": found_order.get("business_id"),
+                            "expected_business_id": BUSINESS_ID,
+                            "customer_name": found_order.get("customer_name"),
+                            "total_amount": found_order.get("total_amount"),
+                            "status": found_order.get("status"),
+                            "items_count": len(found_order.get("items", [])),
+                            "present_fields": present_fields,
+                            "missing_fields": missing_fields
+                        }
+                    )
+                    return len(missing_fields) == 0 and business_id_correct
+                else:
+                    self.log_test(
+                        "Order Data Integrity", 
+                        False, 
+                        f"Order {created_order_id} not found in business incoming orders"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Order Data Integrity", 
+                    False, 
+                    f"Failed to retrieve business orders: HTTP {response.status_code}: {response.text}"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Order Data Integrity", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_database_verification(self, created_order_id):
+        """Test 6: Database verification via admin endpoints (if available)"""
+        try:
+            # Try to get order details via customer endpoint to verify database state
+            customer_session, customer_user = self.customer_login()
+            
+            if not customer_session:
+                self.log_test("Database Verification", False, "Could not login as customer for verification")
+                return False
+            
+            # Get customer orders to verify order exists in database
+            response = customer_session.get(f"{BACKEND_URL}/orders")
             
             if response.status_code == 200:
                 orders_data = response.json()
@@ -468,53 +540,39 @@ class BusinessOrderDisplayTester:
                         break
                 
                 if found_order:
-                    # Check required fields
-                    required_fields = [
-                        "id", "business_id", "customer_id", "delivery_address",
-                        "items", "total_amount", "status"
-                    ]
+                    # Verify order has business_id field and it matches expected
+                    order_business_id = found_order.get("business_id")
+                    business_id_matches = order_business_id == BUSINESS_ID
                     
-                    missing_fields = [field for field in required_fields if field not in found_order]
-                    
-                    if not missing_fields:
-                        self.log_test(
-                            "Order Data Integrity", 
-                            True, 
-                            f"Order contains all required fields: {', '.join(required_fields)}",
-                            {
-                                "order_id": created_order_id,
-                                "business_id": found_order.get("business_id"),
-                                "customer_id": found_order.get("customer_id"),
-                                "total_amount": found_order.get("total_amount"),
-                                "status": found_order.get("status"),
-                                "items_count": len(found_order.get("items", []))
-                            }
-                        )
-                        return True
-                    else:
-                        self.log_test(
-                            "Order Data Integrity", 
-                            False, 
-                            f"Order missing required fields: {missing_fields}"
-                        )
-                        return False
+                    self.log_test(
+                        "Database Verification", 
+                        business_id_matches, 
+                        f"Order in database has business_id: {order_business_id}, matches expected: {business_id_matches}",
+                        {
+                            "order_id": created_order_id,
+                            "database_business_id": order_business_id,
+                            "expected_business_id": BUSINESS_ID,
+                            "match": business_id_matches
+                        }
+                    )
+                    return business_id_matches
                 else:
                     self.log_test(
-                        "Order Data Integrity", 
+                        "Database Verification", 
                         False, 
-                        f"Order {created_order_id} not found for integrity check"
+                        f"Order {created_order_id} not found in customer orders (database issue)"
                     )
                     return False
             else:
                 self.log_test(
-                    "Order Data Integrity", 
+                    "Database Verification", 
                     False, 
-                    f"Failed to retrieve orders: HTTP {response.status_code}: {response.text}"
+                    f"Failed to retrieve customer orders: HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("Order Data Integrity", False, f"Request error: {str(e)}")
+            self.log_test("Database Verification", False, f"Request error: {str(e)}")
             return False
     
     def test_cross_user_order_isolation(self):
