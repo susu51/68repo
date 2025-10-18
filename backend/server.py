@@ -1516,8 +1516,8 @@ async def get_courier_user(current_user: dict = Depends(get_current_user)):
     return current_user
 
 # Customer dependency
-async def get_customer_user(current_user: dict = Depends(get_current_user)):
-    """Require customer role"""
+async def get_customer_user(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Require customer role (supports both cookie and bearer token auth)"""
     if current_user.get("role") != "customer":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
