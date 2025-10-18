@@ -1251,7 +1251,7 @@ export const BusinessDashboard = ({ user, onLogout }) => {
 
           {/* Menu Tab */}
           <TabsContent value="menu" className="p-0">
-            <BusinessMenuManager />
+            <BusinessMenuManager onMenuItemsChange={(items) => setProducts(items)} />
           </TabsContent>
 
           {/* OLD MENU TAB - BACKUP */}
