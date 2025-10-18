@@ -1742,11 +1742,8 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Admin Advertisements Tab Functionality"
-    - "Customer Panel Backend System - Comprehensive Testing"
-  stuck_tasks: 
-    - "Admin Advertisements Tab Functionality"
-    - "JWT-based endpoint authentication (orders, profile)"
+    - "Order Flow Fix - Business Panel Order Display"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
