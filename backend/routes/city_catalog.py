@@ -82,53 +82,55 @@ async def get_city_nearby_businesses(
                     "query": base_query
                 }
             },
-                {
-                    "$addFields": {
-                        "district_match": (
-                            {"$eq": ["$address.district_slug", district]} if district 
-                            else {"$literal": False}
-                        ),
-                        "is_priority_zone": {
-                            "$lte": ["$dist", PRIORITY_RADIUS_M]  # Within 10km priority zone
-                        }
+            {
+                "$addFields": {
+                    "district_match": (
+                        {"$eq": ["$address.district_slug", district]} if district 
+                        else {"$literal": False}
+                    ),
+                    "is_priority_zone": {
+                        "$lte": ["$dist", PRIORITY_RADIUS_M]  # Within 10km priority zone
                     }
-                },
-                {
-                    "$sort": {
-                        "is_priority_zone": -1,  # Priority zone first
-                        "district_match": -1,     # Then same district
-                        "dist": 1                 # Finally by distance
-                    }
-                },
-                {
-                    "$lookup": {
-                        "from": "menu_items", 
-                        "let": {"bid": "$_id"},
-                        "pipeline": [
-                            {
-                                "$match": {
-                                    "$expr": {"$eq": ["$business_id", "$$bid"]},
-                                    "is_available": True
-                                }
-                            },
-                            {"$project": {"title": 1, "price": 1, "photo_url": 1}},
-                            {"$limit": 3}
-                        ],
-                        "as": "menu_snippet"
-                    }
-                },
-                {
-                    "$project": {
-                        "_id": 1,
-                        "name": 1,
-                        "address": 1,
-                        "dist": 1,
-                        "menu_snippet": 1
-                    }
-                },
-                {"$limit": limit}
-            ]
-        else:
+                }
+            },
+            {
+                "$sort": {
+                    "is_priority_zone": -1,  # Priority zone first
+                    "district_match": -1,     # Then same district
+                    "dist": 1                 # Finally by distance
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "menu_items", 
+                    "let": {"bid": "$_id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {"$eq": ["$business_id", "$$bid"]},
+                                "is_available": True
+                            }
+                        },
+                        {"$project": {"title": 1, "price": 1, "photo_url": 1}},
+                        {"$limit": 3}
+                    ],
+                    "as": "menu_snippet"
+                }
+            },
+            {
+                "$project": {
+                    "_id": 1,
+                    "name": 1,
+                    "address": 1,
+                    "dist": 1,
+                    "menu_snippet": 1
+                }
+            },
+            {"$limit": limit}
+        ]
+        
+        # Execute pipeline
+        businesses = await db.businesses.aggregate(pipeline).to_list(length=None)
             # City/district-based search without GPS (no distance sorting)
             match_query = {
                 "is_active": True,
