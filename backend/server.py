@@ -2242,7 +2242,7 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     return order_doc
 
 @api_router.get("/orders")
-async def get_orders(status: Optional[str] = None, current_user: dict = Depends(get_current_user_from_cookie)):
+async def get_orders(status: Optional[str] = None, current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
     """Get orders based on user role"""
     filter_query = {}
     
