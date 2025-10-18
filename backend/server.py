@@ -6511,8 +6511,8 @@ async def get_business_incoming_orders(current_user: dict = Depends(get_approved
         
         formatted_orders = []
         for order in orders:
-            # Get customer details
-            customer = await db.users.find_one({"_id": order.get("customer_id")})
+            # Get customer details (use 'id' field, not '_id')
+            customer = await db.users.find_one({"id": order.get("customer_id")})
             customer_name = "Unknown Customer"
             customer_phone = ""
             
