@@ -6560,8 +6560,8 @@ async def get_business_active_orders(current_user: dict = Depends(get_approved_b
         
         formatted_orders = []
         for order in orders:
-            # Get customer details
-            customer = await db.users.find_one({"_id": order.get("customer_id")})
+            # Get customer details (use 'id' field, not '_id')
+            customer = await db.users.find_one({"id": order.get("customer_id")})
             customer_name = "Unknown Customer"
             
             if customer:
@@ -6575,7 +6575,8 @@ async def get_business_active_orders(current_user: dict = Depends(get_approved_b
                     preparation_time = int((datetime.now(timezone.utc).timestamp() - confirmed_time.timestamp()) / 60)
             
             formatted_order = {
-                "id": order.get("_id", str(order.get("id", ""))),
+                "id": order.get("id", str(order.get("_id", ""))),  # Use 'id' field first
+                "business_id": order.get("business_id"),  # Add business_id
                 "customer_name": customer_name,
                 "items": order.get("items", []),
                 "total_amount": float(order.get("total_amount", 0)),
