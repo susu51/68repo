@@ -59,69 +59,127 @@ async def get_city_nearby_businesses(
     radius_m = radius_km * 1000
     max_radius_m = min(radius_m, NEARBY_RADIUS_M)  # Cap at 70km max
     
-    print(f"🎯 City-strict search: city={city}, district={district}, radius={radius_km}km ({max_radius_m}m)")
+    has_gps = lat is not None and lng is not None
+    print(f"🎯 City-strict search: city={city}, district={district}, radius={radius_km}km, GPS={has_gps}")
     
     try:
-        # MongoDB aggregation pipeline
-        pipeline = [
-            {
-                "$geoNear": {
-                    "near": {"type": "Point", "coordinates": [lng, lat]},
-                    "spherical": True,
-                    "distanceField": "dist",
-                    "maxDistance": max_radius_m,
-                    "query": {
-                        "is_active": True,
-                        "address.city_slug": city  # CRITICAL: City filter
+        # Build pipeline based on GPS availability
+        if has_gps:
+            # GPS-based search with distance sorting
+            pipeline = [
+                {
+                    "$geoNear": {
+                        "near": {"type": "Point", "coordinates": [lng, lat]},
+                        "spherical": True,
+                        "distanceField": "dist",
+                        "maxDistance": max_radius_m,
+                        "query": {
+                            "is_active": True,
+                            "address.city_slug": city  # CRITICAL: City filter
+                        }
                     }
-                }
-            },
-            {
-                "$addFields": {
-                    "district_match": (
-                        {"$eq": ["$address.district_slug", district]} if district 
-                        else {"$literal": False}
-                    ),
-                    "is_priority_zone": {
-                        "$lte": ["$dist", PRIORITY_RADIUS_M]  # Within 10km priority zone
+                },
+                {
+                    "$addFields": {
+                        "district_match": (
+                            {"$eq": ["$address.district_slug", district]} if district 
+                            else {"$literal": False}
+                        ),
+                        "is_priority_zone": {
+                            "$lte": ["$dist", PRIORITY_RADIUS_M]  # Within 10km priority zone
+                        }
                     }
-                }
-            },
-            {
-                "$sort": {
-                    "is_priority_zone": -1,  # Priority zone first
-                    "district_match": -1,     # Then same district
-                    "dist": 1                 # Finally by distance
-                }
-            },
-            {
-                "$lookup": {
-                    "from": "menu_items", 
-                    "let": {"bid": "$_id"},
-                    "pipeline": [
-                        {
-                            "$match": {
-                                "$expr": {"$eq": ["$business_id", "$$bid"]},
-                                "is_available": True
-                            }
-                        },
-                        {"$project": {"title": 1, "price": 1, "photo_url": 1}},
-                        {"$limit": 3}
-                    ],
-                    "as": "menu_snippet"
-                }
-            },
-            {
-                "$project": {
-                    "_id": 1,
-                    "name": 1,
-                    "address": 1,
-                    "dist": 1,
-                    "menu_snippet": 1
-                }
-            },
-            {"$limit": limit}
-        ]
+                },
+                {
+                    "$sort": {
+                        "is_priority_zone": -1,  # Priority zone first
+                        "district_match": -1,     # Then same district
+                        "dist": 1                 # Finally by distance
+                    }
+                },
+                {
+                    "$lookup": {
+                        "from": "menu_items", 
+                        "let": {"bid": "$_id"},
+                        "pipeline": [
+                            {
+                                "$match": {
+                                    "$expr": {"$eq": ["$business_id", "$$bid"]},
+                                    "is_available": True
+                                }
+                            },
+                            {"$project": {"title": 1, "price": 1, "photo_url": 1}},
+                            {"$limit": 3}
+                        ],
+                        "as": "menu_snippet"
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 1,
+                        "name": 1,
+                        "address": 1,
+                        "dist": 1,
+                        "menu_snippet": 1
+                    }
+                },
+                {"$limit": limit}
+            ]
+        else:
+            # City/district-based search without GPS (no distance sorting)
+            match_query = {
+                "is_active": True,
+                "address.city_slug": city
+            }
+            
+            if district:
+                match_query["address.district_slug"] = district
+            
+            pipeline = [
+                {"$match": match_query},
+                {
+                    "$addFields": {
+                        "district_match": (
+                            {"$eq": ["$address.district_slug", district]} if district 
+                            else {"$literal": False}
+                        ),
+                        "dist": 0  # No GPS, so distance is 0
+                    }
+                },
+                {
+                    "$sort": {
+                        "district_match": -1,  # Same district first
+                        "name": 1              # Then by name
+                    }
+                },
+                {
+                    "$lookup": {
+                        "from": "menu_items", 
+                        "let": {"bid": "$_id"},
+                        "pipeline": [
+                            {
+                                "$match": {
+                                    "$expr": {"$eq": ["$business_id", "$$bid"]},
+                                    "is_available": True
+                                }
+                            },
+                            {"$project": {"title": 1, "price": 1, "photo_url": 1}},
+                            {"$limit": 3}
+                        ],
+                        "as": "menu_snippet"
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 1,
+                        "name": 1,
+                        "address": 1,
+                        "dist": 1,
+                        "menu_snippet": 1
+                    }
+                },
+                {"$limit": limit}
+            ]
         
         # Execute aggregation
         results = await db.business.aggregate(pipeline).to_list(length=None)
