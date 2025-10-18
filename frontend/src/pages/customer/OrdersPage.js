@@ -50,10 +50,17 @@ const OrdersPage = ({ user }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setOrders(data.orders || []);
+        // Backend returns array directly, not wrapped in {orders: [...]}
+        const ordersData = Array.isArray(data) ? data : (data.orders || []);
+        console.log('✅ Orders loaded:', ordersData.length, ordersData);
+        setOrders(ordersData);
+      } else {
+        console.error('❌ Orders API error:', response.status, response.statusText);
+        toast.error('Siparişler yüklenemedi');
       }
     } catch (error) {
-      console.error('Siparişler yüklenemedi:', error);
+      console.error('❌ Siparişler yüklenemedi:', error);
+      toast.error('Siparişler yüklenirken hata oluştu');
     } finally {
       setLoading(false);
     }
