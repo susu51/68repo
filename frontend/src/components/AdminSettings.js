@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Card, CardContent, CardHeader } from './ui/card.jsx';
+import { Button } from './ui/button.jsx';
+import { Input } from './ui/input.jsx';
 import { toast } from 'react-hot-toast';
 import api from '../api/http';
 
