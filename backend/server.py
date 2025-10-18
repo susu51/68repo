@@ -6521,7 +6521,8 @@ async def get_business_incoming_orders(current_user: dict = Depends(get_approved
                 customer_phone = customer.get("phone", "")
             
             formatted_order = {
-                "id": order.get("_id", str(order.get("id", ""))),
+                "id": order.get("id", str(order.get("_id", ""))),  # Use 'id' field first
+                "business_id": order.get("business_id"),  # Add business_id to response
                 "customer_name": customer_name,
                 "customer_phone": customer_phone,
                 "items": order.get("items", []),
