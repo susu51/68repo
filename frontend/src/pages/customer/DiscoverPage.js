@@ -20,19 +20,6 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
   const [userAddresses, setUserAddresses] = useState([]);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
 
-  // Load restaurants on component mount
-  useEffect(() => {
-    loadRestaurants();
-  }, []);
-
-  // Reload restaurants when location or sort mode changes
-  useEffect(() => {
-    if (sortMode === 'location' && userLocation) {
-      console.log('🎯 User location changed, reloading restaurants with location sorting...');
-      loadRestaurants();
-    }
-  }, [userLocation, sortMode]);
-
   // Load user's saved addresses when component mounts or user changes
   useEffect(() => {
     console.log('🚀 DISCOVER PAGE - useEffect for address loading triggered');
@@ -46,6 +33,22 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
       console.log('❌ DISCOVER PAGE - No user, skipping address loading');
     }
   }, [user]);
+
+  // Load restaurants when selectedAddress becomes available or changes
+  useEffect(() => {
+    if (selectedAddress) {
+      console.log('🔄 Selected address changed, loading restaurants...');
+      loadRestaurants();
+    }
+  }, [selectedAddress]);
+
+  // Reload restaurants when location or sort mode changes
+  useEffect(() => {
+    if (sortMode === 'location' && userLocation) {
+      console.log('🎯 User location changed, reloading restaurants with location sorting...');
+      loadRestaurants();
+    }
+  }, [userLocation, sortMode]);
 
   // Calculate distance between two coordinates using Haversine formula
   const calculateDistance = (lat1, lng1, lat2, lng2) => {
