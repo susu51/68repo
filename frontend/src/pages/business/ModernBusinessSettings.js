@@ -135,6 +135,29 @@ export const ModernBusinessSettings = ({ businessInfo, onUpdate }) => {
             <CardDescription>İşletmenizin genel bilgileri</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Yetkili Kişi Bilgileri */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="first_name">Yetkili Adı *</Label>
+                <Input
+                  id="first_name"
+                  value={settings.first_name}
+                  onChange={(e) => setSettings({...settings, first_name: e.target.value})}
+                  placeholder="Ahmet"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="last_name">Yetkili Soyadı *</Label>
+                <Input
+                  id="last_name"
+                  value={settings.last_name}
+                  onChange={(e) => setSettings({...settings, last_name: e.target.value})}
+                  placeholder="Yılmaz"
+                />
+              </div>
+            </div>
+            
             <div>
               <Label htmlFor="business_name">İşletme Adı *</Label>
               <Input
