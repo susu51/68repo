@@ -15,7 +15,7 @@ BUSINESS_EMAIL = "testbusiness@example.com"
 BUSINESS_PASSWORD = "test123"
 CUSTOMER_EMAIL = "test@kuryecini.com"
 CUSTOMER_PASSWORD = "test123"
-BUSINESS_ID = None  # Will be determined from login
+BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Lezzet Döner
 
 class OrderFlowFixTester:
     def __init__(self):
