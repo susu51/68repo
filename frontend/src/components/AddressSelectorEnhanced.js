@@ -30,29 +30,29 @@ export const AddressSelectorEnhanced = ({ selectedAddress, onAddressSelect }) =>
   const fetchAddresses = async () => {
     try {
       setLoading(true);
-      // Try multiple endpoints
-      let response = await fetch(`${API}/user/addresses`, {
+      // Use the correct endpoint
+      const response = await fetch(`${API}/me/addresses`, {
         credentials: 'include'
       });
 
-      if (!response.ok) {
-        response = await fetch(`${API}/customer/addresses`, {
-          credentials: 'include'
-        });
-      }
-
       if (response.ok) {
         const data = await response.json();
-        const addressList = data.addresses || data || [];
+        const addressList = Array.isArray(data) ? data : (data.addresses || []);
         setAddresses(addressList);
+        
+        console.log('✅ Loaded addresses:', addressList.length);
         
         // Auto-select first address if none selected
         if (addressList.length > 0 && !selectedAddress) {
           onAddressSelect(addressList[0]);
         }
+      } else {
+        console.error('Failed to load addresses:', response.status);
+        toast.error('Adresler yüklenemedi');
       }
     } catch (error) {
       console.error('Adres yükleme hatası:', error);
+      toast.error('Adres yükleme hatası');
     } finally {
       setLoading(false);
     }
