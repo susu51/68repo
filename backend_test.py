@@ -93,48 +93,86 @@ class BusinessOrderDisplayTester:
             self.log_test("Customer Login", False, f"Login error: {str(e)}")
             return None, None
     
-    def test_business_verification(self):
-        """Test business login and verify business_id consistency"""
+    def test_business_exists(self):
+        """Test 1: Verify business exists in system"""
         try:
-            business_user = self.business_login()
+            # Get all businesses to verify our test business exists
+            response = self.session.get(f"{BACKEND_URL}/businesses")
             
-            if not business_user:
-                return False
-            
-            business_id = business_user.get("id")
-            if not business_id:
+            if response.status_code == 200:
+                businesses = response.json()
+                business_list = businesses if isinstance(businesses, list) else businesses.get("businesses", [])
+                
+                # Find our test business
+                test_business = None
+                for business in business_list:
+                    if business.get("id") == BUSINESS_ID:
+                        test_business = business
+                        break
+                
+                if test_business:
+                    self.log_test(
+                        "Business Exists", 
+                        True, 
+                        f"Test business found: {test_business.get('name', 'Lezzet Döner')} (ID: {BUSINESS_ID})",
+                        {"business_id": BUSINESS_ID, "business_name": test_business.get("name")}
+                    )
+                    return True
+                else:
+                    self.log_test(
+                        "Business Exists", 
+                        False, 
+                        f"Test business with ID {BUSINESS_ID} not found in businesses list"
+                    )
+                    return False
+            else:
                 self.log_test(
-                    "Business Verification", 
+                    "Business Exists", 
                     False, 
-                    "Business user missing ID field"
+                    f"Failed to get businesses: HTTP {response.status_code}: {response.text}"
                 )
                 return False
-            
-            # Check existing menu items
-            response = self.session.get(f"{BACKEND_URL}/business/menu")
+                
+        except Exception as e:
+            self.log_test("Business Exists", False, f"Request error: {str(e)}")
+            return False
+    
+    def test_get_menu_items(self):
+        """Test 2: Get menu items from business public endpoint"""
+        try:
+            # Get menu items from public endpoint (no auth required)
+            response = self.session.get(f"{BACKEND_URL}/business/public-menu/{BUSINESS_ID}/products")
             
             if response.status_code == 200:
                 menu_data = response.json()
                 menu_items = menu_data if isinstance(menu_data, list) else menu_data.get("items", [])
                 
-                self.log_test(
-                    "Business Verification", 
-                    True, 
-                    f"Business ID: {business_id}, Menu items: {len(menu_items)}",
-                    {"business_id": business_id, "menu_count": len(menu_items)}
-                )
-                return business_id, menu_items
+                if menu_items:
+                    self.log_test(
+                        "Get Menu Items", 
+                        True, 
+                        f"Retrieved {len(menu_items)} menu items from business {BUSINESS_ID}",
+                        {"business_id": BUSINESS_ID, "menu_count": len(menu_items), "items": menu_items[:2]}
+                    )
+                    return menu_items
+                else:
+                    self.log_test(
+                        "Get Menu Items", 
+                        False, 
+                        f"No menu items found for business {BUSINESS_ID}"
+                    )
+                    return []
             else:
                 self.log_test(
-                    "Business Verification", 
+                    "Get Menu Items", 
                     False, 
-                    f"Failed to get menu: HTTP {response.status_code}: {response.text}"
+                    f"Failed to get menu items: HTTP {response.status_code}: {response.text}"
                 )
-                return False
+                return []
                 
         except Exception as e:
-            self.log_test("Business Verification", False, f"Request error: {str(e)}")
-            return False
+            self.log_test("Get Menu Items", False, f"Request error: {str(e)}")
+            return []
     
     def test_create_order(self, business_id, menu_items):
         """Test creating order as customer with menu items from testbusiness"""
