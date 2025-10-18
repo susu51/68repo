@@ -135,56 +135,90 @@ class OrderFlowAuthenticationTester:
             self.log_test("Business Verification", False, f"Request error: {str(e)}")
             return False
     
-    def test_update_system_settings(self):
-        """Test POST /api/admin/settings/system"""
+    def test_create_order(self, business_id, menu_items):
+        """Test creating order as customer with menu items from testbusiness"""
         try:
-            # Test data with new values
-            update_data = {
-                "maintenance_mode": False,
-                "maintenance_message": "Test maintenance message",
-                "maintenance_eta": "2024-12-31T23:59:59Z",
-                "contact_email": "test@kuryecini.com",
-                "contact_phone": "+90 555 999 88 77",
-                "social_media": {
-                    "instagram": "https://instagram.com/kuryecini_test",
-                    "twitter": "https://twitter.com/kuryecini_test",
-                    "facebook": "https://facebook.com/kuryecini_test"
-                },
-                "theme_color": "#FF0000",
-                "logo_url": "/test-logo.png"
+            customer_session, customer_user = self.customer_login()
+            
+            if not customer_session or not customer_user:
+                return False, None
+            
+            customer_id = customer_user.get("id")
+            if not customer_id:
+                self.log_test(
+                    "Create Test Order", 
+                    False, 
+                    "Customer user missing ID field"
+                )
+                return False, None
+            
+            # Use menu items from the business if available
+            if not menu_items:
+                self.log_test(
+                    "Create Test Order", 
+                    False, 
+                    "No menu items available from business"
+                )
+                return False, None
+            
+            # Create order with first available menu item
+            menu_item = menu_items[0]
+            
+            order_data = {
+                "delivery_address": "Test Delivery Address, Aksaray, Turkey",
+                "delivery_lat": 38.3687,
+                "delivery_lng": 34.0370,
+                "items": [
+                    {
+                        "product_id": menu_item.get("id"),
+                        "product_name": menu_item.get("name", "Test Item"),
+                        "product_price": float(menu_item.get("price", 25.99)),
+                        "quantity": 1,
+                        "subtotal": float(menu_item.get("price", 25.99))
+                    }
+                ],
+                "total_amount": float(menu_item.get("price", 25.99)),
+                "notes": "Test order for authentication verification"
             }
             
-            response = self.session.post(f"{BACKEND_URL}/admin/settings/system", json=update_data)
+            response = customer_session.post(f"{BACKEND_URL}/orders", json=order_data)
             
-            if response.status_code == 200:
-                data = response.json()
+            if response.status_code == 201:
+                order = response.json()
+                order_id = order.get("id")
+                order_business_id = order.get("business_id")
                 
-                if data.get("message") and "updated successfully" in data["message"].lower():
+                if order_business_id == business_id:
                     self.log_test(
-                        "POST System Settings", 
+                        "Create Test Order", 
                         True, 
-                        f"Settings updated successfully: {data['message']}",
-                        {"response": data}
+                        f"Order created successfully with correct business_id: {order_id}",
+                        {
+                            "order_id": order_id,
+                            "business_id": order_business_id,
+                            "customer_id": customer_id,
+                            "total_amount": order.get("total_amount")
+                        }
                     )
-                    return True
+                    return True, order_id
                 else:
                     self.log_test(
-                        "POST System Settings", 
+                        "Create Test Order", 
                         False, 
-                        f"Unexpected response format: {data}"
+                        f"Order business_id mismatch: expected {business_id}, got {order_business_id}"
                     )
-                    return False
+                    return False, None
             else:
                 self.log_test(
-                    "POST System Settings", 
+                    "Create Test Order", 
                     False, 
-                    f"HTTP {response.status_code}: {response.text}"
+                    f"Failed to create order: HTTP {response.status_code}: {response.text}"
                 )
-                return False
+                return False, None
                 
         except Exception as e:
-            self.log_test("POST System Settings", False, f"Request error: {str(e)}")
-            return False
+            self.log_test("Create Test Order", False, f"Request error: {str(e)}")
+            return False, None
     
     def test_maintenance_mode_toggle(self):
         """Test POST /api/admin/settings/maintenance-mode"""
