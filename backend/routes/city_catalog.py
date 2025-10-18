@@ -34,51 +34,54 @@ class BusinessNearby(BaseModel):
 
 @router.get("/city-nearby", response_model=List[BusinessNearby])
 async def get_city_nearby_businesses(
-    city: str = Query(..., description="City slug (required)"),
-    lat: Optional[float] = Query(None, description="Latitude (optional for GPS-based search)"),
-    lng: Optional[float] = Query(None, description="Longitude (optional for GPS-based search)"), 
+    lat: Optional[float] = Query(None, description="Latitude (required for GPS search)"),
+    lng: Optional[float] = Query(None, description="Longitude (required for GPS search)"),
+    city: Optional[str] = Query(None, description="City slug (optional - for filtering by city)"),
     district: Optional[str] = Query(None, description="District slug (optional)"),
-    radius_km: int = Query(50, description="Search radius in kilometers (default: 10km with GPS, 50km without)"),
+    radius_km: int = Query(50, description="Search radius in kilometers (default: 50km)"),
     limit: int = Query(30, le=100, description="Max results")
 ):
     """
-    Get nearby businesses in SAME CITY ONLY
-    CRITICAL: Cross-city results are FORBIDDEN
-    Dynamic radius: 10km with GPS, 50km without GPS
-    If lat/lng not provided, returns all businesses in the city sorted by district match
+    Get nearby businesses based on GPS coordinates
+    - If city provided: returns businesses only in that city (city-strict search)
+    - If city NOT provided: returns businesses nationwide within radius (GPS-only search)
+    - Dynamic radius based on GPS availability
     """
     
-    # Validate required parameters
-    if not city:
+    # Validate GPS coordinates
+    if lat is None or lng is None:
         raise HTTPException(
             status_code=422,
-            detail="city is a required parameter"
+            detail="lat and lng are required for GPS-based search"
         )
     
     # Convert radius_km to meters
     radius_m = radius_km * 1000
     max_radius_m = min(radius_m, NEARBY_RADIUS_M)  # Cap at 70km max
     
-    has_gps = lat is not None and lng is not None
-    print(f"🎯 City-strict search: city={city}, district={district}, radius={radius_km}km, GPS={has_gps}")
+    has_city_filter = city is not None
+    print(f"🎯 GPS search: lat={lat}, lng={lng}, city={city}, district={district}, radius={radius_km}km, city_filter={has_city_filter}")
     
     try:
-        # Build pipeline based on GPS availability
-        if has_gps:
-            # GPS-based search with distance sorting
-            pipeline = [
-                {
-                    "$geoNear": {
-                        "near": {"type": "Point", "coordinates": [lng, lat]},
-                        "spherical": True,
-                        "distanceField": "dist",
-                        "maxDistance": max_radius_m,
-                        "query": {
-                            "is_active": True,
-                            "address.city_slug": city  # CRITICAL: City filter
-                        }
-                    }
-                },
+        # Build query based on city filter
+        base_query = {"is_active": True}
+        if has_city_filter:
+            base_query["address.city_slug"] = city  # City-strict filter
+            print(f"   🏙️ City filter active: {city}")
+        else:
+            print(f"   🌍 Nationwide GPS search (no city filter)")
+        
+        # GPS-based search with distance sorting
+        pipeline = [
+            {
+                "$geoNear": {
+                    "near": {"type": "Point", "coordinates": [lng, lat]},
+                    "spherical": True,
+                    "distanceField": "dist",
+                    "maxDistance": max_radius_m,
+                    "query": base_query
+                }
+            },
                 {
                     "$addFields": {
                         "district_match": (
