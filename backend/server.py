@@ -6945,6 +6945,8 @@ async def get_business_profile(current_user: dict = Depends(get_approved_busines
         return {
             "id": business.get("id"),
             "email": business.get("email"),
+            "first_name": business.get("first_name", ""),
+            "last_name": business.get("last_name", ""),
             "business_name": business.get("business_name", ""),
             "phone": business.get("phone", ""),
             "address": business.get("address", ""),
