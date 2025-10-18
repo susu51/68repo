@@ -2217,12 +2217,22 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     
     # Get business info from first menu item
     if order_data.items:
-        first_item = await db.products.find_one({"id": order_data.items[0].product_id})
+        product_id = order_data.items[0].product_id
+        print(f"🔍 Looking for product with ID: {product_id}")
+        first_item = await db.products.find_one({"id": product_id})
+        print(f"🔍 Found product: {first_item}")
         if first_item:
             order_doc["business_id"] = first_item["business_id"]
+            print(f"🔍 Business ID from product: {first_item['business_id']}")
             # Get business name from users collection
             business = await db.users.find_one({"id": first_item["business_id"]})
+            print(f"🔍 Found business: {business}")
             order_doc["business_name"] = business.get("business_name", "") if business else ""
+        else:
+            print(f"❌ Product not found with ID: {product_id}")
+            # Let's also try to find all products to see what IDs exist
+            all_products = await db.products.find({}).to_list(length=10)
+            print(f"🔍 Available products: {[p.get('id', 'NO_ID') for p in all_products]}")
     
     await db.orders.insert_one(order_doc)
     
