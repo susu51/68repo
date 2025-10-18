@@ -11,7 +11,7 @@ const VAT_RATES = [
   { value: 0.18, label: 'Standart KDV (%18)' }
 ];
 
-export const BusinessMenuManager = () => {
+export const BusinessMenuManager = ({ onMenuItemsChange }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
