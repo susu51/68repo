@@ -2219,7 +2219,18 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     if order_data.items:
         product_id = order_data.items[0].product_id
         print(f"🔍 Looking for product with ID: {product_id}")
+        
+        # Try to find product by 'id' field first (new products)
         first_item = await db.products.find_one({"id": product_id})
+        
+        # If not found, try to find by '_id' field (old products)
+        if not first_item:
+            try:
+                from bson import ObjectId
+                first_item = await db.products.find_one({"_id": ObjectId(product_id)})
+            except:
+                pass
+        
         print(f"🔍 Found product: {first_item}")
         if first_item:
             order_doc["business_id"] = first_item["business_id"]
@@ -2232,7 +2243,7 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
             print(f"❌ Product not found with ID: {product_id}")
             # Let's also try to find all products to see what IDs exist
             all_products = await db.products.find({}).to_list(length=10)
-            print(f"🔍 Available products: {[p.get('id', 'NO_ID') for p in all_products]}")
+            print(f"🔍 Available products: {[p.get('id', str(p.get('_id', 'NO_ID'))) for p in all_products]}")
     
     await db.orders.insert_one(order_doc)
     
