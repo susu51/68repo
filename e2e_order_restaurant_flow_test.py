@@ -202,7 +202,7 @@ class E2EOrderRestaurantFlowTester:
             return False
     
     def business_login(self):
-        """Login as business user"""
+        """Login as business user and get JWT token"""
         try:
             if not self.business_email or not self.business_password:
                 self.log_test("Business Login", False, "No business credentials available")
@@ -218,6 +218,14 @@ class E2EOrderRestaurantFlowTester:
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
+                    # Try to get JWT token from response or use cookie auth
+                    access_token = data.get("access_token")
+                    if access_token:
+                        # Set Authorization header for JWT token
+                        self.business_session.headers.update({
+                            "Authorization": f"Bearer {access_token}"
+                        })
+                    
                     self.log_test("Business Login", True, f"Business authenticated successfully: {self.business_email}")
                     return True
                 else:
