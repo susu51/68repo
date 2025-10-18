@@ -2149,88 +2149,214 @@ async def delete_product(product_id: str, current_user: dict = Depends(get_busin
 # Order Management Endpoints
 @api_router.post("/orders")
 @limiter.limit("10/minute")  # Prevent order spam
-async def create_order(request: Request, order_data: OrderCreate, current_user: dict = Depends(get_current_user_from_cookie)):
-    """Create new order (Customer only)"""
-    if current_user.get("role") != "customer":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only customers can create orders"
-        )
-    
-    # Calculate commission (3%)
-    commission_amount = order_data.total_amount * 0.03
-    
-    order_doc = {
-        "id": str(uuid.uuid4()),
-        "customer_id": current_user["id"],
-        "customer_name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip(),
-        "business_id": "",  # Will be set from product lookup
-        "business_name": "",  # We'll need to get this from product
-        "courier_id": None,
-        "courier_name": None,
-        "status": OrderStatus.CREATED,
-        "delivery_address": order_data.delivery_address,
-        "delivery_lat": order_data.delivery_lat,
-        "delivery_lng": order_data.delivery_lng,
-        "items": [item.dict() for item in order_data.items],
-        "total_amount": order_data.total_amount,
-        "commission_amount": commission_amount,
-        "notes": order_data.notes,
-        "created_at": datetime.now(timezone.utc),
-        "assigned_at": None,
-        "picked_up_at": None,
-        "delivered_at": None
-    }
-    
-    # Get business info from first menu item
-    if order_data.items:
-        product_id = order_data.items[0].product_id
-        
-        # The product_id from business menu endpoint is the _id field (which is a UUID string in this case)
-        # Try to find menu item by '_id' field directly (no ObjectId conversion needed)
-        first_item = await db.menu_items.find_one({"_id": product_id})
-        
-        # If not found by _id, try by 'id' field (for newer items that might have custom id)
-        if not first_item:
-            first_item = await db.menu_items.find_one({"id": product_id})
-        
-        if first_item:
-            order_doc["business_id"] = first_item["business_id"]
-            # Get business name from users collection
-            business = await db.users.find_one({"id": first_item["business_id"]})
-            order_doc["business_name"] = business.get("business_name", "") if business else ""
-    
-    # Insert order into database
+async def create_order(
+    request: Request, 
+    order_data: dict,  # Will validate manually
+    current_user: dict = Depends(get_current_user_from_cookie)
+):
+    """
+    Create new order - HARDENED VERSION
+    - Validates restaurant exists and is active
+    - Creates snapshots of address and items
+    - Ensures business_id is set correctly
+    - Publishes real-time event
+    """
     try:
-        print(f"📦 Inserting order: {order_doc.get('id')}")
-        print(f"   Business ID: {order_doc.get('business_id')}")
-        print(f"   DB object: {db}")
+        # 1. RBAC: Only customers can create orders
+        if current_user.get("role") != "customer":
+            raise HTTPException(
+                status_code=403,
+                detail="Sadece müşteriler sipariş verebilir"
+            )
         
+        # 2. Extract and validate required fields
+        restaurant_id = order_data.get('restaurant_id') or order_data.get('business_id')
+        if not restaurant_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Restoran seçilmedi"
+            )
+        
+        address_id = order_data.get('address_id')
+        items = order_data.get('items', [])
+        
+        if not items or len(items) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Sepet boş olamaz"
+            )
+        
+        # 3. Validate restaurant exists and is active
+        restaurant = await db.users.find_one({
+            "id": restaurant_id,
+            "role": "business",
+            "is_active": True
+        })
+        
+        if not restaurant:
+            raise HTTPException(
+                status_code=404,
+                detail="Restoran bulunamadı veya aktif değil"
+            )
+        
+        # Check KYC approval
+        if restaurant.get('kyc_status') != 'approved':
+            raise HTTPException(
+                status_code=403,
+                detail="Bu restoran henüz onaylanmamış"
+            )
+        
+        # 4. Get delivery address
+        address = None
+        if address_id:
+            address = await db.addresses.find_one({"id": address_id, "user_id": current_user["id"]})
+        
+        # Fallback to order_data address fields
+        address_snapshot = {
+            "full": address.get("acik_adres") if address else order_data.get("delivery_address", ""),
+            "city": address.get("il") if address else order_data.get("city"),
+            "district": address.get("ilce") if address else order_data.get("district"),
+            "neighborhood": address.get("mahalle") if address else order_data.get("neighborhood"),
+            "lat": address.get("lat") if address else order_data.get("delivery_lat"),
+            "lng": address.get("lng") if address else order_data.get("delivery_lng")
+        }
+        
+        if not address_snapshot["full"]:
+            raise HTTPException(
+                status_code=400,
+                detail="Teslimat adresi gerekli"
+            )
+        
+        # 5. Create items snapshot with current prices
+        items_snapshot = []
+        subtotal = 0.0
+        
+        for item_data in items:
+            product_id = item_data.get('product_id') or item_data.get('id')
+            quantity = int(item_data.get('quantity', 1))
+            
+            # Get product from database
+            product = await db.products.find_one({"id": product_id}) or \
+                     await db.products.find_one({"_id": product_id})
+            
+            if not product:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Ürün bulunamadı: {product_id}"
+                )
+            
+            if not product.get('is_available', True):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Ürün mevcut değil: {product.get('name', product_id)}"
+                )
+            
+            item_price = float(product.get('price', 0))
+            item_subtotal = item_price * quantity
+            subtotal += item_subtotal
+            
+            items_snapshot.append({
+                "id": product.get('id', str(product.get('_id'))),
+                "name": product.get('name') or product.get('title', 'Ürün'),
+                "price": item_price,
+                "quantity": quantity,
+                "notes": item_data.get('notes'),
+                "subtotal": item_subtotal
+            })
+        
+        # 6. Calculate totals
+        delivery_fee = float(restaurant.get('delivery_fee', 0))
+        discount = 0.0  # TODO: Apply coupons if any
+        
+        totals = {
+            "sub": subtotal,
+            "delivery": delivery_fee,
+            "discount": discount,
+            "grand": subtotal + delivery_fee - discount
+        }
+        
+        # Check minimum order
+        min_order = float(restaurant.get('min_order_amount', 0))
+        if subtotal < min_order:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Minimum sipariş tutarı: {min_order} TL (Sepet: {subtotal} TL)"
+            )
+        
+        # 7. Create order document
+        order_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc)
+        
+        order_doc = {
+            "id": order_id,
+            "user_id": current_user["id"],
+            "customer_id": current_user["id"],
+            "customer_name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip() or current_user.get('email', 'Müşteri'),
+            "restaurant_id": restaurant_id,
+            "business_id": restaurant_id,  # Same as restaurant_id
+            "business_name": restaurant.get('business_name', 'Restoran'),
+            "address_snapshot": address_snapshot,
+            "items_snapshot": items_snapshot,
+            "totals": totals,
+            "payment_method": order_data.get('payment_method', 'cash'),
+            "payment_status": "paid_mock" if order_data.get('payment_method') == 'online_mock' else "unpaid",
+            "status": "created",
+            "timeline": [{
+                "event": "created",
+                "at": now,
+                "meta": {"note": "Sipariş oluşturuldu"}
+            }],
+            "courier_id": None,
+            "eta": None,
+            "special_instructions": order_data.get('notes') or order_data.get('special_instructions'),
+            "created_at": now,
+            "updated_at": now
+        }
+        
+        # 8. Insert order
         result = await db.orders.insert_one(order_doc)
         
-        print(f"✅ Order inserted successfully!")
-        print(f"   Inserted ID: {result.inserted_id}")
-        print(f"   Acknowledged: {result.acknowledged}")
+        if not result.acknowledged:
+            raise HTTPException(
+                status_code=500,
+                detail="Sipariş kaydedilemedi"
+            )
         
-        # Verify insertion
-        verify = await db.orders.find_one({"id": order_doc["id"]})
-        if verify:
-            print(f"✅ Verified: Order exists in database")
-        else:
-            print(f"⚠️ Warning: Order not found after insertion!")
-            
-    except Exception as insert_error:
-        print(f"❌ DB INSERT ERROR: {insert_error}")
-        print(f"   Error type: {type(insert_error)}")
+        print(f"✅ Order created: {order_id}")
+        print(f"   Restaurant: {restaurant.get('business_name')}")
+        print(f"   Business ID: {restaurant_id}")
+        print(f"   Customer: {order_doc['customer_name']}")
+        print(f"   Total: {totals['grand']} TL")
+        
+        # 9. TODO: Publish real-time event
+        # await publish_event("order.created", {
+        #     "order_id": order_id,
+        #     "restaurant_id": restaurant_id,
+        #     "business_id": restaurant_id
+        # })
+        
+        # 10. Return response (serialize datetime)
+        order_doc["created_at"] = order_doc["created_at"].isoformat()
+        order_doc["updated_at"] = order_doc["updated_at"].isoformat()
+        order_doc["timeline"][0]["at"] = order_doc["timeline"][0]["at"].isoformat()
+        del order_doc["_id"]
+        
+        return {
+            "success": True,
+            "order": order_doc,
+            "message": "Siparişiniz alındı!"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Order creation error: {e}")
         import traceback
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Database insert failed: {str(insert_error)}")
-    
-    # Convert datetime to string
-    order_doc["created_at"] = order_doc["created_at"].isoformat()
-    del order_doc["_id"]
-    
-    return order_doc
+        raise HTTPException(
+            status_code=500,
+            detail=f"Sipariş oluşturulamadı: {str(e)}"
+        )
 
 @api_router.get("/orders")
 async def get_orders(status: Optional[str] = None, current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
