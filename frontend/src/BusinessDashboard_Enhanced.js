@@ -98,6 +98,14 @@ export const BusinessDashboard = ({ user, onLogout }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Re-fetch products when cookieUser becomes available
+  useEffect(() => {
+    if (cookieUser && products.length === 0) {
+      console.log('🔄 CookieUser available, fetching products...');
+      fetchProducts();
+    }
+  }, [cookieUser]);
+
   const initializeBusinessData = async () => {
     try {
       setLoading(true);
