@@ -285,42 +285,53 @@ class OrderFlowAuthenticationTester:
             self.log_test("Business Order Retrieval", False, f"Request error: {str(e)}")
             return False
     
-    def test_maintenance_status_public(self):
-        """Test GET /api/maintenance-status (public endpoint)"""
+    def test_authentication_consistency(self):
+        """Test authentication consistency between endpoints"""
         try:
-            # Test without authentication (public endpoint)
-            public_session = requests.Session()
-            response = public_session.get(f"{BACKEND_URL}/maintenance-status")
+            # Login as business and get user info via /me endpoint
+            business_user = self.business_login()
             
-            if response.status_code == 200:
-                data = response.json()
+            if not business_user:
+                return False
+            
+            # Get user info via /me endpoint (uses get_current_user_from_cookie_or_bearer)
+            me_response = self.session.get(f"{BACKEND_URL}/me")
+            
+            if me_response.status_code == 200:
+                me_data = me_response.json()
+                me_user_id = me_data.get("id")
                 
-                # Check required fields
-                if "maintenance_mode" in data:
+                # Get orders via /orders endpoint (should use same authentication)
+                orders_response = self.session.get(f"{BACKEND_URL}/orders")
+                
+                if orders_response.status_code == 200:
                     self.log_test(
-                        "Public Maintenance Status", 
+                        "Authentication Consistency", 
                         True, 
-                        f"Public maintenance status accessible: maintenance_mode={data['maintenance_mode']}",
-                        {"response": data}
+                        f"Both /me and /orders endpoints accessible with same authentication (user_id: {me_user_id})",
+                        {
+                            "me_user_id": me_user_id,
+                            "orders_accessible": True
+                        }
                     )
                     return True
                 else:
                     self.log_test(
-                        "Public Maintenance Status", 
+                        "Authentication Consistency", 
                         False, 
-                        f"Missing maintenance_mode field: {data}"
+                        f"/me works but /orders fails: HTTP {orders_response.status_code}: {orders_response.text}"
                     )
                     return False
             else:
                 self.log_test(
-                    "Public Maintenance Status", 
+                    "Authentication Consistency", 
                     False, 
-                    f"HTTP {response.status_code}: {response.text}"
+                    f"Failed to get user info: HTTP {me_response.status_code}: {me_response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("Public Maintenance Status", False, f"Request error: {str(e)}")
+            self.log_test("Authentication Consistency", False, f"Request error: {str(e)}")
             return False
     
     def test_backend_logs_retrieval(self):
