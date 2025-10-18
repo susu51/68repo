@@ -1789,10 +1789,11 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Customer Panel Restaurant Display After Login"
-  stuck_tasks: []
+    - "Admin Settings Tab Display & Functionality"
+  stuck_tasks: 
+    - "Admin Settings Tab Display & Functionality"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
     -agent: "main"
