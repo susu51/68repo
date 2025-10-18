@@ -1192,6 +1192,21 @@ backend:
     -agent: "testing"
     -message: "🚨 CRITICAL PHASE 1 COURIER PANEL AUTHENTICATION FAILURE: Comprehensive testing of newly implemented Phase 1 Courier Panel backend endpoints reveals MAJOR AUTHENTICATION SYSTEM BUG (2.8% success rate, 1/36 tests passed). ✅ COURIER REGISTRATION & LOGIN: Test courier testkurye@example.com successfully registered and authenticated via cookie-based auth system (/api/auth/login), JWT token generated correctly, /api/auth/me endpoint working perfectly with same credentials. ❌ CRITICAL AUTHENTICATION BUG: ALL courier endpoints (/api/courier/*) returning 401 'Invalid token' despite successful authentication. Affected endpoints: PDF Reports System (GET /api/courier/earnings/report/pdf), Profile Update System (PUT /api/courier/profile), Availability Management (POST/GET /api/courier/availability), Order History Filters (GET /api/courier/orders/history), Ready Orders System (GET /api/courier/orders/ready). 🔍 ROOT CAUSE ANALYSIS: auth_dependencies.py get_current_user function failing to validate tokens that work perfectly with auth_cookie.py get_current_user_from_cookie function. This suggests circular import issue or database connection problem in auth_dependencies.py when importing 'from server import db' at runtime. Both cookie-based and bearer token authentication failing for courier endpoints. 🔧 URGENT FIX REQUIRED: auth_dependencies.py authentication system needs to be aligned with working auth_cookie.py system OR courier endpoints need to use cookie-based authentication dependency instead of JWT bearer token dependency. This is blocking ALL Phase 1 Courier Panel functionality including PDF generation, profile updates, availability management, order history, and ready orders system."
 frontend:
+  - task: "Customer Order Flow - Cart & Checkout"
+    implemented: true
+    working: true
+    file: "pages/customer/DiscoverPage.js, pages/customer/CustomerApp.js, pages/customer/CartPageEnhanced.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "USER REPORTED ISSUE: 'Sepete ekle sipariş ver sepeti onayla çalışmıyor' - Complete order flow from cart to checkout not working"
+        - working: "NA"
+          agent: "main"
+          comment: "✅ ORDER FLOW FIXED: Complete cart and checkout system repaired. CHANGES: 1) DiscoverPage - Added useCart hook import, implemented addToCart function for 'Sepete Ekle' button, properly maps product fields (id, name, price, image, quantity). Sets restaurant context before adding to cart. 2) CustomerApp - Fixed handleCreateOrder to match backend OrderCreate model. Correct order data format: delivery_address (string), delivery_lat/lng, items array with product_id, product_name, product_price, quantity, subtotal. Calculates total_amount correctly. Uses proper address fields (acik_adres/full). 3) Backend OrderCreate expects: delivery_address (str), delivery_lat/lng (float), items (List[OrderItem]), total_amount (float). OrderItem fields: product_id, product_name, product_price, quantity, subtotal. ORDER FLOW: Customer clicks restaurant → views menu → clicks 'Sepete Ekle' → goes to cart → reviews items → proceeds to checkout → selects address & payment → confirms order → order created in backend."
+
   - task: "Customer DiscoverPage - City-Based Restaurant Discovery"
     implemented: true
     working: true
