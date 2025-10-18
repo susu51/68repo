@@ -136,46 +136,6 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
         console.log('⚠️ No address selected');
         toast.error('Lütfen bir teslimat adresi seçin');
       }
-        
-        // Categorize restaurants by location relevance
-        const sameDistrict = [];
-        const sameCity = [];
-        const others = [];
-        
-        restaurantsData.forEach(restaurant => {
-          const restaurantCity = restaurant.city?.toLowerCase();
-          const restaurantDistrict = restaurant.district?.toLowerCase();
-          const customerCity = selectedAddress.city?.toLowerCase();
-          const customerDistrict = selectedAddress.district?.toLowerCase();
-          
-          if (restaurantCity === customerCity && restaurantDistrict === customerDistrict) {
-            sameDistrict.push(restaurant);
-          } else if (restaurantCity === customerCity) {
-            sameCity.push(restaurant);
-          } else {
-            others.push(restaurant);
-          }
-        });
-        
-        // Combine in priority order: District → City (NO OTHERS - city filter!)
-        restaurantsData = [...sameDistrict, ...sameCity];
-        
-        console.log(`📊 City-filtered results:`);
-        console.log(`  🎯 Same district (${selectedAddress.district}): ${sameDistrict.length}`);
-        console.log(`  🏙️ Same city (${selectedAddress.city}): ${sameCity.length}`);
-        console.log(`  🚫 Other cities excluded: ${others.length}`);
-        
-        if (restaurantsData.length === 0) {
-          toast.error(`${selectedAddress.city} şehrinde restoran bulunamadı`);
-        } else if (sameDistrict.length > 0) {
-          toast.success(`${sameDistrict.length} restoran ${selectedAddress.district} ilçesinde, ${sameCity.length} restoran ${selectedAddress.city} genelinde`);
-        } else if (sameCity.length > 0) {
-          toast.success(`${sameCity.length} restoran ${selectedAddress.city} şehrinde bulundu`);
-        }
-      } else {
-        // Fallback: Show all active restaurants
-        console.log(`📋 Showing all ${restaurantsData.length} restaurants (no address filter)`);
-      }
       
       setRestaurants(restaurantsData);
       
