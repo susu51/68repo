@@ -15,29 +15,28 @@ CUSTOMER_EMAIL = "test@kuryecini.com"
 CUSTOMER_PASSWORD = "test123"
 TEST_CITY = "Aksaray"
 
-class AdvertisementTester:
+class CustomerOrderFlowTester:
     def __init__(self):
         self.session = requests.Session()
-        self.admin_token = None
+        self.auth_token = None
+        self.customer_id = None
         self.test_results = []
         
-    def log_test(self, test_name, success, details="", error=""):
+    def log_test(self, test_name, success, details="", response_data=None):
         """Log test results"""
         status = "✅ PASS" if success else "❌ FAIL"
-        result = {
-            "test": test_name,
-            "status": status,
-            "success": success,
-            "details": details,
-            "error": error,
-            "timestamp": datetime.now().isoformat()
-        }
-        self.test_results.append(result)
-        print(f"{status}: {test_name}")
+        print(f"{status} {test_name}")
         if details:
             print(f"   Details: {details}")
-        if error:
-            print(f"   Error: {error}")
+        if response_data and not success:
+            print(f"   Response: {response_data}")
+        
+        self.test_results.append({
+            "test": test_name,
+            "success": success,
+            "details": details,
+            "response": response_data
+        })
         print()
     
     def test_admin_login(self):
