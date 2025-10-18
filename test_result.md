@@ -142,7 +142,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "İşletme kayıt ve müşteri keşfet sistemini geliştir: 1) İşletme kayıt kısmında il ve ilçe seçimine göre GPS koordinatları otomatik eklensin, 2) Müşteri panelinde şehir/ilçe konumuna göre aynı şehirdeki restoranları göster, 3) Müşteri restoranlara sipariş verebilsin"
+user_problem_statement: "Admin paneli ayarlar bölümüne kapsamlı sistem yönetimi ekle: 1) Bakım modu sistemi (toggle, herkes için geçerli, kuryelere özel mesaj, landing page), 2) Website buton test araçları, 3) Console log viewer (frontend + backend logları), 4) Görüntüleme ayarları (tema, logo, renkler), 5) Bakım modu landing page (Kuryecini tanıtımı, görseller, iletişim bilgileri)"
 
 backend:
   - task: "City-Based Restaurant Discovery System"
