@@ -6761,8 +6761,10 @@ async def get_business_menu_items(current_user: dict = Depends(get_approved_busi
         
         menu_items = []
         for product in products:
+            # Use 'id' field if available, otherwise use '_id' as string
+            product_id = product.get("id") or str(product.get("_id", ""))
             menu_items.append({
-                "id": product.get("id"),
+                "id": product_id,
                 "name": product.get("name"),
                 "description": product.get("description", ""),
                 "price": product.get("price", 0),
