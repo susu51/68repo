@@ -1192,6 +1192,18 @@ backend:
     -agent: "testing"
     -message: "🚨 CRITICAL PHASE 1 COURIER PANEL AUTHENTICATION FAILURE: Comprehensive testing of newly implemented Phase 1 Courier Panel backend endpoints reveals MAJOR AUTHENTICATION SYSTEM BUG (2.8% success rate, 1/36 tests passed). ✅ COURIER REGISTRATION & LOGIN: Test courier testkurye@example.com successfully registered and authenticated via cookie-based auth system (/api/auth/login), JWT token generated correctly, /api/auth/me endpoint working perfectly with same credentials. ❌ CRITICAL AUTHENTICATION BUG: ALL courier endpoints (/api/courier/*) returning 401 'Invalid token' despite successful authentication. Affected endpoints: PDF Reports System (GET /api/courier/earnings/report/pdf), Profile Update System (PUT /api/courier/profile), Availability Management (POST/GET /api/courier/availability), Order History Filters (GET /api/courier/orders/history), Ready Orders System (GET /api/courier/orders/ready). 🔍 ROOT CAUSE ANALYSIS: auth_dependencies.py get_current_user function failing to validate tokens that work perfectly with auth_cookie.py get_current_user_from_cookie function. This suggests circular import issue or database connection problem in auth_dependencies.py when importing 'from server import db' at runtime. Both cookie-based and bearer token authentication failing for courier endpoints. 🔧 URGENT FIX REQUIRED: auth_dependencies.py authentication system needs to be aligned with working auth_cookie.py system OR courier endpoints need to use cookie-based authentication dependency instead of JWT bearer token dependency. This is blocking ALL Phase 1 Courier Panel functionality including PDF generation, profile updates, availability management, order history, and ready orders system."
 frontend:
+  - task: "Customer DiscoverPage - City-Based Restaurant Discovery"
+    implemented: true
+    working: true
+    file: "pages/customer/DiscoverPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ CITY-BASED RESTAURANT DISCOVERY IMPLEMENTED: Simplified restaurant loading to use city/district filtering from customer address. CHANGES: 1) Removed complex GPS-based distance calculations and multiple fallback logic. 2) Now uses /businesses endpoint with city/district parameters from selected address. 3) Shows restaurants ONLY in customer's city (exact city match). 4) Optional district filtering if customer has district in address. 5) Displays clear messages when no restaurants found in selected city. 6) Maps API response fields (name → business_name, category → business_category) for compatibility. BEHAVIOR: Customer must have an address selected with city information. System loads all approved businesses in that city. If district is specified, businesses in that district are prioritized. Example: Aksaray address shows 5 Aksaray businesses successfully."
+
   - task: "Customer DiscoverPage - Full Address Display Fix"
     implemented: true
     working: true
