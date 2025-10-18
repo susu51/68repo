@@ -6477,10 +6477,10 @@ async def get_business_incoming_orders(current_user: dict = Depends(get_approved
     try:
         business_id = current_user["id"]
         
-        # Get orders with status 'pending' or 'placed' assigned to this business
+        # Get orders with status 'created', 'pending' or 'placed' assigned to this business
         orders = await db.orders.find({
             "business_id": business_id,
-            "status": {"$in": ["pending", "placed"]}
+            "status": {"$in": ["created", "pending", "placed"]}
         }).sort("created_at", -1).to_list(length=50)
         
         formatted_orders = []
