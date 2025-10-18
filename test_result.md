@@ -145,6 +145,18 @@
 user_problem_statement: "Admin paneli ayarlar bölümüne kapsamlı sistem yönetimi ekle: 1) Bakım modu sistemi (toggle, herkes için geçerli, kuryelere özel mesaj, landing page), 2) Website buton test araçları, 3) Console log viewer (frontend + backend logları), 4) Görüntüleme ayarları (tema, logo, renkler), 5) Bakım modu landing page (Kuryecini tanıtımı, görseller, iletişim bilgileri)"
 
 backend:
+  - task: "Admin Settings & Maintenance Mode System"
+    implemented: true
+    working: true
+    file: "server.py (admin settings endpoints)"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ COMPREHENSIVE ADMIN SETTINGS SYSTEM IMPLEMENTED: Complete maintenance mode, logging, testing, and display settings system. MAINTENANCE MODE: 1) GET/POST /api/admin/settings/system - Full system settings management with maintenance_mode flag, message, ETA, contact info (email, phone, social media), theme settings. 2) POST /api/admin/settings/maintenance-mode - Toggle maintenance on/off with custom message and ETA. 3) GET /api/maintenance-status (PUBLIC) - Check if site is in maintenance without auth. Settings stored in MongoDB 'settings' collection with _id='system_settings'. LOGGING SYSTEM: GET /api/admin/logs/backend - Retrieve backend logs from /var/log/supervisor/backend.log with filtering by level (all, error, warn, info). Returns last N lines with metadata. TESTING SYSTEM: POST /api/admin/test-buttons - Run system tests for various components (api, auth, orders). Returns test results with status (success, warning, error) and detailed messages. Tests database connectivity, authentication, orders system. FEATURES: Maintenance mode affects all users except admins, automatic settings creation with defaults, timestamp tracking (updated_at, updated_by), comprehensive error handling."
+
   - task: "City-Based Restaurant Discovery System"
     implemented: true
     working: true
