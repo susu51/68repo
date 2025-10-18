@@ -298,7 +298,19 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
                           </span>
                           <Button
                             onClick={() => {
-                              onAddToCart(product);
+                              // Set the restaurant first
+                              if (selectedRestaurant) {
+                                setRestaurant(selectedRestaurant);
+                              }
+                              // Add product to cart
+                              addToCart({
+                                id: product.id,
+                                name: product.name,
+                                description: product.description || '',
+                                price: product.price,
+                                image: product.image_url,
+                                quantity: 1
+                              });
                               toast.success(`${product.name} sepete eklendi!`);
                             }}
                             className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm"
