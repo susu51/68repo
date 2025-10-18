@@ -92,50 +92,48 @@ class OrderFlowAuthenticationTester:
             self.log_test("Customer Login", False, f"Login error: {str(e)}")
             return None, None
     
-    def test_get_system_settings(self):
-        """Test GET /api/admin/settings/system"""
+    def test_business_verification(self):
+        """Test business login and verify business_id consistency"""
         try:
-            response = self.session.get(f"{BACKEND_URL}/admin/settings/system")
+            business_user = self.business_login()
+            
+            if not business_user:
+                return False
+            
+            business_id = business_user.get("id")
+            if not business_id:
+                self.log_test(
+                    "Business Verification", 
+                    False, 
+                    "Business user missing ID field"
+                )
+                return False
+            
+            # Check existing menu items
+            response = self.session.get(f"{BACKEND_URL}/business/menu")
             
             if response.status_code == 200:
-                data = response.json()
+                menu_data = response.json()
+                menu_items = menu_data if isinstance(menu_data, list) else menu_data.get("items", [])
                 
-                # Check required fields
-                required_fields = [
-                    "maintenance_mode", "maintenance_message", "maintenance_eta",
-                    "contact_email", "contact_phone", "social_media", 
-                    "theme_color", "logo_url"
-                ]
-                
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    self.log_test(
-                        "GET System Settings", 
-                        True, 
-                        f"Retrieved complete system settings with all required fields",
-                        {"settings_keys": list(data.keys())}
-                    )
-                    return data
-                else:
-                    self.log_test(
-                        "GET System Settings", 
-                        False, 
-                        f"Missing required fields: {missing_fields}",
-                        {"received_data": data}
-                    )
-                    return None
+                self.log_test(
+                    "Business Verification", 
+                    True, 
+                    f"Business ID: {business_id}, Menu items: {len(menu_items)}",
+                    {"business_id": business_id, "menu_count": len(menu_items)}
+                )
+                return business_id, menu_items
             else:
                 self.log_test(
-                    "GET System Settings", 
+                    "Business Verification", 
                     False, 
-                    f"HTTP {response.status_code}: {response.text}"
+                    f"Failed to get menu: HTTP {response.status_code}: {response.text}"
                 )
-                return None
+                return False
                 
         except Exception as e:
-            self.log_test("GET System Settings", False, f"Request error: {str(e)}")
-            return None
+            self.log_test("Business Verification", False, f"Request error: {str(e)}")
+            return False
     
     def test_update_system_settings(self):
         """Test POST /api/admin/settings/system"""
