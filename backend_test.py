@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-End-to-End Order Flow Authentication Fix Testing
-Re-testing order flow after authentication fix to verify orders reach the correct restaurant
+CRITICAL TEST: Business Order Display - Check if Orders Appear in Business Panel
+Testing the specific scenario where orders weren't appearing in business panel
 """
 
 import requests
@@ -9,11 +9,12 @@ import json
 import sys
 from datetime import datetime
 
-# Configuration
+# Configuration from review request
 BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
 BUSINESS_EMAIL = "testbusiness@example.com"
 BUSINESS_PASSWORD = "test123"
-CUSTOMER_EMAIL = "test@kuryecini.com"
+BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Lezzet Döner
+CUSTOMER_EMAIL = "testcustomer@example.com"
 CUSTOMER_PASSWORD = "test123"
 
 class OrderFlowAuthenticationTester:
