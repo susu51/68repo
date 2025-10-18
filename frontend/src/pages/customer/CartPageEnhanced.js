@@ -18,9 +18,12 @@ const CartPageEnhanced = ({ onBack, onProceedToCheckout }) => {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
-  // Safety check for cart
-  const safeCart = Array.isArray(cart) ? cart : [];
+  // Safety check for cart - cart is an object with items array
+  const safeCart = cart?.items || [];
+  const restaurant = cart?.restaurant;
   const cartSummary = getCartSummary ? getCartSummary() : { itemCount: 0, total: 0 };
+  
+  console.log('🛒 CartPageEnhanced - cart:', cart, 'safeCart:', safeCart, 'items:', safeCart.length);
   
   // Calculate totals
   const subtotal = cartSummary.total || 0;
