@@ -163,9 +163,6 @@ class OrderFlowAuthenticationTester:
             
             # Create order with first available menu item
             menu_item = menu_items[0]
-            print(f"🔍 Using menu item: {menu_item}")
-            print(f"🔍 Menu item ID: {menu_item.get('id')}")
-            print(f"🔍 Menu item business_id: {menu_item.get('business_id')}")
             
             order_data = {
                 "delivery_address": "Test Delivery Address, Aksaray, Turkey",
