@@ -2237,7 +2237,31 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
             business = await db.users.find_one({"id": first_item["business_id"]})
             order_doc["business_name"] = business.get("business_name", "") if business else ""
     
-    await db.orders.insert_one(order_doc)
+    # Insert order into database
+    try:
+        print(f"📦 Inserting order: {order_doc.get('id')}")
+        print(f"   Business ID: {order_doc.get('business_id')}")
+        print(f"   DB object: {db}")
+        
+        result = await db.orders.insert_one(order_doc)
+        
+        print(f"✅ Order inserted successfully!")
+        print(f"   Inserted ID: {result.inserted_id}")
+        print(f"   Acknowledged: {result.acknowledged}")
+        
+        # Verify insertion
+        verify = await db.orders.find_one({"id": order_doc["id"]})
+        if verify:
+            print(f"✅ Verified: Order exists in database")
+        else:
+            print(f"⚠️ Warning: Order not found after insertion!")
+            
+    except Exception as insert_error:
+        print(f"❌ DB INSERT ERROR: {insert_error}")
+        print(f"   Error type: {type(insert_error)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Database insert failed: {str(insert_error)}")
     
     # Convert datetime to string
     order_doc["created_at"] = order_doc["created_at"].isoformat()
