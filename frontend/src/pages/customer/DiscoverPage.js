@@ -5,8 +5,10 @@ import { Input } from '../../components/ui/input';
 import { toast } from 'react-hot-toast';
 import api from '../../api/http';
 import AdvertisementBanner from '../../components/AdvertisementBanner';
+import { useCart } from '../../contexts/CartContext';
 
 const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
+  const { addToCart, setRestaurant } = useCart();
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
