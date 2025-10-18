@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Customer Order Flow Backend Testing
-Testing complete customer order flow from discovering restaurants to placing an order
+Admin Settings & Maintenance Mode System Backend Testing
+Testing the newly implemented admin settings and maintenance mode functionality
 """
 
 import requests
@@ -10,10 +10,9 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
-CUSTOMER_EMAIL = "test@kuryecini.com"
-CUSTOMER_PASSWORD = "test123"
-TEST_CITY = "Aksaray"
+BACKEND_URL = "https://delivery-nexus-5.preview.emergentagent.com/api"
+ADMIN_EMAIL = "admin@kuryecini.com"
+ADMIN_PASSWORD = "admin123"
 
 class CustomerOrderFlowTester:
     def __init__(self):
