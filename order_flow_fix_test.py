@@ -365,7 +365,8 @@ class OrderFlowFixTester:
                             f"Order contains all required fields and data integrity verified",
                             {
                                 "order_id": created_order_id,
-                                "present_fields": present_fields,
+                                "required_fields": present_fields,
+                                "optional_fields": optional_present,
                                 "business_id": found_order.get("business_id"),
                                 "business_name": found_order.get("business_name"),
                                 "customer_info": has_customer_info,
