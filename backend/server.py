@@ -6827,6 +6827,8 @@ async def create_business_menu_item(
         
         print(f"📝 Creating menu item for business: {business_id}")
         print(f"   Item: {item_data.get('name')}")
+        print(f"   DB object: {db}")
+        print(f"   DB name: {db.name if db else 'None'}")
         
         # Create menu item
         menu_item = {
@@ -6842,22 +6844,38 @@ async def create_business_menu_item(
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
-        # Insert into database
-        await db.products.insert_one(menu_item)
+        print(f"📦 Menu item prepared: {menu_item}")
         
-        print(f"✅ Menu item created: {menu_item.get('id')}")
+        # Insert into database
+        try:
+            result = await db.products.insert_one(menu_item)
+            print(f"✅ Insert successful! Inserted ID: {result.inserted_id}")
+            print(f"   Acknowledged: {result.acknowledged}")
+        except Exception as insert_error:
+            print(f"❌ DB INSERT ERROR: {insert_error}")
+            print(f"   Error type: {type(insert_error)}")
+            raise HTTPException(status_code=500, detail=f"Database insert failed: {str(insert_error)}")
+        
+        # Verify insertion
+        verify = await db.products.find_one({"id": menu_item["id"]})
+        if verify:
+            print(f"✅ Verified: Item exists in database")
+        else:
+            print(f"⚠️ Warning: Item not found after insertion!")
         
         # Remove _id from response
         if "_id" in menu_item:
             del menu_item["_id"]
         
-        # Return the item directly (backward compatibility)
+        # Return the item directly
         return menu_item
         
     except HTTPException:
         raise
     except Exception as e:
         print(f"❌ Error creating menu item: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to create menu item: {str(e)}")
 
 @api_router.patch("/business/menu/{item_id}")
