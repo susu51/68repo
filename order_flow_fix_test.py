@@ -261,7 +261,11 @@ class OrderFlowFixTester:
                 
                 if response.status_code == 200:
                     data = response.json()
-                    orders = data.get("orders", [])
+                    # Handle both list and dict responses
+                    if isinstance(data, list):
+                        orders = data
+                    else:
+                        orders = data.get("orders", [])
                     
                     # Check business_id consistency in all orders
                     business_id_issues = []
