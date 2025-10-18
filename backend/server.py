@@ -2217,7 +2217,7 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     
     # Get business info from first menu item
     if order_data.items:
-        first_item = await db.menu_items.find_one({"id": order_data.items[0].product_id})
+        first_item = await db.products.find_one({"id": order_data.items[0].product_id})
         if first_item:
             order_doc["business_id"] = first_item["business_id"]
             # Get business name from users collection
