@@ -6778,6 +6778,41 @@ async def get_business_menu_items(current_user: dict = Depends(get_approved_busi
         print(f"❌ Error getting business menu: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get menu: {str(e)}")
 
+@api_router.get("/business/public-menu/{business_id}/products")
+async def get_public_business_menu(business_id: str):
+    """Public endpoint to get menu items for a specific business (for customers)"""
+    try:
+        print(f"🔍 Getting public menu for business: {business_id}")
+        
+        # Get all available menu items for this business
+        products = await db.products.find({
+            "business_id": business_id,
+            "is_available": True
+        }).to_list(None)
+        
+        print(f"✅ Found {len(products)} products for business {business_id}")
+        
+        menu_items = []
+        for product in products:
+            # Use 'id' field if available, otherwise use '_id' as string
+            product_id = product.get("id") or str(product.get("_id", ""))
+            menu_items.append({
+                "id": product_id,
+                "name": product.get("name"),
+                "description": product.get("description", ""),
+                "price": product.get("price", 0),
+                "category": product.get("category", "uncategorized"),
+                "image_url": product.get("image_url", ""),
+                "is_available": product.get("is_available", True),
+                "business_id": product.get("business_id")
+            })
+        
+        return menu_items
+        
+    except Exception as e:
+        print(f"❌ Error getting public menu: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get menu: {str(e)}")
+
 @api_router.post("/business/menu")
 async def create_business_menu_item(
     item_data: dict,
