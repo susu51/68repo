@@ -128,73 +128,43 @@ class E2EOrderRestaurantFlowTester:
     def find_business_credentials(self):
         """Find business login credentials by checking test users"""
         try:
-            # Try common test business credentials
-            test_businesses = [
-                {"email": "testbusiness@example.com", "password": "test123"},
-                {"email": "business@kuryecini.com", "password": "test123"},
-                {"email": "restaurant@kuryecini.com", "password": "test123"}
-            ]
+            # Use testbusiness@example.com which we know exists
+            creds = {"email": "testbusiness@example.com", "password": "test123"}
             
-            for creds in test_businesses:
-                login_data = {
-                    "email": creds["email"],
-                    "password": creds["password"]
-                }
-                
-                response = self.business_session.post(f"{BACKEND_URL}/auth/login", json=login_data)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get("success"):
-                        # Check if this business has the same ID as our target business
-                        user_response = self.business_session.get(f"{BACKEND_URL}/me")
-                        if user_response.status_code == 200:
-                            user_data = user_response.json()
-                            if user_data.get("id") == self.business_id:
-                                self.business_email = creds["email"]
-                                self.business_password = creds["password"]
-                                self.log_test(
-                                    "Find Business Credentials", 
-                                    True, 
-                                    f"Found matching business credentials: {creds['email']}"
-                                )
-                                return True
+            login_data = {
+                "email": creds["email"],
+                "password": creds["password"]
+            }
             
-            # If no matching credentials found, use the first working business credentials
-            # and update our business_id to match
-            for creds in test_businesses:
-                login_data = {
-                    "email": creds["email"],
-                    "password": creds["password"]
-                }
-                
-                response = self.business_session.post(f"{BACKEND_URL}/auth/login", json=login_data)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get("success"):
-                        user_response = self.business_session.get(f"{BACKEND_URL}/me")
-                        if user_response.status_code == 200:
-                            user_data = user_response.json()
-                            if user_data.get("role") == "business":
-                                self.business_id = user_data.get("id")
-                                self.business_email = creds["email"]
-                                self.business_password = creds["password"]
-                                
-                                # Get menu for this business
-                                menu_response = self.session.get(f"{BACKEND_URL}/business/public/{self.business_id}/menu")
-                                if menu_response.status_code == 200:
-                                    menu_data = menu_response.json()
-                                    self.menu_items = menu_data if isinstance(menu_data, list) else menu_data.get("items", [])
-                                
-                                self.log_test(
-                                    "Find Business Credentials", 
-                                    True, 
-                                    f"Using business credentials: {creds['email']} (ID: {self.business_id})"
-                                )
-                                return True
+            response = self.business_session.post(f"{BACKEND_URL}/auth/login", json=login_data)
             
-            self.log_test("Find Business Credentials", False, "No working business credentials found")
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    # Get the user ID from the login response (this is the correct one)
+                    login_user = data.get("user", {})
+                    correct_business_id = login_user.get("id")
+                    
+                    if correct_business_id:
+                        # Update our business_id to match the login response
+                        self.business_id = correct_business_id
+                        self.business_email = creds["email"]
+                        self.business_password = creds["password"]
+                        
+                        # Get menu for this business using the correct ID
+                        menu_response = self.session.get(f"{BACKEND_URL}/business/public/{self.business_id}/menu")
+                        if menu_response.status_code == 200:
+                            menu_data = menu_response.json()
+                            self.menu_items = menu_data if isinstance(menu_data, list) else menu_data.get("items", [])
+                        
+                        self.log_test(
+                            "Find Business Credentials", 
+                            True, 
+                            f"Using business credentials: {creds['email']} (ID: {self.business_id})"
+                        )
+                        return True
+            
+            self.log_test("Find Business Credentials", False, "testbusiness@example.com login failed")
             return False
                 
         except Exception as e:
