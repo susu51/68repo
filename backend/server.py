@@ -666,6 +666,9 @@ class BusinessRegister(BaseModel):
     password: str
     business_name: str
     tax_number: str
+    first_name: str  # Yetkili kişi adı
+    last_name: str   # Yetkili kişi soyadı
+    phone: Optional[str] = None
     address: str
     city: str
     district: str  # Required for location-based filtering
