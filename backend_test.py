@@ -861,6 +861,6 @@ class EndToEndOrderFlowTester:
         return passed_tests >= total_tests * 0.8  # 80% success rate required for E2E flow
 
 if __name__ == "__main__":
-    tester = BusinessOrderDisplayTester()
+    tester = EndToEndOrderFlowTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
