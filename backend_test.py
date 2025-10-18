@@ -39,37 +39,55 @@ class CustomerOrderFlowTester:
         })
         print()
     
-    def test_admin_login(self):
-        """Test 1: Admin login with admin@kuryecini.com/admin123"""
+    def test_customer_login(self):
+        """Test customer login functionality"""
+        print("🔐 Testing Customer Login...")
+        
         try:
+            # Test login endpoint
             login_data = {
-                "email": ADMIN_EMAIL,
-                "password": ADMIN_PASSWORD
+                "email": CUSTOMER_EMAIL,
+                "password": CUSTOMER_PASSWORD
             }
             
-            response = self.session.post(f"{BACKEND_URL}/auth/login", json=login_data)
+            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
             
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success") and "access_token" in data:
-                    self.admin_token = data["access_token"]
+                    self.auth_token = data["access_token"]
+                    self.customer_id = data.get("user", {}).get("id")
+                    
                     # Set authorization header for future requests
-                    self.session.headers.update({"Authorization": f"Bearer {self.admin_token}"})
+                    self.session.headers.update({
+                        "Authorization": f"Bearer {self.auth_token}"
+                    })
+                    
                     self.log_test(
-                        "Admin Login", 
+                        "Customer Login", 
                         True, 
-                        f"Successfully logged in as {ADMIN_EMAIL}, token length: {len(self.admin_token)} chars"
+                        f"Successfully logged in as {CUSTOMER_EMAIL}, token length: {len(self.auth_token)}"
                     )
                     return True
                 else:
-                    self.log_test("Admin Login", False, "", "Login response missing success or access_token")
+                    self.log_test(
+                        "Customer Login", 
+                        False, 
+                        "Login response missing required fields",
+                        data
+                    )
                     return False
             else:
-                self.log_test("Admin Login", False, "", f"HTTP {response.status_code}: {response.text}")
+                self.log_test(
+                    "Customer Login", 
+                    False, 
+                    f"Login failed with status {response.status_code}",
+                    response.text
+                )
                 return False
                 
         except Exception as e:
-            self.log_test("Admin Login", False, "", f"Exception: {str(e)}")
+            self.log_test("Customer Login", False, f"Exception: {str(e)}")
             return False
     
     def test_get_approved_businesses(self):
