@@ -398,66 +398,76 @@ class OrderFlowAuthenticationTester:
             self.log_test("Menu Item Business Association", False, f"Request error: {str(e)}")
             return False
     
-    def test_system_button_tests(self):
-        """Test POST /api/admin/test-buttons"""
+    def test_order_data_integrity(self, created_order_id):
+        """Test order data integrity and required fields"""
         try:
-            # Test all button types
-            test_data = {"button_type": "all"}
+            # Login as business to get order details
+            business_user = self.business_login()
             
-            response = self.session.post(f"{BACKEND_URL}/admin/test-buttons", json=test_data)
+            if not business_user:
+                return False
+            
+            # Get orders and find the created order
+            response = self.session.get(f"{BACKEND_URL}/orders")
             
             if response.status_code == 200:
-                data = response.json()
+                orders_data = response.json()
+                orders = orders_data if isinstance(orders_data, list) else orders_data.get("orders", [])
                 
-                if "test_results" in data and "overall_status" in data:
-                    test_results = data["test_results"]
-                    overall_status = data["overall_status"]
+                found_order = None
+                for order in orders:
+                    if order.get("id") == created_order_id:
+                        found_order = order
+                        break
+                
+                if found_order:
+                    # Check required fields
+                    required_fields = [
+                        "id", "business_id", "customer_id", "delivery_address",
+                        "items", "total_amount", "status"
+                    ]
                     
-                    self.log_test(
-                        "System Tests (All)", 
-                        True, 
-                        f"System tests completed with status: {overall_status} ({len(test_results)} tests)",
-                        {"test_results": test_results}
-                    )
+                    missing_fields = [field for field in required_fields if field not in found_order]
                     
-                    # Test specific button types
-                    for button_type in ["api", "auth", "orders"]:
-                        specific_data = {"button_type": button_type}
-                        response2 = self.session.post(f"{BACKEND_URL}/admin/test-buttons", json=specific_data)
-                        
-                        if response2.status_code == 200:
-                            data2 = response2.json()
-                            self.log_test(
-                                f"System Tests ({button_type})", 
-                                True, 
-                                f"Specific test '{button_type}' completed: {data2['overall_status']}",
-                                {"results": data2["test_results"]}
-                            )
-                        else:
-                            self.log_test(
-                                f"System Tests ({button_type})", 
-                                False, 
-                                f"HTTP {response2.status_code}: {response2.text}"
-                            )
-                    
-                    return True
+                    if not missing_fields:
+                        self.log_test(
+                            "Order Data Integrity", 
+                            True, 
+                            f"Order contains all required fields: {', '.join(required_fields)}",
+                            {
+                                "order_id": created_order_id,
+                                "business_id": found_order.get("business_id"),
+                                "customer_id": found_order.get("customer_id"),
+                                "total_amount": found_order.get("total_amount"),
+                                "status": found_order.get("status"),
+                                "items_count": len(found_order.get("items", []))
+                            }
+                        )
+                        return True
+                    else:
+                        self.log_test(
+                            "Order Data Integrity", 
+                            False, 
+                            f"Order missing required fields: {missing_fields}"
+                        )
+                        return False
                 else:
                     self.log_test(
-                        "System Tests (All)", 
+                        "Order Data Integrity", 
                         False, 
-                        f"Missing required fields in response: {data}"
+                        f"Order {created_order_id} not found for integrity check"
                     )
                     return False
             else:
                 self.log_test(
-                    "System Tests (All)", 
+                    "Order Data Integrity", 
                     False, 
-                    f"HTTP {response.status_code}: {response.text}"
+                    f"Failed to retrieve orders: HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("System Button Tests", False, f"Request error: {str(e)}")
+            self.log_test("Order Data Integrity", False, f"Request error: {str(e)}")
             return False
     
     def test_admin_authentication_required(self):
