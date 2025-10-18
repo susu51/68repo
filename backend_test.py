@@ -652,7 +652,7 @@ class BusinessOrderDisplayTester:
         print("=" * 80)
         print("🎯 Testing Scenario: Previously fixed issue where orders weren't appearing in business panel")
         print(f"🏪 Business: testbusiness@example.com (ID: {BUSINESS_ID} - Lezzet Döner)")
-        print(f"👤 Customer: testcustomer@example.com")
+        print(f"👤 Customer: test@kuryecini.com")
         print("=" * 80)
         
         # Test 1: Verify business exists
