@@ -135,8 +135,8 @@ async def get_city_nearby_businesses(
         print(f"✅ Found {len(businesses)} businesses")
         
         # Format response
-        businesses = []
-        for business in results:
+        formatted_businesses = []
+        for business in businesses:
             businesses.append(BusinessNearby(
                 id=business["_id"],
                 name=business["name"],
