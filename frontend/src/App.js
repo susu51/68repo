@@ -4999,6 +4999,29 @@ function App() {
 // Separate component to access CookieAuthContext
 function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
   const { user, loading, logout } = useCookieAuth();
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceLoading, setMaintenanceLoading] = useState(true);
+
+  // Check maintenance mode on mount
+  useEffect(() => {
+    const checkMaintenance = async () => {
+      try {
+        const response = await axios.get('/api/maintenance-status');
+        setMaintenanceMode(response.data.maintenance_mode || false);
+      } catch (error) {
+        console.error('Error checking maintenance status:', error);
+        setMaintenanceMode(false);
+      } finally {
+        setMaintenanceLoading(false);
+      }
+    };
+    
+    checkMaintenance();
+    
+    // Check every 30 seconds
+    const interval = setInterval(checkMaintenance, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Auto-close login modal when user becomes authenticated
   useEffect(() => {
@@ -5008,7 +5031,12 @@ function AppContent({ showLogin, onAuthStart, onLoginSuccess, onCloseLogin }) {
     }
   }, [user, showLogin, onCloseLogin]);
 
-  if (loading) {
+  // Show maintenance page if enabled (except for admins)
+  if (maintenanceMode && (!user || user.role !== 'admin')) {
+    return <MaintenancePage />;
+  }
+
+  if (loading || maintenanceLoading) {
     return (
       <div style={{ 
         display: 'flex', 
