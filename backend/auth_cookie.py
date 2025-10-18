@@ -117,8 +117,17 @@ async def get_current_user_from_cookie_or_bearer(request: Request):
     if not user:
         raise HTTPException(404, "User not found")
     
-    # Ensure consistent user ID format
-    if "_id" in user and "id" not in user:
+    # Debug: Check user ID fields
+    print(f"🔍 User document _id: {user.get('_id')}")
+    print(f"🔍 User document id: {user.get('id')}")
+    print(f"🔍 User email: {user.get('email')}")
+    
+    # Ensure consistent user ID format - use 'id' field if available, otherwise use '_id'
+    if "id" in user and user["id"]:
+        # User has custom 'id' field, use it
+        pass
+    elif "_id" in user:
+        # User only has '_id', convert to string and set as 'id'
         user["id"] = str(user["_id"])
     
     return user
