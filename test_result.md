@@ -1284,13 +1284,28 @@ frontend:
           agent: "main"
           comment: "✅ ORDER FLOW FIXED: Complete cart and checkout system repaired. CHANGES: 1) DiscoverPage - Added useCart hook import, implemented addToCart function for 'Sepete Ekle' button, properly maps product fields (id, name, price, image, quantity). Sets restaurant context before adding to cart. 2) CustomerApp - Fixed handleCreateOrder to match backend OrderCreate model. Correct order data format: delivery_address (string), delivery_lat/lng, items array with product_id, product_name, product_price, quantity, subtotal. Calculates total_amount correctly. Uses proper address fields (acik_adres/full). 3) Backend OrderCreate expects: delivery_address (str), delivery_lat/lng (float), items (List[OrderItem]), total_amount (float). OrderItem fields: product_id, product_name, product_price, quantity, subtotal. ORDER FLOW: Customer clicks restaurant → views menu → clicks 'Sepete Ekle' → goes to cart → reviews items → proceeds to checkout → selects address & payment → confirms order → order created in backend."
 
+  - task: "Customer Panel Restaurant Display After Login - API Integration Issue"
+    implemented: true
+    working: false
+    file: "pages/customer/DiscoverPage.js"
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "user"
+          comment: "USER REPORTED: 'restaurants are not showing in customer discover page after recent fixes' - customers cannot see restaurants after login despite previous fixes"
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL API INTEGRATION ISSUE IDENTIFIED: Comprehensive testing reveals restaurants ARE displaying but API integration is completely broken. ✅ WORKING: Customer login (test@kuryecini.com/test123), customer panel loads, Keşfet tab accessible, restaurants visible on page (Lezzet Döner, Test Restoranı), address system partially working (3 saved addresses, modal opens). ❌ CRITICAL FAILURES: 1) NO ADDRESS API CALLS - loadUserAddresses() logs activity but never calls GET /api/user/addresses. 2) NO RESTAURANT API CALLS - No /businesses, /restaurants, or /catalog calls despite restaurants being visible. 3) selectedAddress remains null preventing proper restaurant loading. 4) Cart API errors (403/404). ROOT CAUSE: DiscoverPage useEffect hooks not executing actual API calls despite console logging. Either API integration is mocked/hardcoded, network interception issues, or authentication problems. URGENT: Investigate why loadUserAddresses() and loadRestaurants() functions show console activity but make no actual HTTP requests."
+
   - task: "Customer DiscoverPage - City-Based Restaurant Discovery"
     implemented: true
     working: true
     file: "pages/customer/DiscoverPage.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
