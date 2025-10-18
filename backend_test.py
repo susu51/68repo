@@ -35,12 +35,12 @@ class OrderFlowAuthenticationTester:
             "timestamp": datetime.now().isoformat()
         })
     
-    def admin_login(self):
-        """Login as admin user"""
+    def business_login(self):
+        """Login as business user"""
         try:
             login_data = {
-                "email": ADMIN_EMAIL,
-                "password": ADMIN_PASSWORD
+                "email": BUSINESS_EMAIL,
+                "password": BUSINESS_PASSWORD
             }
             
             response = self.session.post(f"{BACKEND_URL}/auth/login", json=login_data)
@@ -49,18 +49,48 @@ class OrderFlowAuthenticationTester:
                 data = response.json()
                 if data.get("success"):
                     # Cookie-based auth - token stored in cookies
-                    self.log_test("Admin Login", True, f"Admin authenticated successfully via cookies")
-                    return True
+                    self.log_test("Business Login", True, f"Business authenticated successfully via cookies")
+                    return data.get("user", {})
                 else:
-                    self.log_test("Admin Login", False, f"Login failed: {data}")
-                    return False
+                    self.log_test("Business Login", False, f"Login failed: {data}")
+                    return None
             else:
-                self.log_test("Admin Login", False, f"HTTP {response.status_code}: {response.text}")
-                return False
+                self.log_test("Business Login", False, f"HTTP {response.status_code}: {response.text}")
+                return None
                 
         except Exception as e:
-            self.log_test("Admin Login", False, f"Login error: {str(e)}")
-            return False
+            self.log_test("Business Login", False, f"Login error: {str(e)}")
+            return None
+    
+    def customer_login(self):
+        """Login as customer user"""
+        try:
+            # Create new session for customer
+            customer_session = requests.Session()
+            
+            login_data = {
+                "email": CUSTOMER_EMAIL,
+                "password": CUSTOMER_PASSWORD
+            }
+            
+            response = customer_session.post(f"{BACKEND_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    # Cookie-based auth - token stored in cookies
+                    self.log_test("Customer Login", True, f"Customer authenticated successfully via cookies")
+                    return customer_session, data.get("user", {})
+                else:
+                    self.log_test("Customer Login", False, f"Login failed: {data}")
+                    return None, None
+            else:
+                self.log_test("Customer Login", False, f"HTTP {response.status_code}: {response.text}")
+                return None, None
+                
+        except Exception as e:
+            self.log_test("Customer Login", False, f"Login error: {str(e)}")
+            return None, None
     
     def test_get_system_settings(self):
         """Test GET /api/admin/settings/system"""
