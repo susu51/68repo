@@ -263,69 +263,73 @@ class BusinessOrderDisplayTester:
             self.log_test("Create Test Order", False, f"Request error: {str(e)}")
             return False, None
     
-    def test_business_order_retrieval(self, business_id, created_order_id):
-        """Test business retrieving orders via GET /orders (CRITICAL TEST)"""
+    def test_business_login_and_orders(self, created_order_id):
+        """Test 4: Business login and order retrieval (CRITICAL TEST)"""
         try:
-            # Re-login as business to ensure fresh authentication
+            # Login as business user
             business_user = self.business_login()
             
             if not business_user:
                 return False
             
-            # Call GET /orders endpoint
-            response = self.session.get(f"{BACKEND_URL}/orders")
+            business_id = business_user.get("id")
+            
+            # Verify business ID matches expected
+            if business_id != BUSINESS_ID:
+                self.log_test(
+                    "Business Login Verification", 
+                    False, 
+                    f"Business ID mismatch: expected {BUSINESS_ID}, got {business_id}"
+                )
+                return False
+            
+            # Test GET /api/business/orders/incoming endpoint
+            response = self.session.get(f"{BACKEND_URL}/business/orders/incoming")
             
             if response.status_code == 200:
                 orders_data = response.json()
-                orders = orders_data if isinstance(orders_data, list) else orders_data.get("orders", [])
+                orders = orders_data.get("orders", []) if isinstance(orders_data, dict) else orders_data
                 
-                # Check if the created order is in the list
-                found_order = None
-                for order in orders:
-                    if order.get("id") == created_order_id:
-                        found_order = order
-                        break
+                self.log_test(
+                    "Business Incoming Orders", 
+                    True, 
+                    f"Retrieved {len(orders)} incoming orders for business {business_id}",
+                    {
+                        "business_id": business_id,
+                        "total_orders": len(orders),
+                        "orders_preview": [{"id": o.get("id"), "business_id": o.get("business_id")} for o in orders[:3]]
+                    }
+                )
                 
-                if found_order:
-                    order_business_id = found_order.get("business_id")
-                    
-                    if order_business_id == business_id:
-                        self.log_test(
-                            "Business Order Retrieval", 
-                            True, 
-                            f"Business successfully retrieved their order: {created_order_id}",
-                            {
-                                "order_id": created_order_id,
-                                "business_id": order_business_id,
-                                "total_orders": len(orders),
-                                "order_status": found_order.get("status")
-                            }
-                        )
-                        return True
-                    else:
-                        self.log_test(
-                            "Business Order Retrieval", 
-                            False, 
-                            f"Order business_id mismatch: expected {business_id}, got {order_business_id}"
-                        )
-                        return False
-                else:
-                    self.log_test(
-                        "Business Order Retrieval", 
-                        False, 
-                        f"Created order {created_order_id} not found in business orders list (total: {len(orders)})"
-                    )
-                    return False
+                # Check if orders include business_id field
+                orders_with_business_id = [o for o in orders if o.get("business_id")]
+                orders_matching_business = [o for o in orders if o.get("business_id") == business_id]
+                
+                self.log_test(
+                    "Business ID in Orders", 
+                    len(orders_with_business_id) == len(orders), 
+                    f"{len(orders_with_business_id)}/{len(orders)} orders have business_id field",
+                    {"orders_with_business_id": len(orders_with_business_id), "total_orders": len(orders)}
+                )
+                
+                self.log_test(
+                    "Correct Business Orders", 
+                    len(orders_matching_business) == len(orders), 
+                    f"{len(orders_matching_business)}/{len(orders)} orders match business ID {business_id}",
+                    {"matching_orders": len(orders_matching_business), "total_orders": len(orders)}
+                )
+                
+                return True
             else:
                 self.log_test(
-                    "Business Order Retrieval", 
+                    "Business Incoming Orders", 
                     False, 
-                    f"Failed to retrieve orders: HTTP {response.status_code}: {response.text}"
+                    f"Failed to retrieve incoming orders: HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("Business Order Retrieval", False, f"Request error: {str(e)}")
+            self.log_test("Business Login and Orders", False, f"Request error: {str(e)}")
             return False
     
     def test_authentication_consistency(self):
