@@ -69,7 +69,7 @@ async def get_city_nearby_businesses(
             base_query["address.city_slug"] = city  # City-strict filter
             print(f"   🏙️ City filter active: {city}")
         else:
-            print(f"   🌍 Nationwide GPS search (no city filter)")
+            print("   🌍 Nationwide GPS search (no city filter)")
         
         # GPS-based search with distance sorting
         pipeline = [
