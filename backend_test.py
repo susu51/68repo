@@ -108,61 +108,69 @@ class EndToEndOrderFlowTester:
             self.log_test("Customer Login", False, f"Login error: {str(e)}")
             return None, None
     
-    def test_business_exists(self):
-        """Test 1: Verify business exists in system"""
+    def test_customer_login(self):
+        """Test 1: Customer Login"""
         try:
-            # First try to login as business to verify account exists
-            business_user = self.business_login()
+            customer_session, customer_user = self.customer_login()
             
-            if business_user and business_user.get("id") == BUSINESS_ID:
-                self.log_test(
-                    "Business Exists", 
-                    True, 
-                    f"Test business account verified: {business_user.get('email')} (ID: {BUSINESS_ID})",
-                    {"business_id": BUSINESS_ID, "email": business_user.get("email"), "role": business_user.get("role")}
-                )
-                return True
-            else:
-                # Fallback: Check public businesses list
-                response = self.session.get(f"{BACKEND_URL}/businesses")
+            if customer_session and customer_user:
+                customer_id = customer_user.get("id")
+                customer_email = customer_user.get("email")
                 
-                if response.status_code == 200:
-                    businesses = response.json()
-                    business_list = businesses if isinstance(businesses, list) else businesses.get("businesses", [])
-                    
-                    # Find our test business
-                    test_business = None
-                    for business in business_list:
-                        if business.get("id") == BUSINESS_ID:
-                            test_business = business
-                            break
-                    
-                    if test_business:
-                        self.log_test(
-                            "Business Exists", 
-                            True, 
-                            f"Test business found in public list: {test_business.get('name', 'Lezzet Döner')} (ID: {BUSINESS_ID})",
-                            {"business_id": BUSINESS_ID, "business_name": test_business.get("name")}
-                        )
-                        return True
-                    else:
-                        self.log_test(
-                            "Business Exists", 
-                            False, 
-                            f"Test business with ID {BUSINESS_ID} not found (may not be approved for public listing)"
-                        )
-                        return False
-                else:
-                    self.log_test(
-                        "Business Exists", 
-                        False, 
-                        f"Failed to verify business existence: HTTP {response.status_code}: {response.text}"
-                    )
-                    return False
+                self.log_test(
+                    "Customer Login", 
+                    True, 
+                    f"Customer authenticated successfully: {customer_email} (ID: {customer_id})",
+                    {"customer_id": customer_id, "email": customer_email, "role": customer_user.get("role")}
+                )
+                return customer_session, customer_user
+            else:
+                self.log_test("Customer Login", False, "Customer authentication failed")
+                return None, None
                 
         except Exception as e:
-            self.log_test("Business Exists", False, f"Request error: {str(e)}")
-            return False
+            self.log_test("Customer Login", False, f"Login error: {str(e)}")
+            return None, None
+    
+    def test_get_businesses_by_city(self):
+        """Test 2: Get Available Businesses by City (Aksaray)"""
+        try:
+            response = self.session.get(f"{BACKEND_URL}/businesses?city=Aksaray")
+            
+            if response.status_code == 200:
+                businesses_data = response.json()
+                businesses = businesses_data if isinstance(businesses_data, list) else businesses_data.get("businesses", [])
+                
+                if businesses:
+                    self.log_test(
+                        "Get Businesses by City", 
+                        True, 
+                        f"Found {len(businesses)} businesses in Aksaray",
+                        {
+                            "city": "Aksaray",
+                            "business_count": len(businesses),
+                            "businesses": [{"id": b.get("id"), "name": b.get("name", b.get("business_name"))} for b in businesses[:3]]
+                        }
+                    )
+                    return businesses
+                else:
+                    self.log_test(
+                        "Get Businesses by City", 
+                        False, 
+                        "No businesses found in Aksaray"
+                    )
+                    return []
+            else:
+                self.log_test(
+                    "Get Businesses by City", 
+                    False, 
+                    f"Failed to get businesses: HTTP {response.status_code}: {response.text}"
+                )
+                return []
+                
+        except Exception as e:
+            self.log_test("Get Businesses by City", False, f"Request error: {str(e)}")
+            return []
     
     def test_get_menu_items(self):
         """Test 2: Get menu items from business public endpoint"""
