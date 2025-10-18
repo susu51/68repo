@@ -223,47 +223,61 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         )}
         
         <input
+          key="first_name"
           type="text"
           name="first_name"
           placeholder="Adınız *"
           value={formData.first_name}
           onChange={(e) => handleInputChange('first_name', e.target.value)}
+          autoComplete="given-name"
+          inputMode="text"
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
+          key="last_name"
           type="text"
           name="last_name"
           placeholder="Soyadınız *"
           value={formData.last_name}
           onChange={(e) => handleInputChange('last_name', e.target.value)}
+          autoComplete="family-name"
+          inputMode="text"
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
+          key="phone"
           type="tel"
           name="phone"
           placeholder="Telefon (05XX XXX XX XX) *"
           value={formData.phone}
           onChange={(e) => handleInputChange('phone', e.target.value)}
+          autoComplete="tel"
+          inputMode="tel"
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
+          key="email"
           type="email"
           name="email"
           placeholder="E-posta *"
           value={formData.email}
           onChange={(e) => handleInputChange('email', e.target.value)}
+          autoComplete="email"
+          inputMode="email"
           className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
         <input
+          key="password"
           type="password"
           name="password"
           placeholder="Şifre (min. 6 karakter) *"
           value={formData.password}
           onChange={(e) => handleInputChange('password', e.target.value)}
+          autoComplete="new-password"
           className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           required
         />
