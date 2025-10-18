@@ -309,10 +309,10 @@ class EndToEndOrderFlowTester:
             self.log_test("Create Order", False, f"Request error: {str(e)}")
             return False, None, None
     
-    def test_business_login_and_orders(self, created_order_id):
-        """Test 4: Business login and order retrieval (CRITICAL TEST)"""
+    def test_business_login_and_incoming_orders(self, expected_business_id, created_order_id):
+        """Test 5: Business Login and Incoming Orders Check (CRITICAL)"""
         try:
-            # Login as business user
+            # Login as business user with the SAME business_id from order
             business_user = self.business_login()
             
             if not business_user:
@@ -320,16 +320,22 @@ class EndToEndOrderFlowTester:
             
             business_id = business_user.get("id")
             
-            # Verify business ID matches expected
-            if business_id != BUSINESS_ID:
+            # Verify business ID matches expected from order
+            if business_id != expected_business_id:
                 self.log_test(
-                    "Business Login Verification", 
+                    "Business ID Match", 
                     False, 
-                    f"Business ID mismatch: expected {BUSINESS_ID}, got {business_id}"
+                    f"Business ID mismatch: expected {expected_business_id}, got {business_id}"
                 )
                 return False
+            else:
+                self.log_test(
+                    "Business ID Match", 
+                    True, 
+                    f"Business ID matches: {business_id}"
+                )
             
-            # Test GET /api/business/orders/incoming endpoint
+            # Test GET /api/business/orders/incoming endpoint (CRITICAL)
             response = self.session.get(f"{BACKEND_URL}/business/orders/incoming")
             
             if response.status_code == 200:
@@ -337,7 +343,7 @@ class EndToEndOrderFlowTester:
                 orders = orders_data.get("orders", []) if isinstance(orders_data, dict) else orders_data
                 
                 self.log_test(
-                    "Business Incoming Orders", 
+                    "Get Incoming Orders", 
                     True, 
                     f"Retrieved {len(orders)} incoming orders for business {business_id}",
                     {
@@ -347,35 +353,62 @@ class EndToEndOrderFlowTester:
                     }
                 )
                 
-                # Check if orders include business_id field
-                orders_with_business_id = [o for o in orders if o.get("business_id")]
-                orders_matching_business = [o for o in orders if o.get("business_id") == business_id]
+                # Check if the newly created order appears in response
+                found_order = None
+                for order in orders:
+                    if order.get("id") == created_order_id:
+                        found_order = order
+                        break
                 
-                self.log_test(
-                    "Business ID in Orders", 
-                    len(orders_with_business_id) == len(orders), 
-                    f"{len(orders_with_business_id)}/{len(orders)} orders have business_id field",
-                    {"orders_with_business_id": len(orders_with_business_id), "total_orders": len(orders)}
-                )
+                if found_order:
+                    self.log_test(
+                        "New Order in Incoming", 
+                        True, 
+                        f"Newly created order {created_order_id} found in incoming orders",
+                        {"order_id": created_order_id, "found": True}
+                    )
+                    
+                    # Verify order details are complete and correct
+                    required_fields = ["business_id", "customer_name", "items", "total_amount", "status", "delivery_address"]
+                    missing_fields = [field for field in required_fields if field not in found_order or found_order[field] is None]
+                    
+                    business_id_correct = found_order.get("business_id") == business_id
+                    
+                    self.log_test(
+                        "Order Details Complete", 
+                        len(missing_fields) == 0 and business_id_correct, 
+                        f"Order has all required fields: {len(required_fields) - len(missing_fields)}/{len(required_fields)}, business_id correct: {business_id_correct}",
+                        {
+                            "order_id": created_order_id,
+                            "business_id": found_order.get("business_id"),
+                            "customer_name": found_order.get("customer_name"),
+                            "items_count": len(found_order.get("items", [])),
+                            "total_amount": found_order.get("total_amount"),
+                            "status": found_order.get("status"),
+                            "delivery_address": found_order.get("delivery_address"),
+                            "missing_fields": missing_fields
+                        }
+                    )
+                    
+                    return len(missing_fields) == 0 and business_id_correct
+                else:
+                    self.log_test(
+                        "New Order in Incoming", 
+                        False, 
+                        f"Newly created order {created_order_id} NOT found in incoming orders"
+                    )
+                    return False
                 
-                self.log_test(
-                    "Correct Business Orders", 
-                    len(orders_matching_business) == len(orders), 
-                    f"{len(orders_matching_business)}/{len(orders)} orders match business ID {business_id}",
-                    {"matching_orders": len(orders_matching_business), "total_orders": len(orders)}
-                )
-                
-                return True
             else:
                 self.log_test(
-                    "Business Incoming Orders", 
+                    "Get Incoming Orders", 
                     False, 
                     f"Failed to retrieve incoming orders: HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test("Business Login and Orders", False, f"Request error: {str(e)}")
+            self.log_test("Business Login and Incoming Orders", False, f"Request error: {str(e)}")
             return False
     
     def test_authentication_consistency(self):
