@@ -754,6 +754,6 @@ class BusinessOrderDisplayTester:
         return passed_tests >= total_tests * 0.75  # 75% success rate required
 
 if __name__ == "__main__":
-    tester = OrderFlowAuthenticationTester()
+    tester = BusinessOrderDisplayTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
