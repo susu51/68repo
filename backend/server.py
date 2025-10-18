@@ -1293,6 +1293,9 @@ async def register_business(business_data: BusinessRegister):
         "role": "business",
         "business_name": business_data.business_name,
         "tax_number": business_data.tax_number,
+        "first_name": business_data.first_name,  # Yetkili kişi adı
+        "last_name": business_data.last_name,    # Yetkili kişi soyadı
+        "phone": business_data.phone if business_data.phone else "",
         "address": business_data.address,
         "city": city_original,  # Keep original for reference
         "city_normalized": city_normalized,  # Normalized for searching
