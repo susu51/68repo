@@ -45,12 +45,17 @@ export const ModernOrdersManagement = ({ businessId }) => {
       
       // Fetch both incoming and active orders
       const [incomingResult, activeResult] = await Promise.all([
-        get('/business/orders/incoming').catch(() => ({ data: [] })),
-        get('/business/orders/active').catch(() => ({ data: [] }))
+        get('/business/orders/incoming').catch(() => ({ data: { orders: [] } })),
+        get('/business/orders/active').catch(() => ({ data: { orders: [] } }))
       ]);
       
-      const incomingOrders = Array.isArray(incomingResult?.data) ? incomingResult.data : [];
-      const activeOrders = Array.isArray(activeResult?.data) ? activeResult.data : [];
+      // Handle response format - check if data has 'orders' property or is array directly
+      const incomingOrders = Array.isArray(incomingResult?.data) 
+        ? incomingResult.data 
+        : (incomingResult?.data?.orders || []);
+      const activeOrders = Array.isArray(activeResult?.data) 
+        ? activeResult.data 
+        : (activeResult?.data?.orders || []);
       
       const allOrders = [...incomingOrders, ...activeOrders];
       setOrders(allOrders);
