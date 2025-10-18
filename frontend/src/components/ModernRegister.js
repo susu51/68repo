@@ -201,20 +201,26 @@ const ModernRegister = ({ onSuccess, onBack }) => {
         {role === 'business' && (
           <>
             <input
+              key="business_name"
               type="text"
               name="business_name"
               placeholder="İşletme/Restoran Adı *"
               value={formData.business_name}
               onChange={(e) => handleInputChange('business_name', e.target.value)}
+              autoComplete="organization"
+              inputMode="text"
               className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               required
             />
             <input
+              key="business_tax_id"
               type="text"
               name="business_tax_id"
               placeholder="Vergi Numarası *"
               value={formData.business_tax_id}
               onChange={(e) => handleInputChange('business_tax_id', e.target.value)}
+              autoComplete="off"
+              inputMode="numeric"
               className="col-span-1 md:col-span-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               required
             />
