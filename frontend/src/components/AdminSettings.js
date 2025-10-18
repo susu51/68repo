@@ -342,47 +342,63 @@ const AdminSettings = () => {
         {/* Tests Tab */}
         {activeTab === 'tests' && (
           <div className="space-y-6">
+            {/* Customer Panel Tests */}
             <Card>
-              <CardHeader className="bg-green-50 border-b">
-                <h2 className="text-xl font-bold text-gray-800">🧪 Sistem Buton Testleri</h2>
+              <CardHeader className="bg-blue-50 border-b">
+                <h2 className="text-xl font-bold text-gray-800">👥 Müşteri Paneli Testleri</h2>
+                <p className="text-sm text-gray-600 mt-1">Müşteri panelindeki tüm özellikleri test edin</p>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <Button 
-                    onClick={() => runButtonTests('all')}
+                    onClick={() => runButtonTests('customer-all')}
                     className="bg-blue-500 hover:bg-blue-600 text-white"
                     disabled={loading}
                   >
-                    🔍 Tüm Testleri Çalıştır
+                    🔍 Tüm Müşteri Testleri
                   </Button>
                   <Button 
-                    onClick={() => runButtonTests('api')}
-                    className="bg-purple-500 hover:bg-purple-600 text-white"
-                    disabled={loading}
-                  >
-                    🌐 API Testleri
-                  </Button>
-                  <Button 
-                    onClick={() => runButtonTests('auth')}
+                    onClick={() => runButtonTests('customer-auth')}
                     className="bg-indigo-500 hover:bg-indigo-600 text-white"
                     disabled={loading}
                   >
-                    🔐 Auth Testleri
+                    🔐 Müşteri Login
                   </Button>
                   <Button 
-                    onClick={() => runButtonTests('orders')}
+                    onClick={() => runButtonTests('customer-discover')}
+                    className="bg-purple-500 hover:bg-purple-600 text-white"
+                    disabled={loading}
+                  >
+                    🍽️ Restoran Keşfet
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('customer-orders')}
                     className="bg-orange-500 hover:bg-orange-600 text-white"
                     disabled={loading}
                   >
-                    📦 Sipariş Testleri
+                    📦 Sipariş Verme
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('customer-address')}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                    disabled={loading}
+                  >
+                    📍 Adres Yönetimi
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('customer-cart')}
+                    className="bg-pink-500 hover:bg-pink-600 text-white"
+                    disabled={loading}
+                  >
+                    🛒 Sepet İşlemleri
                   </Button>
                 </div>
 
-                {/* Test Results */}
-                {testResults.length > 0 && (
+                {/* Test Results for Customer */}
+                {testResults.filter(r => r.panel === 'customer').length > 0 && (
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-lg mb-3">Test Sonuçları:</h3>
-                    {testResults.map((result, index) => (
+                    <h3 className="font-semibold text-lg mb-3">Müşteri Paneli Sonuçları:</h3>
+                    {testResults.filter(r => r.panel === 'customer').map((result, index) => (
                       <div 
                         key={index}
                         className={`p-4 rounded-lg border-l-4 ${
@@ -392,11 +408,184 @@ const AdminSettings = () => {
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <div>
+                          <div className="flex-1">
                             <h4 className="font-semibold">{result.test}</h4>
                             <p className="text-sm text-gray-600">{result.message}</p>
+                            {result.error && (
+                              <p className="text-xs text-red-600 mt-1 font-mono">{result.error}</p>
+                            )}
                           </div>
-                          <span className="text-2xl">
+                          <span className="text-2xl ml-4">
+                            {result.status === 'success' ? '✅' : 
+                             result.status === 'warning' ? '⚠️' : '❌'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Business Panel Tests */}
+            <Card>
+              <CardHeader className="bg-green-50 border-b">
+                <h2 className="text-xl font-bold text-gray-800">🏪 İşletme Paneli Testleri</h2>
+                <p className="text-sm text-gray-600 mt-1">İşletme panelindeki tüm özellikleri test edin</p>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <Button 
+                    onClick={() => runButtonTests('business-all')}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                    disabled={loading}
+                  >
+                    🔍 Tüm İşletme Testleri
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('business-auth')}
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white"
+                    disabled={loading}
+                  >
+                    🔐 İşletme Login
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('business-menu')}
+                    className="bg-purple-500 hover:bg-purple-600 text-white"
+                    disabled={loading}
+                  >
+                    🍽️ Menü Yönetimi
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('business-orders')}
+                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                    disabled={loading}
+                  >
+                    📦 Sipariş Yönetimi
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('business-dashboard')}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    disabled={loading}
+                  >
+                    📊 Dashboard
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('business-kyc')}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                    disabled={loading}
+                  >
+                    ✅ KYC Durumu
+                  </Button>
+                </div>
+
+                {/* Test Results for Business */}
+                {testResults.filter(r => r.panel === 'business').length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-lg mb-3">İşletme Paneli Sonuçları:</h3>
+                    {testResults.filter(r => r.panel === 'business').map((result, index) => (
+                      <div 
+                        key={index}
+                        className={`p-4 rounded-lg border-l-4 ${
+                          result.status === 'success' ? 'bg-green-50 border-green-500' :
+                          result.status === 'warning' ? 'bg-yellow-50 border-yellow-500' :
+                          'bg-red-50 border-red-500'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{result.test}</h4>
+                            <p className="text-sm text-gray-600">{result.message}</p>
+                            {result.error && (
+                              <p className="text-xs text-red-600 mt-1 font-mono">{result.error}</p>
+                            )}
+                          </div>
+                          <span className="text-2xl ml-4">
+                            {result.status === 'success' ? '✅' : 
+                             result.status === 'warning' ? '⚠️' : '❌'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Courier Panel Tests */}
+            <Card>
+              <CardHeader className="bg-yellow-50 border-b">
+                <h2 className="text-xl font-bold text-gray-800">🚴 Kurye Paneli Testleri</h2>
+                <p className="text-sm text-gray-600 mt-1">Kurye panelindeki tüm özellikleri test edin</p>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <Button 
+                    onClick={() => runButtonTests('courier-all')}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                    disabled={loading}
+                  >
+                    🔍 Tüm Kurye Testleri
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('courier-auth')}
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white"
+                    disabled={loading}
+                  >
+                    🔐 Kurye Login
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('courier-orders')}
+                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                    disabled={loading}
+                  >
+                    📦 Sipariş Kabul
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('courier-delivery')}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                    disabled={loading}
+                  >
+                    🚚 Teslimat İşlemleri
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('courier-location')}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    disabled={loading}
+                  >
+                    📍 Konum Takip
+                  </Button>
+                  <Button 
+                    onClick={() => runButtonTests('courier-kyc')}
+                    className="bg-purple-500 hover:bg-purple-600 text-white"
+                    disabled={loading}
+                  >
+                    ✅ KYC Durumu
+                  </Button>
+                </div>
+
+                {/* Test Results for Courier */}
+                {testResults.filter(r => r.panel === 'courier').length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-lg mb-3">Kurye Paneli Sonuçları:</h3>
+                    {testResults.filter(r => r.panel === 'courier').map((result, index) => (
+                      <div 
+                        key={index}
+                        className={`p-4 rounded-lg border-l-4 ${
+                          result.status === 'success' ? 'bg-green-50 border-green-500' :
+                          result.status === 'warning' ? 'bg-yellow-50 border-yellow-500' :
+                          'bg-red-50 border-red-500'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{result.test}</h4>
+                            <p className="text-sm text-gray-600">{result.message}</p>
+                            {result.error && (
+                              <p className="text-xs text-red-600 mt-1 font-mono">{result.error}</p>
+                            )}
+                          </div>
+                          <span className="text-2xl ml-4">
                             {result.status === 'success' ? '✅' : 
                              result.status === 'warning' ? '⚠️' : '❌'}
                           </span>
