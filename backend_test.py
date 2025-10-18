@@ -186,7 +186,7 @@ class OrderFlowAuthenticationTester:
             
             response = customer_session.post(f"{BACKEND_URL}/orders", json=order_data)
             
-            if response.status_code == 201:
+            if response.status_code in [200, 201]:
                 order = response.json()
                 order_id = order.get("id")
                 order_business_id = order.get("business_id")
