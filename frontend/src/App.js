@@ -130,6 +130,27 @@ const CitySelector = ({ value, onChange, required = false }) => {
   );
 };
 
+// Order Status Badge Component
+const OrderStatusBadge = ({ status }) => {
+  const statusConfig = {
+    created: { label: 'Oluşturuldu', color: 'bg-blue-100 text-blue-800' },
+    confirmed: { label: 'Onaylandı', color: 'bg-green-100 text-green-800' },
+    preparing: { label: 'Hazırlanıyor', color: 'bg-yellow-100 text-yellow-800' },
+    ready: { label: 'Hazır', color: 'bg-purple-100 text-purple-800' },
+    picked_up: { label: 'Kuryede', color: 'bg-indigo-100 text-indigo-800' },
+    delivered: { label: 'Teslim Edildi', color: 'bg-green-100 text-green-800' },
+    cancelled: { label: 'İptal', color: 'bg-red-100 text-red-800' }
+  };
+
+  const config = statusConfig[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
+
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.color}`}>
+      {config.label}
+    </span>
+  );
+};
+
 // Admin Dashboard - Simple Working Version with Theme
 const AdminDashboard = ({ user }) => {
   const { logout } = useCookieAuth();
