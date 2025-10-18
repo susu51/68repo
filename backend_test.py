@@ -639,6 +639,6 @@ class OrderFlowAuthenticationTester:
         return passed_tests == total_tests
 
 if __name__ == "__main__":
-    tester = AdminSettingsMaintenanceTester()
+    tester = OrderFlowAuthenticationTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
