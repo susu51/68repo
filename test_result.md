@@ -1759,7 +1759,7 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Order Flow Fix - Business Panel Order Display"
+    - "Customer Panel Restaurant Display After Login"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
