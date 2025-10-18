@@ -34,24 +34,25 @@ class BusinessNearby(BaseModel):
 
 @router.get("/city-nearby", response_model=List[BusinessNearby])
 async def get_city_nearby_businesses(
-    lat: float = Query(..., description="Latitude (required)"),
-    lng: float = Query(..., description="Longitude (required)"), 
     city: str = Query(..., description="City slug (required)"),
+    lat: Optional[float] = Query(None, description="Latitude (optional for GPS-based search)"),
+    lng: Optional[float] = Query(None, description="Longitude (optional for GPS-based search)"), 
     district: Optional[str] = Query(None, description="District slug (optional)"),
-    radius_km: int = Query(10, description="Search radius in kilometers (default: 10km with GPS, 50km without)"),
+    radius_km: int = Query(50, description="Search radius in kilometers (default: 10km with GPS, 50km without)"),
     limit: int = Query(30, le=100, description="Max results")
 ):
     """
     Get nearby businesses in SAME CITY ONLY
     CRITICAL: Cross-city results are FORBIDDEN
     Dynamic radius: 10km with GPS, 50km without GPS
+    If lat/lng not provided, returns all businesses in the city sorted by district match
     """
     
     # Validate required parameters
-    if lat is None or lng is None or not city:
+    if not city:
         raise HTTPException(
             status_code=422,
-            detail="lat, lng, and city are required parameters"
+            detail="city is a required parameter"
         )
     
     # Convert radius_km to meters
