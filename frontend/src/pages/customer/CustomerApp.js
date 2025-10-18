@@ -57,11 +57,16 @@ export const CustomerApp = ({ user, onLogout }) => {
   };
 
   const handleProceedToCheckout = () => {
+    console.log('🛒 Proceeding to checkout, cart:', cartSummary);
+    
     if (cartSummary.itemCount === 0) {
       toast.error('Sepetiniz boş');
       return;
     }
+    
+    console.log('✅ Setting activeView to checkout');
     setActiveView('checkout');
+    toast.success('Ödeme sayfasına yönlendiriliyorsunuz...');
   };
 
   const handleCreateOrder = async () => {
