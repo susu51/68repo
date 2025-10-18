@@ -2220,15 +2220,18 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
         product_id = order_data.items[0].product_id
         print(f"🔍 Looking for menu item with ID: {product_id}")
         
+        # The product_id from business menu endpoint is actually the string representation of ObjectId
         # Try to find menu item by '_id' field (menu_items collection uses ObjectId)
         first_item = None
         try:
             from bson import ObjectId
+            # The product_id is a string representation of ObjectId, convert it back
             first_item = await db.menu_items.find_one({"_id": ObjectId(product_id)})
-        except:
+        except Exception as e:
+            print(f"🔍 Failed to convert {product_id} to ObjectId: {e}")
             pass
         
-        # If not found by ObjectId, try by 'id' field
+        # If not found by ObjectId, try by 'id' field (for newer items that might have custom id)
         if not first_item:
             first_item = await db.menu_items.find_one({"id": product_id})
         
