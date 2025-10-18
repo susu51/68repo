@@ -470,55 +470,63 @@ class OrderFlowAuthenticationTester:
             self.log_test("Order Data Integrity", False, f"Request error: {str(e)}")
             return False
     
-    def test_admin_authentication_required(self):
-        """Test that admin endpoints require admin authentication"""
+    def test_cross_user_order_isolation(self):
+        """Test that businesses only see their own orders"""
         try:
-            # Test without authentication
-            public_session = requests.Session()
+            # Login as business and get their orders
+            business_user = self.business_login()
             
-            admin_endpoints = [
-                "/admin/settings/system",
-                "/admin/logs/backend"
-            ]
+            if not business_user:
+                return False
             
-            auth_test_results = []
+            business_id = business_user.get("id")
             
-            for endpoint in admin_endpoints:
-                response = public_session.get(f"{BACKEND_URL}{endpoint}")
+            # Get orders for this business
+            response = self.session.get(f"{BACKEND_URL}/orders")
+            
+            if response.status_code == 200:
+                orders_data = response.json()
+                orders = orders_data if isinstance(orders_data, list) else orders_data.get("orders", [])
                 
-                if response.status_code in [401, 403]:
-                    auth_test_results.append(f"✅ {endpoint}: Properly secured ({response.status_code})")
-                else:
-                    auth_test_results.append(f"❌ {endpoint}: Not secured ({response.status_code})")
-            
-            # Test POST endpoints
-            post_endpoints = [
-                ("/admin/settings/system", {"test": "data"}),
-                ("/admin/settings/maintenance-mode", {"enabled": True}),
-                ("/admin/test-buttons", {"button_type": "all"})
-            ]
-            
-            for endpoint, data in post_endpoints:
-                response = public_session.post(f"{BACKEND_URL}{endpoint}", json=data)
+                # Check that all orders belong to this business
+                wrong_business_orders = []
+                for order in orders:
+                    order_business_id = order.get("business_id")
+                    if order_business_id and order_business_id != business_id:
+                        wrong_business_orders.append({
+                            "order_id": order.get("id"),
+                            "business_id": order_business_id
+                        })
                 
-                if response.status_code in [401, 403]:
-                    auth_test_results.append(f"✅ {endpoint}: Properly secured ({response.status_code})")
+                if not wrong_business_orders:
+                    self.log_test(
+                        "Cross-User Order Isolation", 
+                        True, 
+                        f"Business only sees their own orders ({len(orders)} orders, all belong to business {business_id})",
+                        {
+                            "business_id": business_id,
+                            "total_orders": len(orders),
+                            "isolation_verified": True
+                        }
+                    )
+                    return True
                 else:
-                    auth_test_results.append(f"❌ {endpoint}: Not secured ({response.status_code})")
-            
-            all_secured = all("✅" in result for result in auth_test_results)
-            
-            self.log_test(
-                "Admin Authentication Required", 
-                all_secured, 
-                f"Admin endpoints security check: {'All secured' if all_secured else 'Some endpoints not secured'}",
-                {"security_results": auth_test_results}
-            )
-            
-            return all_secured
+                    self.log_test(
+                        "Cross-User Order Isolation", 
+                        False, 
+                        f"Business sees orders from other businesses: {wrong_business_orders}"
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Cross-User Order Isolation", 
+                    False, 
+                    f"Failed to retrieve orders: HTTP {response.status_code}: {response.text}"
+                )
+                return False
                 
         except Exception as e:
-            self.log_test("Admin Authentication Required", False, f"Request error: {str(e)}")
+            self.log_test("Cross-User Order Isolation", False, f"Request error: {str(e)}")
             return False
     
     def run_all_tests(self):
