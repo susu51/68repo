@@ -2218,7 +2218,6 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
     # Get business info from first menu item
     if order_data.items:
         product_id = order_data.items[0].product_id
-        print(f"🔍 Looking for menu item with ID: {product_id}")
         
         # The product_id from business menu endpoint is the _id field (which is a UUID string in this case)
         # Try to find menu item by '_id' field directly (no ObjectId conversion needed)
@@ -2228,26 +2227,11 @@ async def create_order(request: Request, order_data: OrderCreate, current_user: 
         if not first_item:
             first_item = await db.menu_items.find_one({"id": product_id})
         
-        print(f"🔍 Found menu item: {first_item}")
         if first_item:
             order_doc["business_id"] = first_item["business_id"]
-            print(f"🔍 Business ID from menu item: {first_item['business_id']}")
             # Get business name from users collection
             business = await db.users.find_one({"id": first_item["business_id"]})
-            print(f"🔍 Found business: {business}")
             order_doc["business_name"] = business.get("business_name", "") if business else ""
-        else:
-            print(f"❌ Menu item not found with ID: {product_id}")
-            # Let's also try to find all menu items to see what IDs exist
-            all_menu_items = await db.menu_items.find({}).to_list(length=10)
-            print(f"🔍 Available menu items ObjectIds: {[str(item.get('_id', 'NO_ID')) for item in all_menu_items]}")
-            print(f"🔍 Available menu items custom ids: {[item.get('id', 'NO_CUSTOM_ID') for item in all_menu_items]}")
-            
-            # Let's also check if there's a menu item with the business_id we expect
-            business_menu_items = await db.menu_items.find({"business_id": "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"}).to_list(length=10)
-            print(f"🔍 Menu items for business e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed: {len(business_menu_items)}")
-            for item in business_menu_items:
-                print(f"  - ObjectId: {item.get('_id')}, custom_id: {item.get('id')}, name: {item.get('name')}")
     
     await db.orders.insert_one(order_doc)
     
