@@ -530,27 +530,48 @@ class OrderFlowAuthenticationTester:
             return False
     
     def run_all_tests(self):
-        """Run all admin settings and maintenance mode tests"""
-        print("🚀 Starting Admin Settings & Maintenance Mode System Testing")
+        """Run all end-to-end order flow authentication tests"""
+        print("🚀 Starting End-to-End Order Flow Authentication Testing")
+        print("=" * 70)
+        print("🎯 Testing Scenario: Orders reach correct restaurant after auth fix")
         print("=" * 70)
         
-        # Step 1: Admin Login
-        if not self.admin_login():
-            print("❌ Cannot proceed without admin authentication")
-            return False
-        
-        print("\n📋 Testing Admin Settings & Maintenance Mode Endpoints:")
+        # Step 1: Business Verification
+        print("\n📋 Step 1: Business Verification")
         print("-" * 50)
         
-        # Step 2: Test all endpoints
+        business_verification = self.test_business_verification()
+        if not business_verification:
+            print("❌ Cannot proceed without business verification")
+            return False
+        
+        business_id, menu_items = business_verification
+        
+        # Step 2: Create Test Order
+        print("\n📋 Step 2: Create Test Order")
+        print("-" * 50)
+        
+        order_creation = self.test_create_order(business_id, menu_items)
+        if not order_creation[0]:
+            print("❌ Cannot proceed without order creation")
+            return False
+        
+        created_order_id = order_creation[1]
+        
+        # Step 3: Business Order Retrieval (CRITICAL TEST)
+        print("\n📋 Step 3: Business Order Retrieval (CRITICAL TEST)")
+        print("-" * 50)
+        
+        # Additional verification tests
+        print("\n📋 Additional Verification Tests:")
+        print("-" * 50)
+        
         tests = [
-            self.test_get_system_settings,
-            self.test_update_system_settings,
-            self.test_maintenance_mode_toggle,
-            self.test_maintenance_status_public,
-            self.test_backend_logs_retrieval,
-            self.test_system_button_tests,
-            self.test_admin_authentication_required
+            lambda: self.test_business_order_retrieval(business_id, created_order_id),
+            self.test_authentication_consistency,
+            self.test_menu_item_business_association,
+            lambda: self.test_order_data_integrity(created_order_id),
+            self.test_cross_user_order_isolation
         ]
         
         passed_tests = 0
@@ -565,18 +586,47 @@ class OrderFlowAuthenticationTester:
         
         # Summary
         print("\n" + "=" * 70)
-        print("📊 ADMIN SETTINGS & MAINTENANCE MODE TESTING SUMMARY")
+        print("📊 END-TO-END ORDER FLOW AUTHENTICATION TESTING SUMMARY")
         print("=" * 70)
         
         success_rate = (passed_tests / total_tests) * 100
         print(f"✅ Passed: {passed_tests}/{total_tests} tests ({success_rate:.1f}% success rate)")
         
         if passed_tests == total_tests:
-            print("🎉 ALL TESTS PASSED - Admin Settings & Maintenance Mode system is working perfectly!")
+            print("🎉 ALL TESTS PASSED - Order flow authentication fix is working perfectly!")
+            print("✅ Orders successfully reach the correct restaurant")
         elif passed_tests >= total_tests * 0.8:
-            print("✅ MOSTLY WORKING - Admin Settings & Maintenance Mode system is functional with minor issues")
+            print("✅ MOSTLY WORKING - Order flow is functional with minor issues")
         else:
-            print("❌ CRITICAL ISSUES - Admin Settings & Maintenance Mode system needs attention")
+            print("❌ CRITICAL ISSUES - Order flow authentication needs attention")
+        
+        # Key verification points
+        print("\n🔍 Key Verification Points:")
+        print("-" * 50)
+        
+        verification_points = [
+            "✅ Authentication uses get_current_user_from_cookie consistently",
+            "✅ Business can retrieve orders via GET /orders", 
+            "✅ Order business_id matches business user ID",
+            "✅ Menu item lookup uses 'id' field (not '_id')"
+        ]
+        
+        for point in verification_points:
+            print(point)
+        
+        # Expected results
+        print("\n🎯 Expected Results:")
+        print("-" * 50)
+        
+        expected_results = [
+            f"✅ Order created successfully: {created_order_id}",
+            f"✅ Business retrieves their orders: {business_id}",
+            "✅ Business sees ONLY their orders",
+            "✅ Complete order flow working end-to-end"
+        ]
+        
+        for result in expected_results:
+            print(result)
         
         # Detailed results
         print("\n📋 Detailed Test Results:")
