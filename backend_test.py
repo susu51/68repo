@@ -90,33 +90,64 @@ class CustomerOrderFlowTester:
             self.log_test("Customer Login", False, f"Exception: {str(e)}")
             return False
     
-    def test_get_approved_businesses(self):
-        """Test 2: GET /api/admin/businesses - fetch approved businesses for dropdown"""
+    def test_restaurant_discovery(self):
+        """Test /businesses endpoint with city filter"""
+        print("🏪 Testing Restaurant Discovery...")
+        
         try:
-            response = self.session.get(f"{BACKEND_URL}/admin/businesses")
+            # Test businesses endpoint with city filter
+            response = self.session.get(f"{BASE_URL}/businesses?city={TEST_CITY}")
             
             if response.status_code == 200:
                 data = response.json()
-                # Handle both possible response formats
-                if isinstance(data, list):
-                    businesses = data
+                businesses = data if isinstance(data, list) else data.get("businesses", [])
+                
+                if businesses:
+                    self.log_test(
+                        "Restaurant Discovery", 
+                        True, 
+                        f"Found {len(businesses)} approved businesses in {TEST_CITY}"
+                    )
+                    
+                    # Verify business data structure
+                    first_business = businesses[0]
+                    required_fields = ["id", "business_name", "city", "kyc_status"]
+                    missing_fields = [field for field in required_fields if field not in first_business]
+                    
+                    if not missing_fields:
+                        self.log_test(
+                            "Business Data Structure", 
+                            True, 
+                            "All required fields present in business data"
+                        )
+                        return businesses
+                    else:
+                        self.log_test(
+                            "Business Data Structure", 
+                            False, 
+                            f"Missing fields: {missing_fields}",
+                            first_business
+                        )
+                        return businesses
                 else:
-                    businesses = data.get("businesses", [])
-                
-                approved_businesses = [b for b in businesses if b.get("kyc_status") == "approved"]
-                
-                self.log_test(
-                    "Get Approved Businesses", 
-                    True, 
-                    f"Retrieved {len(businesses)} total businesses, {len(approved_businesses)} approved businesses"
-                )
-                return businesses
+                    self.log_test(
+                        "Restaurant Discovery", 
+                        False, 
+                        f"No businesses found in {TEST_CITY}",
+                        data
+                    )
+                    return []
             else:
-                self.log_test("Get Approved Businesses", False, "", f"HTTP {response.status_code}: {response.text}")
+                self.log_test(
+                    "Restaurant Discovery", 
+                    False, 
+                    f"Request failed with status {response.status_code}",
+                    response.text
+                )
                 return []
                 
         except Exception as e:
-            self.log_test("Get Approved Businesses", False, "", f"Exception: {str(e)}")
+            self.log_test("Restaurant Discovery", False, f"Exception: {str(e)}")
             return []
     
     def test_create_advertisement_structure(self):
