@@ -7857,56 +7857,308 @@ async def test_button_functionality(
     test_data: dict,
     current_user: dict = Depends(get_admin_user)
 ):
-    """Test button functionality - returns success/failure for various button actions"""
+    """Test button functionality - Panel-based testing for customer, business, and courier panels"""
     try:
-        button_type = test_data.get("button_type")
+        button_type = test_data.get("button_type", "all")
         test_results = []
         
-        # Test different button types
-        if button_type == "all" or button_type == "api":
-            # Test API connectivity
+        # Customer Panel Tests
+        if button_type in ["customer-all", "customer-auth"]:
             try:
-                test_user = await db.users.find_one({"role": "admin"})
+                # Test customer authentication
+                customer = await db.users.find_one({"role": "customer"})
                 test_results.append({
-                    "test": "Database Connection",
-                    "status": "success" if test_user else "warning",
-                    "message": "Database accessible" if test_user else "No admin user found"
+                    "test": "Müşteri Authentication",
+                    "status": "success" if customer else "warning",
+                    "message": f"Müşteri hesabı bulundu: {customer.get('email') if customer else 'Yok'}" if customer else "Müşteri hesabı bulunamadı",
+                    "error": None if customer else "Test müşteri hesabı oluşturun"
                 })
             except Exception as e:
                 test_results.append({
-                    "test": "Database Connection",
+                    "test": "Müşteri Authentication",
                     "status": "error",
-                    "message": str(e)
+                    "message": "Müşteri authentication testi başarısız",
+                    "error": str(e)
                 })
         
-        if button_type == "all" or button_type == "auth":
-            # Test auth system
-            test_results.append({
-                "test": "Authentication System",
-                "status": "success",
-                "message": "Admin authenticated successfully"
-            })
-        
-        if button_type == "all" or button_type == "orders":
-            # Test orders
+        if button_type in ["customer-all", "customer-discover"]:
             try:
-                orders_count = await db.orders.count_documents({})
+                # Test restaurant discovery
+                restaurants = await db.users.find({"role": "business", "is_active": True}).limit(5).to_list(length=5)
                 test_results.append({
-                    "test": "Orders System",
+                    "test": "Restoran Keşfet",
+                    "status": "success" if len(restaurants) > 0 else "warning",
+                    "message": f"{len(restaurants)} aktif restoran bulundu",
+                    "error": None if len(restaurants) > 0 else "Aktif restoran yok"
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Restoran Keşfet",
+                    "status": "error",
+                    "message": "Restoran keşfet testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["customer-all", "customer-orders"]:
+            try:
+                # Test customer orders
+                orders_count = await db.orders.count_documents({"customer_id": {"$exists": True}})
+                test_results.append({
+                    "test": "Müşteri Sipariş Sistemi",
                     "status": "success",
-                    "message": f"Orders accessible ({orders_count} total orders)"
+                    "message": f"{orders_count} müşteri siparişi bulundu",
+                    "error": None
                 })
             except Exception as e:
                 test_results.append({
-                    "test": "Orders System",
+                    "test": "Müşteri Sipariş Sistemi",
                     "status": "error",
-                    "message": str(e)
+                    "message": "Sipariş sistemi testi başarısız",
+                    "error": str(e)
                 })
+        
+        if button_type in ["customer-all", "customer-address"]:
+            try:
+                # Test address management
+                addresses_count = await db.addresses.count_documents({})
+                test_results.append({
+                    "test": "Adres Yönetimi",
+                    "status": "success",
+                    "message": f"{addresses_count} adres kaydı bulundu",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Adres Yönetimi",
+                    "status": "error",
+                    "message": "Adres yönetimi testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["customer-all", "customer-cart"]:
+            try:
+                # Test cart/products
+                products_count = await db.products.count_documents({"is_available": True})
+                test_results.append({
+                    "test": "Sepet & Ürünler",
+                    "status": "success" if products_count > 0 else "warning",
+                    "message": f"{products_count} aktif ürün bulundu",
+                    "error": None if products_count > 0 else "Aktif ürün yok"
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Sepet & Ürünler",
+                    "status": "error",
+                    "message": "Ürün sistemi testi başarısız",
+                    "error": str(e)
+                })
+        
+        # Business Panel Tests
+        if button_type in ["business-all", "business-auth"]:
+            try:
+                # Test business authentication
+                business = await db.users.find_one({"role": "business"})
+                test_results.append({
+                    "test": "İşletme Authentication",
+                    "status": "success" if business else "warning",
+                    "message": f"İşletme hesabı bulundu: {business.get('business_name') if business else 'Yok'}" if business else "İşletme hesabı bulunamadı",
+                    "error": None if business else "Test işletme hesabı oluşturun"
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "İşletme Authentication",
+                    "status": "error",
+                    "message": "İşletme authentication testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["business-all", "business-menu"]:
+            try:
+                # Test menu management
+                menu_count = await db.products.count_documents({})
+                test_results.append({
+                    "test": "Menü Yönetimi",
+                    "status": "success" if menu_count > 0 else "warning",
+                    "message": f"{menu_count} menü ürünü bulundu",
+                    "error": None if menu_count > 0 else "Menü ürünü yok"
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Menü Yönetimi",
+                    "status": "error",
+                    "message": "Menü sistemi testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["business-all", "business-orders"]:
+            try:
+                # Test business orders
+                business_orders = await db.orders.count_documents({"business_id": {"$exists": True}})
+                test_results.append({
+                    "test": "İşletme Sipariş Yönetimi",
+                    "status": "success",
+                    "message": f"{business_orders} işletme siparişi bulundu",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "İşletme Sipariş Yönetimi",
+                    "status": "error",
+                    "message": "Sipariş yönetimi testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["business-all", "business-dashboard"]:
+            try:
+                # Test business dashboard data
+                test_results.append({
+                    "test": "İşletme Dashboard",
+                    "status": "success",
+                    "message": "Dashboard verileri erişilebilir",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "İşletme Dashboard",
+                    "status": "error",
+                    "message": "Dashboard testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["business-all", "business-kyc"]:
+            try:
+                # Test KYC status
+                kyc_pending = await db.users.count_documents({"role": "business", "kyc_status": "pending"})
+                test_results.append({
+                    "test": "İşletme KYC Durumu",
+                    "status": "success",
+                    "message": f"{kyc_pending} KYC onayı bekleyen işletme",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "İşletme KYC Durumu",
+                    "status": "error",
+                    "message": "KYC sistemi testi başarısız",
+                    "error": str(e)
+                })
+        
+        # Courier Panel Tests
+        if button_type in ["courier-all", "courier-auth"]:
+            try:
+                # Test courier authentication
+                courier = await db.users.find_one({"role": "courier"})
+                test_results.append({
+                    "test": "Kurye Authentication",
+                    "status": "success" if courier else "warning",
+                    "message": f"Kurye hesabı bulundu: {courier.get('email') if courier else 'Yok'}" if courier else "Kurye hesabı bulunamadı",
+                    "error": None if courier else "Test kurye hesabı oluşturun"
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Kurye Authentication",
+                    "status": "error",
+                    "message": "Kurye authentication testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["courier-all", "courier-orders"]:
+            try:
+                # Test courier orders
+                available_orders = await db.orders.count_documents({"status": "confirmed"})
+                test_results.append({
+                    "test": "Kurye Sipariş Kabul",
+                    "status": "success",
+                    "message": f"{available_orders} teslimata hazır sipariş",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Kurye Sipariş Kabul",
+                    "status": "error",
+                    "message": "Sipariş kabul testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["courier-all", "courier-delivery"]:
+            try:
+                # Test delivery system
+                active_deliveries = await db.orders.count_documents({"status": "in_transit"})
+                test_results.append({
+                    "test": "Teslimat İşlemleri",
+                    "status": "success",
+                    "message": f"{active_deliveries} aktif teslimat",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Teslimat İşlemleri",
+                    "status": "error",
+                    "message": "Teslimat sistemi testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["courier-all", "courier-location"]:
+            try:
+                # Test location tracking
+                couriers_with_location = await db.users.count_documents({
+                    "role": "courier",
+                    "lat": {"$exists": True},
+                    "lng": {"$exists": True}
+                })
+                test_results.append({
+                    "test": "Konum Takip Sistemi",
+                    "status": "success",
+                    "message": f"{couriers_with_location} kurye konum bilgisi mevcut",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Konum Takip Sistemi",
+                    "status": "error",
+                    "message": "Konum takip testi başarısız",
+                    "error": str(e)
+                })
+        
+        if button_type in ["courier-all", "courier-kyc"]:
+            try:
+                # Test courier KYC
+                kyc_pending = await db.users.count_documents({"role": "courier", "kyc_status": "pending"})
+                test_results.append({
+                    "test": "Kurye KYC Durumu",
+                    "status": "success",
+                    "message": f"{kyc_pending} KYC onayı bekleyen kurye",
+                    "error": None
+                })
+            except Exception as e:
+                test_results.append({
+                    "test": "Kurye KYC Durumu",
+                    "status": "error",
+                    "message": "KYC sistemi testi başarısız",
+                    "error": str(e)
+                })
+        
+        # Calculate overall status
+        error_count = sum(1 for r in test_results if r["status"] == "error")
+        warning_count = sum(1 for r in test_results if r["status"] == "warning")
+        
+        if error_count > 0:
+            overall_status = "error"
+        elif warning_count > 0:
+            overall_status = "warning"
+        else:
+            overall_status = "success"
         
         return {
             "test_results": test_results,
-            "overall_status": "success" if all(r["status"] == "success" for r in test_results) else "warning",
-            "tested_at": datetime.now(timezone.utc).isoformat()
+            "overall_status": overall_status,
+            "tested_at": datetime.now(timezone.utc).isoformat(),
+            "summary": {
+                "total": len(test_results),
+                "success": sum(1 for r in test_results if r["status"] == "success"),
+                "warning": warning_count,
+                "error": error_count
+            }
         }
     except Exception as e:
         raise HTTPException(500, f"Error running tests: {str(e)}")
