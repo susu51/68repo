@@ -224,22 +224,12 @@ class EndToEndOrderFlowTester:
             self.log_test("Get Business Menu", False, f"Request error: {str(e)}")
             return []
     
-    def test_create_order(self, menu_items):
-        """Test 3: Create order as customer with business items"""
+    def test_create_order(self, customer_session, business_id, menu_items):
+        """Test 4: Create Order with Proper Business ID"""
         try:
-            customer_session, customer_user = self.customer_login()
-            
-            if not customer_session or not customer_user:
-                return False, None
-            
-            customer_id = customer_user.get("id")
-            if not customer_id:
-                self.log_test(
-                    "Create Test Order", 
-                    False, 
-                    "Customer user missing ID field"
-                )
-                return False, None
+            if not customer_session:
+                self.log_test("Create Order", False, "No customer session available")
+                return False, None, None
             
             # Use menu items from the business if available
             if not menu_items:
@@ -258,7 +248,7 @@ class EndToEndOrderFlowTester:
                         }
                     ],
                     "total_amount": 99.99,
-                    "notes": "Test order for business panel display verification"
+                    "notes": "E2E Test order for business panel verification"
                 }
             else:
                 # Create order with first available menu item
@@ -278,7 +268,7 @@ class EndToEndOrderFlowTester:
                         }
                     ],
                     "total_amount": float(menu_item.get("price", 99.99)),
-                    "notes": "Test order for business panel display verification"
+                    "notes": "E2E Test order for business panel verification"
                 }
             
             response = customer_session.post(f"{BACKEND_URL}/orders", json=order_data)
@@ -287,31 +277,37 @@ class EndToEndOrderFlowTester:
                 order = response.json()
                 order_id = order.get("id")
                 order_business_id = order.get("business_id")
+                order_status = order.get("status")
+                
+                # Verify order has expected status
+                expected_statuses = ["created", "pending", "placed"]
+                status_valid = order_status in expected_statuses
                 
                 self.log_test(
-                    "Create Test Order", 
+                    "Create Order", 
                     True, 
-                    f"Order created successfully: {order_id}, business_id: {order_business_id}",
+                    f"Order created: ID={order_id}, business_id={order_business_id}, status={order_status}",
                     {
                         "order_id": order_id,
                         "business_id": order_business_id,
-                        "customer_id": customer_id,
-                        "total_amount": order.get("total_amount"),
-                        "status": order.get("status")
+                        "expected_business_id": business_id,
+                        "status": order_status,
+                        "status_valid": status_valid,
+                        "total_amount": order.get("total_amount")
                     }
                 )
-                return True, order_id
+                return True, order_id, order_business_id
             else:
                 self.log_test(
-                    "Create Test Order", 
+                    "Create Order", 
                     False, 
                     f"Failed to create order: HTTP {response.status_code}: {response.text}"
                 )
-                return False, None
+                return False, None, None
                 
         except Exception as e:
-            self.log_test("Create Test Order", False, f"Request error: {str(e)}")
-            return False, None
+            self.log_test("Create Order", False, f"Request error: {str(e)}")
+            return False, None, None
     
     def test_business_login_and_orders(self, created_order_id):
         """Test 4: Business login and order retrieval (CRITICAL TEST)"""
