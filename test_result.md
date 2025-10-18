@@ -140,9 +140,21 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix customer panel issues: 1) Restaurants not appearing in customer panel - businesses registered without GPS coordinates, 2) Full address not displaying in customer discover section address selector"
+user_problem_statement: "İşletme kayıt ve müşteri keşfet sistemini geliştir: 1) İşletme kayıt kısmında il ve ilçe seçimine göre GPS koordinatları otomatik eklensin, 2) Müşteri panelinde şehir/ilçe konumuna göre aynı şehirdeki restoranları göster, 3) Müşteri restoranlara sipariş verebilsin"
 
 backend:
+  - task: "City-Based Restaurant Discovery System"
+    implemented: true
+    working: true
+    file: "server.py (GET /businesses endpoint)"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ CITY-BASED RESTAURANT DISCOVERY IMPLEMENTED: Enhanced /businesses endpoint with city/district filtering. ENDPOINT FEATURES: 1) GET /businesses?city=Aksaray - Returns all approved businesses in Aksaray. 2) GET /businesses?city=Aksaray&district=Merkez - Returns businesses in specific district. 3) Uses city_normalized field for consistent city matching. 4) Only returns KYC approved businesses (kyc_status=approved, is_active=true). 5) Returns business details: id, name, category, city, district, address, description, lat/lng coordinates. TESTED: Successfully tested with Aksaray city - 5 businesses found and returned correctly. Customer panel can now discover restaurants based on their address city/district."
+
   - task: "Business GPS Coordinates System"
     implemented: true
     working: true
