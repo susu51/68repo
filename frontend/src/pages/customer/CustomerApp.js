@@ -223,30 +223,41 @@ export const CustomerApp = ({ user, onLogout }) => {
         <div style={{ display: activeView === 'checkout' ? 'block' : 'none' }}>
           <div className="max-w-4xl mx-auto p-6 space-y-6">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold">Ödeme</h1>
+              <h1 className="text-2xl font-bold">✅ Ödeme ve Teslimat</h1>
               <Button variant="outline" onClick={handleBackToCart}>
                 ← Sepete Dön
               </Button>
             </div>
 
+            {/* Debug Info */}
+            {console.log('🎯 Checkout page - selectedAddress:', selectedAddress, 'selectedPaymentMethod:', selectedPaymentMethod)}
+
             {/* Step 1: Address Selection */}
             <AddressSelectorEnhanced
               selectedAddress={selectedAddress}
-              onAddressSelect={setSelectedAddress}
+              onAddressSelect={(addr) => {
+                console.log('📍 Address selected:', addr);
+                setSelectedAddress(addr);
+                toast.success('Adres seçildi');
+              }}
             />
 
             {/* Step 2: Payment Method (shown only if address selected) */}
             {selectedAddress && (
               <PaymentOptionsEnhanced
                 selectedMethod={selectedPaymentMethod}
-                onMethodSelect={setSelectedPaymentMethod}
+                onMethodSelect={(method) => {
+                  console.log('💳 Payment method selected:', method);
+                  setSelectedPaymentMethod(method);
+                  toast.success('Ödeme yöntemi seçildi');
+                }}
               />
             )}
 
             {/* Order Summary & Confirm */}
             {selectedAddress && selectedPaymentMethod && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="font-bold text-lg mb-4">Sipariş Özeti</h3>
+              <div className="bg-white rounded-lg shadow-sm p-6 border-2 border-green-200">
+                <h3 className="font-bold text-lg mb-4 text-green-700">✅ Sipariş Özeti</h3>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between">
                     <span>Ürün Toplam:</span>
@@ -261,9 +272,30 @@ export const CustomerApp = ({ user, onLogout }) => {
                     <span>₺{(cartSummary.total + 10).toFixed(2)}</span>
                   </div>
                 </div>
-                <Button onClick={handleCreateOrder} className="w-full" size="lg">
-                  Siparişi Onayla
+                <Button 
+                  onClick={() => {
+                    console.log('🎉 Create order clicked');
+                    handleCreateOrder();
+                  }} 
+                  className="w-full bg-green-600 hover:bg-green-700" 
+                  size="lg"
+                >
+                  🎉 Siparişi Onayla ve Ver
                 </Button>
+              </div>
+            )}
+
+            {/* Show hint if payment method not selected */}
+            {selectedAddress && !selectedPaymentMethod && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-800">⚠️ Ödeme yöntemi seçin</p>
+              </div>
+            )}
+
+            {/* Show hint if address not selected */}
+            {!selectedAddress && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800">ℹ️ Yukarıdan teslimat adresinizi seçin</p>
               </div>
             )}
           </div>
