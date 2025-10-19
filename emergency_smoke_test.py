@@ -176,7 +176,7 @@ class EmergencySmokeTest:
         """Authenticate business user"""
         for credentials in BUSINESS_CREDENTIALS:
             try:
-                response = requests.post(
+                response = self.business_session.post(
                     f"{BACKEND_URL}/api/auth/login",
                     json=credentials,
                     timeout=10
