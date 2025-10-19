@@ -7,16 +7,21 @@ from typing import List
 from datetime import datetime, timezone
 import uuid
 
-from auth_cookie import get_admin_user_from_cookie
+from auth_dependencies import get_admin_user
 from models_package.coupons import (
     Coupon, CouponCreate, CouponUpdate, CouponType, CouponScope
 )
 
 router = APIRouter(prefix="/admin/coupons", tags=["admin-coupons"])
 
+# Admin dependency wrapper
+async def require_admin(current_user: dict = Depends(get_admin_user)):
+    """Ensure user is admin"""
+    return current_user
+
 @router.get("", response_model=List[Coupon])
 async def get_coupons(
-    current_user: dict = Depends(get_admin_user_from_cookie)
+    current_user: dict = Depends(require_admin)
 ):
     """Get all coupons"""
     from server import db
