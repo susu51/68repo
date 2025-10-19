@@ -22,7 +22,7 @@ from models_package.ai_settings import (
 )
 
 # Import auth dependencies
-from auth_cookie import get_admin_user
+from auth_dependencies import get_admin_user
 
 router = APIRouter(prefix="/admin/ai/settings", tags=["AI Settings"])
 db_client: Optional[AsyncIOMotorClient] = None
