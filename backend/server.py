@@ -6108,6 +6108,14 @@ api_router.include_router(business_confirm_router)
 from routes.courier_tasks import router as courier_tasks_router
 api_router.include_router(courier_tasks_router)
 
+# Admin Coupons (Phase 3)
+from routes.admin_coupons import router as admin_coupons_router
+api_router.include_router(admin_coupons_router)
+
+# Cart Coupons (Phase 3)
+from routes.cart_coupons import router as cart_coupons_router
+api_router.include_router(cart_coupons_router)
+
 # Phase 3 Routers
 api_router.include_router(order_status_router)
 api_router.include_router(courier_workflow_router)
