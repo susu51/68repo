@@ -95,117 +95,153 @@ def trim_log_sample(log_text: str, max_bytes: int = 2000) -> str:
     return trimmed + "..."
 
 
-def get_turkish_system_prompt(scope: str) -> str:
+def get_turkish_system_prompt(scope: str, mode: str) -> str:
     """
-    Get Turkish system prompt based on panel scope
+    Get Turkish system prompt based on panel scope and mode
     """
-    common = (
+    base_prompt = (
         "Sen Kuryecini'nin panel-bilinçli sistem asistanısın. "
-        "PII (kişisel veri) asla paylaşma; tüm örneklerde maske uygula. "
-        "İstendiğinde kök neden analizi (RCA) yap, etkiyi (kullanıcı sayısı/akışlar) belirt, "
-        "kısa ve uygulanabilir çözüm adımları öner. "
-        "Kod istenirse FastAPI/React/Tailwind/MongoDB örnek yama ver. "
-        "Yanıtlarını Türkçe ver."
+        "YALNIZCA seçilen panel verilerini kullan. "
+        "PII maskelerini (<MASK:EMAIL>, <MASK:PHONE>, vb.) asla açma, korunmalı. "
+        "Kısa, uygulanabilir, Türkçe yanıt ver."
     )
     
-    scope_prompts = {
-        "customer": (
-            f"{common}\n\n"
-            "Sadece müşteri paneline ait log/metric/akışları kullan. "
-            "Restoran keşfi, sepet/checkout, kupon, sipariş takibi konularına odaklan. "
-            "Müşteri deneyimini iyileştirmeye yönelik öneriler sun."
-        ),
-        "business": (
-            f"{common}\n\n"
-            "Sadece işletme paneline ait verileri kullan. "
-            "Sipariş liste/confirm, menü yönetimi, çalışma saatleri, SLA ihlalleri odaklı analiz yap. "
-            "İşletme verimliliğini artırıcı çözümler öner."
-        ),
-        "courier": (
-            f"{common}\n\n"
-            "Sadece kurye paneli ve görev akışlarını kullan. "
-            "WS bağlantısı, görev kabul/rota, konum paylaşımı ve ETA konularına odaklan. "
-            "Kurye operasyonel verimliliğini artır."
-        ),
-        "multi": (
-            f"{common}\n\n"
-            "Üç panelin verilerini ayrı ayrı özetle ve etkileşimlerini açıkla. "
-            "Kök nedeni panel bazında ayır ve çapraz etkileri analiz et. "
-            "Sistemsel iyileştirme önerileri sun."
-        )
+    # Mode-specific instructions
+    mode_instructions = {
+        "metrics": "Metrik yorumlamaya odaklan. Sayısal değerleri analiz et ve trend yorumu yap.",
+        "summary": "Log ve cluster özetleri ile birlikte Kök Neden Analizi (RCA) yap.",
+        "patch": "RCA ile birlikte kısa kod yaması (FastAPI/React/MongoDB) ve test önerisi ver."
     }
     
-    return scope_prompts.get(scope, scope_prompts["customer"])
+    # Scope-specific focus
+    scope_focus = {
+        "customer": "Müşteri paneli: Restoran keşfi, sepet/checkout, kupon, sipariş takibi.",
+        "business": "İşletme paneli: Sipariş liste/onay, menü yönetimi, çalışma saatleri, SLA.",
+        "courier": "Kurye paneli: Görev kabul, WS bağlantısı, rota/konum, ETA.",
+        "multi": "Üç paneli ayrı ayrı özetle, etkileşimleri açıkla, çapraz etkileri analiz et."
+    }
+    
+    # Response format
+    format_template = """
+Yanıt formatı:
+**[Başlık]**
+**Bulgular** (son X dakikada)
+- Bulgu 1
+- Bulgu 2
 
-
-def get_turkish_answer_format() -> str:
-    """Get Turkish answer format template"""
-    return """
-Yanıtını şu formatta ver:
-
-**Durum Özeti**
-- Ana bulgular (son {time_window} dakikada)
-
-**Muhtemel Nedenler (RCA)**
+**Kök Nedenler**
 - Neden 1
 - Neden 2
-- Neden 3
 
 **Hızlı Çözümler**
-- Anında uygula: ...
+- Anında: ...
 - Konfigürasyon: ...
-
-**Kod/Düzeltme Örneği** (mode=patch ise)
+"""
+    
+    if mode == "patch":
+        format_template += """
+**Kod Örneği**
 ```python
-# Örnek kod
+# Örnek düzeltme
 ```
 
-**İzleme/Test Önerisi**
-- Hangi metriğe bakılmalı
-- Nasıl test edilmeli
+**İzleme/Test**
+- Metrik: ...
+- Test: ...
 """
+    
+    full_prompt = f"{base_prompt}\n\n{mode_instructions.get(mode, '')}\n\n{scope_focus.get(scope, '')}\n\n{format_template}"
+    
+    return full_prompt
 
 
 async def build_panel_context(scope: str, time_window_minutes: int, include_logs: bool, db) -> dict:
     """
-    Build panel-aware context from metrics, logs, and clusters
-    
-    This is a simplified version. In production, you would:
-    - Query actual metrics from system status endpoints
-    - Fetch real logs from ai_logs collection filtered by app field
-    - Get error clusters from ai_clusters collection
+    Build panel-aware context with proper isolation and redaction
     """
-    # Calculate time range
     now = datetime.now(timezone.utc)
     start_time = now - timedelta(minutes=time_window_minutes)
     
-    # Mock metrics (in production, fetch from actual sources)
-    metrics = {
-        "time_window": f"Son {time_window_minutes} dakika",
-        "scope": scope,
-        "p50_latency": "120ms",
-        "p95_latency": "450ms",
-        "error_rate": "2.3%",
-        "active_connections": 45,
-        "queue_depth": 3,
-        "order_ingress_rate": "12/min" if scope in ["customer", "business", "multi"] else "N/A"
-    }
-    
+    # Initialize context structure with Turkish field names
     context = {
-        "scope": scope,
-        "time_window_minutes": time_window_minutes,
-        "metrics": metrics,
-        "logs_included": include_logs
+        "baglam": {
+            "panel": scope,
+            "zaman_dilimi_dk": time_window_minutes,
+            "metrikler": {},
+            "kume_ozetleri": [],
+            "ornek_loglar": []
+        }
     }
     
-    # If logs are requested, add log summary
+    # Fetch metrics (mock for now, can be enhanced with real system metrics)
+    if scope == "multi":
+        # Multi-panel: fetch all three
+        context["baglam"]["metrikler"] = {
+            "customer": {"p50": "110ms", "p95": "420ms", "hata_orani": "1.8%", "ws": 12},
+            "business": {"p50": "95ms", "p95": "380ms", "hata_orani": "2.1%", "ws": 23},
+            "courier": {"p50": "130ms", "p95": "450ms", "hata_orani": "1.5%", "ws": 8}
+        }
+    else:
+        # Single panel metrics
+        context["baglam"]["metrikler"] = {
+            "p50": "105ms",
+            "p95": "395ms",
+            "hata_orani": "1.9%",
+            "kuyruk": 4,
+            "aktif_ws": 15 if scope == "business" else (8 if scope == "customer" else 5),
+            "siparis_dak": "8/dk" if scope in ["customer", "business"] else "N/A"
+        }
+    
+    # Fetch log samples if requested
     if include_logs:
-        # In production: query ai_logs filtered by app=scope and time range
-        context["log_summary"] = f"Son {time_window_minutes} dakikada {scope} panelinde 15 log kaydı, 2 hata, 3 uyarı."
-        context["top_errors"] = [
-            "REDACTED: API timeout error (3 occurrences)",
-            "REDACTED: Invalid session token (2 occurrences)"
-        ]
+        try:
+            # Query ai_logs collection filtered by app field
+            app_filter = scope if scope != "multi" else {"$in": ["customer", "business", "courier"]}
+            
+            logs_cursor = db.ai_logs.find(
+                {
+                    "app": app_filter,
+                    "timestamp": {"$gte": start_time}
+                },
+                {"message": 1, "level": 1, "timestamp": 1, "_id": 0}
+            ).sort("timestamp", -1).limit(10)
+            
+            logs = await logs_cursor.to_list(length=10)
+            
+            if logs:
+                # Redact and trim log samples
+                context["baglam"]["ornek_loglar"] = [
+                    trim_log_sample(redact_pii(log.get("message", "")))
+                    for log in logs
+                ]
+            else:
+                context["baglam"]["ornek_loglar"] = [
+                    "Son {} dakikada log kaydı bulunamadı.".format(time_window_minutes)
+                ]
+            
+            # Fetch error clusters
+            clusters_cursor = db.ai_clusters.find(
+                {
+                    "app": app_filter,
+                    "last_seen": {"$gte": start_time}
+                },
+                {"fingerprint": 1, "sample_message": 1, "count_24h": 1, "_id": 0}
+            ).sort("count_24h", -1).limit(5)
+            
+            clusters = await clusters_cursor.to_list(length=5)
+            
+            if clusters:
+                context["baglam"]["kume_ozetleri"] = [
+                    {
+                        "baslik": cluster.get("fingerprint", "Unknown")[:50],
+                        "ornek": trim_log_sample(redact_pii(cluster.get("sample_message", "")), 500),
+                        "siklik_24s": cluster.get("count_24h", 0)
+                    }
+                    for cluster in clusters
+                ]
+        except Exception as e:
+            print(f"⚠️ Log fetch error: {str(e)}")
+            context["baglam"]["ornek_loglar"] = ["Log verisi alınamadı."]
     
     return context
 
