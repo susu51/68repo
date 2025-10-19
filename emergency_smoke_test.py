@@ -76,10 +76,19 @@ class EmergencySmokeTest:
                     is_open_field = "is_open" in restaurant or "is_active" in restaurant
                     
                     if has_name and has_coords and has_delivery_fee:
+                        # Get coordinates for display
+                        if "lat" in restaurant and "lng" in restaurant:
+                            coords_display = f"({restaurant.get('lat')}, {restaurant.get('lng')})"
+                        elif restaurant.get("location", {}).get("coordinates"):
+                            coords = restaurant["location"]["coordinates"]
+                            coords_display = f"({coords[1]}, {coords[0]})"  # GeoJSON is [lng, lat]
+                        else:
+                            coords_display = "N/A"
+                        
                         self.log_test(
                             "Restaurant Discovery (No Params)",
                             True,
-                            f"Found {len(restaurants)} restaurants. Sample: {restaurant.get('name', restaurant.get('business_name'))}, coords: ({restaurant.get('lat')}, {restaurant.get('lng')}), is_open: {restaurant.get('is_open', restaurant.get('is_active'))}"
+                            f"Found {len(restaurants)} restaurants. Sample: {restaurant.get('name', restaurant.get('business_name'))}, coords: {coords_display}, is_open: {restaurant.get('is_open', restaurant.get('is_active'))}"
                         )
                         return True
                     else:
