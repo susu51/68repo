@@ -70,7 +70,7 @@ class BusinessWebSocketTester:
         """Authenticate business user - try multiple credentials"""
         for i, credentials in enumerate(BUSINESS_CREDENTIALS_LIST):
             try:
-                response = requests.post(
+                response = self.business_session.post(
                     f"{BACKEND_URL}/api/auth/login",
                     json=credentials,
                     timeout=10
