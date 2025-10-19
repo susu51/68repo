@@ -94,21 +94,31 @@ manager = ConnectionManager()
 
 async def websocket_order_notifications(
     websocket: WebSocket,
-    business_id: str = Query(..., description="Business ID to subscribe to")
+    business_id: str = Query(None, description="Business ID to subscribe to (for businesses)"),
+    role: str = Query("business", description="Role: 'business' or 'admin'")
 ):
     """
     WebSocket endpoint for real-time order notifications
-    Connect: ws://domain/api/ws/orders?business_id={business_id}
+    Business: ws://domain/api/ws/orders?business_id={business_id}&role=business
+    Admin: ws://domain/api/ws/orders?role=admin
     """
-    await manager.connect(websocket, business_id)
+    client_id = business_id if role == "business" else "admin"
+    
+    # Validate parameters
+    if role == "business" and not business_id:
+        await websocket.close(code=1008, reason="business_id is required for business role")
+        return
+    
+    await manager.connect(websocket, client_id, role)
     
     try:
         # Send connection confirmation
         await websocket.send_json({
             "type": "connected",
-            "business_id": business_id,
+            "role": role,
+            "client_id": client_id,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "message": "Sipariş bildirimleri aktif"
+            "message": "Sipariş bildirimleri aktif" if role == "business" else "Admin sipariş takibi aktif"
         })
         
         # Subscribe to event bus
@@ -116,13 +126,26 @@ async def websocket_order_notifications(
         
         async def on_order_event(data: dict):
             """Callback for order events"""
-            await manager.send_to_business(business_id, {
-                "type": "order_notification",
-                "data": data
-            })
+            if role == "admin":
+                # Admin receives all orders
+                await manager.send_to_admins({
+                    "type": "order_notification",
+                    "data": data
+                })
+            else:
+                # Business receives only their orders
+                await manager.send_to_business(business_id, {
+                    "type": "order_notification",
+                    "data": data
+                })
         
-        # Subscribe to business-specific topic
-        await event_bus.subscribe(f"business:{business_id}", on_order_event)
+        # Subscribe to appropriate topic
+        if role == "admin":
+            # Subscribe to all order events
+            await event_bus.subscribe("orders:all", on_order_event)
+        else:
+            # Subscribe to business-specific topic
+            await event_bus.subscribe(f"business:{business_id}", on_order_event)
         
         # Keep connection alive
         while True:
@@ -134,8 +157,8 @@ async def websocket_order_notifications(
                 await websocket.send_text("pong")
             
     except WebSocketDisconnect:
-        manager.disconnect(websocket, business_id)
-        print(f"Client disconnected: business_id={business_id}")
+        manager.disconnect(websocket, client_id, role)
+        print(f"Client disconnected: role={role}, client_id={client_id}")
     except Exception as e:
         print(f"❌ WebSocket error: {e}")
-        manager.disconnect(websocket, business_id)
+        manager.disconnect(websocket, client_id, role)
