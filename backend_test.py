@@ -124,8 +124,8 @@ class WebSocketTester:
         except Exception as e:
             self.log_test("Customer Authentication", False, error=f"Authentication error: {str(e)}")
             return False
-    
-    def test_customer_login(self):
+
+    async def test_admin_websocket_connection(self):
         """Test 1: Customer Login"""
         try:
             customer_session, customer_user = self.customer_login()
