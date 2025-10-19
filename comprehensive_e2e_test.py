@@ -224,7 +224,7 @@ class ComprehensiveE2ETester:
             
             # Get customer orders
             response = customer_session.get(f"{BACKEND_URL}/orders")
-            print(f"DEBUG: Customer orders response: {response.status_code} - {response.text[:200]}")
+            # Debug removed for clean output
             
             if response.status_code == 200:
                 orders = response.json()
