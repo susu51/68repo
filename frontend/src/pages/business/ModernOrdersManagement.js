@@ -15,10 +15,13 @@ import {
   Eye,
   RefreshCw,
   CheckCheck,
-  AlertCircle
+  AlertCircle,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { get, patch } from '../../api/http';
+import { useOrderNotifications } from '../../hooks/useOrderNotifications';
 
 export const ModernOrdersManagement = ({ businessId }) => {
   const [orders, setOrders] = useState([]);
@@ -32,9 +35,19 @@ export const ModernOrdersManagement = ({ businessId }) => {
     delivered: 0
   });
 
+  // WebSocket for real-time notifications
+  const { isConnected, reconnect } = useOrderNotifications(
+    businessId,
+    (event) => {
+      console.log('🔔 New order event received:', event);
+      // Refresh orders when new order arrives
+      fetchOrders();
+    }
+  );
+
   useEffect(() => {
     fetchOrders();
-    // Auto-refresh every 30 seconds
+    // Auto-refresh every 30 seconds as fallback
     const interval = setInterval(fetchOrders, 30000);
     return () => clearInterval(interval);
   }, []);
