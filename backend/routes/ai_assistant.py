@@ -248,23 +248,49 @@ async def build_panel_context(scope: str, time_window_minutes: int, include_logs
 
 async def stream_ai_response(question: str, scope: str, context: dict, mode: str, settings: dict):
     """
-    Stream AI response using emergentintegrations with proper SSE format
+    Stream REAL AI response using emergentintegrations - NO TEMPLATES
     """
+    # Telemetry data
+    telemetry = {
+        "provider": None,
+        "model": None,
+        "use_emergent_key": False,
+        "used_custom_key": False,
+        "scope": scope,
+        "mode": mode,
+        "time_window": context.get("baglam", {}).get("zaman_dilimi_dk", 60)
+    }
+    
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
         
-        # Determine API key
+        # Determine API key and provider
         api_key = None
+        provider = "emergent"
+        model = settings.get("default_model", "gpt-4o-mini") if settings else "gpt-4o-mini"
+        
+        # Try custom key first if set and enabled
         if settings and settings.get("openai_api_key") and not settings.get("use_emergent_key", True):
             api_key = settings["openai_api_key"]
+            provider = "openai_custom"
+            telemetry["used_custom_key"] = True
         else:
+            # Use Emergent LLM Key
             api_key = os.environ.get("EMERGENT_LLM_KEY")
+            provider = "emergent"
+            telemetry["use_emergent_key"] = True
         
         if not api_key:
-            error_payload = json.dumps({"error": "API anahtarı yapılandırılmamış."})
+            error_payload = json.dumps({"error": "API anahtarı yapılandırılmamış."}, ensure_ascii=False)
             yield f"data: {error_payload}\n\n"
             yield "data: [DONE]\n\n"
             return
+        
+        telemetry["provider"] = provider
+        telemetry["model"] = model
+        
+        # Log telemetry (no PII)
+        print(f"📊 LLM Call: provider={provider}, model={model}, scope={scope}, mode={mode}, window={telemetry['time_window']}dk")
         
         # Get system prompt
         system_prompt = get_turkish_system_prompt(scope, mode)
@@ -291,72 +317,116 @@ Metrikler:
         
         user_message_text = f"{context_str}\n\nSoru: {question}"
         
-        # Create chat instance with optimized parameters
-        model = settings.get("default_model", "gpt-4o-mini") if settings else "gpt-4o-mini"
-        
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"panel_ai_{datetime.now().timestamp()}",
-            system_message=system_prompt
-        ).with_model("openai", model)
-        
-        # Send message (attempt streaming with retry logic)
-        user_message = UserMessage(text=user_message_text)
-        
+        # Retry logic
         retry_count = 0
         max_retries = 2
+        last_error = None
         
         while retry_count <= max_retries:
             try:
-                # Get full response (streaming not fully supported by simple SDK)
+                # Create chat instance with optimized parameters
+                chat = LlmChat(
+                    api_key=api_key,
+                    session_id=f"panel_ai_{datetime.now().timestamp()}",
+                    system_message=system_prompt
+                ).with_model("openai", model)
+                
+                # Configure parameters for natural responses
+                # Note: emergentintegrations may not support all parameters
+                # temperature=0.4, max_tokens=900, top_p=1
+                
+                # Send message - REAL LLM CALL
+                user_message = UserMessage(text=user_message_text)
                 response = await chat.send_message(user_message)
                 
-                # Check if empty response
-                if not response or len(response.strip()) < 10:
-                    yield f"data: {{\"delta\": \"Seçili zaman diliminde yeterli log yok. Zaman penceresini 24 saat yapmayı veya 'Multi' modunu denemeyi öneririm.\"}}\n\n"
-                    yield "data: [DONE]\n\n"
-                    return
+                # Check if we got a real response
+                if not response or len(response.strip()) < 20:
+                    # This is suspicious - likely not a real LLM response
+                    if retry_count < max_retries:
+                        retry_count += 1
+                        await asyncio.sleep(0.5 * retry_count)
+                        continue
+                    else:
+                        # All retries exhausted - fail properly
+                        raise Exception("Model returned empty/invalid response")
                 
-                # Stream response in chunks (simulate streaming)
+                # Send metadata first
+                meta_payload = json.dumps({
+                    "meta": {
+                        "provider": provider,
+                        "model": model,
+                        "scope": scope,
+                        "mode": mode
+                    }
+                }, ensure_ascii=False)
+                yield f"data: {meta_payload}\n\n"
+                
+                # Stream REAL response in chunks
                 chunk_size = 30
                 for i in range(0, len(response), chunk_size):
                     chunk = response[i:i+chunk_size]
-                    # Proper SSE format with JSON delta
                     chunk_json = json.dumps({"delta": chunk}, ensure_ascii=False)
                     yield f"data: {chunk_json}\n\n"
                     await asyncio.sleep(0.03)  # Smooth streaming
                 
                 yield "data: [DONE]\n\n"
+                
+                # Log success
+                print(f"✅ LLM Success: provider={provider}, model={model}, response_length={len(response)}")
                 return
                 
             except Exception as e:
-                error_str = str(e)
+                last_error = str(e)
+                print(f"⚠️ LLM Error (attempt {retry_count + 1}): {last_error}")
+                
+                # Handle 401 - invalid custom key, fallback to Emergent
+                if "401" in last_error or "unauthorized" in last_error.lower():
+                    if provider == "openai_custom" and retry_count == 0:
+                        print("🔄 Custom key failed, falling back to Emergent LLM Key")
+                        api_key = os.environ.get("EMERGENT_LLM_KEY")
+                        provider = "emergent"
+                        telemetry["provider"] = "emergent"
+                        telemetry["use_emergent_key"] = True
+                        retry_count += 1
+                        continue
                 
                 # Handle 429 rate limit
-                if "429" in error_str or "rate_limit" in error_str.lower():
+                if "429" in last_error or "rate_limit" in last_error.lower():
                     if retry_count < max_retries:
-                        await asyncio.sleep(0.5 * (retry_count + 1))  # Backoff
+                        backoff_delay = 0.5 * (retry_count + 1)
+                        print(f"⏳ Rate limited, backing off {backoff_delay}s")
+                        await asyncio.sleep(backoff_delay)
                         retry_count += 1
                         continue
                     else:
-                        error_payload = json.dumps({"error": "Hız limiti aşıldı, lütfen biraz sonra tekrar deneyin."})
+                        error_payload = json.dumps({"error": "Hız limiti aşıldı, lütfen biraz sonra tekrar deneyin."}, ensure_ascii=False)
                         yield f"data: {error_payload}\n\n"
                         yield "data: [DONE]\n\n"
                         return
                 
-                # Handle other errors
-                retry_count += 1
-                if retry_count > max_retries:
-                    error_payload = json.dumps({"error": f"Model yanıtı alınamadı. Lütfen yeniden deneyin. ({error_str})"})
+                # Other errors - retry with backoff
+                if retry_count < max_retries:
+                    retry_count += 1
+                    await asyncio.sleep(1 * retry_count)
+                    continue
+                else:
+                    # All retries exhausted - fail with 502-like error
+                    # Frontend will handle this as a proper error
+                    error_payload = json.dumps({
+                        "error": "Model yanıtı alınamadı. Lütfen ayarları kontrol edip tekrar deneyin.",
+                        "llm_call_failed": True
+                    }, ensure_ascii=False)
                     yield f"data: {error_payload}\n\n"
                     yield "data: [DONE]\n\n"
                     return
-                
-                await asyncio.sleep(1)  # Wait before retry
         
     except Exception as e:
-        error_msg = f"AI sorgu hatası: {str(e)}"
-        error_payload = json.dumps({"error": error_msg})
+        error_msg = f"LLM sistem hatası: {str(e)}"
+        print(f"❌ LLM System Error: {error_msg}")
+        error_payload = json.dumps({
+            "error": "Model yanıtı alınamadı. Lütfen ayarları kontrol edip tekrar deneyin.",
+            "llm_call_failed": True
+        }, ensure_ascii=False)
         yield f"data: {error_payload}\n\n"
         yield "data: [DONE]\n\n"
 
