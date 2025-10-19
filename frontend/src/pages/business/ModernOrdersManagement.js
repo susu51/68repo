@@ -152,9 +152,6 @@ export const ModernOrdersManagement = ({ businessId }) => {
       toast.error('Bir hata oluştu');
     }
   };
-      toast.error(error.response?.data?.detail || 'Durum güncellenemedi');
-    }
-  };
 
   const getStatusLabel = (status) => {
     const labels = {
