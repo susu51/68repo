@@ -35,19 +35,23 @@ const useAdminOrderNotifications = (onNewOrder) => {
       const ws = new WebSocket(websocketUrl);
       
       ws.onopen = () => {
-        console.log('✅ Admin WebSocket connected');
+        console.log('✅ Admin WebSocket connected successfully');
         setIsConnected(true);
         setConnectionAttempts(0);
         
         // Send ping every 30 seconds to keep connection alive
         const pingInterval = setInterval(() => {
           if (ws.readyState === WebSocket.OPEN) {
+            console.log('📡 Sending ping to admin WebSocket');
             ws.send('ping');
+          } else {
+            console.warn('⚠️ WebSocket not open, readyState:', ws.readyState);
           }
         }, 30000);
         
         // Store interval for cleanup
         ws.pingInterval = pingInterval;
+        console.log('⏰ Ping interval set up for admin WebSocket');
       };
       
       ws.onmessage = (event) => {
