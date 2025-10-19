@@ -259,29 +259,38 @@ class WebSocketTester:
 
     def get_business_menu(self, business_id):
         """Get business menu items"""
-        try:
-            response = requests.get(f"{BACKEND_URL}/api/business/public/{business_id}/menu", timeout=10)
-            
-            if response.status_code == 200:
-                menu_items = response.json()
-                if menu_items and len(menu_items) > 0:
-                    item = menu_items[0]
-                    self.log_test(
-                        "Get Business Menu",
-                        True,
-                        f"Found {len(menu_items)} menu items, using: {item.get('name')} (₺{item.get('price')})"
-                    )
-                    return item
-                else:
-                    self.log_test("Get Business Menu", False, error="No menu items found")
-                    return None
-            else:
-                self.log_test("Get Business Menu", False, error=f"Menu API error: {response.status_code}")
-                return None
+        # Try multiple menu endpoints
+        endpoints_to_try = [
+            f"{BACKEND_URL}/api/business/public/{business_id}/menu",
+            f"{BACKEND_URL}/api/business/{business_id}/menu", 
+            f"{BACKEND_URL}/api/business/public-menu/{business_id}/products",
+            f"{BACKEND_URL}/api/businesses/{business_id}/products"
+        ]
+        
+        for endpoint in endpoints_to_try:
+            try:
+                response = requests.get(endpoint, timeout=10)
                 
-        except Exception as e:
-            self.log_test("Get Business Menu", False, error=f"Error getting menu: {str(e)}")
-            return None
+                if response.status_code == 200:
+                    menu_items = response.json()
+                    if menu_items and len(menu_items) > 0:
+                        item = menu_items[0]
+                        self.log_test(
+                            "Get Business Menu",
+                            True,
+                            f"Found {len(menu_items)} menu items using {endpoint}, using: {item.get('name')} (₺{item.get('price')})"
+                        )
+                        return item
+                    else:
+                        print(f"   Tried {endpoint}: Empty menu")
+                else:
+                    print(f"   Tried {endpoint}: {response.status_code}")
+                    
+            except Exception as e:
+                print(f"   Tried {endpoint}: Error - {str(e)}")
+        
+        self.log_test("Get Business Menu", False, error="No menu items found in any endpoint")
+        return None
 
     def create_test_order(self, business_id, menu_item):
         """Create a test order"""
