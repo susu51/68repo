@@ -19,7 +19,7 @@ from datetime import datetime
 import sys
 
 # Configuration
-BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com"
 
 # Test credentials
 BUSINESS_CREDENTIALS = [

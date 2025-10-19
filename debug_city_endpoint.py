@@ -7,7 +7,7 @@ import requests
 import json
 
 # Backend URL
-BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
 
 def debug_endpoint():
     """Debug the city catalog endpoint"""

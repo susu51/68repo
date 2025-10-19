@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://admin-wsocket.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tools.preview.emergentagent.com/api';
 
 export const BannerManager = () => {
   const [banners, setBanners] = useState([]);

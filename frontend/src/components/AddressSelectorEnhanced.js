@@ -6,7 +6,7 @@ import { Label } from './ui/label.jsx';
 import { MapPin, Plus, Check, Home, Briefcase, MapPinned, Navigation } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://admin-wsocket.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tools.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const AddressSelectorEnhanced = ({ selectedAddress, onAddressSelect }) => {

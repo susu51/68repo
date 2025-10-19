@@ -13,7 +13,7 @@ import { RatingModal } from '../../components/RatingModal';
 import { AddressManagementPage } from './AddressManagementPage';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://admin-wsocket.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tools.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 // PHASE 2 - Customer App: Profil, Checkout Flow, Ratings

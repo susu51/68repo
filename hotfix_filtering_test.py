@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
 
 async def test_business_filtering():
     """Test business filtering with normalized cities"""

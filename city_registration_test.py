@@ -18,7 +18,7 @@ import uuid
 from datetime import datetime, timezone
 
 # Configuration - Use environment URL
-BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
 
 class CityRegistrationTester:
     def __init__(self):

@@ -7,7 +7,7 @@ Deep dive into the business visibility pipeline to identify the exact issue
 import requests
 import json
 
-BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
 
 def get_token(role):
     """Get authentication token for role"""

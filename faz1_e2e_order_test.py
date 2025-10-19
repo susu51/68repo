@@ -26,7 +26,7 @@ import sys
 from pymongo import MongoClient
 
 # Configuration
-BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com"
 
 # Test credentials
 CUSTOMER_CREDENTIALS = {

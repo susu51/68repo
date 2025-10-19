@@ -13,7 +13,7 @@ import aiohttp
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
 
 class CriticalIssuesFixer:
     def __init__(self):
