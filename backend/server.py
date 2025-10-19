@@ -65,6 +65,8 @@ from routes.addresses import set_db_client as set_addresses_db_client
 from routes.city_catalog import set_db_client as set_city_catalog_db_client
 # AI settings router db setup
 from routes.ai_settings import set_db_client as set_ai_settings_db_client
+# AI assistant router db setup  
+from routes.ai_assistant import set_db_client as set_ai_assistant_db_client
 
 # Import phone validation function
 try:
