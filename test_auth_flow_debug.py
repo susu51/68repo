@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BASE_URL = "https://food-dash-87.preview.emergentagent.com"
+BASE_URL = "https://admin-wsocket.preview.emergentagent.com"
 AUTH_BASE_URL = f"{BASE_URL}/api/auth"
 
 async def test_auth_flow():

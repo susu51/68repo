@@ -1,60 +1,53 @@
 <analysis>
-The previous AI engineer meticulously advanced the Kuryecini application, resolving numerous critical bugs and implementing substantial features. Initial efforts centered on fixing order display in the business panel due to  mismatches and frontend  issues, which were resolved via  and  modifications. Subsequent fixes included synchronizing the Menü Ürünleri: 0 count in the Business Dashboard, correcting Restoran bulunamadı on the DiscoverPage for GPS activation, and mitigating mobile keyboard closing issues in registration forms. A major architectural fix involved restructuring  to correctly render Admin Settings, which were previously unclickable due to incorrect  placement. Panel-based test buttons were added to Admin Settings. Authentication issues, an infinite refresh loop in the business panel, and WebSocket connectivity problems (missing , / protocol mismatch) were also addressed. Most recently, a comprehensive real-time order routing system, including database migrations, new order models, event publishing via WebSockets, and frontend integration with audible alerts, was implemented and fully tested.
+The AI engineer continued developing the Kuryecini application, focusing on real-time order management. The initial analysis provided by the system prompt detailed previous work including bug fixes for order display, frontend  issues, business dashboard counts, DiscoverPage GPS, mobile keyboard, and Admin Settings rendering. A major part was the implementation of a comprehensive real-time order routing system with new database models, WebSocket integration, and frontend notifications.
+
+The current trajectory details the work on integrating real-time order visibility into the Admin Panel. This involved modifying backend WebSocket logic for admin roles, creating a new frontend hook (), and integrating this into  and  to display live orders with filters. Debugging efforts primarily focused on resolving WebSocket connection issues, first identifying a missing  prefix in the frontend URL construction, and then, after fixing that, addressing a persistent WebSocket is closed before connection is established error. A troubleshoot agent was consulted, diagnosing a failing event bus subscription. Error handling was added, but the issue persists, indicating further investigation is needed.
 </analysis>
 
 <product_requirements>
-The Kuryecini platform is a multi-role (Customer, Business, Courier, Admin) application, leveraging React, FastAPI, and MongoDB. Key functionalities include robust address management, geocoding, distance-based restaurant discovery, and real-time order processing. Recent feature development focused on a detailed, role-specific registration process with KYC, an advertisement system with city-filtered banners, and a modern, theme-aware login/registration UX. Menu management allows businesses to upload images. Restaurant discovery for customers is intelligent, using city/district and GPS filtering, and displays full addresses. An Admin Settings panel was required, including maintenance mode. A critical focus was ensuring the end-to-end order flow (add-to-cart, payment, order visibility) functions flawlessly across customer, business, and courier panels. The latest major requirement is to harden order routing with strict data models, indexing, API validations, real-time WebSocket updates, RBAC, improved notifications, comprehensive testing, and observability.
+The Kuryecini platform is a multi-role (Customer, Business, Courier, Admin) application built with React, FastAPI, and MongoDB. Core features include robust address management, geocoding for restaurant discovery, role-specific registration with KYC, and advertisement display. Recent development introduced a modern, theme-aware login/registration UX and comprehensive menu management. Customer discovery utilizes city/district and GPS filtering. An Admin Settings panel was implemented, including a maintenance mode feature. The primary objective is a flawless end-to-end order flow across all user panels (customer, business, courier). The latest, significant requirement was to harden the order routing system with strict data models, indexing, API validations, real-time WebSocket updates, RBAC, improved notifications, and testing. The current work specifically extends this real-time order visibility to the Admin panel.
 </product_requirements>
 
 <key_technical_concepts>
--   Full-stack Architecture: React, FastAPI, MongoDB.
--   Authentication: JWT, secure cookies, role-based access control.
--   UI/Styling: Tailwind CSS, React Context API, gradient designs.
--   Routing: React Router DOM.
--   State Management: React hooks (, , , ).
--   Geocoding/Location: Distance-based and city/district filtering, GPS coordinates, geospatial indexing.
--   Database Interaction: MongoDB with UUIDs for IDs.
--   Real-time Communication: WebSockets (FastAPI, React hooks, in-memory event bus).
+- Full-stack Architecture: React, FastAPI, MongoDB.
+- Real-time Communication: WebSockets (FastAPI, React hooks, in-memory event bus).
+- Authentication: JWT, secure cookies, role-based access control.
+- UI/Styling: Tailwind CSS, React Context API.
+- Routing: React Router DOM.
+- State Management: React hooks (, , ).
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: Central FastAPI application. Overhauled  for new models, added event publishing and WebSocket router. Fixed  to use cookie authentication, removed duplicate order endpoints. Updated  for panel-based tests and business profile update logic.
--   ****: (NEW) Defines hardened Pydantic models for order creation and representation.
--   ****: (NEW) Script to migrate existing order data for schema consistency and create essential MongoDB indexes.
--   ****: (NEW) Implements a simple in-memory event publishing/subscription mechanism.
--   ****: (NEW) Defines the backend WebSocket endpoint logic for real-time order notifications.
--   ****: (NEW) Created to properly initialize the  directory as a Python package, resolving import errors.
--   ****: Handles city/location filtering. The  parameter in  was made optional; a syntax error in pipeline construction was corrected.
--   ****: Core Pydantic models. Added  and  fields to the  model.
--   ****: Main application component. Fixed  hierarchy for Admin Settings rendering; added  after successful login.
--   ****: Customer restaurant discovery. Improved  to correctly handle GPS and address-based filtering; a duplicate  was removed.
--   ****: Main customer application. Updated  to align with the new backend API format.
--   ****: Customer order history. Adjusted order display to directly use array responses from the API.
--   ****: User registration forms. Added , , and  props to input fields to address mobile keyboard issues.
--   ****: Business profile settings. Added UI fields for  and  to reflect registration data.
--   ****: Business order management. Integrated  for real-time updates, added a WebSocket connection indicator, and removed erroneous  calls.
--   ****: Main business application. Ensured the correct  is passed as  to .
--   ****: (NEW) Custom React hook for managing WebSocket connections and processing real-time order notifications. Dynamically adjusts  to  for WebSocket URLs.
--   ****: (NEW) Utility function to play an audible alert upon receiving new order notifications.
+-   ****: Central FastAPI application. Modified to include event publishing for admin-specific order updates.
+-   ****: Defines backend WebSocket logic. Modified to handle admin  in connections and subscriptions. Error handling added around event bus subscription.
+-   ****: Implements in-memory event publishing/subscription. Reviewed to confirm async nature of .
+-   ****: Main application component. Modified to integrate  with real-time order updates, including importing the new admin-specific WebSocket hook and integrating enhanced orders tab UI with filters.
+-   ****: Admin dashboard component. Modified to import and utilize the  hook for real-time order display and WebSocket status indication.
+-   ****: (NEW) Custom React hook for managing WebSocket connections for admin order notifications, processing messages, and dynamically adjusting WebSocket URLs. Modified to explicitly add  prefix to the WebSocket URL.
 </code_architecture>
 
 <pending_tasks>
--   Complete order tracking features with real-time updates and map view (PHASE 2C).
--   Integrate customer rating modal post-delivery (PHASE 2C).
--   Implement Business/Restaurant analytics (PHASE 2D).
--   Add unit and E2E tests for all new features (PHASE 2D).
--   Implement Yeni Sipariş toast + badge counter in Business Panel.
--   Implement order filters in Business Panel ().
--   Implement manual refresh button + automatic WS/poll sync in Business Panel.
--   Integrate Admin Panel Orders (Admin Siparişler tablosunda anlık görünür).
--   Add Observability metrics (, ) to .
+- Complete order tracking features with real-time updates and map view (PHASE 2C).
+- Integrate customer rating modal post-delivery (PHASE 2C).
+- Implement Business/Restaurant analytics (PHASE 2D).
+- Add unit and E2E tests for all new features (PHASE 2D).
+- Implement Yeni Sipariş toast + badge counter in Business Panel.
+- Implement order filters in Business Panel ().
+- Implement manual refresh button + automatic WS/poll sync in Business Panel.
+- Add Observability metrics (, ) to .
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer completed a major hardening of the order routing system. This involved: running a database migration () to ensure all orders have correct  linkages and statuses, and to create necessary MongoDB indexes. New robust  models were defined in . The  endpoint in  was refactored for new models, comprehensive validations, item snapshots, and event publishing. A real-time WebSocket Pub/Sub system, including  and , was implemented in the backend. On the frontend,  was updated for the new API, and  was created and integrated into  for real-time updates, including a WebSocket connection indicator. Critical bugs were fixed: a backend 502 error ( not imported) and a WebSocket connection error ( vs  protocol mismatch). The last completed task was adding an audible alert () for new orders received via WebSocket, and the system has passed an end-to-end test with 100% success for order routing.
+Immediately prior to this summary, the AI engineer was working on integrating real-time order visibility into the Admin Panel. This involved:
+1.  **Backend Enhancements**: Modifying  to support  in WebSocket connections and ensuring the  publishes to an orders:all topic for admin.
+2.  **Frontend Hook**: Creating  to manage the WebSocket connection and process notifications for the admin panel.
+3.  **Admin Panel Integration**: Updating  and  to incorporate the new hook, display real-time order data, add filter functionality for order statuses (e.g., Bekleyen, Hazırlanıyor), and show WebSocket connection status.
+4.  **Debugging WebSocket Connection**: The primary issue encountered was a persistent WebSocket is closed before the connection is established error. Initial attempts involved fixing a missing  prefix in the WebSocket URL constructed on the frontend (Chat Message 80-87). After correcting the URL, the error persisted, leading to a consultation with the .
+5.  **Troubleshoot Agent Diagnosis & Fix Attempt**: The  identified that the Event bus subscription fails, causing the WebSocket to close immediately. Based on this, error handling was added to the WebSocket handler in  (Chat Message 103).
+Despite these changes, the WebSocket connection issue remains unresolved, and the WebSocket is closed before the connection is established error persists, indicating the underlying problem with the event bus subscription or WebSocket handshake is still present.
 </current_work>
 
 <optional_next_step>
-Integrate Admin Panel Orders for real-time visibility.
+Investigate why the WebSocket connection is still failing after adding error handling, specifically examining backend logs for subscription errors.
 </optional_next_step>

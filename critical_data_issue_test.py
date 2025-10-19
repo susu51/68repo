@@ -7,7 +7,7 @@ Testing the root cause: Admin and customer endpoints query different collections
 import requests
 import json
 
-BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
+BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
 
 def get_admin_token():
     creds = {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"}

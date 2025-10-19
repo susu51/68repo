@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
+BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
 
 def test_businesses_endpoint():
     """Debug the businesses endpoint error"""

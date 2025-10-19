@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
+BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
 BUSINESS_EMAIL = "testbusiness@example.com"
 BUSINESS_PASSWORD = "test123"
 

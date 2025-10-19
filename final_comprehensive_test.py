@@ -107,7 +107,7 @@ class FinalComprehensiveTest:
         # Feature 4: Environment variables and CORS configuration
         try:
             headers = {
-                'Origin': 'https://food-dash-87.preview.emergentagent.com',
+                'Origin': 'https://admin-wsocket.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type,Authorization'
             }

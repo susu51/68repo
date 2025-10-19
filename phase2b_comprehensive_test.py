@@ -17,7 +17,7 @@ import random
 from datetime import datetime, timezone
 
 # Configuration
-BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
+BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
 
 # Test credentials
 BUSINESS_EMAIL = "testbusiness@example.com"

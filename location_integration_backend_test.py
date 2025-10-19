@@ -25,7 +25,7 @@ import sys
 import os
 
 # Backend URL from environment
-BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
+BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com/api"
 
 class LocationIntegrationTester:
     def __init__(self):

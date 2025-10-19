@@ -14,7 +14,7 @@ const useAdminOrderNotifications = (onNewOrder) => {
   const connect = useCallback(() => {
     try {
       // Get backend URL from environment
-      let backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://food-dash-87.preview.emergentagent.com';
+      let backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://admin-wsocket.preview.emergentagent.com';
       
       // Ensure /api is included in the URL
       if (!backendUrl.endsWith('/api')) {

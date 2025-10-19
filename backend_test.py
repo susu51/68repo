@@ -22,7 +22,7 @@ import os
 import sys
 
 # Configuration
-BACKEND_URL = "https://food-dash-87.preview.emergentagent.com"
+BACKEND_URL = "https://admin-wsocket.preview.emergentagent.com"
 WS_URL = "wss://food-dash-87.preview.emergentagent.com"
 
 # Test credentials - try multiple admin credentials
