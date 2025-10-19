@@ -66,9 +66,14 @@ export const NewBusinessApp = ({ user, onLogout }) => {
 
   const loadBusinessInfo = async () => {
     try {
+      // Get business ID from authenticated user
+      const businessId = user?.id; // Business user's own ID is the business_id
+      
+      console.log('🏪 Loading business info for ID:', businessId);
+      
       setBusinessInfo({
-        id: user?.business_id || 'business-1',
-        name: user?.business_name || 'İşletmem',
+        id: businessId,
+        name: user?.business_name || user?.first_name || 'İşletmem',
         is_open: true,
         rating: 4.5,
         total_reviews: 128,
@@ -77,6 +82,8 @@ export const NewBusinessApp = ({ user, onLogout }) => {
         address: 'Ankara, Türkiye',
         opening_hours: '09:00 - 23:00'
       });
+      
+      console.log('✅ Business info loaded, ID:', businessId);
     } catch (error) {
       console.error('Business info error:', error);
     }
