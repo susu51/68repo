@@ -126,28 +126,37 @@ class WebSocketTester:
             return False
 
     async def test_admin_websocket_connection(self):
-        """Test 1: Customer Login"""
+        """Test 1: Admin WebSocket Connection"""
         try:
-            customer_session, customer_user = self.customer_login()
+            # Test admin WebSocket connection with role=admin
+            ws_url = f"{WS_URL}/api/ws/orders?role=admin"
             
-            if customer_session and customer_user:
-                customer_id = customer_user.get("id")
-                customer_email = customer_user.get("email")
+            async with websockets.connect(ws_url) as websocket:
+                # Wait for connection confirmation
+                response = await asyncio.wait_for(websocket.recv(), timeout=10)
+                data = json.loads(response)
                 
-                self.log_test(
-                    "Customer Login", 
-                    True, 
-                    f"Customer authenticated successfully: {customer_email} (ID: {customer_id})",
-                    {"customer_id": customer_id, "email": customer_email, "role": customer_user.get("role")}
-                )
-                return customer_session, customer_user
-            else:
-                self.log_test("Customer Login", False, "Customer authentication failed")
-                return None, None
-                
+                if (data.get("type") == "connected" and 
+                    data.get("role") == "admin" and
+                    data.get("client_id") == "admin"):
+                    
+                    self.log_test(
+                        "Admin WebSocket Connection",
+                        True,
+                        f"Connection successful: role={data.get('role')}, client_id={data.get('client_id')}, message='{data.get('message')}'"
+                    )
+                    return True
+                else:
+                    self.log_test(
+                        "Admin WebSocket Connection",
+                        False,
+                        error=f"Unexpected connection response: {data}"
+                    )
+                    return False
+                    
         except Exception as e:
-            self.log_test("Customer Login", False, f"Login error: {str(e)}")
-            return None, None
+            self.log_test("Admin WebSocket Connection", False, error=f"WebSocket connection failed: {str(e)}")
+            return False
     
     def test_get_businesses_by_city(self):
         """Test 2: Get Available Businesses by City (Aksaray)"""
