@@ -13,7 +13,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import toast from 'react-hot-toast';
-import { getAISettings, putAISettings, testAISettings } from '../api/aiSettings';
+import { getAISettings, putAISettings, testAISettings, selftestAI } from '../api/aiSettings';
 
 export const SettingsAI = () => {
   const [loading, setLoading] = useState(true);
