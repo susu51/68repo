@@ -246,51 +246,25 @@ async def build_panel_context(scope: str, time_window_minutes: int, include_logs
     return context
 
 
-async def stream_ai_response(question: str, scope: str, context: dict, mode: str, settings: dict):
+async def stream_ai_response(question: str, scope: str, context: dict, mode: str, settings: dict, prefer_provider: Optional[str] = None):
     """
-    Stream REAL AI response using emergentintegrations - NO TEMPLATES
+    Stream REAL AI response using provider abstraction - Dual OpenAI/Emergent support
     """
+    # Import provider abstraction
+    from ai_provider import stream_chat, current_provider_meta
+    
     # Telemetry data
     telemetry = {
-        "provider": None,
-        "model": None,
-        "use_emergent_key": False,
-        "used_custom_key": False,
+        "provider": prefer_provider or current_provider_meta()["provider"],
+        "model": settings.get("default_model", "gpt-4o-mini") if settings else "gpt-4o-mini",
         "scope": scope,
         "mode": mode,
         "time_window": context.get("baglam", {}).get("zaman_dilimi_dk", 60)
     }
     
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
-        
-        # Determine API key and provider
-        api_key = None
-        provider = "emergent"
-        model = settings.get("default_model", "gpt-4o-mini") if settings else "gpt-4o-mini"
-        
-        # Try custom key first if set and enabled
-        if settings and settings.get("openai_api_key") and not settings.get("use_emergent_key", True):
-            api_key = settings["openai_api_key"]
-            provider = "openai_custom"
-            telemetry["used_custom_key"] = True
-        else:
-            # Use Emergent LLM Key
-            api_key = os.environ.get("EMERGENT_LLM_KEY")
-            provider = "emergent"
-            telemetry["use_emergent_key"] = True
-        
-        if not api_key:
-            error_payload = json.dumps({"error": "API anahtarı yapılandırılmamış."}, ensure_ascii=False)
-            yield f"data: {error_payload}\n\n"
-            yield "data: [DONE]\n\n"
-            return
-        
-        telemetry["provider"] = provider
-        telemetry["model"] = model
-        
         # Log telemetry (no PII)
-        print(f"📊 LLM Call: provider={provider}, model={model}, scope={scope}, mode={mode}, window={telemetry['time_window']}dk")
+        print(f"📊 LLM Call: provider={telemetry['provider']}, model={telemetry['model']}, scope={scope}, mode={mode}, window={telemetry['time_window']}dk")
         
         # Get system prompt
         system_prompt = get_turkish_system_prompt(scope, mode)
