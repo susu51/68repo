@@ -408,7 +408,7 @@ async def ai_ask(
     
     # Return streaming response with proper headers
     return StreamingResponse(
-        stream_ai_response(request.question, request.scope, context, request.mode, settings),
+        stream_ai_response(request.question, request.scope, context, request.mode, settings, request.provider),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
