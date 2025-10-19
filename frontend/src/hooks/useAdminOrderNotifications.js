@@ -126,7 +126,8 @@ const useAdminOrderNotifications = (onNewOrder) => {
         wsRef.current = null;
       }
     };
-  }, [connect]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount/unmount, not when connect changes
 
   return { isConnected };
 };
