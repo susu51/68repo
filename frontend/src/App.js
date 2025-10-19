@@ -3680,6 +3680,24 @@ const CustomerDashboard = ({ user }) => {
               `}
             >
               <span>⭐</span>
+              <span>Sadakat</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('coupons')}
+              className={`
+                flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 text-sm
+                ${activeTab === 'coupons' 
+                  ? 'bg-red-500 text-white shadow-md' 
+                  : 'bg-red-100 text-red-600 hover:bg-red-200'
+                }
+              `}
+            >
+              <span>🎫</span>
+              <span>Kuponlar</span>
+            </button>
+            >
+              <span>⭐</span>
               <span>Puanlarım</span>
               <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
                 {loyaltyPoints.total_points}
