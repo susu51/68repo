@@ -2254,3 +2254,36 @@ metadata:
           agent: "testing"
           comment: "🎯 ADMIN KYC ENDPOINTS COMPREHENSIVE TESTING COMPLETE: PERFECT results (100% success rate, 5/5 tests passed). ✅ CRITICAL FEATURES VERIFIED: 1) Admin authentication working perfectly with admin@kuryecini.com/admin123 - JWT token obtained successfully, proper admin role verified. 2) GET /api/admin/kyc/pending retrieved 3 pending KYC requests with COMPLETE data validation: all requests include email, phone, name (contact info), city, district, neighborhood (location info), role, kyc_documents array, and role-specific fields (vehicle_type for couriers, business_name/business_tax_id for businesses). 3) GET /api/admin/kyc/stats retrieved accurate statistics: 3 pending, 11 approved, 0 rejected, 14 total. 4) Admin RBAC security working perfectly - all endpoints properly secured, customer access blocked with 403 Forbidden, unauthenticated access blocked with 401 Unauthorized. 5) KYC data completeness verified - found all 3 expected test users (test.courier@kyc.com with 3 documents: license/id_card/vehicle_registration, test.business@kyc.com with 2 documents: id_card/business_photo, test.courier2@kyc.com with 1 document: id_card). ✅ BACKEND API STRUCTURE VERIFIED: Response includes all required fields for frontend display, document array structure with type/filename/path fields working correctly. 📝 CONCLUSION: Admin KYC backend endpoints are production-ready with 100% success rate. All requirements met: contact info display, location info display, role-specific info display, documents display with clickable links. System ready for frontend integration testing."
 
+
+# Panel-Aware AI Assistant Implementation
+user_problem_statement: "Build a panel-aware AI Assistant inside the Admin Panel that answers questions using ONLY selected panel context (customer/business/courier/multi). Features: scope selector, time window picker, preset questions, context toggles, streaming chat in Turkish. Settings page for OpenAI key config, redaction rules, rate limits."
+
+backend:
+  - task: "AI Settings API - Phase 1 Foundation"
+    implemented: true
+    working: "NA"
+    file: "routes/ai_settings.py, models_package/ai_settings.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ PHASE 1 AI SETTINGS API IMPLEMENTED: Complete backend foundation for Panel-Aware AI Assistant settings management. ENVIRONMENT: Added EMERGENT_LLM_KEY, AI_RATE_LIMIT_PER_MIN, DEFAULT_TIME_WINDOW_MIN to .env. MODELS: Created AI settings models in models_package/ai_settings.py with AISettings (full model), AISettingsUpdate (patch model), AISettingsResponse (masked response), RedactionRule (PII rules). Fields include: openai_api_key (optional custom key), use_emergent_key (default true), default_model (default gpt-4o-mini), default_time_window_minutes, rate_limit_per_min, redact_rules array for PII types (phone/email/iban/jwt/address/card). API ENDPOINTS: GET /admin/ai/settings (returns masked settings, shows if custom key configured without exposing it), PUT /admin/ai/settings (update settings with partial updates), POST /admin/ai/settings/test (test OpenAI connection with current settings). FEATURES: Emergent LLM Key support (universal key), custom OpenAI API key override, MongoDB storage in admin_settings_ai collection, RBAC with get_admin_user (SuperAdmin & Operasyon only), masked API key responses for security. INTEGRATION: Router integrated into server.py, DB client initialized, emergentintegrations library installed for OpenAI streaming. NEEDS TESTING: GET settings endpoint returns default settings correctly, PUT settings updates and persists to database, Test endpoint validates OpenAI connection, RBAC blocks non-admin access, Emergent LLM Key vs custom key logic works correctly."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.1"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "AI Settings API - Phase 1 Foundation"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "✅ PHASE 1 BACKEND COMPLETE: AI Settings API implemented with GET/PUT/TEST endpoints. Environment configured with EMERGENT_LLM_KEY. emergentintegrations library installed. Backend restarted successfully. Ready for backend testing to verify: (1) GET returns default/saved settings with masked API keys, (2) PUT updates settings correctly, (3) POST /test validates OpenAI connection using Emergent LLM Key, (4) RBAC blocks non-admin users. All endpoints use proper authentication (get_admin_user) and MongoDB storage (admin_settings_ai collection)."
