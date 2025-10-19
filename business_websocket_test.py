@@ -247,6 +247,7 @@ class BusinessWebSocketTester:
         """Create a test order for the business"""
         try:
             order_data = {
+                "business_id": self.business_id,
                 "delivery_address": "Test Address for WebSocket Notification, Aksaray Merkez",
                 "delivery_lat": 38.3687,
                 "delivery_lng": 34.0254,
