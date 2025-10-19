@@ -1277,55 +1277,130 @@ const AdminDashboard = ({ user }) => {
           <TabsContent value="orders" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Sipariş Yönetimi ({orders.length})</CardTitle>
-                <CardDescription>
-                  Tüm siparişleri görüntüleyin ve yönetin
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      Sipariş Yönetimi ({filteredOrders.length})
+                      {newOrdersCount > 0 && (
+                        <Badge variant="destructive" className="animate-pulse">
+                          {newOrdersCount} Yeni
+                        </Badge>
+                      )}
+                    </CardTitle>
+                    <CardDescription>
+                      Tüm platform siparişlerini gerçek zamanlı görüntüleyin
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {/* WebSocket Status Indicator */}
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100">
+                      <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                      <span className="text-xs font-medium">
+                        {isConnected ? 'Canlı' : 'Bağlantı Kesildi'}
+                      </span>
+                    </div>
+                    {/* Manual Refresh Button */}
+                    <Button 
+                      onClick={() => {
+                        fetchOrders();
+                        setNewOrdersCount(0);
+                      }}
+                      size="sm"
+                      variant="outline"
+                      disabled={loading}
+                    >
+                      🔄 Yenile
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                {orders.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Sipariş bulunamadı</p>
+                {/* Status Filters */}
+                <div className="mb-6 flex flex-wrap gap-2">
+                  {[
+                    { value: 'all', label: 'Tümü', icon: '📦' },
+                    { value: 'created', label: 'Bekleyen', icon: '⏳' },
+                    { value: 'preparing', label: 'Hazırlanıyor', icon: '👨‍🍳' },
+                    { value: 'ready', label: 'Hazır', icon: '✅' },
+                    { value: 'on_route', label: 'Yolda', icon: '🚚' },
+                    { value: 'delivered', label: 'Teslim', icon: '✔️' },
+                    { value: 'cancelled', label: 'İptal', icon: '❌' }
+                  ].map((filter) => (
+                    <button
+                      key={filter.value}
+                      onClick={() => {
+                        setOrderStatusFilter(filter.value);
+                        setNewOrdersCount(0); // Reset badge when viewing
+                      }}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        orderStatusFilter === filter.value
+                          ? 'bg-blue-500 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {filter.icon} {filter.label} ({getOrderCountByStatus(filter.value)})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Orders List */}
+                {filteredOrders.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 text-lg">
+                      {orderStatusFilter === 'all' ? 'Henüz sipariş yok' : `${orderStatusFilter} durumunda sipariş yok`}
+                    </p>
+                    <p className="text-gray-400 text-sm mt-2">Yeni siparişler gerçek zamanlı olarak burada görünecek</p>
+                  </div>
                 ) : (
                   <div className="space-y-4">
-                    {orders.map((order) => (
-                      <Card key={order.id}>
+                    {filteredOrders.map((order) => (
+                      <Card key={order.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                         <CardContent className="p-4">
                           <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold">Sipariş #{order.id.slice(-8)}</h3>
+                                <OrderStatusBadge status={order.status} />
+                              </div>
                               <p className="text-sm text-gray-600">
-                                {order.customer_name} → {order.business_name}
+                                👤 {order.customer_name} → 🏪 {order.business_name}
                               </p>
-                              <p className="text-xs text-gray-500">
-                                {typeof order.delivery_address === 'object' ? 
+                              <p className="text-xs text-gray-500 mt-1">
+                                📍 {typeof order.delivery_address === 'object' ? 
                                   order.delivery_address?.address || 'Adres bilgisi yok' : 
                                   order.delivery_address}
                               </p>
                               {order.courier_name && (
-                                <p className="text-xs text-gray-500">Kurye: {order.courier_name}</p>
+                                <p className="text-xs text-gray-500 mt-1">🚴 Kurye: {order.courier_name}</p>
                               )}
                             </div>
                             <div className="text-right">
-                              <p className="font-bold text-lg">₺{order.total_amount}</p>
-                              <p className="text-sm text-gray-500">
-                                Komisyon: ₺{order.commission_amount?.toFixed(2)}
-                              </p>
-                              <OrderStatusBadge status={order.status} />
+                              <p className="font-bold text-lg text-green-600">₺{order.total_amount}</p>
+                              {order.commission_amount && (
+                                <p className="text-sm text-gray-500">
+                                  Komisyon: ₺{order.commission_amount.toFixed(2)}
+                                </p>
+                              )}
                             </div>
                           </div>
 
-                          <div className="mb-3">
-                            <h4 className="font-medium mb-1">Siparişler:</h4>
-                            {order.items.map((item, index) => (
-                              <div key={index} className="text-sm text-gray-600">
-                                {item.quantity}x {item.product_name} - ₺{item.subtotal}
-                              </div>
-                            ))}
-                          </div>
+                          {/* Order Items */}
+                          {order.items && order.items.length > 0 && (
+                            <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                              <h4 className="font-medium text-sm mb-2">📋 Sipariş Detayları:</h4>
+                              {order.items.map((item, index) => (
+                                <div key={index} className="text-sm text-gray-600 flex justify-between">
+                                  <span>{item.quantity}x {item.product_name || item.name}</span>
+                                  <span className="font-medium">₺{item.subtotal || (item.price * item.quantity)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
 
-                          <div className="flex justify-between items-center">
+                          {/* Order Actions & Timestamp */}
+                          <div className="flex justify-between items-center pt-3 border-t">
                             <p className="text-xs text-gray-500">
-                              {new Date(order.created_at).toLocaleString('tr-TR')}
+                              🕐 {new Date(order.created_at).toLocaleString('tr-TR')}
                             </p>
                             
                             {order.status !== 'delivered' && order.status !== 'cancelled' && (
