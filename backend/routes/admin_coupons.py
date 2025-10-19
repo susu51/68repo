@@ -61,7 +61,7 @@ async def get_coupons(
 @router.post("", response_model=Coupon)
 async def create_coupon(
     coupon_data: CouponCreate,
-    current_user: dict = Depends(get_admin_user_from_cookie)
+    current_user: dict = Depends(require_admin)
 ):
     """Create new coupon"""
     from server import db
@@ -137,7 +137,7 @@ async def create_coupon(
 async def update_coupon(
     coupon_id: str,
     coupon_data: CouponUpdate,
-    current_user: dict = Depends(get_admin_user_from_cookie)
+    current_user: dict = Depends(require_admin)
 ):
     """Update coupon"""
     from server import db
@@ -193,7 +193,7 @@ async def update_coupon(
 @router.delete("/{coupon_id}")
 async def delete_coupon(
     coupon_id: str,
-    current_user: dict = Depends(get_admin_user_from_cookie)
+    current_user: dict = Depends(require_admin)
 ):
     """Delete coupon"""
     from server import db
