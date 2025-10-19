@@ -253,19 +253,17 @@ class EndToEndOrderFlowTester:
                 menu_item = menu_items[0]
                 
                 order_data = {
+                    "restaurant_id": business_id,  # Required field for business association
                     "delivery_address": "Test Delivery Address, Aksaray, Turkey",
                     "delivery_lat": 38.3687,
                     "delivery_lng": 34.0370,
                     "items": [
                         {
                             "product_id": menu_item.get("id"),
-                            "product_name": menu_item.get("name", menu_item.get("title", "Test Item")),
-                            "product_price": float(menu_item.get("price", 99.99)),
-                            "quantity": 1,
-                            "subtotal": float(menu_item.get("price", 99.99))
+                            "quantity": 1
                         }
                     ],
-                    "total_amount": float(menu_item.get("price", 99.99)),
+                    "payment_method": "cash",
                     "notes": "E2E Test order for business panel verification"
                 }
             
