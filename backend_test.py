@@ -271,7 +271,8 @@ class EndToEndOrderFlowTester:
             
             if response.status_code in [200, 201]:
                 order = response.json()
-                order_id = order.get("id")
+                print(f"DEBUG: Order response: {order}")  # Debug output
+                order_id = order.get("id") or order.get("order_id")
                 order_business_id = order.get("business_id")
                 order_status = order.get("status")
                 
