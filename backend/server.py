@@ -8460,3 +8460,11 @@ async def check_business_gps_status(current_user: dict = Depends(get_admin_user)
         )
 
 app.include_router(api_router)
+
+# WebSocket endpoint for real-time order notifications
+@app.websocket("/api/ws/orders")
+async def websocket_orders_endpoint(websocket: WebSocket, business_id: str = Query(...)):
+    """Real-time order notifications via WebSocket"""
+    from realtime.websocket_orders import websocket_order_notifications
+    await websocket_order_notifications(websocket, business_id)
+
