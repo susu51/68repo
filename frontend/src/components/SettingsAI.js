@@ -34,7 +34,17 @@ export const SettingsAI = () => {
 
   useEffect(() => {
     loadSettings();
+    checkConnection(); // Check connection on mount
   }, []);
+
+  const checkConnection = async () => {
+    try {
+      const result = await selftestAI();
+      setConnectionStatus(result);
+    } catch (error) {
+      console.error('Connection check failed:', error);
+    }
+  };
 
   const loadSettings = async () => {
     try {
