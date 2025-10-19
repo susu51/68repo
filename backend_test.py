@@ -463,8 +463,23 @@ class WebSocketTester:
     def test_admin_orders_endpoint(self):
         """Test 5: Admin Endpoint Access"""
         try:
-            headers = {"Authorization": f"Bearer {self.admin_token}"}
-            response = requests.get(f"{BACKEND_URL}/api/admin/orders", headers=headers, timeout=10)
+            # Use cookie-based authentication (no headers needed if we're using the same session)
+            # Create a new session and login as admin for this test
+            admin_session = requests.Session()
+            
+            # Login as admin to get cookies
+            login_response = admin_session.post(
+                f"{BACKEND_URL}/api/auth/login",
+                json={"email": "admin@kuryecini.com", "password": "admin123"},
+                timeout=10
+            )
+            
+            if login_response.status_code != 200:
+                self.log_test("Admin Orders Endpoint Access", False, error="Admin login failed for orders test")
+                return False
+            
+            # Now try to access admin orders with cookies
+            response = admin_session.get(f"{BACKEND_URL}/api/admin/orders", timeout=10)
             
             if response.status_code == 200:
                 orders = response.json()
