@@ -44,6 +44,8 @@ class BusinessWebSocketTester:
         self.business_id = None
         self.business_name = None
         self.test_results = []
+        self.business_session = requests.Session()
+        self.customer_session = requests.Session()
         
     def log_test(self, test_name, success, details="", error=""):
         """Log test result"""
