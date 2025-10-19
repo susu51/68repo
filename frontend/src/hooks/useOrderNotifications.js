@@ -23,12 +23,25 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
     try {
       // Construct WebSocket URL
       const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = backendUrl.replace(/^https?:\/\//, '') || window.location.host;
+      
+      // Determine protocol (wss for https, ws for http)
+      let protocol = 'ws:';
+      let host = window.location.host;
+      
+      if (backendUrl) {
+        // Use backend URL if provided
+        protocol = backendUrl.startsWith('https') ? 'wss:' : 'ws:';
+        host = backendUrl.replace(/^https?:\/\//, '');
+      } else if (window.location.protocol === 'https:') {
+        protocol = 'wss:';
+      }
+      
       const wsUrl = `${protocol}//${host}/api/ws/orders?business_id=${businessId}`;
 
       console.log('🔌 Connecting to WebSocket:');
-      console.log('   URL:', wsUrl);
+      console.log('   Protocol:', protocol);
+      console.log('   Host:', host);
+      console.log('   Full URL:', wsUrl);
       console.log('   Business ID:', businessId);
       console.log('   Backend URL:', backendUrl);
 
