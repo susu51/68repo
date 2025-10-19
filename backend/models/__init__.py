@@ -1,3 +1,6 @@
 """Models package"""
-from models.orders import *
-from models.courier_tasks import *
+# Import order models
+from .orders import *
+
+# Courier tasks are imported separately to avoid conflicts
+
