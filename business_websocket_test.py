@@ -436,7 +436,7 @@ class BusinessWebSocketTester:
                 headers["Authorization"] = f"Bearer {self.business_token}"
             
             # Check business orders endpoint
-            response = requests.get(
+            response = self.business_session.get(
                 f"{BACKEND_URL}/api/business/orders/incoming",
                 headers=headers,
                 timeout=10
