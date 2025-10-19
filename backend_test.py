@@ -1,38 +1,42 @@
 #!/usr/bin/env python3
 """
-CRITICAL END-TO-END TEST: Customer Order to Business Panel Flow
-Testing the complete flow from customer placing an order to it appearing in the business order management panel.
+Admin Panel Orders Real-Time WebSocket Integration Testing
 
-Test Scenario:
-1. Customer Order Creation:
-   - Login as customer: test@kuryecini.com / test123
-   - Get available businesses: GET /api/businesses?city=Aksaray
-   - Select a business and get menu: GET /api/business/public-menu/{business_id}/products
-   - Create order with proper business_id: POST /api/orders
-   - Verify order created with status "created" or "pending"
-   - Record order_id and business_id
+CRITICAL: Test the newly implemented admin WebSocket system for real-time order notifications.
 
-2. Business Panel - Incoming Orders Check:
-   - Login as business with the SAME business_id from order
-   - GET /api/business/orders/incoming
-   - Verify the newly created order appears in response
-   - Check order has correct business_id, customer_name, items array, total_amount, status, delivery_address
+Test Scenarios:
+1. Admin WebSocket Connection
+2. Order Creation & Admin Notification  
+3. WebSocket Role Validation
+4. Multiple Admin Connections
+5. Admin Endpoint Access
 """
 
-import requests
+import asyncio
 import json
-import sys
+import requests
+import websockets
+import time
 from datetime import datetime
+import os
+import sys
 
-# Configuration from review request
-BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
-BUSINESS_EMAIL = "testbusiness@example.com"
-BUSINESS_PASSWORD = "test123"
-BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Expected business ID
-CUSTOMER_EMAIL = "test@kuryecini.com"
-CUSTOMER_PASSWORD = "test123"
+# Configuration
+BACKEND_URL = "https://food-dash-87.preview.emergentagent.com"
+WS_URL = "wss://food-dash-87.preview.emergentagent.com"
 
-class EndToEndOrderFlowTester:
+# Test credentials
+ADMIN_CREDENTIALS = {
+    "email": "admin@kuryecini.com",
+    "password": "KuryeciniAdmin2024!"
+}
+
+CUSTOMER_CREDENTIALS = {
+    "email": "test@kuryecini.com", 
+    "password": "test123"
+}
+
+class WebSocketTester:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None
