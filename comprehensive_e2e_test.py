@@ -472,10 +472,12 @@ class ComprehensiveE2ETester:
                     # Allow some flexibility for optional fields
                     all_checks_passed = core_passed and sum(checks.values()) >= len(checks) * 0.8
                     
+                    passed_checks = sum(checks.values())
+                    
                     self.log_test(
                         "Data Integrity", 
                         all_checks_passed, 
-                        f"Data integrity verified - {sum(checks.values())}/{len(checks)} checks passed",
+                        f"Data integrity verified - {passed_checks}/{len(checks)} checks passed (core: {core_passed})",
                         {
                             "order_id": self.created_order_id,
                             "checks": checks,
