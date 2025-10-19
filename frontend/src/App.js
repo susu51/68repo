@@ -4296,18 +4296,7 @@ const CustomerDashboard = ({ user }) => {
           {activeTab === 'coupons' && (
             <AdminCoupons />
           )}
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="text-center">
-                  <CardContent className="p-4">
-                    <div className="text-2xl mb-2">📦</div>
-                    <div className="text-2xl font-bold text-orange-600">{orders.length}</div>
-                    <div className="text-sm text-gray-600">Toplam Sipariş</div>
-                  </CardContent>
-                </Card>
-                <Card className="text-center">
-                  <CardContent className="p-4">
+        </div>
                     <div className="text-2xl mb-2">⭐</div>
                     <div className="text-2xl font-bold text-purple-600">{loyaltyPoints.total_points}</div>
                     <div className="text-sm text-gray-600">Puan</div>
