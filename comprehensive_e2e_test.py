@@ -442,14 +442,18 @@ class ComprehensiveE2ETester:
                         break
                 
                 if found_order:
-                    # Data integrity checks
+                    # Data integrity checks - check multiple possible field names
+                    items = found_order.get("items", []) or found_order.get("items_snapshot", [])
+                    total = found_order.get("total_amount", 0) or found_order.get("totals", {}).get("grand", 0)
+                    address = found_order.get("delivery_address") or found_order.get("address_snapshot", {}).get("full")
+                    
                     checks = {
                         "has_business_id": found_order.get("business_id") is not None,
                         "valid_status": found_order.get("status") in ["created", "pending", "confirmed", "preparing", "ready", "picked_up", "delivered"],
-                        "has_items": len(found_order.get("items", [])) > 0,
-                        "has_total": found_order.get("total_amount", 0) > 0,
+                        "has_items": len(items) > 0,
+                        "has_total": total > 0,
                         "has_customer": found_order.get("customer_name") is not None,
-                        "has_address": found_order.get("delivery_address") is not None
+                        "has_address": address is not None and address != ""
                     }
                     
                     print(f"DEBUG: Data integrity checks: {checks}")
