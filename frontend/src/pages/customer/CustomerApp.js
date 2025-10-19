@@ -333,12 +333,15 @@ export const CustomerApp = ({ user, onLogout }) => {
                   </div>
                 </div>
                 <Button 
-                  onClick={() => {
-                    console.log('🎉 Create order clicked');
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🎉 Create order button CLICKED!');
+                    console.log('🎉 Button event:', e);
                     handleCreateOrder();
                   }} 
                   className="w-full bg-green-600 hover:bg-green-700" 
-                  size="lg"
+                  type="button"
                 >
                   🎉 Siparişi Onayla ve Ver
                 </Button>
