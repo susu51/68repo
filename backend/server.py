@@ -6129,7 +6129,7 @@ from routes.ai_diagnostics_ingest import router as ai_diagnostics_router
 api_router.include_router(ai_diagnostics_router)
 
 # AI Settings (Panel-Aware AI Assistant - Phase 1)
-from routes.ai_settings import router as ai_settings_router, set_db_client as set_ai_settings_db_client
+from routes.ai_settings import router as ai_settings_router
 api_router.include_router(ai_settings_router)
 
 # Phase 3 Routers
