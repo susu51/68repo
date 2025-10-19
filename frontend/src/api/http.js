@@ -26,7 +26,11 @@ export async function api(path, init = {}) {
   return res;
 }
 
-export const get = (p) => api(p);
+export const get = async (p) => {
+  const res = await api(p);
+  const data = await res.json();
+  return { data };
+};
 export const post = (p, b) => api(p, { method: 'POST', body: JSON.stringify(b) });
 export const patch = (p, b) => api(p, { method: 'PATCH', body: JSON.stringify(b) });
 export const del = (p) => api(p, { method: 'DELETE' });
