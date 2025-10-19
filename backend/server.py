@@ -238,6 +238,7 @@ if mongo_url:
             set_addresses_db_client(db)
             set_city_catalog_db_client(db)
             set_ai_settings_db_client(db)
+            set_ai_assistant_db_client(db)
             print("🍪 Cookie auth system initialized")
             
         except Exception as e2:
