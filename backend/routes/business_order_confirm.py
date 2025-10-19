@@ -86,8 +86,16 @@ async def confirm_order(
         # Update order status to 'confirmed'
         now = datetime.now(timezone.utc)
         
+        # Update using the same query that found the order
+        query = {"id": order_id}
+        try:
+            # Try ObjectId first
+            query = {"_id": ObjectId(order_id)}
+        except:
+            query = {"id": order_id}
+        
         await db.orders.update_one(
-            {"_id": order_id},
+            query,
             {
                 "$set": {
                     "status": "confirmed",
