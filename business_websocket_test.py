@@ -475,7 +475,7 @@ class BusinessWebSocketTester:
                 return False
             
             # Verify business exists and is active
-            response = requests.get(f"{BACKEND_URL}/api/businesses", timeout=10)
+            response = self.business_session.get(f"{BACKEND_URL}/api/businesses", timeout=10)
             
             if response.status_code == 200:
                 businesses = response.json()
