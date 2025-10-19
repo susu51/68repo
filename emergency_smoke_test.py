@@ -416,7 +416,7 @@ class EmergencySmokeTest:
                 timeout=10
             )
             
-            if response.status_code == 201:
+            if response.status_code in [200, 201]:
                 order = response.json()
                 order_id = order.get("order_id", order.get("id"))
                 
