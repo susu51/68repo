@@ -13,21 +13,28 @@ const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tool
  * @param {AbortSignal} signal - Abort signal for cancellation
  * @param {function} onMeta - Metadata callback (optional)
  */
-export async function askAI({ question, scope, time_window_minutes, include_logs, mode }, onChunk, onError, signal, onMeta) {
+export async function askAI({ question, scope, time_window_minutes, include_logs, mode, provider }, onChunk, onError, signal, onMeta) {
   try {
+    const body = {
+      question,
+      scope,
+      time_window_minutes,
+      include_logs,
+      mode
+    };
+    
+    // Add provider only if explicitly set
+    if (provider) {
+      body.provider = provider;
+    }
+    
     const response = await fetch(`${API_BASE}/api/admin/ai/ask`, {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json; charset=utf-8'
       },
-      body: JSON.stringify({
-        question,
-        scope,
-        time_window_minutes,
-        include_logs,
-        mode
-      }),
+      body: JSON.stringify(body),
       signal
     });
 
