@@ -80,34 +80,35 @@ export const CustomerApp = ({ user, onLogout }) => {
         return;
       }
 
-      // Check cart items (cart is object with items array)
+      // Check cart items
       const cartItems = cart?.items || [];
       if (!cartItems || cartItems.length === 0) {
         toast.error('Sepetiniz boş');
         return;
       }
 
-      // Calculate total
-      const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      // Get restaurant_id from cart
+      const restaurant_id = cart?.restaurant?.id || cart?.businessId;
+      if (!restaurant_id) {
+        toast.error('Restoran bilgisi bulunamadı');
+        return;
+      }
 
+      // Prepare order data for new API
       const orderData = {
-        delivery_address: selectedAddress.acik_adres || selectedAddress.full || 
-                         `${selectedAddress.mahalle}, ${selectedAddress.ilce}, ${selectedAddress.il}`,
-        delivery_lat: selectedAddress.lat || 0,
-        delivery_lng: selectedAddress.lng || 0,
+        restaurant_id: restaurant_id,
+        address_id: selectedAddress.id,
         items: cartItems.map(item => ({
-          product_id: item.id,
-          product_name: item.name || item.title,
-          product_price: item.price,
+          id: item.id,
           quantity: item.quantity,
-          subtotal: item.price * item.quantity
+          notes: item.notes || ''
         })),
-        total_amount: totalAmount,
-        notes: `Ödeme yöntemi: ${selectedPaymentMethod}`
+        payment_method: selectedPaymentMethod === 'Nakit' ? 'cash' : 
+                       selectedPaymentMethod === 'Kart' ? 'pos' : 'online_mock',
+        special_instructions: cart?.notes || ''
       };
 
-      console.log('🎉 Creating order:', orderData);
-      console.log('🏪 Restaurant:', cart?.restaurant);
+      console.log('🎉 Creating order with new API:', orderData);
 
       const response = await fetch(`${API}/orders`, {
         method: 'POST',
@@ -117,26 +118,28 @@ export const CustomerApp = ({ user, onLogout }) => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const result = await response.json();
+        const orderData = result.order || result;
         
         // Show success message
-        toast.success('🎉 Siparişiniz onaylandı!', {
+        toast.success('🎉 Siparişiniz alındı!', {
           duration: 4000,
           icon: '✅'
         });
         
-        console.log('✅ Order created:', data);
-        console.log('📦 Order ID:', data.id);
-        console.log('🏪 Business ID:', data.business_id);
-        console.log('👤 Business Name:', data.business_name);
+        console.log('✅ Order created:', orderData);
+        console.log('📦 Order ID:', orderData.id);
+        console.log('🏪 Business ID:', orderData.business_id);
+        console.log('👤 Business Name:', orderData.business_name);
+        console.log('💰 Total:', orderData.totals?.grand);
         
         // Clear cart and navigate
         clearCart();
-        setCurrentOrderId(data.id);
+        setCurrentOrderId(orderData.id);
         
         // Show additional info
         setTimeout(() => {
-          toast.success(`Siparişiniz ${data.business_name || 'restorana'} iletildi`, {
+          toast.success(`Siparişiniz ${orderData.business_name || 'restorana'} iletildi`, {
             duration: 3000
           });
         }, 500);
