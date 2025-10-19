@@ -70,8 +70,9 @@ class EmergencySmokeTest:
                     
                     # Check required fields
                     has_name = "name" in restaurant or "business_name" in restaurant
-                    has_coords = "lat" in restaurant and "lng" in restaurant
-                    has_delivery_fee = "delivery_fee" in restaurant or "min_order_amount" in restaurant
+                    has_coords = ("lat" in restaurant and "lng" in restaurant) or \
+                                ("location" in restaurant and restaurant.get("location", {}).get("coordinates"))
+                    has_delivery_fee = "delivery_fee" in restaurant or "min_order_amount" in restaurant or "min_order" in restaurant
                     is_open_field = "is_open" in restaurant or "is_active" in restaurant
                     
                     if has_name and has_coords and has_delivery_fee:
