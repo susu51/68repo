@@ -4290,6 +4290,10 @@ const CustomerDashboard = ({ user }) => {
             <AdminCoupons />
           )}
         </div>
+      </div>
+    </div>
+  );
+};
 
 // Main Pages
 const HomePage = ({ onAuthStart }) => {
