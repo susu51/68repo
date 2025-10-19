@@ -63,6 +63,8 @@ from auth_cookie import auth_router, get_current_user_from_cookie, get_current_u
 from routes.addresses import set_db_client as set_addresses_db_client
 # City catalog router db setup
 from routes.city_catalog import set_db_client as set_city_catalog_db_client
+# AI settings router db setup
+from routes.ai_settings import set_db_client as set_ai_settings_db_client
 
 # Import phone validation function
 try:
