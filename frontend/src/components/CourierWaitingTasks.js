@@ -1,7 +1,6 @@
-"""
-Courier Waiting Tasks Component - Phase 2
-Shows waiting tasks on map with accept button
-"""
+// Courier Waiting Tasks Component - Phase 2
+// Shows waiting tasks on map with accept button
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
