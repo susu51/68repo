@@ -76,24 +76,20 @@ export const ModernOrdersManagement = ({ businessId }) => {
       
       console.log(`✅ Found ${incomingOrders.length} incoming orders`);
       
-      // For now, just show incoming orders (we can add active orders later)
-      const allOrders = incomingOrders;
-      
-      setOrders(allOrders);
-      
-      const allOrders = [...incomingOrders, ...activeOrders];
-      setOrders(allOrders);
+      // Set orders
+      setOrders(incomingOrders);
       
       // Calculate stats
       const newStats = {
-        pending: allOrders.filter(o => ['created', 'pending', 'placed'].includes(o.status)).length,
-        preparing: allOrders.filter(o => o.status === 'preparing').length,
-        ready: allOrders.filter(o => o.status === 'ready').length,
-        confirmed: allOrders.filter(o => o.status === 'confirmed').length
+        pending: incomingOrders.filter(o => ['created', 'pending', 'placed'].includes(o.status)).length,
+        preparing: incomingOrders.filter(o => o.status === 'preparing').length,
+        ready: incomingOrders.filter(o => o.status === 'ready').length,
+        confirmed: incomingOrders.filter(o => o.status === 'confirmed').length,
+        delivered: incomingOrders.filter(o => o.status === 'delivered').length
       };
       setStats(newStats);
       
-      console.log('✅ Orders loaded:', allOrders.length);
+      console.log('✅ Orders loaded:', incomingOrders.length, 'Stats:', newStats);
     } catch (error) {
       console.error('❌ Orders loading error:', error);
       toast.error('Siparişler yüklenemedi');
