@@ -8463,8 +8463,12 @@ app.include_router(api_router)
 
 # WebSocket endpoint for real-time order notifications
 @app.websocket("/api/ws/orders")
-async def websocket_orders_endpoint(websocket: WebSocket, business_id: str = Query(...)):
+async def websocket_orders_endpoint(
+    websocket: WebSocket, 
+    business_id: str = Query(None, description="Business ID to subscribe to (for businesses)"),
+    role: str = Query("business", description="Role: 'business' or 'admin'")
+):
     """Real-time order notifications via WebSocket"""
     from realtime.websocket_orders import websocket_order_notifications
-    await websocket_order_notifications(websocket, business_id)
+    await websocket_order_notifications(websocket, business_id, role)
 
