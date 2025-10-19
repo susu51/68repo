@@ -471,6 +471,29 @@ async def ai_ingest_health(
         }
 
 
+@router.get("/provider/status", summary="AI Provider Status")
+async def ai_provider_status(
+    current_user: dict = Depends(get_admin_user)
+):
+    """
+    Get AI provider status and availability
+    
+    **RBAC**: SuperAdmin & Operasyon only
+    
+    Returns status of both Emergent and OpenAI providers.
+    """
+    from ai_provider import get_provider_status, current_provider_meta
+    
+    status = get_provider_status()
+    meta = current_provider_meta()
+    
+    return {
+        "providers": status,
+        "current": meta,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
 @router.post("/selftest", summary="AI LLM Connection Self-Test")
 async def ai_selftest(
     current_user: dict = Depends(get_admin_user)
