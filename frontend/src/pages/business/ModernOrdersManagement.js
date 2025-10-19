@@ -98,6 +98,60 @@ export const ModernOrdersManagement = ({ businessId }) => {
       await fetchOrders();
     } catch (error) {
       console.error('❌ Status update error:', error);
+      toast.error('Durum güncellenemedi');
+    }
+  };
+
+  const confirmOrder = async (orderId) => {
+    try {
+      console.log('🎯 Confirming order:', orderId);
+      
+      // Get unit delivery fee from input
+      const input = document.getElementById(`unit-fee-${orderId}`);
+      const unitFee = parseFloat(input?.value);
+      
+      console.log('💰 Unit fee:', unitFee);
+      
+      // Validation
+      if (!unitFee || unitFee <= 0) {
+        toast.error('Lütfen geçerli bir paket ücreti girin');
+        return;
+      }
+      
+      // Call confirm API
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/business/orders/${orderId}/confirm`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unit_delivery_fee: unitFee })
+      });
+      
+      console.log('📡 Response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Order confirmed:', data);
+        
+        toast.success('Sipariş onaylandı. Kurye bekleniyor.', {
+          duration: 4000,
+          icon: '✅'
+        });
+        
+        // Refresh orders
+        await fetchOrders();
+        
+        // Clear input
+        if (input) input.value = '';
+      } else {
+        const error = await response.json();
+        console.error('❌ Confirm error:', error);
+        toast.error(error.detail || 'Sipariş onaylanamadı');
+      }
+    } catch (error) {
+      console.error('❌ Confirm order error:', error);
+      toast.error('Bir hata oluştu');
+    }
+  };
       toast.error(error.response?.data?.detail || 'Durum güncellenemedi');
     }
   };
