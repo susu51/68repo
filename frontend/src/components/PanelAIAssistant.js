@@ -18,10 +18,11 @@ import { askAI } from '../api/panelAI';
 import ReactMarkdown from 'react-markdown';
 
 const PanelAIAssistant = () => {
-  const [scope, setScope] = useState('customer');
+  const [scope, setScope] = useState('business');
   const [timeWindow, setTimeWindow] = useState(60);
   const [includeLogs, setIncludeLogs] = useState(true);
   const [mode, setMode] = useState('summary');
+  const [provider, setProvider] = useState(''); // '' = use settings, 'emergent', 'openai'
   const [question, setQuestion] = useState('');
   const [output, setOutput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
