@@ -36,7 +36,7 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
         protocol = 'wss:';
       }
       
-      const wsUrl = `${protocol}//${host}/api/ws/orders?business_id=${businessId}`;
+      const wsUrl = `${protocol}//${host}/api/ws/orders?business_id=${businessId}&role=business`;
 
       console.log('🔌 Connecting to WebSocket:');
       console.log('   Protocol:', protocol);
