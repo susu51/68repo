@@ -64,36 +64,50 @@ class WebSocketTester:
         print()
     
     def authenticate_admin(self):
-        """Authenticate admin user"""
-        try:
-            response = requests.post(
-                f"{BACKEND_URL}/api/auth/login",
-                json=ADMIN_CREDENTIALS,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.admin_token = data.get("access_token")
-                user_role = data.get("user", {}).get("role")
+        """Authenticate admin user - try multiple credentials"""
+        for i, credentials in enumerate(ADMIN_CREDENTIALS_LIST):
+            try:
+                response = requests.post(
+                    f"{BACKEND_URL}/api/auth/login",
+                    json=credentials,
+                    timeout=10
+                )
                 
-                if user_role == "admin":
-                    self.log_test(
-                        "Admin Authentication",
-                        True,
-                        f"Admin login successful, role: {user_role}, token length: {len(self.admin_token) if self.admin_token else 0}"
-                    )
-                    return True
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check if it's cookie-based auth (success field) or JWT auth (access_token field)
+                    if data.get("success"):
+                        # Cookie-based auth
+                        user_role = data.get("user", {}).get("role")
+                        if user_role == "admin":
+                            self.log_test(
+                                "Admin Authentication",
+                                True,
+                                f"Admin login successful (cookie-based): {credentials['email']}, role: {user_role}"
+                            )
+                            return True
+                    elif data.get("access_token"):
+                        # JWT-based auth
+                        self.admin_token = data.get("access_token")
+                        user_role = data.get("user", {}).get("role")
+                        if user_role == "admin":
+                            self.log_test(
+                                "Admin Authentication",
+                                True,
+                                f"Admin login successful (JWT): {credentials['email']}, role: {user_role}, token length: {len(self.admin_token)}"
+                            )
+                            return True
+                    
+                    print(f"   Tried {credentials['email']}: Wrong role ({data.get('user', {}).get('role')})")
                 else:
-                    self.log_test("Admin Authentication", False, error=f"Expected admin role, got: {user_role}")
-                    return False
-            else:
-                self.log_test("Admin Authentication", False, error=f"Login failed: {response.status_code} - {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Admin Authentication", False, error=f"Authentication error: {str(e)}")
-            return False
+                    print(f"   Tried {credentials['email']}: {response.status_code}")
+                    
+            except Exception as e:
+                print(f"   Tried {credentials['email']}: Error - {str(e)}")
+        
+        self.log_test("Admin Authentication", False, error="All admin credential attempts failed")
+        return False
     
     def authenticate_customer(self):
         """Authenticate customer user"""
