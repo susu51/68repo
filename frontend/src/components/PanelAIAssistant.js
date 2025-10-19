@@ -25,6 +25,7 @@ const PanelAIAssistant = () => {
   const [question, setQuestion] = useState('');
   const [output, setOutput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [metadata, setMetadata] = useState(null); // {provider, model, scope, mode}
   const abortControllerRef = useRef(null);
   const outputRef = useRef(null);
 
