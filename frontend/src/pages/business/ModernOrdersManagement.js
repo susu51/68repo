@@ -56,19 +56,30 @@ export const ModernOrdersManagement = ({ businessId }) => {
     try {
       setLoading(true);
       
-      // Fetch both incoming and active orders
-      const [incomingResult, activeResult] = await Promise.all([
-        get('/business/orders/incoming').catch(() => ({ data: { orders: [] } })),
-        get('/business/orders/active').catch(() => ({ data: { orders: [] } }))
-      ]);
+      console.log('🔄 Fetching orders from business API...');
       
-      // Handle response format - check if data has 'orders' property or is array directly
-      const incomingOrders = Array.isArray(incomingResult?.data) 
-        ? incomingResult.data 
-        : (incomingResult?.data?.orders || []);
-      const activeOrders = Array.isArray(activeResult?.data) 
-        ? activeResult.data 
-        : (activeResult?.data?.orders || []);
+      // Fetch incoming orders (created/pending status)
+      const incomingResponse = await get('/business/orders/incoming');
+      console.log('📡 Incoming orders response:', incomingResponse);
+      
+      // Parse response - backend returns array directly
+      let incomingOrders = [];
+      if (incomingResponse) {
+        if (Array.isArray(incomingResponse)) {
+          incomingOrders = incomingResponse;
+        } else if (Array.isArray(incomingResponse.data)) {
+          incomingOrders = incomingResponse.data;
+        } else if (incomingResponse.data?.orders) {
+          incomingOrders = incomingResponse.data.orders;
+        }
+      }
+      
+      console.log(`✅ Found ${incomingOrders.length} incoming orders`);
+      
+      // For now, just show incoming orders (we can add active orders later)
+      const allOrders = incomingOrders;
+      
+      setOrders(allOrders);
       
       const allOrders = [...incomingOrders, ...activeOrders];
       setOrders(allOrders);
