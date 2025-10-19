@@ -178,7 +178,7 @@ class BusinessWebSocketTester:
                 
                 if (data.get("type") == "connected" and 
                     data.get("role") == "business" and
-                    data.get("business_id") == self.business_id):
+                    data.get("client_id") == self.business_id):
                     
                     self.log_test(
                         "Business WebSocket Connection",
