@@ -1,16 +1,18 @@
 """
-Panel AI Assistant Backend Endpoint
-Streaming Turkish AI responses based on panel context (customer/business/courier/multi)
+Panel AI Assistant Backend Endpoint - HARDENED
+Streaming Turkish AI responses with proper PII redaction and panel isolation
 """
 
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from datetime import datetime, timezone, timedelta
 import os
 import asyncio
+import re
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
