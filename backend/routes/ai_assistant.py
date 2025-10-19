@@ -372,29 +372,36 @@ async def ai_ask(
     **RBAC**: SuperAdmin & Operasyon only
     
     **Scope options**:
-    - customer: Customer panel context (restaurant discovery, orders, cart)
-    - business: Business panel context (order management, menu, KYC)
-    - courier: Courier panel context (task acceptance, routing, location)
+    - customer: Customer panel context
+    - business: Business panel context (default)
+    - courier: Courier panel context
     - multi: Cross-panel analysis
     
     **Mode options**:
     - metrics: Focus on metrics analysis
-    - summary: General summary with RCA
+    - summary: General summary with RCA (default)
     - patch: Include code examples and fixes
     
-    Returns streaming response in SSE format.
+    Returns streaming SSE response with proper Turkish messages.
     """
     db = get_db()
+    
+    # Validate scope
+    valid_scopes = ["customer", "business", "courier", "multi"]
+    if request.scope not in valid_scopes:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Geçersiz panel seçimi. Geçerli değerler: {', '.join(valid_scopes)}"
+        )
     
     # Get AI settings
     settings_doc = await db.admin_settings_ai.find_one({"id": "ai_settings_default"})
     settings = settings_doc if settings_doc else {}
     
-    # Rate limiting check (simplified - in production use Redis)
-    # For now, just log the request
-    print(f"📊 AI Query: user={current_user.get('email')}, scope={request.scope}, mode={request.mode}")
+    # Rate limiting check (simplified - log for monitoring)
+    print(f"📊 AI Query: user={current_user.get('email')}, scope={request.scope}, mode={request.mode}, window={request.time_window_minutes}dk")
     
-    # Build context
+    # Build panel-aware context
     context = await build_panel_context(
         request.scope,
         request.time_window_minutes,
@@ -403,22 +410,79 @@ async def ai_ask(
     )
     
     # Audit log
-    await db.ai_audit_logs.insert_one({
-        "user_id": current_user.get("id", current_user.get("_id")),
-        "user_email": current_user.get("email"),
-        "question": request.question[:200],  # Truncate
-        "scope": request.scope,
-        "mode": request.mode,
-        "time_window_minutes": request.time_window_minutes,
-        "timestamp": datetime.now(timezone.utc)
-    })
+    try:
+        await db.ai_audit_logs.insert_one({
+            "user_id": current_user.get("id", current_user.get("_id")),
+            "user_email": current_user.get("email"),
+            "question": request.question[:200],  # Truncate
+            "scope": request.scope,
+            "mode": request.mode,
+            "time_window_minutes": request.time_window_minutes,
+            "timestamp": datetime.now(timezone.utc)
+        })
+    except Exception as e:
+        print(f"⚠️ Audit log error: {str(e)}")
     
-    # Return streaming response
+    # Return streaming response with proper headers
     return StreamingResponse(
         stream_ai_response(request.question, request.scope, context, request.mode, settings),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no"
+            "X-Accel-Buffering": "no",
+            "Content-Type": "text/event-stream; charset=utf-8",
+            "Connection": "keep-alive"
         }
     )
+
+
+@router.get("/ingest/health", summary="AI Log Ingest Health Check")
+async def ai_ingest_health(
+    current_user: dict = Depends(get_admin_user)
+):
+    """
+    Check AI log ingest health per panel
+    
+    **RBAC**: SuperAdmin & Operasyon only
+    
+    Returns count of logs per panel in last 15 minutes.
+    """
+    db = get_db()
+    
+    # Calculate 15 min ago
+    now = datetime.now(timezone.utc)
+    fifteen_min_ago = now - timedelta(minutes=15)
+    
+    try:
+        # Count logs per app in last 15 min
+        apps_health = {}
+        
+        for app in ["customer", "business", "courier", "admin"]:
+            count = await db.ai_logs.count_documents({
+                "app": app,
+                "timestamp": {"$gte": fifteen_min_ago}
+            })
+            
+            # Get last timestamp
+            last_log = await db.ai_logs.find_one(
+                {"app": app},
+                sort=[("timestamp", -1)]
+            )
+            
+            apps_health[app] = {
+                "count_15m": count,
+                "last_ts": last_log.get("timestamp").isoformat() if last_log else None
+            }
+        
+        return {
+            "ok": True,
+            "apps": apps_health,
+            "checked_at": now.isoformat()
+        }
+    
+    except Exception as e:
+        return {
+            "ok": False,
+            "error": str(e),
+            "checked_at": now.isoformat()
+        }
