@@ -25,11 +25,13 @@ import sys
 BACKEND_URL = "https://food-dash-87.preview.emergentagent.com"
 WS_URL = "wss://food-dash-87.preview.emergentagent.com"
 
-# Test credentials
-ADMIN_CREDENTIALS = {
-    "email": "admin@kuryecini.com",
-    "password": "KuryeciniAdmin2024!"
-}
+# Test credentials - try multiple admin credentials
+ADMIN_CREDENTIALS_LIST = [
+    {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
+    {"email": "admin@kuryecini.com", "password": "admin123"},
+    {"email": "admin@demo.com", "password": "Admin!234"},
+    {"email": "admin@kuryecini.com", "password": "6851"}
+]
 
 CUSTOMER_CREDENTIALS = {
     "email": "test@kuryecini.com", 
