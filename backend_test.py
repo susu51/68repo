@@ -93,35 +93,37 @@ class WebSocketTester:
             self.log_test("Admin Authentication", False, error=f"Authentication error: {str(e)}")
             return False
     
-    def customer_login(self):
-        """Login as customer user"""
+    def authenticate_customer(self):
+        """Authenticate customer user"""
         try:
-            # Create new session for customer
-            customer_session = requests.Session()
-            
-            login_data = {
-                "email": CUSTOMER_EMAIL,
-                "password": CUSTOMER_PASSWORD
-            }
-            
-            response = customer_session.post(f"{BACKEND_URL}/auth/login", json=login_data)
+            response = requests.post(
+                f"{BACKEND_URL}/api/auth/login",
+                json=CUSTOMER_CREDENTIALS,
+                timeout=10
+            )
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success"):
-                    # Cookie-based auth - token stored in cookies
-                    self.log_test("Customer Login", True, f"Customer authenticated successfully via cookies")
-                    return customer_session, data.get("user", {})
+                self.customer_token = data.get("access_token")
+                user_role = data.get("user", {}).get("role")
+                
+                if user_role == "customer":
+                    self.log_test(
+                        "Customer Authentication",
+                        True,
+                        f"Customer login successful, role: {user_role}"
+                    )
+                    return True
                 else:
-                    self.log_test("Customer Login", False, f"Login failed: {data}")
-                    return None, None
+                    self.log_test("Customer Authentication", False, error=f"Expected customer role, got: {user_role}")
+                    return False
             else:
-                self.log_test("Customer Login", False, f"HTTP {response.status_code}: {response.text}")
-                return None, None
+                self.log_test("Customer Authentication", False, error=f"Login failed: {response.status_code}")
+                return False
                 
         except Exception as e:
-            self.log_test("Customer Login", False, f"Login error: {str(e)}")
-            return None, None
+            self.log_test("Customer Authentication", False, error=f"Authentication error: {str(e)}")
+            return False
     
     def test_customer_login(self):
         """Test 1: Customer Login"""
