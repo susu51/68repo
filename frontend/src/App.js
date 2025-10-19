@@ -169,6 +169,8 @@ const AdminDashboard = ({ user }) => {
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [newOrdersCount, setNewOrdersCount] = useState(0);
+  const [orderStatusFilter, setOrderStatusFilter] = useState('all');
   
   // User management state  
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
@@ -188,6 +190,48 @@ const AdminDashboard = ({ user }) => {
     address: '',
     business_category: 'gida'
   });
+
+  // WebSocket hook for real-time order notifications
+  const handleNewOrder = (orderData) => {
+    console.log('🎉 Admin received new order:', orderData);
+    
+    // Play notification sound
+    playNotificationSound();
+    
+    // Add new order to the top of the list
+    setOrders(prevOrders => {
+      // Check if order already exists
+      const exists = prevOrders.some(o => o.id === orderData.order_id);
+      if (exists) return prevOrders;
+      
+      // Create order object from notification data
+      const newOrder = {
+        id: orderData.order_id,
+        business_id: orderData.business_id,
+        business_name: orderData.business_name || 'Unknown',
+        customer_id: orderData.customer_id,
+        customer_name: orderData.customer_name || 'Unknown',
+        status: orderData.status,
+        total_amount: orderData.total_amount,
+        items: orderData.items || [],
+        delivery_address: orderData.delivery_address,
+        created_at: orderData.timestamp || new Date().toISOString(),
+      };
+      
+      return [newOrder, ...prevOrders];
+    });
+    
+    // Increment new orders badge
+    setNewOrdersCount(prev => prev + 1);
+    
+    // Show toast notification
+    toast.success(`🆕 Yeni Sipariş! ${orderData.business_name || 'İşletme'}`, {
+      duration: 5000,
+      icon: '🔔'
+    });
+  };
+  
+  const { isConnected } = useAdminOrderNotifications(handleNewOrder);
 
   const fetchUsers = async () => {
     try {
