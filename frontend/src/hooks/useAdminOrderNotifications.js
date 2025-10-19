@@ -13,10 +13,15 @@ const useAdminOrderNotifications = (onNewOrder) => {
 
   const connect = useCallback(() => {
     try {
-      // Get backend URL from environment (includes /api)
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://food-dash-87.preview.emergentagent.com/api';
+      // Get backend URL from environment
+      let backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://food-dash-87.preview.emergentagent.com';
       
-      // Convert http/https to ws/wss, keep the full URL including /api
+      // Ensure /api is included in the URL
+      if (!backendUrl.endsWith('/api')) {
+        backendUrl = `${backendUrl}/api`;
+      }
+      
+      // Convert http/https to ws/wss
       const wsUrl = backendUrl
         .replace('https://', 'wss://')
         .replace('http://', 'ws://');
