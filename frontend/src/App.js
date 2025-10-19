@@ -678,6 +678,7 @@ const AdminDashboard = ({ user }) => {
               { value: 'users', icon: '👥', label: 'Kullanıcılar' },
               { value: 'kyc', icon: '📋', label: 'KYC' },
               { value: 'advertisements', icon: '📢', label: 'Reklamlar' },
+              { value: 'tools', icon: '🛠️', label: 'Araçlar' },
               { value: 'settings', icon: '⚙️', label: 'Ayarlar' }
             ].map((item) => (
               <button
