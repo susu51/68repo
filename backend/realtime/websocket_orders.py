@@ -161,17 +161,27 @@ async def websocket_order_notifications(
             })
         
         # Keep connection alive
+        print(f"🔄 Entering message loop for {role}:{client_id}")
         while True:
-            # Wait for ping/pong or client messages
-            data = await websocket.receive_text()
-            
-            # Echo back for keepalive
-            if data == "ping":
-                await websocket.send_text("pong")
+            try:
+                # Wait for ping/pong or client messages
+                print(f"⏳ Waiting for message from {role}:{client_id}")
+                data = await websocket.receive_text()
+                print(f"📨 Received message from {role}:{client_id}: {data}")
+                
+                # Echo back for keepalive
+                if data == "ping":
+                    await websocket.send_text("pong")
+                    print(f"🏓 Sent pong to {role}:{client_id}")
+            except Exception as loop_error:
+                print(f"❌ Error in message loop for {role}:{client_id}: {loop_error}")
+                raise
             
     except WebSocketDisconnect:
         manager.disconnect(websocket, client_id, role)
-        print(f"Client disconnected: role={role}, client_id={client_id}")
+        print(f"🔌 Client disconnected normally: role={role}, client_id={client_id}")
     except Exception as e:
-        print(f"❌ WebSocket error: {e}")
+        print(f"❌ WebSocket error for {role}:{client_id}: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         manager.disconnect(websocket, client_id, role)
