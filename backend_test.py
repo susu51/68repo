@@ -61,32 +61,37 @@ class WebSocketTester:
             print(f"   Error: {error}")
         print()
     
-    def business_login(self):
-        """Login as business user"""
+    def authenticate_admin(self):
+        """Authenticate admin user"""
         try:
-            login_data = {
-                "email": BUSINESS_EMAIL,
-                "password": BUSINESS_PASSWORD
-            }
-            
-            response = self.session.post(f"{BACKEND_URL}/auth/login", json=login_data)
+            response = requests.post(
+                f"{BACKEND_URL}/api/auth/login",
+                json=ADMIN_CREDENTIALS,
+                timeout=10
+            )
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success"):
-                    # Cookie-based auth - token stored in cookies
-                    self.log_test("Business Login", True, f"Business authenticated successfully via cookies")
-                    return data.get("user", {})
+                self.admin_token = data.get("access_token")
+                user_role = data.get("user", {}).get("role")
+                
+                if user_role == "admin":
+                    self.log_test(
+                        "Admin Authentication",
+                        True,
+                        f"Admin login successful, role: {user_role}, token length: {len(self.admin_token) if self.admin_token else 0}"
+                    )
+                    return True
                 else:
-                    self.log_test("Business Login", False, f"Login failed: {data}")
-                    return None
+                    self.log_test("Admin Authentication", False, error=f"Expected admin role, got: {user_role}")
+                    return False
             else:
-                self.log_test("Business Login", False, f"HTTP {response.status_code}: {response.text}")
-                return None
+                self.log_test("Admin Authentication", False, error=f"Login failed: {response.status_code} - {response.text}")
+                return False
                 
         except Exception as e:
-            self.log_test("Business Login", False, f"Login error: {str(e)}")
-            return None
+            self.log_test("Admin Authentication", False, error=f"Authentication error: {str(e)}")
+            return False
     
     def customer_login(self):
         """Login as customer user"""
