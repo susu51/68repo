@@ -1495,6 +1495,11 @@ const AdminDashboard = ({ user }) => {
           <TabsContent value="settings" className="space-y-6">
             <AdminSettings />
           </TabsContent>
+
+          {/* Tools Tab */}
+          <TabsContent value="tools" className="space-y-6">
+            <PanelAIAssistant />
+          </TabsContent>
             </Tabs>
           </div>
         </div>
