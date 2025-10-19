@@ -56,6 +56,14 @@ const useAdminOrderNotifications = (onNewOrder) => {
       
       ws.onmessage = (event) => {
         try {
+          console.log('📨 Admin WebSocket raw message:', event.data);
+          
+          // Handle pong response
+          if (event.data === 'pong') {
+            console.log('🏓 Received pong from admin WebSocket');
+            return;
+          }
+          
           const message = JSON.parse(event.data);
           console.log('📨 Admin received WebSocket message:', message);
           
