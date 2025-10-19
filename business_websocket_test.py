@@ -216,7 +216,7 @@ class BusinessWebSocketTester:
                     if self.business_token:
                         headers["Authorization"] = f"Bearer {self.business_token}"
                     
-                    response = requests.get(endpoint, headers=headers, timeout=10)
+                    response = self.business_session.get(endpoint, headers=headers, timeout=10)
                     
                     if response.status_code == 200:
                         menu_items = response.json()
