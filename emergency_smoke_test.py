@@ -94,8 +94,8 @@ class EmergencySmokeTest:
                     else:
                         missing_fields = []
                         if not has_name: missing_fields.append("name/business_name")
-                        if not has_coords: missing_fields.append("lat/lng")
-                        if not has_delivery_fee: missing_fields.append("delivery_fee/min_order_amount")
+                        if not has_coords: missing_fields.append("lat/lng/location.coordinates")
+                        if not has_delivery_fee: missing_fields.append("delivery_fee/min_order_amount/min_order")
                         
                         self.log_test(
                             "Restaurant Discovery (No Params)",
