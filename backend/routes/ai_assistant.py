@@ -556,3 +556,83 @@ async def ai_ingest_health(
             "error": str(e),
             "checked_at": now.isoformat()
         }
+
+
+@router.post("/selftest", summary="AI LLM Connection Self-Test")
+async def ai_selftest(
+    current_user: dict = Depends(get_admin_user)
+):
+    """
+    Test LLM connection with a harmless prompt
+    
+    **RBAC**: SuperAdmin & Operasyon only
+    
+    Returns provider, model, and latency.
+    """
+    db = get_db()
+    
+    # Get AI settings
+    settings_doc = await db.admin_settings_ai.find_one({"id": "ai_settings_default"})
+    settings = settings_doc if settings_doc else {}
+    
+    start_time = datetime.now(timezone.utc)
+    
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        
+        # Determine API key and provider
+        api_key = None
+        provider = "emergent"
+        model = settings.get("default_model", "gpt-4o-mini")
+        
+        if settings and settings.get("openai_api_key") and not settings.get("use_emergent_key", True):
+            api_key = settings["openai_api_key"]
+            provider = "openai_custom"
+        else:
+            api_key = os.environ.get("EMERGENT_LLM_KEY")
+            provider = "emergent"
+        
+        if not api_key:
+            return {
+                "ok": False,
+                "error": "API anahtarı yapılandırılmamış.",
+                "provider": None,
+                "model": None
+            }
+        
+        # Create test chat
+        test_chat = LlmChat(
+            api_key=api_key,
+            session_id=f"selftest_{current_user.get('email', 'unknown')}",
+            system_message="Sen yardımcı bir asistansın."
+        ).with_model("openai", model)
+        
+        # Send harmless test message
+        test_message = UserMessage(text="Bu bir sağlık kontrolüdür. Sadece 'OK' ile yanıt ver.")
+        response = await test_chat.send_message(test_message)
+        
+        # Calculate latency
+        end_time = datetime.now(timezone.utc)
+        latency_ms = int((end_time - start_time).total_seconds() * 1000)
+        
+        return {
+            "ok": True,
+            "provider": provider,
+            "model": model,
+            "latency_ms": latency_ms,
+            "test_response": response[:50],  # First 50 chars
+            "timestamp": end_time.isoformat()
+        }
+    
+    except Exception as e:
+        end_time = datetime.now(timezone.utc)
+        latency_ms = int((end_time - start_time).total_seconds() * 1000)
+        
+        return {
+            "ok": False,
+            "error": str(e),
+            "provider": provider if 'provider' in locals() else None,
+            "model": model if 'model' in locals() else None,
+            "latency_ms": latency_ms,
+            "timestamp": end_time.isoformat()
+        }
