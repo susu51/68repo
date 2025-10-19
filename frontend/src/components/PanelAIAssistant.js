@@ -84,6 +84,7 @@ const PanelAIAssistant = () => {
     abortControllerRef.current = new AbortController();
     setIsStreaming(true);
     setOutput('');
+    setMetadata(null); // Reset metadata
 
     try {
       await askAI(
@@ -100,8 +101,32 @@ const PanelAIAssistant = () => {
         (error) => {
           toast.error(error);
           setIsStreaming(false);
+          
+          // If LLM call failed, offer link to settings
+          if (error.includes('Model yanıtı alınamadı') || error.includes('ayarları kontrol')) {
+            setTimeout(() => {
+              toast((t) => (
+                <div>
+                  <p className="font-medium mb-2">LLM yanıtı alınamadı.</p>
+                  <button
+                    onClick={() => {
+                      window.location.href = '#/admin?tab=settings';
+                      toast.dismiss(t.id);
+                    }}
+                    className="text-sm text-blue-600 hover:text-blue-700 underline"
+                  >
+                    AI Ayarlarına Git →
+                  </button>
+                </div>
+              ), { duration: 8000 });
+            }, 500);
+          }
         },
-        abortControllerRef.current.signal
+        abortControllerRef.current.signal,
+        (meta) => {
+          // Metadata callback
+          setMetadata(meta);
+        }
       );
       
       setIsStreaming(false);
