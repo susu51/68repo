@@ -7,10 +7,17 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, timezone
 
-from auth_cookie import get_courier_user_from_cookie
+from auth_cookie import get_current_user_from_cookie_or_bearer
 from models_package.courier_tasks import CourierTaskStatus
 
 router = APIRouter(prefix="/courier/tasks", tags=["courier-tasks"])
+
+# Courier user validation
+async def get_courier_user(current_user: dict = Depends(get_current_user_from_cookie_or_bearer)):
+    """Validate that current user is a courier"""
+    if current_user.get("role") != "courier":
+        raise HTTPException(status_code=403, detail="Only couriers can access this endpoint")
+    return current_user
 
 class TaskResponse(BaseModel):
     id: str
