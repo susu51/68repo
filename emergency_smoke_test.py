@@ -229,8 +229,8 @@ class EmergencySmokeTest:
             if token:
                 headers["Authorization"] = f"Bearer {token}"
             
-            # Test business orders endpoint
-            response = requests.get(
+            # Test business orders endpoint using the authenticated session
+            response = self.business_session.get(
                 f"{BACKEND_URL}/api/business/orders/incoming",
                 headers=headers,
                 timeout=10
