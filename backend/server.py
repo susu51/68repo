@@ -2328,12 +2328,23 @@ async def create_order(
         print(f"   Customer: {order_doc['customer_name']}")
         print(f"   Total: {totals['grand']} TL")
         
-        # 9. TODO: Publish real-time event
-        # await publish_event("order.created", {
-        #     "order_id": order_id,
-        #     "restaurant_id": restaurant_id,
-        #     "business_id": restaurant_id
-        # })
+        # 9. Publish real-time event
+        try:
+            from realtime.event_bus import publish_order_created
+            await publish_order_created(
+                order_id=order_id,
+                restaurant_id=restaurant_id,
+                business_id=restaurant_id,
+                order_data={
+                    "customer_name": order_doc['customer_name'],
+                    "total": totals['grand'],
+                    "items_count": len(items_snapshot),
+                    "business_name": order_doc['business_name']
+                }
+            )
+            print(f"✅ Real-time event published")
+        except Exception as event_error:
+            print(f"⚠️ Event publish failed (non-critical): {event_error}")
         
         # 10. Return response (serialize datetime)
         order_doc["created_at"] = order_doc["created_at"].isoformat()
