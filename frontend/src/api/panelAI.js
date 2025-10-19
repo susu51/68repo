@@ -11,8 +11,9 @@ const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tool
  * @param {function} onChunk - Callback for each streamed chunk
  * @param {function} onError - Error callback
  * @param {AbortSignal} signal - Abort signal for cancellation
+ * @param {function} onMeta - Metadata callback (optional)
  */
-export async function askAI({ question, scope, time_window_minutes, include_logs, mode }, onChunk, onError, signal) {
+export async function askAI({ question, scope, time_window_minutes, include_logs, mode }, onChunk, onError, signal, onMeta) {
   try {
     const response = await fetch(`${API_BASE}/api/admin/ai/ask`, {
       method: 'POST',
@@ -35,6 +36,8 @@ export async function askAI({ question, scope, time_window_minutes, include_logs
         throw new Error('Hız limiti aşıldı, lütfen biraz sonra tekrar deneyin.');
       } else if (response.status === 403) {
         throw new Error('Yetkisiz erişim.');
+      } else if (response.status === 502 || response.status === 503) {
+        throw new Error('Model yanıtı alınamadı. Lütfen ayarları kontrol edip tekrar deneyin.');
       } else if (response.status === 400) {
         const errorData = await response.json();
         throw new Error(errorData.detail || `API hatası: ${response.status}`);
@@ -72,12 +75,25 @@ export async function askAI({ question, scope, time_window_minutes, include_logs
           
           if (data) {
             try {
-              // Try to parse as JSON (new format with delta)
+              // Try to parse as JSON
               const parsed = JSON.parse(data);
+              
+              // Handle error
               if (parsed.error) {
                 onError(parsed.error);
+                if (parsed.llm_call_failed) {
+                  // Special handling for LLM failures
+                  console.error('LLM call failed:', parsed.error);
+                }
                 return;
               }
+              
+              // Handle metadata
+              if (parsed.meta && onMeta) {
+                onMeta(parsed.meta);
+              }
+              
+              // Handle delta (content chunk)
               if (parsed.delta) {
                 onChunk(parsed.delta);
               }
