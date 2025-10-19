@@ -41,7 +41,7 @@ class AcceptTaskResponse(BaseModel):
 @router.get("", response_model=List[TaskResponse])
 async def get_courier_tasks(
     status: Optional[str] = Query(None, description="Filter by status: waiting, assigned, picked_up, delivering, delivered"),
-    current_user: dict = Depends(get_courier_user_from_cookie)
+    current_user: dict = Depends(get_courier_user)
 ):
     """
     Get courier tasks
