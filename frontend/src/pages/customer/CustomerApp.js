@@ -126,8 +126,7 @@ export const CustomerApp = ({ user, onLogout }) => {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        const orderData = result.order || result;
+        const orderData = await response.json();
         
         // Show success message
         toast.success('🎉 Siparişiniz alındı!', {
@@ -139,7 +138,7 @@ export const CustomerApp = ({ user, onLogout }) => {
         console.log('📦 Order ID:', orderData.id);
         console.log('🏪 Business ID:', orderData.business_id);
         console.log('👤 Business Name:', orderData.business_name);
-        console.log('💰 Total:', orderData.totals?.grand);
+        console.log('💰 Total:', orderData.total_amount);
         
         // Clear cart and navigate
         clearCart();
@@ -156,6 +155,8 @@ export const CustomerApp = ({ user, onLogout }) => {
       } else {
         const error = await response.json();
         console.error('❌ Order creation error:', error);
+        toast.error(error.detail || 'Sipariş oluşturulamadı');
+      }
         toast.error(error.detail || 'Sipariş oluşturulamadı');
       }
     } catch (error) {
