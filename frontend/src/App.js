@@ -4277,27 +4277,25 @@ const CustomerDashboard = ({ user }) => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-800">
-                        {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Müşteri'}
+                        {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Admin'}
                       </h3>
                       <p className="text-gray-600">{user?.email}</p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-                          ✅ Aktif Hesap
-                        </span>
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
-                          ⭐ {loyaltyPoints.tier_level || 'Bronze'} Üye
+                          ✅ Admin Hesap
                         </span>
                       </div>
                     </div>
-                    <Button 
-                      onClick={() => setShowProfile(true)}
-                      className="bg-orange-500 hover:bg-orange-600 text-white"
-                    >
-                      ⚙️ Düzenle
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          )}
+
+          {/* Coupons Tab */}
+          {activeTab === 'coupons' && (
+            <AdminCoupons />
+          )}
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
