@@ -128,10 +128,14 @@ export const CustomerApp = ({ user, onLogout }) => {
       if (response.ok) {
         const orderData = await response.json();
         
-        // Show success message
-        toast.success('🎉 Siparişiniz alındı!', {
-          duration: 4000,
-          icon: '✅'
+        // Show success message with order code
+        toast.success(`✅ Siparişiniz Onaylandı!\n\nSipariş Kodu: ${orderData.id.substring(0, 8).toUpperCase()}`, {
+          duration: 6000,
+          icon: '🎉',
+          style: {
+            fontSize: '16px',
+            fontWeight: 'bold'
+          }
         });
         
         console.log('✅ Order created:', orderData);
@@ -144,14 +148,17 @@ export const CustomerApp = ({ user, onLogout }) => {
         clearCart();
         setCurrentOrderId(orderData.id);
         
-        // Show additional info
+        // Show business confirmation
         setTimeout(() => {
           toast.success(`Siparişiniz ${orderData.business_name || 'restorana'} iletildi`, {
-            duration: 3000
+            duration: 4000
           });
-        }, 500);
+        }, 800);
         
-        setActiveView('orders');
+        // Navigate to orders page after a brief delay
+        setTimeout(() => {
+          setActiveView('orders');
+        }, 1200);
       } else {
         const error = await response.json();
         console.error('❌ Order creation error:', error);
