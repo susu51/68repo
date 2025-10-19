@@ -73,13 +73,17 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
             // New order received!
             const orderInfo = data.data.data;
             
-            // Play notification sound (optional)
+            // Play notification sound
             try {
-              const audio = new Audio('/notification.mp3');
-              audio.play().catch(e => console.log('Audio play failed:', e));
-            } catch (e) {}
+              // Use utility function for sound
+              import('../utils/notificationSound').then(module => {
+                module.default();
+              });
+            } catch (e) {
+              console.log('Audio notification failed:', e);
+            }
 
-            // Show toast notification
+            // Show toast notification with enhanced styling
             toast.success(
               `🆕 Yeni Sipariş!\n${orderInfo.customer_name}\n${orderInfo.total} TL`,
               {
@@ -89,7 +93,9 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
                   background: '#10b981',
                   color: 'white',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  border: '2px solid #059669',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                 }
               }
             );
