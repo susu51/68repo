@@ -1,6 +1,6 @@
 /**
- * Panel AI Assistant API Client
- * Handles streaming AI responses from backend
+ * Panel AI Assistant API Client - HARDENED
+ * Proper SSE parsing with UTF-8 handling and error recovery
  */
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tools.preview.emergentagent.com';
@@ -18,7 +18,7 @@ export async function askAI({ question, scope, time_window_minutes, include_logs
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json; charset=utf-8'
       },
       body: JSON.stringify({
         question,
@@ -35,33 +35,56 @@ export async function askAI({ question, scope, time_window_minutes, include_logs
         throw new Error('Hız limiti aşıldı, lütfen biraz sonra tekrar deneyin.');
       } else if (response.status === 403) {
         throw new Error('Yetkisiz erişim.');
+      } else if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `API hatası: ${response.status}`);
       } else {
         throw new Error(`API hatası: ${response.status}`);
       }
     }
 
-    // Read streaming response
+    // Read streaming response with proper UTF-8 handling
     const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       
       if (done) break;
 
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
+      // Decode chunk and add to buffer
+      buffer += decoder.decode(value, { stream: true });
+      
+      // Process complete lines
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
       for (const line of lines) {
+        if (!line.trim()) continue; // Skip empty lines
+        
         if (line.startsWith('data: ')) {
-          const data = line.substring(6);
+          const data = line.substring(6).trim();
           
           if (data === '[DONE]') {
             return;
           }
           
-          if (data.trim()) {
-            onChunk(data);
+          if (data) {
+            try {
+              // Try to parse as JSON (new format with delta)
+              const parsed = JSON.parse(data);
+              if (parsed.error) {
+                onError(parsed.error);
+                return;
+              }
+              if (parsed.delta) {
+                onChunk(parsed.delta);
+              }
+            } catch (e) {
+              // Fallback: treat as plain text (backward compatibility)
+              onChunk(data);
+            }
           }
         }
       }
@@ -72,5 +95,25 @@ export async function askAI({ question, scope, time_window_minutes, include_logs
     } else {
       onError(error.message);
     }
+  }
+}
+
+/**
+ * Get AI ingest health status
+ */
+export async function getAIHealth() {
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/ai/ingest/health`, {
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      throw new Error('Health check failed');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('AI health check error:', error);
+    return { ok: false, error: error.message };
   }
 }
