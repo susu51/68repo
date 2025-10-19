@@ -398,8 +398,38 @@ export const ModernOrdersManagement = ({ businessId }) => {
                     </div>
 
                     {/* Right: Action Buttons */}
-                    {nextAction && (
-                      <div className="flex flex-col gap-2 lg:w-48">
+                    <div className="flex flex-col gap-2 lg:w-64">
+                      {/* Bekleyen siparişler için onay UI */}
+                      {['created', 'pending', 'placed'].includes(order.status) && (
+                        <div className="space-y-2">
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                              Paket Başı Fiyat (₺)
+                            </label>
+                            <input
+                              type="number"
+                              data-testid="unit-fee-input"
+                              placeholder="10.00"
+                              step="0.50"
+                              min="0"
+                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                              id={`unit-fee-${order.id}`}
+                            />
+                          </div>
+                          <Button
+                            data-testid="approve-order-btn"
+                            onClick={() => confirmOrder(order.id)}
+                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                            size="lg"
+                          >
+                            <CheckCheck className="h-4 w-4 mr-2" />
+                            Onayla
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {/* Diğer durumlar için normal aksiyon */}
+                      {nextAction && !['created', 'pending', 'placed'].includes(order.status) && (
                         <Button
                           onClick={() => updateOrderStatus(order.id, nextAction.nextStatus)}
                           className={`${nextAction.color} hover:opacity-90 text-white`}
@@ -408,16 +438,17 @@ export const ModernOrdersManagement = ({ businessId }) => {
                           {React.createElement(nextAction.icon, { className: 'h-4 w-4 mr-2' })}
                           {nextAction.label}
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedOrder(order)}
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          Detay
-                        </Button>
-                      </div>
-                    )}
+                      )}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Detay
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
