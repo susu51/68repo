@@ -6120,6 +6120,10 @@ api_router.include_router(cart_coupons_router)
 from routes.stable_restaurants import router as stable_restaurants_router
 api_router.include_router(stable_restaurants_router)
 
+# AI Diagnostics Log Ingestion (Phase 1)
+from routes.ai_diagnostics_ingest import router as ai_diagnostics_router
+api_router.include_router(ai_diagnostics_router)
+
 # Phase 3 Routers
 api_router.include_router(order_status_router)
 api_router.include_router(courier_workflow_router)
