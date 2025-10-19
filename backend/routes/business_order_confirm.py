@@ -8,7 +8,7 @@ from typing import Optional
 from datetime import datetime, timezone
 import uuid
 
-from auth_dependencies import get_approved_business_user_from_cookie
+from auth_cookie import get_approved_business_user_from_cookie
 from models.courier_tasks import CourierTaskStatus, Coordinates
 from models import OrderStatus
 
