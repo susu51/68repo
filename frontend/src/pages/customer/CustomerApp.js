@@ -70,26 +70,39 @@ export const CustomerApp = ({ user, onLogout }) => {
   };
 
   const handleCreateOrder = async () => {
+    console.log('🎬 handleCreateOrder STARTED');
+    console.log('📍 selectedAddress:', selectedAddress);
+    console.log('💳 selectedPaymentMethod:', selectedPaymentMethod);
+    console.log('🛒 cart:', cart);
+    
     try {
       if (!selectedAddress) {
+        console.error('❌ VALIDATION FAILED: No address selected');
         toast.error('Lütfen teslimat adresi seçin');
         return;
       }
       if (!selectedPaymentMethod) {
+        console.error('❌ VALIDATION FAILED: No payment method selected');
         toast.error('Lütfen ödeme yöntemi seçin');
         return;
       }
 
       // Check cart items
       const cartItems = cart?.items || [];
+      console.log('🛒 Cart items:', cartItems);
+      
       if (!cartItems || cartItems.length === 0) {
+        console.error('❌ VALIDATION FAILED: Cart is empty');
         toast.error('Sepetiniz boş');
         return;
       }
 
       // Get restaurant_id from cart
       const restaurant_id = cart?.restaurant?.id || cart?.businessId;
+      console.log('🏪 Restaurant ID:', restaurant_id);
+      
       if (!restaurant_id) {
+        console.error('❌ VALIDATION FAILED: No restaurant ID');
         toast.error('Restoran bilgisi bulunamadı');
         return;
       }
@@ -116,7 +129,7 @@ export const CustomerApp = ({ user, onLogout }) => {
         notes: cart?.notes || ''
       };
 
-      console.log('🎉 Creating order with backend API:', orderData);
+      console.log('🎉 Creating order with backend API:', JSON.stringify(orderData, null, 2));
 
       const response = await fetch(`${API}/api/orders`, {
         method: 'POST',
@@ -125,8 +138,11 @@ export const CustomerApp = ({ user, onLogout }) => {
         body: JSON.stringify(orderData)
       });
 
+      console.log('📡 API Response status:', response.status);
+
       if (response.ok) {
         const orderData = await response.json();
+        console.log('✅ Order created successfully:', orderData);
         
         // Show success message with order code
         toast.success(`✅ Siparişiniz Onaylandı!\n\nSipariş Kodu: ${orderData.id.substring(0, 8).toUpperCase()}`, {
@@ -166,6 +182,10 @@ export const CustomerApp = ({ user, onLogout }) => {
       }
     } catch (error) {
       console.error('❌ Sipariş oluşturma hatası:', error);
+      console.error('❌ Error stack:', error.stack);
+      toast.error('Bir hata oluştu: ' + error.message);
+    }
+  };
       toast.error('Bir hata oluştu');
     }
   };
