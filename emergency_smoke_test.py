@@ -417,7 +417,14 @@ class EmergencySmokeTest:
             )
             
             if response.status_code in [200, 201]:
-                order = response.json()
+                data = response.json()
+                
+                # Handle both direct order response and wrapped response
+                if data.get("success") and data.get("order"):
+                    order = data.get("order")
+                else:
+                    order = data
+                
                 order_id = order.get("order_id", order.get("id"))
                 
                 # Check if business_id is populated
