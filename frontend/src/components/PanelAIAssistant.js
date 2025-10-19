@@ -94,7 +94,8 @@ const PanelAIAssistant = () => {
           scope,
           time_window_minutes: timeWindow,
           include_logs: includeLogs,
-          mode
+          mode,
+          provider: provider || undefined // Send only if explicitly selected
         },
         (chunk) => {
           setOutput(prev => prev + chunk);
