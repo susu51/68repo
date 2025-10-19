@@ -6095,6 +6095,10 @@ api_router.include_router(business_router)
 api_router.include_router(nearby_router)
 api_router.include_router(orders_router)
 
+# Business Order Confirmation (Phase 1)
+from routes.business_order_confirm import router as business_confirm_router
+api_router.include_router(business_confirm_router)
+
 # Phase 3 Routers
 api_router.include_router(order_status_router)
 api_router.include_router(courier_workflow_router)
