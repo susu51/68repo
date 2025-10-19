@@ -266,7 +266,7 @@ class BusinessWebSocketTester:
             if self.customer_token:
                 headers["Authorization"] = f"Bearer {self.customer_token}"
             
-            response = requests.post(
+            response = self.customer_session.post(
                 f"{BACKEND_URL}/api/orders",
                 json=order_data,
                 headers=headers,
