@@ -270,8 +270,11 @@ class EndToEndOrderFlowTester:
             response = customer_session.post(f"{BACKEND_URL}/orders", json=order_data)
             
             if response.status_code in [200, 201]:
-                order = response.json()
-                print(f"DEBUG: Order response: {order}")  # Debug output
+                response_data = response.json()
+                print(f"DEBUG: Order response: {response_data}")  # Debug output
+                
+                # Extract order from nested response
+                order = response_data.get("order", response_data)
                 order_id = order.get("id") or order.get("order_id")
                 order_business_id = order.get("business_id")
                 order_status = order.get("status")
