@@ -248,7 +248,7 @@ async def build_panel_context(scope: str, time_window_minutes: int, include_logs
 
 async def stream_ai_response(question: str, scope: str, context: dict, mode: str, settings: dict):
     """
-    Stream AI response using emergentintegrations
+    Stream AI response using emergentintegrations with proper SSE format
     """
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
@@ -261,26 +261,37 @@ async def stream_ai_response(question: str, scope: str, context: dict, mode: str
             api_key = os.environ.get("EMERGENT_LLM_KEY")
         
         if not api_key:
-            yield "data: " + '{"error": "API key not configured"}\n\n'
+            error_payload = json.dumps({"error": "API anahtarı yapılandırılmamış."})
+            yield f"data: {error_payload}\n\n"
+            yield "data: [DONE]\n\n"
             return
         
         # Get system prompt
-        system_prompt = get_turkish_system_prompt(scope)
-        answer_format = get_turkish_answer_format()
+        system_prompt = get_turkish_system_prompt(scope, mode)
         
-        # Build user message with context
+        # Build user message with context (Turkish fields)
+        context_data = context.get("baglam", {})
         context_str = f"""
-Panel: {scope}
-Zaman Aralığı: {context.get('time_window_minutes')} dakika
-Metrikler: {context.get('metrics')}
+Panel: {context_data.get('panel')}
+Zaman Dilimi: {context_data.get('zaman_dilimi_dk')} dakika
+
+Metrikler:
+{json.dumps(context_data.get('metrikler', {}), ensure_ascii=False, indent=2)}
 """
         
-        if context.get('logs_included'):
-            context_str += f"\nLog Özeti: {context.get('log_summary')}\nÖnemli Hatalar: {context.get('top_errors')}"
+        if context_data.get('kume_ozetleri'):
+            context_str += f"\n\nHata Kümeleri:\n"
+            for cluster in context_data.get('kume_ozetleri', [])[:3]:
+                context_str += f"- {cluster.get('baslik')} (24s'de {cluster.get('siklik_24s')} kez)\n  Örnek: {cluster.get('ornek')[:200]}\n"
         
-        user_message_text = f"{context_str}\n\nSoru: {question}\n\n{answer_format}"
+        if context_data.get('ornek_loglar'):
+            context_str += f"\n\nÖrnek Loglar:\n"
+            for log in context_data.get('ornek_loglar', [])[:5]:
+                context_str += f"- {log[:300]}\n"
         
-        # Create chat instance
+        user_message_text = f"{context_str}\n\nSoru: {question}"
+        
+        # Create chat instance with optimized parameters
         model = settings.get("default_model", "gpt-4o-mini") if settings else "gpt-4o-mini"
         
         chat = LlmChat(
@@ -289,24 +300,64 @@ Metrikler: {context.get('metrics')}
             system_message=system_prompt
         ).with_model("openai", model)
         
-        # Send message and stream response
+        # Send message (attempt streaming with retry logic)
         user_message = UserMessage(text=user_message_text)
         
-        # For now, send full response (streaming not yet implemented in simple way)
-        response = await chat.send_message(user_message)
+        retry_count = 0
+        max_retries = 2
         
-        # Stream response in chunks
-        chunk_size = 50
-        for i in range(0, len(response), chunk_size):
-            chunk = response[i:i+chunk_size]
-            yield f"data: {chunk}\n\n"
-            await asyncio.sleep(0.05)  # Simulate streaming delay
-        
-        yield "data: [DONE]\n\n"
+        while retry_count <= max_retries:
+            try:
+                # Get full response (streaming not fully supported by simple SDK)
+                response = await chat.send_message(user_message)
+                
+                # Check if empty response
+                if not response or len(response.strip()) < 10:
+                    yield f"data: {{\"delta\": \"Seçili zaman diliminde yeterli log yok. Zaman penceresini 24 saat yapmayı veya 'Multi' modunu denemeyi öneririm.\"}}\n\n"
+                    yield "data: [DONE]\n\n"
+                    return
+                
+                # Stream response in chunks (simulate streaming)
+                chunk_size = 30
+                for i in range(0, len(response), chunk_size):
+                    chunk = response[i:i+chunk_size]
+                    # Proper SSE format with JSON delta
+                    chunk_json = json.dumps({"delta": chunk}, ensure_ascii=False)
+                    yield f"data: {chunk_json}\n\n"
+                    await asyncio.sleep(0.03)  # Smooth streaming
+                
+                yield "data: [DONE]\n\n"
+                return
+                
+            except Exception as e:
+                error_str = str(e)
+                
+                # Handle 429 rate limit
+                if "429" in error_str or "rate_limit" in error_str.lower():
+                    if retry_count < max_retries:
+                        await asyncio.sleep(0.5 * (retry_count + 1))  # Backoff
+                        retry_count += 1
+                        continue
+                    else:
+                        error_payload = json.dumps({"error": "Hız limiti aşıldı, lütfen biraz sonra tekrar deneyin."})
+                        yield f"data: {error_payload}\n\n"
+                        yield "data: [DONE]\n\n"
+                        return
+                
+                # Handle other errors
+                retry_count += 1
+                if retry_count > max_retries:
+                    error_payload = json.dumps({"error": f"Model yanıtı alınamadı. Lütfen yeniden deneyin. ({error_str})"})
+                    yield f"data: {error_payload}\n\n"
+                    yield "data: [DONE]\n\n"
+                    return
+                
+                await asyncio.sleep(1)  # Wait before retry
         
     except Exception as e:
         error_msg = f"AI sorgu hatası: {str(e)}"
-        yield f"data: {error_msg}\n\n"
+        error_payload = json.dumps({"error": error_msg})
+        yield f"data: {error_payload}\n\n"
         yield "data: [DONE]\n\n"
 
 
