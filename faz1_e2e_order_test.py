@@ -339,8 +339,10 @@ class FAZ1OrderFlowTester:
             client = MongoClient(mongo_url)
             db = client.kuryecini
             
-            # Query courier_tasks collection for our task
-            task = db.courier_tasks.find_one({"id": self.task_id})
+            # Query courier_tasks collection for our task - try both _id and id fields
+            task = db.courier_tasks.find_one({"_id": self.task_id})
+            if not task:
+                task = db.courier_tasks.find_one({"id": self.task_id})
             
             if task:
                 task_order_id = task.get("order_id")
