@@ -675,6 +675,18 @@ export const CourierDashboard = ({ user, onLogout }) => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 mb-6">
           <div className="flex space-x-1 overflow-x-auto">
               <button
+                onClick={() => setActiveTab('waiting')}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
+                  activeTab === 'waiting' 
+                    ? 'bg-orange-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                }`}
+              >
+                <span className="text-lg">📦</span>
+                <span>Bekleyen Paketler</span>
+              </button>
+              
+              <button
                 onClick={() => setActiveTab('orders')}
                 className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
                   activeTab === 'orders' 
