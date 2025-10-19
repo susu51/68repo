@@ -680,6 +680,76 @@ const AdminSettings = () => {
             </Card>
           </div>
         )}
+
+        {/* Integrations Tab */}
+        {activeTab === 'integrations' && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader className="bg-blue-50 border-b">
+                <h2 className="text-xl font-bold text-gray-800">🔌 Entegrasyonlar</h2>
+                <p className="text-sm text-gray-600 mt-1">Harici servis entegrasyonlarını yönetin</p>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {/* AI Settings Card */}
+                  <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="text-3xl">✨</div>
+                          <div>
+                            <h3 className="font-semibold text-lg">AI Ayarları</h3>
+                            <p className="text-sm text-gray-600">
+                              OpenAI entegrasyonu, PII redaction, rate limiting
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setActiveTab('ai-settings')}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          Yapılandır →
+                        </button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Feature Flags Info */}
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-800 mb-2">📌 Feature Flags</h4>
+                    <div className="space-y-1 text-sm text-gray-600">
+                      <div className="flex items-center space-x-2">
+                        <span className={`w-2 h-2 rounded-full ${process.env.REACT_APP_FEATURE_ADMIN_SETTINGS === 'true' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                        <span>FEATURE_ADMIN_SETTINGS: {process.env.REACT_APP_FEATURE_ADMIN_SETTINGS || 'true'}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className={`w-2 h-2 rounded-full ${process.env.REACT_APP_FEATURE_AI_SETTINGS === 'true' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                        <span>FEATURE_AI_SETTINGS: {process.env.REACT_APP_FEATURE_AI_SETTINGS || 'true'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* AI Settings Sub-Page */}
+        {activeTab === 'ai-settings' && (
+          <div className="space-y-6">
+            {/* Back Button */}
+            <button
+              onClick={() => setActiveTab('integrations')}
+              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
+            >
+              <span>←</span>
+              <span>Entegrasyonlara Dön</span>
+            </button>
+
+            {/* AI Settings Component */}
+            <SettingsAI />
+          </div>
+        )}
       </div>
     </div>
   );
