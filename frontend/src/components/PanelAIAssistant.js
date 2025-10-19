@@ -284,6 +284,26 @@ const PanelAIAssistant = () => {
               ))}
             </div>
           </div>
+
+          {/* Provider Selection */}
+          <div>
+            <label htmlFor="provider" className="block text-sm font-medium text-gray-700 mb-2">
+              AI Sağlayıcı (İsteğe Bağlı)
+            </label>
+            <select
+              id="provider"
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Ayarları Kullan (Varsayılan)</option>
+              <option value="emergent">Emergent LLM Key</option>
+              <option value="openai">OpenAI SDK</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Boş bırakırsanız sistem ayarlarındaki sağlayıcı kullanılır. Seçerseniz otomatik fallback aktif.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
