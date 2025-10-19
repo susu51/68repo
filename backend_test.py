@@ -38,22 +38,28 @@ CUSTOMER_CREDENTIALS = {
 
 class WebSocketTester:
     def __init__(self):
-        self.session = requests.Session()
         self.admin_token = None
+        self.customer_token = None
         self.test_results = []
         
-    def log_test(self, test_name, success, message, details=None):
+    def log_test(self, test_name, success, details="", error=""):
         """Log test result"""
         status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}: {message}")
-        
-        self.test_results.append({
+        result = {
             "test": test_name,
+            "status": status,
             "success": success,
-            "message": message,
             "details": details,
+            "error": error,
             "timestamp": datetime.now().isoformat()
-        })
+        }
+        self.test_results.append(result)
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        if error:
+            print(f"   Error: {error}")
+        print()
     
     def business_login(self):
         """Login as business user"""
