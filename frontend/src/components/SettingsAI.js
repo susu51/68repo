@@ -19,6 +19,7 @@ export const SettingsAI = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState(null); // {ok, provider, model, latency_ms}
   
   const [settings, setSettings] = useState({
     openai_api_key: '',
