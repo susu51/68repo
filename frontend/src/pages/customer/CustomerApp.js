@@ -94,23 +94,31 @@ export const CustomerApp = ({ user, onLogout }) => {
         return;
       }
 
-      // Prepare order data for new API
+      // Prepare order data matching backend OrderCreate model
       const orderData = {
-        restaurant_id: restaurant_id,
-        address_id: selectedAddress.id,
+        business_id: restaurant_id,
         items: cartItems.map(item => ({
-          id: item.id,
+          product_id: item.id,
+          title: item.name || item.title,
+          price: item.price,
           quantity: item.quantity,
           notes: item.notes || ''
         })),
-        payment_method: selectedPaymentMethod === 'Nakit' ? 'cash' : 
-                       selectedPaymentMethod === 'Kart' ? 'pos' : 'online_mock',
-        special_instructions: cart?.notes || ''
+        delivery_address: {
+          label: selectedAddress.label || selectedAddress.adres_basligi || 'Ev',
+          address: selectedAddress.address || selectedAddress.acik_adres || selectedAddress.full,
+          lat: selectedAddress.lat || 0,
+          lng: selectedAddress.lng || 0,
+          notes: selectedAddress.notes || ''
+        },
+        payment_method: selectedPaymentMethod === 'Nakit' ? 'cash_on_delivery' : 
+                       selectedPaymentMethod === 'Kart' ? 'pos_on_delivery' : 'online',
+        notes: cart?.notes || ''
       };
 
-      console.log('🎉 Creating order with new API:', orderData);
+      console.log('🎉 Creating order with backend API:', orderData);
 
-      const response = await fetch(`${API}/orders`, {
+      const response = await fetch(`${API}/api/orders`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
