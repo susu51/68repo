@@ -157,8 +157,6 @@ export const CustomerApp = ({ user, onLogout }) => {
         console.error('❌ Order creation error:', error);
         toast.error(error.detail || 'Sipariş oluşturulamadı');
       }
-        toast.error(error.detail || 'Sipariş oluşturulamadı');
-      }
     } catch (error) {
       console.error('❌ Sipariş oluşturma hatası:', error);
       toast.error('Bir hata oluştu');
