@@ -174,7 +174,8 @@ const AdminSettings = () => {
             { id: 'maintenance', label: '🔧 Bakım Modu', icon: '🔧' },
             { id: 'logs', label: '📋 Console & Loglar', icon: '📋' },
             { id: 'tests', label: '🧪 Buton Testleri', icon: '🧪' },
-            { id: 'display', label: '🎨 Görüntüleme', icon: '🎨' }
+            { id: 'display', label: '🎨 Görüntüleme', icon: '🎨' },
+            { id: 'integrations', label: '🔌 Entegrasyonlar', icon: '🔌' }
           ].map(tab => (
             <button
               key={tab.id}
