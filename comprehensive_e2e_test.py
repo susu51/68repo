@@ -456,6 +456,7 @@ class ComprehensiveE2ETester:
                         "has_address": address is not None and address != ""
                     }
                     
+                    print(f"DEBUG: Full order structure: {json.dumps(found_order, indent=2)[:500]}...")
                     print(f"DEBUG: Data integrity checks: {checks}")
                     print(f"DEBUG: Order data: business_id={found_order.get('business_id')}, status={found_order.get('status')}, items={len(items)}, total={total}, customer={found_order.get('customer_name')}, address={address}")
                     
