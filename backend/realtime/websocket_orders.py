@@ -57,18 +57,37 @@ class ConnectionManager:
             except Exception as e:
                 print(f"❌ Error sending to WebSocket: {e}")
                 # Remove failed connection
-                self.disconnect(connection, business_id)
+                self.disconnect(connection, business_id, role="business")
+    
+    async def send_to_admins(self, message: dict):
+        """Send message to all admin connections"""
+        # Make a copy to avoid modification during iteration
+        connections = self.admin_connections.copy()
+        
+        for connection in connections:
+            try:
+                await connection.send_json(message)
+            except Exception as e:
+                print(f"❌ Error sending to admin WebSocket: {e}")
+                # Remove failed connection
+                self.admin_connections.discard(connection)
     
     async def broadcast(self, message: dict):
-        """Broadcast message to all connected clients"""
+        """Broadcast message to all connected clients (businesses + admins)"""
+        # Send to all businesses
         for business_id in list(self.active_connections.keys()):
             await self.send_to_business(business_id, message)
+        
+        # Send to all admins
+        await self.send_to_admins(message)
     
-    def get_connection_count(self, business_id: str = None) -> int:
-        """Get total connections or connections for a business"""
+    def get_connection_count(self, business_id: str = None, role: str = None) -> int:
+        """Get total connections or connections for a business/role"""
+        if role == "admin":
+            return len(self.admin_connections)
         if business_id:
             return len(self.active_connections.get(business_id, set()))
-        return sum(len(conns) for conns in self.active_connections.values())
+        return sum(len(conns) for conns in self.active_connections.values()) + len(self.admin_connections)
 
 # Global connection manager
 manager = ConnectionManager()
