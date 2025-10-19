@@ -157,8 +157,8 @@ class WebSocketTester:
         except Exception as e:
             self.log_test("Admin WebSocket Connection", False, error=f"WebSocket connection failed: {str(e)}")
             return False
-    
-    def test_get_businesses_by_city(self):
+
+    async def test_websocket_role_validation(self):
         """Test 2: Get Available Businesses by City (Aksaray)"""
         try:
             response = self.session.get(f"{BACKEND_URL}/businesses?city=Aksaray")
