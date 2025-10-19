@@ -41,6 +41,11 @@ import asyncio
 import time
 
 # Import real database models
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
+
+# Import from the main models.py file directly
 from models import (
     OrderStatus, UserRole, Business, MenuItem, Order, CourierLocation,
     GlobalSettings, Earning, INDEXES, STATUS_TRANSITIONS, ROLE_TRANSITIONS
