@@ -328,6 +328,57 @@ export const SettingsAI = () => {
         </CardContent>
       </Card>
 
+      {/* Connection Status Widget */}
+      {connectionStatus && (
+        <Card className={connectionStatus.ok ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center space-x-2">
+              <span>{connectionStatus.ok ? '✅' : '❌'}</span>
+              <span>Bağlantı Durumu</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {connectionStatus.ok ? (
+              <div className="space-y-2 text-green-800">
+                <p className="font-medium">✓ LLM bağlantısı çalışıyor</p>
+                <div className="text-sm space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium">Sağlayıcı:</span>
+                    <span>{connectionStatus.provider === 'emergent' ? 'Emergent LLM Key' : 'OpenAI (Özel Anahtar)'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium">Model:</span>
+                    <span>{connectionStatus.model}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium">Gecikme:</span>
+                    <span>{connectionStatus.latency_ms}ms</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium">Son Test:</span>
+                    <span>{new Date(connectionStatus.timestamp).toLocaleString('tr-TR')}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2 text-red-800">
+                <p className="font-medium">✗ LLM bağlantısı başarısız</p>
+                <p className="text-sm">{connectionStatus.error}</p>
+                {connectionStatus.provider && (
+                  <p className="text-sm">Denenen sağlayıcı: {connectionStatus.provider}</p>
+                )}
+              </div>
+            )}
+            <button
+              onClick={checkConnection}
+              className="mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              🔄 Tekrar Test Et
+            </button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Feature Flag Info */}
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="p-4">
