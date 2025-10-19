@@ -49,8 +49,19 @@ async def confirm_order(
                 detail="Geçerli bir paket ücreti giriniz."
             )
         
-        # Find order
-        order = await db.orders.find_one({"_id": order_id})
+        # Find order - try both _id and id fields
+        from bson import ObjectId
+        order = None
+        
+        # Try to find by ObjectId first
+        try:
+            order = await db.orders.find_one({"_id": ObjectId(order_id)})
+        except:
+            pass
+        
+        # If not found, try by custom id field
+        if not order:
+            order = await db.orders.find_one({"id": order_id})
         
         if not order:
             raise HTTPException(
