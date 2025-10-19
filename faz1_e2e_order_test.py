@@ -200,9 +200,10 @@ class FAZ1OrderFlowTester:
                 timeout=10
             )
             
-            if response.status_code == 201:
-                order = response.json()
-                self.order_id = order.get("order_id") or order.get("id")
+            if response.status_code in [200, 201]:
+                data = response.json()
+                order = data.get("order", data)  # Handle both response formats
+                self.order_id = order.get("id") or order.get("order_id")
                 order_business_id = order.get("business_id")
                 order_status = order.get("status")
                 
