@@ -133,9 +133,36 @@ class FAZ1OrderFlowTester:
             return False
 
     def get_business_for_order(self):
-        """Get available business with menu items"""
+        """Get available business with menu items - prioritize the logged-in business"""
         try:
-            # Get businesses in Aksaray (where test customer is located)
+            # First, try to use the business we're logged in as
+            if self.business_id:
+                menu_response = requests.get(
+                    f"{BACKEND_URL}/api/business/public/{self.business_id}/menu", 
+                    timeout=10
+                )
+                
+                if menu_response.status_code == 200:
+                    menu_items = menu_response.json()
+                    if menu_items and len(menu_items) > 0:
+                        # Get business name
+                        business_response = requests.get(f"{BACKEND_URL}/api/businesses", timeout=10)
+                        business_name = "Test Business"
+                        if business_response.status_code == 200:
+                            businesses = business_response.json()
+                            for b in businesses:
+                                if b.get("id") == self.business_id:
+                                    business_name = b.get("name", "Test Business")
+                                    break
+                        
+                        self.log_test(
+                            "Get Business for Order",
+                            True,
+                            f"Using logged-in business: {business_name} (ID: {self.business_id}), {len(menu_items)} menu items"
+                        )
+                        return self.business_id, business_name, menu_items[0]
+            
+            # Fallback: Get businesses in Aksaray (where test customer is located)
             response = requests.get(f"{BACKEND_URL}/api/businesses?city=Aksaray", timeout=10)
             
             if response.status_code == 200:
