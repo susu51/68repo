@@ -186,9 +186,6 @@ export const CustomerApp = ({ user, onLogout }) => {
       toast.error('Bir hata oluştu: ' + error.message);
     }
   };
-      toast.error('Bir hata oluştu');
-    }
-  };
 
   const handleBackToDiscover = () => {
     setActiveView('discover');
