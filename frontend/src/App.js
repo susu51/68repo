@@ -30,6 +30,7 @@ import { AdminMessages } from "./components/AdminMessages";
 import { BannerManager } from "./components/BannerManager";
 import MaintenancePage from "./pages/MaintenancePage";
 import useAdminOrderNotifications from "./hooks/useAdminOrderNotifications";
+import { AdminCoupons } from './components/AdminCoupons';
 import { playNotificationSound } from "./utils/notificationSound";
 
 // Components
