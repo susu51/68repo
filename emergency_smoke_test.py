@@ -408,8 +408,8 @@ class EmergencySmokeTest:
             if token:
                 headers["Authorization"] = f"Bearer {token}"
             
-            # Create order
-            response = requests.post(
+            # Create order using the authenticated session
+            response = self.customer_session.post(
                 f"{BACKEND_URL}/api/orders",
                 json=order_data,
                 headers=headers,
