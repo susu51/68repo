@@ -572,3 +572,97 @@ async def ai_selftest(
             "latency_ms": latency_ms,
             "timestamp": end_time.isoformat()
         }
+
+
+# ==================== AI Dev Tools ====================
+
+@router.get("/dev/list_files", summary="List Repository Files")
+async def dev_list_files(
+    prefix: str = "",
+    current_user: dict = Depends(get_admin_user)
+):
+    """
+    List all text files in repository
+    
+    **RBAC**: SuperAdmin & Operasyon only
+    **READ-ONLY**: No file modifications
+    
+    Args:
+        prefix: Filter files by path prefix
+    """
+    from ai_tools_extra import list_files
+    
+    try:
+        files = await list_files(prefix)
+        return {
+            "files": files,
+            "count": len(files),
+            "prefix": prefix
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Dosya listesi alınamadı: {str(e)}"
+        )
+
+
+@router.get("/dev/grep", summary="Search Files (Grep)")
+async def dev_grep(
+    pattern: str,
+    prefix: str = "",
+    current_user: dict = Depends(get_admin_user)
+):
+    """
+    Search for pattern in files (grep-like)
+    
+    **RBAC**: SuperAdmin & Operasyon only
+    **READ-ONLY**: No file modifications
+    
+    Args:
+        pattern: Regex pattern to search
+        prefix: Filter files by path prefix
+    """
+    from ai_tools_extra import grep
+    
+    try:
+        hits = await grep(pattern, prefix)
+        return {
+            "hits": hits,
+            "count": len(hits),
+            "pattern": pattern,
+            "prefix": prefix
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Arama başarısız: {str(e)}"
+        )
+
+
+@router.get("/dev/ast_outline", summary="Python AST Outline")
+async def dev_ast_outline(
+    path: str,
+    current_user: dict = Depends(get_admin_user)
+):
+    """
+    Get AST outline of Python file (classes and functions)
+    
+    **RBAC**: SuperAdmin & Operasyon only
+    **READ-ONLY**: No file modifications
+    
+    Args:
+        path: Relative path to Python file
+    """
+    from ai_tools_extra import ast_outline_py
+    
+    try:
+        outline = await ast_outline_py(path)
+        return {
+            "outline": outline,
+            "path": path
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"AST analizi başarısız: {str(e)}"
+        )
