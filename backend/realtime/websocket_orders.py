@@ -12,26 +12,36 @@ class ConnectionManager:
     def __init__(self):
         # business_id -> Set of WebSocket connections
         self.active_connections: Dict[str, Set[WebSocket]] = {}
+        # Admin connections (receive ALL orders)
+        self.admin_connections: Set[WebSocket] = set()
     
-    async def connect(self, websocket: WebSocket, business_id: str):
+    async def connect(self, websocket: WebSocket, client_id: str, role: str = "business"):
         """Connect a new WebSocket client"""
         await websocket.accept()
         
-        if business_id not in self.active_connections:
-            self.active_connections[business_id] = set()
-        
-        self.active_connections[business_id].add(websocket)
-        print(f"✅ WebSocket connected: business_id={business_id}, total={len(self.active_connections[business_id])}")
+        if role == "admin":
+            self.admin_connections.add(websocket)
+            print(f"✅ WebSocket connected: role=admin, total_admins={len(self.admin_connections)}")
+        else:
+            # Business connection
+            if client_id not in self.active_connections:
+                self.active_connections[client_id] = set()
+            
+            self.active_connections[client_id].add(websocket)
+            print(f"✅ WebSocket connected: business_id={client_id}, total={len(self.active_connections[client_id])}")
     
-    def disconnect(self, websocket: WebSocket, business_id: str):
+    def disconnect(self, websocket: WebSocket, client_id: str = None, role: str = "business"):
         """Disconnect a WebSocket client"""
-        if business_id in self.active_connections:
-            self.active_connections[business_id].discard(websocket)
+        if role == "admin":
+            self.admin_connections.discard(websocket)
+            print(f"✅ WebSocket disconnected: role=admin")
+        elif client_id and client_id in self.active_connections:
+            self.active_connections[client_id].discard(websocket)
             
-            if len(self.active_connections[business_id]) == 0:
-                del self.active_connections[business_id]
+            if len(self.active_connections[client_id]) == 0:
+                del self.active_connections[client_id]
             
-            print(f"✅ WebSocket disconnected: business_id={business_id}")
+            print(f"✅ WebSocket disconnected: business_id={client_id}")
     
     async def send_to_business(self, business_id: str, message: dict):
         """Send message to all connections of a business"""
