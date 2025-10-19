@@ -43,10 +43,56 @@ def get_db():
 class AIAskRequest(BaseModel):
     """AI Assistant query request"""
     question: str = Field(..., min_length=1, max_length=2000, description="User question in Turkish")
-    scope: Literal["customer", "business", "courier", "multi"] = Field(default="customer", description="Panel scope")
+    scope: Literal["customer", "business", "courier", "multi"] = Field(default="business", description="Panel scope")
     time_window_minutes: int = Field(default=60, ge=1, le=1440, description="Time window in minutes")
     include_logs: bool = Field(default=True, description="Include log summaries")
     mode: Literal["metrics", "summary", "patch"] = Field(default="summary", description="Response mode")
+
+
+def redact_pii(text: str) -> str:
+    """
+    Redact PII while preserving sentence structure
+    Uses placeholders instead of removal to maintain readability
+    """
+    if not text:
+        return text
+    
+    # Email: user@domain.com -> <MASK:EMAIL>
+    text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '<MASK:EMAIL>', text)
+    
+    # Turkish phone: +90 5XX XXX XX XX, 0 5XX XXX XX XX
+    text = re.sub(r'(\+90|0)?[\s\-]?5\d{2}[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}', '<MASK:PHONE>', text)
+    
+    # IBAN: TR XX XXXX ...
+    text = re.sub(r'\bTR\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{2}\b', '<MASK:IBAN>', text, flags=re.IGNORECASE)
+    
+    # JWT/Bearer tokens (long alphanumeric strings)
+    text = re.sub(r'\b(eyJ[A-Za-z0-9_-]{20,}\.eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,})\b', '<MASK:TOKEN>', text)
+    text = re.sub(r'\bBearer\s+[A-Za-z0-9_-]{30,}\b', '<MASK:TOKEN>', text, flags=re.IGNORECASE)
+    
+    # Card numbers: XXXX XXXX XXXX XXXX
+    text = re.sub(r'\b\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}\b', '<MASK:CARD>', text)
+    
+    # Precise addresses (street numbers + street names)
+    text = re.sub(r'\b\d{1,5}\s+[A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s+(Sokak|Cadde|Bulvarı|Sk\.|Cd\.)', '<MASK:ADDR>', text, flags=re.IGNORECASE)
+    
+    return text
+
+
+def trim_log_sample(log_text: str, max_bytes: int = 2000) -> str:
+    """
+    Trim log sample to max bytes while preserving UTF-8 boundaries
+    """
+    if not log_text:
+        return log_text
+    
+    encoded = log_text.encode('utf-8')
+    if len(encoded) <= max_bytes:
+        return log_text
+    
+    # Trim to max_bytes and decode, ignoring incomplete characters
+    trimmed = encoded[:max_bytes].decode('utf-8', errors='ignore')
+    return trimmed + "..."
 
 
 def get_turkish_system_prompt(scope: str) -> str:
