@@ -131,7 +131,7 @@ export const CustomerApp = ({ user, onLogout }) => {
 
       console.log('🎉 Creating order with backend API:', JSON.stringify(orderData, null, 2));
 
-      const response = await fetch(`${API}/api/orders`, {
+      const response = await fetch(`${API}/orders`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
