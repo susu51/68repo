@@ -29,6 +29,8 @@ import UserProfileWithDocuments from "./components/UserProfileWithDocuments";
 import { AdminMessages } from "./components/AdminMessages";
 import { BannerManager } from "./components/BannerManager";
 import MaintenancePage from "./pages/MaintenancePage";
+import useAdminOrderNotifications from "./hooks/useAdminOrderNotifications";
+import { playNotificationSound } from "./utils/notificationSound";
 
 // Components
 import { Button } from "./components/ui/button";
