@@ -2100,6 +2100,31 @@ agent_communication:
           agent: "main"
           comment: "✅ BUSINESS PANEL ORDER DISPLAY FIX APPLIED: Fixed the critical issue where placed orders were not appearing in business order management panel. ROOT CAUSE: The /api/business/orders/incoming endpoint at server.py line 1621 was not correctly including business_id in responses, causing orders to appear as 'business: None'. FIXES APPLIED: 1) Updated get_incoming_orders endpoint to ensure business_id is included in response, 2) Changed order lookups to use 'id' field consistently instead of '_id', 3) Ensured order responses include both 'id' and 'business_id' fields for proper frontend display. TESTING NEEDED: Verify that orders now appear in business panel with correct business_id and are visible to the relevant business user."
 
+  - task: "Admin Panel Orders Real-Time Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js, /app/backend/realtime/websocket_orders.py, /app/frontend/src/hooks/useAdminOrderNotifications.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ ADMIN PANEL ORDERS REAL-TIME INTEGRATION IMPLEMENTED: Complete WebSocket-based real-time order visibility system for Admin panel. BACKEND ENHANCEMENTS: 1) Updated ConnectionManager in websocket_orders.py to support admin role connections (admin_connections set added). 2) Modified connect() to accept role parameter ('business' or 'admin'). 3) Added send_to_admins() method to broadcast to all admin connections. 4) Updated websocket_order_notifications endpoint to accept role parameter. 5) Admin connections subscribe to 'orders:all' topic to receive ALL orders from ALL businesses. FRONTEND IMPLEMENTATION: 1) Created useAdminOrderNotifications.js hook for admin WebSocket connections (connects with role=admin, no business_id needed). 2) Integrated hook into AdminDashboard component with real-time order notifications. 3) Enhanced Admin Orders tab with: Real-time order display, WebSocket connection status indicator, New orders badge counter, Status filters (Tümü/Bekleyen/Hazırlanıyor/Hazır/Yolda/Teslim/İptal), Manual refresh button, Audible alerts for new orders, Better UI with order details and items. FEATURES ADDED: Orders appear instantly when created by customers, Badge counter shows new orders count, Status filters with order count per status, WebSocket connection indicator (green=connected, red=disconnected), Toast notifications for new orders with business name. NEEDS TESTING: Backend WebSocket connection for admin role, Real-time order notifications from customer orders, Status filters functionality, UI rendering and responsiveness."
+
+frontend:
+  - task: "Admin Panel Orders Real-Time Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js, /app/frontend/src/hooks/useAdminOrderNotifications.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "✅ ADMIN PANEL ORDERS REAL-TIME UI IMPLEMENTED: Complete frontend integration for real-time order visibility. COMPONENTS CREATED: 1) useAdminOrderNotifications.js hook with WebSocket connection management, automatic reconnection logic, ping/pong keepalive. 2) Enhanced AdminDashboard Orders tab with real-time updates, status filters, badge counter, connection indicator. FEATURES: Real-time order insertion at top of list, Audio alerts for new orders, Status-based filtering (7 filter options), Order count badges per status, WebSocket connection status (Canlı/Bağlantı Kesildi), Manual refresh button with loading state, Improved order cards with icons and better formatting. INTEGRATION: useAdminOrderNotifications hook receives WebSocket messages, handleNewOrder callback adds orders to state, filteredOrders computed based on status filter, getOrderCountByStatus helper for badge counts. NEEDS TESTING: WebSocket connection establishment, Real-time order reception, Status filters, Badge counter updates, UI responsiveness."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
