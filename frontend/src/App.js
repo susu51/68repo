@@ -4992,9 +4992,8 @@ function App() {
     // React will re-render and show appropriate dashboard
     setShowLogin(false);
     
-    // Force a page reload to ensure user state is updated properly
-    // This is needed because sometimes React doesn't re-render immediately after login
-    window.location.reload();
+    // DO NOT reload - causes infinite loop!
+    // window.location.reload(); // ❌ REMOVED
   };
 
   return (
