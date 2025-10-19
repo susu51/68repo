@@ -120,7 +120,7 @@ async def get_courier_tasks(
 @router.put("/{task_id}/accept", response_model=AcceptTaskResponse)
 async def accept_task(
     task_id: str,
-    current_user: dict = Depends(get_courier_user_from_cookie)
+    current_user: dict = Depends(get_courier_user)
 ):
     """
     Accept a courier task
