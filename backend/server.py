@@ -6104,6 +6104,10 @@ api_router.include_router(orders_router)
 from routes.business_order_confirm import router as business_confirm_router
 api_router.include_router(business_confirm_router)
 
+# Courier Tasks (Phase 2)
+from routes.courier_tasks import router as courier_tasks_router
+api_router.include_router(courier_tasks_router)
+
 # Phase 3 Routers
 api_router.include_router(order_status_router)
 api_router.include_router(courier_workflow_router)
