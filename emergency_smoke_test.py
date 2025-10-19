@@ -275,7 +275,7 @@ class EmergencySmokeTest:
     def authenticate_customer(self):
         """Authenticate customer user"""
         try:
-            response = requests.post(
+            response = self.customer_session.post(
                 f"{BACKEND_URL}/api/auth/login",
                 json=CUSTOMER_CREDENTIALS,
                 timeout=10
