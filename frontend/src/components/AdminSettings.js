@@ -4,6 +4,7 @@ import { Button } from './ui/button.jsx';
 import { Input } from './ui/input.jsx';
 import { toast } from 'react-hot-toast';
 import api from '../api/http';
+import SettingsAI from './SettingsAI';
 
 const AdminSettings = () => {
   const [activeTab, setActiveTab] = useState('maintenance');
