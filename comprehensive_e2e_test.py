@@ -452,6 +452,9 @@ class ComprehensiveE2ETester:
                         "has_address": found_order.get("delivery_address") is not None
                     }
                     
+                    print(f"DEBUG: Data integrity checks: {checks}")
+                    print(f"DEBUG: Order data: business_id={found_order.get('business_id')}, status={found_order.get('status')}, items={len(found_order.get('items', []))}, total={found_order.get('total_amount')}, customer={found_order.get('customer_name')}, address={found_order.get('delivery_address')}")
+                    
                     # Verify totals calculation (if available)
                     totals = found_order.get("totals", {})
                     if totals:
