@@ -291,108 +291,46 @@ Metrikler:
         
         user_message_text = f"{context_str}\n\nSoru: {question}"
         
-        # Retry logic
-        retry_count = 0
-        max_retries = 2
-        last_error = None
+        # Send metadata first
+        meta_payload = json.dumps({
+            "meta": {
+                "provider": telemetry["provider"],
+                "model": telemetry["model"],
+                "scope": scope,
+                "mode": mode
+            }
+        }, ensure_ascii=False)
+        yield f"data: {meta_payload}\n\n"
         
-        while retry_count <= max_retries:
-            try:
-                # Create chat instance with optimized parameters
-                chat = LlmChat(
-                    api_key=api_key,
-                    session_id=f"panel_ai_{datetime.now().timestamp()}",
-                    system_message=system_prompt
-                ).with_model("openai", model)
-                
-                # Configure parameters for natural responses
-                # Note: emergentintegrations may not support all parameters
-                # temperature=0.4, max_tokens=900, top_p=1
-                
-                # Send message - REAL LLM CALL
-                user_message = UserMessage(text=user_message_text)
-                response = await chat.send_message(user_message)
-                
-                # Check if we got a real response
-                if not response or len(response.strip()) < 20:
-                    # This is suspicious - likely not a real LLM response
-                    if retry_count < max_retries:
-                        retry_count += 1
-                        await asyncio.sleep(0.5 * retry_count)
-                        continue
-                    else:
-                        # All retries exhausted - fail properly
-                        raise Exception("Model returned empty/invalid response")
-                
-                # Send metadata first
-                meta_payload = json.dumps({
-                    "meta": {
-                        "provider": provider,
-                        "model": model,
-                        "scope": scope,
-                        "mode": mode
-                    }
-                }, ensure_ascii=False)
-                yield f"data: {meta_payload}\n\n"
-                
-                # Stream REAL response in chunks
-                chunk_size = 30
-                for i in range(0, len(response), chunk_size):
-                    chunk = response[i:i+chunk_size]
-                    chunk_json = json.dumps({"delta": chunk}, ensure_ascii=False)
-                    yield f"data: {chunk_json}\n\n"
-                    await asyncio.sleep(0.03)  # Smooth streaming
-                
-                yield "data: [DONE]\n\n"
-                
-                # Log success
-                print(f"✅ LLM Success: provider={provider}, model={model}, response_length={len(response)}")
-                return
-                
-            except Exception as e:
-                last_error = str(e)
-                print(f"⚠️ LLM Error (attempt {retry_count + 1}): {last_error}")
-                
-                # Handle 401 - invalid custom key, fallback to Emergent
-                if "401" in last_error or "unauthorized" in last_error.lower():
-                    if provider == "openai_custom" and retry_count == 0:
-                        print("🔄 Custom key failed, falling back to Emergent LLM Key")
-                        api_key = os.environ.get("EMERGENT_LLM_KEY")
-                        provider = "emergent"
-                        telemetry["provider"] = "emergent"
-                        telemetry["use_emergent_key"] = True
-                        retry_count += 1
-                        continue
-                
-                # Handle 429 rate limit
-                if "429" in last_error or "rate_limit" in last_error.lower():
-                    if retry_count < max_retries:
-                        backoff_delay = 0.5 * (retry_count + 1)
-                        print(f"⏳ Rate limited, backing off {backoff_delay}s")
-                        await asyncio.sleep(backoff_delay)
-                        retry_count += 1
-                        continue
-                    else:
-                        error_payload = json.dumps({"error": "Hız limiti aşıldı, lütfen biraz sonra tekrar deneyin."}, ensure_ascii=False)
-                        yield f"data: {error_payload}\n\n"
-                        yield "data: [DONE]\n\n"
-                        return
-                
-                # Other errors - retry with backoff
-                if retry_count < max_retries:
-                    retry_count += 1
-                    await asyncio.sleep(1 * retry_count)
-                    continue
-                else:
-                    # All retries exhausted - fail with 502-like error
-                    # Frontend will handle this as a proper error
-                    error_payload = json.dumps({
-                        "error": "Model yanıtı alınamadı. Lütfen ayarları kontrol edip tekrar deneyin.",
-                        "llm_call_failed": True
-                    }, ensure_ascii=False)
-                    yield f"data: {error_payload}\n\n"
-                    yield "data: [DONE]\n\n"
-                    return
+        # Stream using provider abstraction with automatic fallback
+        try:
+            async for delta in stream_chat(
+                system=system_prompt,
+                user=user_message_text,
+                model=telemetry["model"],
+                prefer=prefer_provider
+            ):
+                chunk_json = json.dumps({"delta": delta}, ensure_ascii=False)
+                yield f"data: {chunk_json}\n\n"
+            
+            yield "data: [DONE]\n\n"
+            
+            # Log success
+            print(f"✅ LLM Success: provider={telemetry['provider']}, model={telemetry['model']}")
+            return
+            
+        except Exception as e:
+            error_msg = str(e)
+            print(f"❌ LLM Error: {error_msg}")
+            
+            # All retries exhausted - fail with error
+            error_payload = json.dumps({
+                "error": "Model yanıtı alınamadı. Lütfen ayarları kontrol edip tekrar deneyin.",
+                "llm_call_failed": True
+            }, ensure_ascii=False)
+            yield f"data: {error_payload}\n\n"
+            yield "data: [DONE]\n\n"
+            return
         
     except Exception as e:
         error_msg = f"LLM sistem hatası: {str(e)}"
