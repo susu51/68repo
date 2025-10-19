@@ -122,30 +122,43 @@ async def websocket_order_notifications(
         })
         
         # Subscribe to event bus
-        from realtime.event_bus import event_bus
-        
-        async def on_order_event(data: dict):
-            """Callback for order events"""
+        try:
+            from realtime.event_bus import event_bus
+            
+            async def on_order_event(data: dict):
+                """Callback for order events"""
+                try:
+                    if role == "admin":
+                        # Admin receives all orders
+                        await manager.send_to_admins({
+                            "type": "order_notification",
+                            "data": data
+                        })
+                    else:
+                        # Business receives only their orders
+                        await manager.send_to_business(business_id, {
+                            "type": "order_notification",
+                            "data": data
+                        })
+                except Exception as e:
+                    print(f"❌ Error in order event callback: {e}")
+            
+            # Subscribe to appropriate topic
             if role == "admin":
-                # Admin receives all orders
-                await manager.send_to_admins({
-                    "type": "order_notification",
-                    "data": data
-                })
+                # Subscribe to all order events
+                await event_bus.subscribe("orders:all", on_order_event)
+                print(f"✅ Admin subscribed to orders:all topic")
             else:
-                # Business receives only their orders
-                await manager.send_to_business(business_id, {
-                    "type": "order_notification",
-                    "data": data
-                })
-        
-        # Subscribe to appropriate topic
-        if role == "admin":
-            # Subscribe to all order events
-            await event_bus.subscribe("orders:all", on_order_event)
-        else:
-            # Subscribe to business-specific topic
-            await event_bus.subscribe(f"business:{business_id}", on_order_event)
+                # Subscribe to business-specific topic
+                await event_bus.subscribe(f"business:{business_id}", on_order_event)
+                print(f"✅ Business {business_id} subscribed to business:{business_id} topic")
+        except Exception as e:
+            print(f"❌ Error subscribing to event bus: {e}")
+            # Don't close connection - keep it alive even if subscription fails
+            await websocket.send_json({
+                "type": "error",
+                "message": "Event subscription failed, but connection maintained"
+            })
         
         # Keep connection alive
         while True:
