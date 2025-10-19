@@ -21,7 +21,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 
 # Configuration
-BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 # Test credentials

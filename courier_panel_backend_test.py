@@ -20,7 +20,7 @@ import os
 from urllib.parse import urljoin
 
 # Configuration
-BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
 COURIER_EMAIL = "testkurye@example.com"
 COURIER_PASSWORD = "test123"
 

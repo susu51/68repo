@@ -16,7 +16,7 @@ import { CourierAvailability } from './components/CourierAvailability';
 import { CourierReadyOrdersMap } from './components/CourierReadyOrdersMap';
 import { CourierOrderHistoryFiltered } from './components/CourierOrderHistoryFiltered';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://order-flow-debug.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://food-dash-87.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierDashboard = ({ user, onLogout }) => {

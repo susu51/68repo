@@ -13,7 +13,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BASE_URL = "https://order-flow-debug.preview.emergentagent.com/api"
+BASE_URL = "https://food-dash-87.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class Colors:

@@ -29,7 +29,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@kuryecini.com"
 ADMIN_PASSWORD = "KuryeciniAdmin2024!"  # Actual admin password from backend
 

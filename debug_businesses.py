@@ -6,7 +6,7 @@ Debug script to check businesses and their menu items
 import requests
 import json
 
-BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
 
 def check_businesses():
     """Check all businesses in Aksaray and their menu items"""

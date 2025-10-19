@@ -1,71 +1,42 @@
 <analysis>
-The previous AI engineer diligently enhanced the Kuryecini application, focusing on critical UI/UX and core functionality. Initially, work involved fixing login components, implementing a gradient-based login UI with OAuth/phone placeholders, and integrating site-wide dark/light mode (excluding specific panels). Routing for  was resolved. Key feature additions included menu item image uploads for businesses, smart restaurant filtering on the customer discover page by city/district and GPS, and fixing business KYC approval processes.
-
-Significant effort was dedicated to resolving issues with GPS coordinates for business discoverability, full address display in the customer panel, and a complex multi-turn debugging process to fix the end-to-end cart and order flow. This involved correcting frontend  hook integration, backend order creation (handling  vs uid=0(root) gid=0(root) groups=0(root) and  vs  collections), and ensuring orders correctly appear in business and courier panels by adjusting API responses and status filters. An Admin Settings page with maintenance mode was also implemented. The work shows an iterative, problem-solving approach to user feedback.
+The previous AI engineer meticulously advanced the Kuryecini application, resolving numerous critical bugs and implementing substantial features. Initial efforts centered on fixing order display in the business panel due to  mismatches and frontend  issues, which were resolved via  and  modifications. Subsequent fixes included synchronizing the Menü Ürünleri: 0 count in the Business Dashboard, correcting Restoran bulunamadı on the DiscoverPage for GPS activation, and mitigating mobile keyboard closing issues in registration forms. A major architectural fix involved restructuring  to correctly render Admin Settings, which were previously unclickable due to incorrect  placement. Panel-based test buttons were added to Admin Settings. Authentication issues, an infinite refresh loop in the business panel, and WebSocket connectivity problems (missing , / protocol mismatch) were also addressed. Most recently, a comprehensive real-time order routing system, including database migrations, new order models, event publishing via WebSockets, and frontend integration with audible alerts, was implemented and fully tested.
 </analysis>
 
 <product_requirements>
-The Kuryecini platform is a modern, role-based application (Customer, Business, Courier, Admin) built with React, FastAPI, and MongoDB. It features address management with geocoding, distance-based restaurant discovery, and real-time order processing. The Business Panel manages menus, orders, and regions.
-
-Recent implementation priorities include:
--   **Detailed Registration:** Multi-step, role-specific forms with KYC document uploads and admin approval.
--   **Advertisement System:** City-filtered, auto-sliding ad banners for customers, managed via an Admin panel.
--   **Login/Registration UX:** Modern login modal (email, phone, OAuth), dedicated registration page with specific visual styles and new tab functionality.
--   **Global Theme & UI:** Site-wide dark/light mode, with forced light mode for customer panels and landing page.
--   **Menu Management:** Businesses must upload images for menu items.
--   **Restaurant Discovery:** Customer panel displays businesses in the same city/district, sorted smartly (10km with GPS, 50km without). Full addresses should be visible in the customer discover section.
--   **Admin Settings:** Implement a comprehensive settings panel including maintenance mode.
--   **Order Flow:** Ensure add-to-cart, order confirmation, and payment flow work correctly, and that placed orders are visible in the respective business and courier panels.
+The Kuryecini platform is a multi-role (Customer, Business, Courier, Admin) application, leveraging React, FastAPI, and MongoDB. Key functionalities include robust address management, geocoding, distance-based restaurant discovery, and real-time order processing. Recent feature development focused on a detailed, role-specific registration process with KYC, an advertisement system with city-filtered banners, and a modern, theme-aware login/registration UX. Menu management allows businesses to upload images. Restaurant discovery for customers is intelligent, using city/district and GPS filtering, and displays full addresses. An Admin Settings panel was required, including maintenance mode. A critical focus was ensuring the end-to-end order flow (add-to-cart, payment, order visibility) functions flawlessly across customer, business, and courier panels. The latest major requirement is to harden order routing with strict data models, indexing, API validations, real-time WebSocket updates, RBAC, improved notifications, comprehensive testing, and observability.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Architecture**: React (frontend), FastAPI (backend), MongoDB (database).
--   **Authentication**: JWT, secure cookies, role-based access control.
--   **UI/Styling**: Tailwind CSS, React Context API for theme, gradient designs.
--   **Routing**: React Router DOM.
--   **State Management**: React hooks (, , , ).
--   **Geocoding/Location**: Distance-based and city/district filtering for restaurants.
--   **Database Interaction**: MongoDB with UUIDs for IDs, not ObjectIDs.
+-   Full-stack Architecture: React, FastAPI, MongoDB.
+-   Authentication: JWT, secure cookies, role-based access control.
+-   UI/Styling: Tailwind CSS, React Context API, gradient designs.
+-   Routing: React Router DOM.
+-   State Management: React hooks (, , , ).
+-   Geocoding/Location: Distance-based and city/district filtering, GPS coordinates, geospatial indexing.
+-   Database Interaction: MongoDB with UUIDs for IDs.
+-   Real-time Communication: WebSockets (FastAPI, React hooks, in-memory event bus).
 </key_technical_concepts>
 
 <code_architecture>
-The application employs a standard MERN-like stack: React for the frontend, FastAPI for the backend, and MongoDB as the database.
 
-
-
-**Key Files and Changes:**
--   ****:
-    -   **Summary**: Central FastAPI application.
-    -   **Changes**: Added  utility endpoint for development. Added  and  for Admin panel control. Introduced a public endpoint  for fetching menus. Modified  for correct product ID lookup. Updated order processing and business order fetching logic (multiple locations in the file were found to have similar endpoints, leading to confusion and duplicate logic). Corrected  and uid=0(root) gid=0(root) groups=0(root) usage in  and  endpoints to ensure business orders display correctly with uid=0(root) gid=0(root) groups=0(root) and  in responses.
--   ****:
-    -   **Summary**: Handles address management endpoints for users.
-    -   **Changes**: Confirmed  (full address) field presence, ensuring backend supports full address storage and retrieval.
--   ****:
-    -   **Summary**: Business-specific API routes.
-    -   **Changes**: Modified  to insert menu items into  with both  and uid=0(root) gid=0(root) groups=0(root) fields to be compatible with public menu endpoints.
--   ****:
-    -   **Summary**: Provides city and location-based catalog filtering.
-    -   **Changes**: Made  and  parameters optional in  and added conditional logic to allow city/district-only filtering without GPS.
--   ****:
-    -   **Summary**: Main application component, handles routing and global context.
-    -   **Changes**: Integrated  component. Added logic to redirect to  if maintenance mode is active. Wrapped  with . Defined  component.
--   ****:
-    -   **Summary**: Customer-facing page for discovering restaurants.
-    -   **Changes**: Updated address display to show full address using . Integrated  hook for add-to-cart functionality. Changed to use the new  endpoint for restaurant listing.
--   ****:
-    -   **Summary**: Main container for customer-specific routes and functionality.
-    -   **Changes**: Modified  to correctly format order data using  and to align with backend  model. Updated toast messages for clarity.
--   ****:
-    -   **Summary**: Displays the customer's cart and initiates checkout.
-    -   **Changes**: Corrected usage of  object to access  for rendering cart contents, fixing a type mismatch issue.
--   ****:
-    -   **Summary**: Component for selecting and managing delivery addresses.
-    -   **Changes**: Corrected API endpoints for fetching and saving addresses to . Updated address saving logic to match backend schema.
--   ** (NEW)**:
-    -   **Summary**: New component created to manage administrative settings, including maintenance mode.
--   ** (NEW)**:
-    -   **Summary**: New page to display a maintenance message when the application is in maintenance mode.
--   ****: Continuously updated with implementation status, bug fixes, feature additions, and test results.
+-   ****: Central FastAPI application. Overhauled  for new models, added event publishing and WebSocket router. Fixed  to use cookie authentication, removed duplicate order endpoints. Updated  for panel-based tests and business profile update logic.
+-   ****: (NEW) Defines hardened Pydantic models for order creation and representation.
+-   ****: (NEW) Script to migrate existing order data for schema consistency and create essential MongoDB indexes.
+-   ****: (NEW) Implements a simple in-memory event publishing/subscription mechanism.
+-   ****: (NEW) Defines the backend WebSocket endpoint logic for real-time order notifications.
+-   ****: (NEW) Created to properly initialize the  directory as a Python package, resolving import errors.
+-   ****: Handles city/location filtering. The  parameter in  was made optional; a syntax error in pipeline construction was corrected.
+-   ****: Core Pydantic models. Added  and  fields to the  model.
+-   ****: Main application component. Fixed  hierarchy for Admin Settings rendering; added  after successful login.
+-   ****: Customer restaurant discovery. Improved  to correctly handle GPS and address-based filtering; a duplicate  was removed.
+-   ****: Main customer application. Updated  to align with the new backend API format.
+-   ****: Customer order history. Adjusted order display to directly use array responses from the API.
+-   ****: User registration forms. Added , , and  props to input fields to address mobile keyboard issues.
+-   ****: Business profile settings. Added UI fields for  and  to reflect registration data.
+-   ****: Business order management. Integrated  for real-time updates, added a WebSocket connection indicator, and removed erroneous  calls.
+-   ****: Main business application. Ensured the correct  is passed as  to .
+-   ****: (NEW) Custom React hook for managing WebSocket connections and processing real-time order notifications. Dynamically adjusts  to  for WebSocket URLs.
+-   ****: (NEW) Utility function to play an audible alert upon receiving new order notifications.
 </code_architecture>
 
 <pending_tasks>
@@ -73,18 +44,17 @@ The application employs a standard MERN-like stack: React for the frontend, Fast
 -   Integrate customer rating modal post-delivery (PHASE 2C).
 -   Implement Business/Restaurant analytics (PHASE 2D).
 -   Add unit and E2E tests for all new features (PHASE 2D).
--   Refine the Restoran bulunamadı issue on DiscoverPage after GPS activation.
--   Fix Dashboard's Menü Ürünleri: 0 count not reflecting actual menu items.
--   Resolve the mobile keyboard closing issue in the registration form.
+-   Implement Yeni Sipariş toast + badge counter in Business Panel.
+-   Implement order filters in Business Panel ().
+-   Implement manual refresh button + automatic WS/poll sync in Business Panel.
+-   Integrate Admin Panel Orders (Admin Siparişler tablosunda anlık görünür).
+-   Add Observability metrics (, ) to .
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was deep into debugging a critical issue where placed orders were not appearing in the relevant business's order management panel. The problem was traced through several layers, including initial issues with menu item creation (not persisting to the database, or incorrect uid=0(root) gid=0(root) groups=0(root) vs  usage), then order creation (orders not saving to the database despite a 200 OK response from the backend), and finally, the display of existing orders in the business panel.
-
-The latest findings indicated that orders *are* now being saved to the database, but the business panel's API endpoints () were not correctly retrieving or formatting the  in their responses. This resulted in orders appearing as  or not being visible to the correct business user. The engineer identified a specific endpoint at  line 1621 responsible for fetching incoming business orders and made a modification to ensure  is included in the response and that uid=0(root) gid=0(root) groups=0(root) is used consistently for lookups. The current state is that this fix has been applied to , the backend has been restarted, and the next step is to test this modification.
+Immediately prior to this summary, the AI engineer completed a major hardening of the order routing system. This involved: running a database migration () to ensure all orders have correct  linkages and statuses, and to create necessary MongoDB indexes. New robust  models were defined in . The  endpoint in  was refactored for new models, comprehensive validations, item snapshots, and event publishing. A real-time WebSocket Pub/Sub system, including  and , was implemented in the backend. On the frontend,  was updated for the new API, and  was created and integrated into  for real-time updates, including a WebSocket connection indicator. Critical bugs were fixed: a backend 502 error ( not imported) and a WebSocket connection error ( vs  protocol mismatch). The last completed task was adding an audible alert () for new orders received via WebSocket, and the system has passed an end-to-end test with 100% success for order routing.
 </current_work>
 
 <optional_next_step>
-Test if orders now appear in the business panel with the correct  and are visible to the relevant business.
+Integrate Admin Panel Orders for real-time visibility.
 </optional_next_step>
-

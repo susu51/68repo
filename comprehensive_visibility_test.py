@@ -7,7 +7,7 @@ Deep dive into the business visibility pipeline to identify the exact issue
 import requests
 import json
 
-BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
 
 def get_token(role):
     """Get authentication token for role"""

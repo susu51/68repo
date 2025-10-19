@@ -6,7 +6,7 @@ Debug Business Menu and Order Flow
 import requests
 import json
 
-BACKEND_URL = "https://order-flow-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://food-dash-87.preview.emergentagent.com/api"
 
 # Login as customer
 customer_response = requests.post(
