@@ -145,6 +145,37 @@ async def create_order(
         estimated_delivery = datetime.now(timezone.utc)
         estimated_delivery = estimated_delivery.replace(minute=estimated_delivery.minute + 45)
         
+        # Publish order event to event bus for real-time notifications
+        try:
+            from realtime.event_bus import publish_order_created
+            
+            # Prepare order data for notification
+            order_notification_data = {
+                "order_id": order_doc["_id"],
+                "business_id": order_doc["business_id"],
+                "business_name": order_doc["business_name"],
+                "customer_id": order_doc["customer_id"],
+                "customer_name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip() or "Customer",
+                "total_amount": order_doc["total_amount"],
+                "delivery_fee": order_doc["delivery_fee"],
+                "status": order_doc["status"],
+                "items": order_doc["items"],
+                "delivery_address": order_doc["delivery_address"],
+                "payment_method": order_doc["payment_method"],
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await publish_order_created(
+                order_id=order_doc["_id"],
+                restaurant_id=order_doc["business_id"],
+                business_id=order_doc["business_id"],
+                order_data=order_notification_data
+            )
+            print(f"📡 Order event published to business:{order_doc['business_id']} and orders:all")
+        except Exception as event_error:
+            print(f"⚠️ Failed to publish order event: {event_error}")
+            # Don't fail the order creation if event publishing fails
+        
         return OrderResponse(
             id=order_doc["_id"],
             customer_id=order_doc["customer_id"],
