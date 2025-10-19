@@ -6136,6 +6136,10 @@ api_router.include_router(ai_diagnostics_router)
 from routes.ai_settings import router as ai_settings_router
 api_router.include_router(ai_settings_router)
 
+# AI Assistant (Panel-Aware AI Chat - Phase 2)
+from routes.ai_assistant import router as ai_assistant_router
+api_router.include_router(ai_assistant_router)
+
 # Phase 3 Routers
 api_router.include_router(order_status_router)
 api_router.include_router(courier_workflow_router)
