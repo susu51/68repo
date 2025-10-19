@@ -47,6 +47,7 @@ class AIAskRequest(BaseModel):
     time_window_minutes: int = Field(default=60, ge=1, le=1440, description="Time window in minutes")
     include_logs: bool = Field(default=True, description="Include log summaries")
     mode: Literal["metrics", "summary", "patch"] = Field(default="summary", description="Response mode")
+    provider: Optional[Literal["emergent", "openai"]] = Field(None, description="Preferred AI provider")
 
 
 def redact_pii(text: str) -> str:
