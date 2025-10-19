@@ -167,6 +167,19 @@ const PanelAIAssistant = () => {
             </span>
           </p>
         </div>
+        
+        {/* Metadata Badge */}
+        {metadata && (
+          <div className="text-sm bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+            <div className="flex items-center space-x-3 text-green-800">
+              <span className="font-medium">Model: {metadata.model}</span>
+              <span>•</span>
+              <span>Sağlayıcı: {metadata.provider === 'emergent' ? 'Emergent LLM' : 'OpenAI (Özel)'}</span>
+              <span>•</span>
+              <span>Mod: {metadata.mode === 'summary' ? 'Özet' : (metadata.mode === 'metrics' ? 'Metrik' : 'Patch')}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Controls */}
