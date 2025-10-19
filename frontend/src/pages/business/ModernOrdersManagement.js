@@ -157,20 +157,42 @@ export const ModernOrdersManagement = ({ businessId }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Sipariş Yönetimi</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
+            Sipariş Yönetimi
+            {/* WebSocket Status Indicator */}
+            {isConnected ? (
+              <Wifi className="h-5 w-5 text-green-500" title="Canlı bildirimler aktif" />
+            ) : (
+              <WifiOff className="h-5 w-5 text-gray-400" title="Canlı bildirimler bağlı değil" />
+            )}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Siparişlerinizi yönetin ve durumlarını güncelleyin
+            {isConnected && <span className="text-green-600 ml-2">• Canlı bildirimler aktif</span>}
           </p>
         </div>
-        <Button
-          onClick={fetchOrders}
-          variant="outline"
-          size="sm"
-          disabled={loading}
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Yenile
-        </Button>
+        <div className="flex gap-2">
+          {!isConnected && (
+            <Button
+              onClick={reconnect}
+              variant="outline"
+              size="sm"
+              className="text-orange-600"
+            >
+              <Wifi className="h-4 w-4 mr-2" />
+              Bağlan
+            </Button>
+          )}
+          <Button
+            onClick={fetchOrders}
+            variant="outline"
+            size="sm"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Yenile
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
