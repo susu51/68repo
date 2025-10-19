@@ -315,6 +315,17 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
+  // Filter orders by status
+  const filteredOrders = orderStatusFilter === 'all' 
+    ? orders 
+    : orders.filter(order => order.status === orderStatusFilter);
+
+  // Get order count by status
+  const getOrderCountByStatus = (status) => {
+    if (status === 'all') return orders.length;
+    return orders.filter(order => order.status === status).length;
+  };
+
   const updateCourierKYC = async (courierId, kycStatus, notes = '') => {
     try {
       setLoading(true);
