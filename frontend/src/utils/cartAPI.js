@@ -1,35 +1,23 @@
 /**
- * Cart API Management - DB entegrasyonu (CI GATE 0 Compliant)
- * Müşteri sepeti backend'de tutulur, logout/login sonrası korunur
+ * Cart API Management - LocalStorage based (simplified for quick ordering)
+ * Müşteri sepeti browser'da localStorage'de tutulur
  */
 
-// HARDCODED FOR DEVELOPMENT - BYPASS .ENV ISSUES
-const API = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://admin-wsocket.preview.emergentagent.com';
+const CART_STORAGE_KEY = 'kuryecini_cart';
 
 class CartAPI {
-  // Sepeti backend'den yükle
+  // Sepeti localStorage'den yükle
   static async loadCart() {
     try {
-      // Using cookie authentication - no token needed
-      console.log('🛒 Loading cart from database...');
-
-      const response = await fetch(`${API}/customer/cart`, {
-        credentials: 'include',  // Include cookies
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const cartData = await response.json();
-        console.log('✅ Cart loaded from DB:', cartData);
+      console.log('🛒 Loading cart from localStorage...');
+      const cartString = localStorage.getItem(CART_STORAGE_KEY);
+      
+      if (cartString) {
+        const cartData = JSON.parse(cartString);
+        console.log('✅ Cart loaded from localStorage:', cartData);
         return cartData;
-      } else if (response.status === 404) {
-        // Sepet yok, yeni sepet
-        console.log('🆕 No cart found, creating empty cart');
-        return { items: [], restaurant: null };
       } else {
-        console.error('❌ Failed to load cart:', response.status);
+        console.log('🆕 No cart found, creating empty cart');
         return { items: [], restaurant: null };
       }
     } catch (error) {
@@ -38,27 +26,12 @@ class CartAPI {
     }
   }
 
-  // Sepeti backend'e kaydet
+  // Sepeti localStorage'e kaydet
   static async saveCart(cartData) {
     try {
-      // Cookie authentication - no token needed
-
-      const response = await fetch(`${API}/customer/cart`, {
-        method: 'POST',
-        credentials: 'include',  // Include cookies
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(cartData)
-      });
-
-      if (response.ok) {
-        console.log('✅ Cart saved to DB');
-        return true;
-      } else {
-        console.error('❌ Failed to save cart:', response.status);
-        return false;
-      }
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+      console.log('✅ Cart saved to localStorage');
+      return true;
     } catch (error) {
       console.error('❌ Cart save error:', error);
       return false;
@@ -68,53 +41,20 @@ class CartAPI {
   // Sepeti temizle
   static async clearCart() {
     try {
-      // Cookie authentication - no token needed
-
-      const response = await fetch(`${API}/customer/cart`, {
-        method: 'DELETE',
-        credentials: 'include',  // Include cookies
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('🗑️ Cart cleared from DB');
-      return response.ok;
+      localStorage.removeItem(CART_STORAGE_KEY);
+      console.log('🗑️ Cart cleared from localStorage');
+      return true;
     } catch (error) {
       console.error('❌ Cart clear error:', error);
       return false;
     }
   }
 
-  // Ürün sepete ekle (optimistic update)
+  // Ürün sepete ekle (localStorage güncellemesi otomatik olacak)
   static async addToCart(product, quantity = 1) {
     try {
-      // Cookie authentication - no token needed
-
-      const response = await fetch(`${API}/customer/cart/add`, {
-        method: 'POST',
-        credentials: 'include',  // Include cookies
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          product_id: product.id,
-          quantity: quantity,
-          product_info: {
-            title: product.title || product.name,
-            price: product.price,
-            business_id: product.business_id
-          }
-        })
-      });
-
-      if (response.ok) {
-        console.log('✅ Item added to cart in DB');
-        return true;
-      } else {
-        console.error('❌ Failed to add item to cart:', response.status);
-        return false;
-      }
+      console.log('✅ Item will be added to cart (handled by CartContext)');
+      return true;
     } catch (error) {
       console.error('❌ Add to cart error:', error);
       return false;
