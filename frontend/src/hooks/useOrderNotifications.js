@@ -16,16 +16,21 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
   const connect = useCallback(() => {
     if (!businessId) {
       console.log('⚠️ No business ID provided for WebSocket');
+      console.log('businessId:', businessId);
       return;
     }
 
     try {
       // Construct WebSocket URL
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = process.env.REACT_APP_BACKEND_URL?.replace(/^https?:\/\//, '') || window.location.host;
+      const host = backendUrl.replace(/^https?:\/\//, '') || window.location.host;
       const wsUrl = `${protocol}//${host}/api/ws/orders?business_id=${businessId}`;
 
-      console.log('🔌 Connecting to WebSocket:', wsUrl);
+      console.log('🔌 Connecting to WebSocket:');
+      console.log('   URL:', wsUrl);
+      console.log('   Business ID:', businessId);
+      console.log('   Backend URL:', backendUrl);
 
       const ws = new WebSocket(wsUrl);
 
