@@ -87,3 +87,32 @@ export async function testAISettings() {
     throw error;
   }
 }
+
+/**
+ * Self-test LLM connection
+ * @returns {Promise<Object>} Self-test result with provider, model, latency
+ */
+export async function selftestAI() {
+  try {
+    const response = await axios.post(
+      `${API_BASE}/api/admin/ai/selftest`,
+      {},
+      {
+        withCredentials: true,
+        timeout: 30000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      toast.error('Yetkisiz erişim.');
+      throw new Error('Unauthorized');
+    }
+    const errorMessage = error.response?.data?.detail || 'Self-test başarısız.';
+    toast.error(errorMessage);
+    throw error;
+  }
+}
