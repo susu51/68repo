@@ -179,6 +179,7 @@ class FAZ1OrderFlowTester:
         """Step 2: Customer creates order using POST /api/orders"""
         try:
             order_data = {
+                "business_id": business_id,  # Add business_id to the order
                 "delivery_address": "Test Address, Aksaray Merkez",
                 "delivery_lat": 38.3687,
                 "delivery_lng": 34.0254,
