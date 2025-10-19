@@ -6116,6 +6116,10 @@ api_router.include_router(admin_coupons_router)
 from routes.cart_coupons import router as cart_coupons_router
 api_router.include_router(cart_coupons_router)
 
+# Stable Restaurant Discovery (Emergency Rollback)
+from routes.stable_restaurants import router as stable_restaurants_router
+api_router.include_router(stable_restaurants_router)
+
 # Phase 3 Routers
 api_router.include_router(order_status_router)
 api_router.include_router(courier_workflow_router)
