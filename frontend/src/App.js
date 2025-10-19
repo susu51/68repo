@@ -3697,13 +3697,6 @@ const CustomerDashboard = ({ user }) => {
               <span>🎫</span>
               <span>Kuponlar</span>
             </button>
-            >
-              <span>⭐</span>
-              <span>Puanlarım</span>
-              <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
-                {loyaltyPoints.total_points}
-              </span>
-            </button>
           </div>
         </div>
 
