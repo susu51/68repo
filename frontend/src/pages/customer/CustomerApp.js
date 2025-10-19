@@ -253,6 +253,7 @@ export const CustomerApp = ({ user, onLogout }) => {
         <div style={{ display: activeView === 'discover' ? 'block' : 'none' }}>
           <DiscoverPage
             onRestaurantSelect={handleRestaurantSelect}
+            onTabChange={setActiveView}
             user={user}
           />
         </div>
