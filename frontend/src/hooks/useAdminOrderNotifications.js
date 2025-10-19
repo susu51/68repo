@@ -13,15 +13,16 @@ const useAdminOrderNotifications = (onNewOrder) => {
 
   const connect = useCallback(() => {
     try {
-      // Get backend URL from environment
+      // Get backend URL from environment (includes /api)
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://food-dash-87.preview.emergentagent.com/api';
       
-      // Convert http/https to ws/wss
+      // Convert http/https to ws/wss, keep the full URL including /api
       const wsUrl = backendUrl
         .replace('https://', 'wss://')
         .replace('http://', 'ws://');
       
       // Admin WebSocket connection (no business_id needed)
+      // WebSocket endpoint is at /api/ws/orders
       const websocketUrl = `${wsUrl}/ws/orders?role=admin`;
       
       console.log('🔌 Admin connecting to WebSocket:', websocketUrl);
