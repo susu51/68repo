@@ -21,17 +21,22 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
   }, [restaurant, setRestaurant]);
 
   const fetchMenuItems = useCallback(async () => {
-    if (!restaurant || !restaurant.id) return;
+    if (!restaurant || !restaurant.id) {
+      console.warn('⚠️ No restaurant or restaurant.id provided');
+      return;
+    }
     
     try {
       setLoading(true);
-      console.log('Fetching menu for restaurant:', restaurant.id);
+      console.log('🍽️ Fetching menu for restaurant:', restaurant.id, restaurant.name);
       
       // Use new public menu endpoint
       const response = await api.get(`/business/public/${restaurant.id}/menu`);
       
+      console.log('📡 Menu API response:', response);
+      
       if (response.data && Array.isArray(response.data)) {
-        setMenuItems(response.data.map(item => ({
+        const items = response.data.map(item => ({
           id: item.id,
           name: item.name,
           description: item.description || '',
@@ -39,14 +44,16 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
           category: item.category || 'main',
           image: item.image_url || 'https://via.placeholder.com/300x200?text=Yemek',
           availability: item.is_available !== false
-        })));
-        console.log(`Loaded ${response.data.length} real menu items`);
+        }));
+        setMenuItems(items);
+        console.log(`✅ Loaded ${items.length} menu items:`, items);
       } else {
-        console.log('No products found - showing empty menu');
+        console.warn('⚠️ No products found - response.data:', response.data);
         setMenuItems([]);
       }
     } catch (error) {
-      console.error('Error fetching menu:', error);
+      console.error('❌ Error fetching menu:', error);
+      console.error('❌ Error details:', error.message, error.stack);
       // Show empty menu on error
       setMenuItems([]);
     } finally {
