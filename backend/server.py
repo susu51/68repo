@@ -2338,11 +2338,7 @@ async def create_order(
                 detail="Sipariş kaydedilemedi"
             )
         
-        print(f"✅ Order created: {order_id}")
-        print(f"   Restaurant: {restaurant.get('business_name')}")
-        print(f"   Business ID: {restaurant_id}")
-        print(f"   Customer: {order_doc['customer_name']}")
-        print(f"   Total: {totals['grand']} TL")
+        logger.info(f"✅ Order created: {order_id} | Restaurant: {restaurant.get('business_name')} | Business ID: {restaurant_id} | Customer: {order_doc['customer_name']} | Total: {totals['grand']} TL")
         
         # 9. Publish real-time event
         try:
@@ -2358,9 +2354,9 @@ async def create_order(
                     "business_name": order_doc['business_name']
                 }
             )
-            print(f"✅ Real-time event published")
+            logger.info(f"✅ Real-time event published for order {order_id}")
         except Exception as event_error:
-            print(f"⚠️ Event publish failed (non-critical): {event_error}")
+            logger.warning(f"⚠️ Event publish failed for order {order_id} (non-critical): {event_error}")
         
         # 10. Return response (serialize datetime)
         order_doc["created_at"] = order_doc["created_at"].isoformat()
