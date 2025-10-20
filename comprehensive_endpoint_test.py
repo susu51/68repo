@@ -467,7 +467,7 @@ class ComprehensiveEndpointTester:
                 )
         except Exception as e:
             self.log_test(
-                "Business - GET /api/business/orders",
+                "Business - GET /api/business/orders/incoming",
                 False,
                 error=f"Request failed: {str(e)}"
             )
