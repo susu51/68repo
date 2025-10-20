@@ -59,14 +59,30 @@ def chat(system_prompt: str, user_message: str, model: Optional[str] = None) -> 
     if use_emergent:
         # Use Emergent LLM integration
         try:
-            chat_session = LlmChat(
-                api_key=api_key,
-                session_id=f"copilot_{hash(user_message) % 10000}",
-                system_message=system_prompt
-            ).with_model("openai", model)
+            import asyncio
             
-            user_msg = UserMessage(text=user_content)
-            response = chat_session.send_message(user_msg)
+            async def _async_chat():
+                chat_session = LlmChat(
+                    api_key=api_key,
+                    session_id=f"copilot_{hash(user_message) % 10000}",
+                    system_message=system_prompt
+                ).with_model("openai", model)
+                
+                user_msg = UserMessage(text=user_content)
+                response = await chat_session.send_message(user_msg)
+                return response
+            
+            # Run the async function
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # If we're already in an async context, create a new task
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(asyncio.run, _async_chat())
+                    response = future.result()
+            else:
+                response = asyncio.run(_async_chat())
+            
             return response
         except Exception as e:
             print(f"❌ Emergent LLM Error: {e}")
