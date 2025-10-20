@@ -399,39 +399,52 @@ class CustomerOrderTester:
             self.log_test("Order Status Flow", False, "No order_id provided")
             return
         
+        # Wait a moment for database consistency
+        time.sleep(1)
+        
         start_time = time.time()
         try:
-            # Check if order appears in customer orders
-            response = self.session.get(f"{BACKEND_URL}/orders/my", timeout=10)
-            response_time = (time.time() - start_time) * 1000
+            # Check if order appears in customer orders (with retry)
+            max_retries = 3
+            order_found = False
             
-            if response.status_code == 200:
-                orders = response.json()
-                order_found = any(order.get('id') == order_id for order in orders)
+            for attempt in range(max_retries):
+                response = self.session.get(f"{BACKEND_URL}/orders/my", timeout=10)
+                response_time = (time.time() - start_time) * 1000
                 
-                if order_found:
-                    self.log_test("Order in Customer List", True, 
-                                f"Order {order_id} found in customer orders", response_time)
+                if response.status_code == 200:
+                    orders = response.json()
+                    order_found = any(order.get('id') == order_id for order in orders)
                     
-                    # Check order details
-                    order = next((o for o in orders if o.get('id') == order_id), None)
-                    if order:
-                        status = order.get('status')
-                        business_id = order.get('business_id')
-                        total_amount = order.get('total_amount')
-                        
-                        if status == 'created':
-                            self.log_test("Order Status Check", True, 
-                                        f"Status: {status}, Business ID: {business_id}, Total: ₺{total_amount}")
-                        else:
-                            self.log_test("Order Status Check", False, 
-                                        f"Expected 'created', got '{status}'")
+                    if order_found:
+                        break
+                    elif attempt < max_retries - 1:
+                        time.sleep(0.5)  # Wait before retry
                 else:
-                    self.log_test("Order in Customer List", False, 
-                                f"Order {order_id} not found in customer orders", response_time)
+                    break
+            
+            if order_found:
+                self.log_test("Order in Customer List", True, 
+                            f"Order {order_id} found in customer orders", response_time)
+                
+                # Check order details
+                order = next((o for o in orders if o.get('id') == order_id), None)
+                if order:
+                    status = order.get('status')
+                    business_id = order.get('business_id')
+                    # Handle different total field formats
+                    total_amount = (order.get('total_amount') or 
+                                  (order.get('totals', {}).get('grand') if isinstance(order.get('totals'), dict) else None))
+                    
+                    if status == 'created':
+                        self.log_test("Order Status Check", True, 
+                                    f"Status: {status}, Business ID: {business_id}, Total: ₺{total_amount}")
+                    else:
+                        self.log_test("Order Status Check", False, 
+                                    f"Expected 'created', got '{status}'")
             else:
-                self.log_test("Order Status Flow", False, 
-                            f"Status: {response.status_code}", response_time)
+                self.log_test("Order in Customer List", False, 
+                            f"Order {order_id} not found in customer orders after {max_retries} attempts", response_time)
                 
         except Exception as e:
             response_time = (time.time() - start_time) * 1000
