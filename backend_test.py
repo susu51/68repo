@@ -12,10 +12,8 @@ Test Scenarios:
 5. Error Handling (HIGH)
 """
 
-import asyncio
 import json
 import requests
-import websockets
 import time
 from datetime import datetime
 import os
