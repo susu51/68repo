@@ -37,7 +37,7 @@ def today_istanbul() -> str:
 
 def chat(system_prompt: str, user_message: str, model: Optional[str] = None) -> str:
     """
-    Send chat completion request to OpenAI (or Emergent LLM Key)
+    Send chat completion request to OpenAI or Emergent LLM
     
     Args:
         system_prompt: System prompt with context
@@ -54,13 +54,32 @@ def chat(system_prompt: str, user_message: str, model: Optional[str] = None) -> 
     if not model:
         model = os.getenv("LLM_MODEL", "gpt-4o-mini")
     
-    resp = client.chat.completions.create(
-        model=model,
-        temperature=0.2,
-        max_tokens=2000,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": RESPONSE_PREFIX + f"Kullanıcı Sorusu: {user_message}"},
-        ],
-    )
-    return resp.choices[0].message.content or ""
+    user_content = RESPONSE_PREFIX + f"Kullanıcı Sorusu: {user_message}"
+    
+    if use_emergent:
+        # Use Emergent LLM integration
+        try:
+            chat_session = LlmChat(
+                api_key=api_key,
+                session_id=f"copilot_{hash(user_message) % 10000}",
+                system_message=system_prompt
+            ).with_model("openai", model)
+            
+            user_msg = UserMessage(text=user_content)
+            response = chat_session.send_message(user_msg)
+            return response
+        except Exception as e:
+            print(f"❌ Emergent LLM Error: {e}")
+            raise e
+    else:
+        # Use OpenAI directly
+        resp = client.chat.completions.create(
+            model=model,
+            temperature=0.2,
+            max_tokens=2000,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+        )
+        return resp.choices[0].message.content or ""
