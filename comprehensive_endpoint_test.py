@@ -455,7 +455,7 @@ class ComprehensiveEndpointTester:
                 data = response.json()
                 orders = data if isinstance(data, list) else data.get("orders", [])
                 self.log_test(
-                    "Business - GET /api/business/orders",
+                    "Business - GET /api/business/orders/incoming",
                     True,
                     f"Retrieved {len(orders)} business orders"
                 )
