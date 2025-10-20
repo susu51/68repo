@@ -64,9 +64,11 @@ class AIDiagnosticsTester:
     
     def authenticate_admin(self):
         """Authenticate admin user - try multiple credentials"""
+        self.admin_session = requests.Session()
+        
         for i, credentials in enumerate(ADMIN_CREDENTIALS_LIST):
             try:
-                response = requests.post(
+                response = self.admin_session.post(
                     f"{BACKEND_URL}/api/auth/login",
                     json=credentials,
                     timeout=10
@@ -87,14 +89,17 @@ class AIDiagnosticsTester:
                             )
                             return True
                     elif data.get("access_token"):
-                        # JWT-based auth
-                        self.admin_token = data.get("access_token")
+                        # JWT-based auth - store token for headers
                         user_role = data.get("user", {}).get("role")
                         if user_role == "admin":
+                            # Set authorization header for session
+                            self.admin_session.headers.update({
+                                "Authorization": f"Bearer {data.get('access_token')}"
+                            })
                             self.log_test(
                                 "Admin Authentication",
                                 True,
-                                f"Admin login successful (JWT): {credentials['email']}, role: {user_role}, token length: {len(self.admin_token)}"
+                                f"Admin login successful (JWT): {credentials['email']}, role: {user_role}"
                             )
                             return True
                     
