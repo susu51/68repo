@@ -1953,10 +1953,9 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Business Panel Authentication & Routing Fix"
-    - "Business Panel Order Display Fix"
+    - "Customer Panel Address Selection Functionality"
   stuck_tasks: 
-    - "Admin Settings Tab Display & Functionality"
+    - "Customer Panel Address Selection Functionality"
   test_all: false
   test_priority: "critical_first"
 
