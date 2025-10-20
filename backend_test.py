@@ -389,40 +389,98 @@ class AIDiagnosticsTester:
             )
             return False
 
-    def get_business_menu(self, business_id):
-        """Get business menu items"""
-        # Try multiple menu endpoints
-        endpoints_to_try = [
-            f"{BACKEND_URL}/api/business/public/{business_id}/menu",
-            f"{BACKEND_URL}/api/business/{business_id}/menu", 
-            f"{BACKEND_URL}/api/business/public-menu/{business_id}/products",
-            f"{BACKEND_URL}/api/businesses/{business_id}/products"
+    def test_error_handling(self):
+        """Test 5: Error Handling (HIGH)"""
+        error_test_cases = [
+            {
+                "name": "Invalid Panel Value",
+                "data": {"panel": "invalid_panel", "message": "test"},
+                "expected_status": 400
+            },
+            {
+                "name": "Empty Message",
+                "data": {"panel": "müşteri", "message": ""},
+                "expected_status": 422
+            },
+            {
+                "name": "Missing Panel",
+                "data": {"message": "test message"},
+                "expected_status": 422
+            },
+            {
+                "name": "Missing Message", 
+                "data": {"panel": "müşteri"},
+                "expected_status": 422
+            }
         ]
         
-        for endpoint in endpoints_to_try:
+        successful_error_tests = []
+        failed_error_tests = []
+        
+        for test_case in error_test_cases:
             try:
-                response = requests.get(endpoint, timeout=10)
+                response = self.admin_session.post(
+                    f"{BACKEND_URL}/api/admin/ai/assist",
+                    json=test_case["data"],
+                    timeout=15
+                )
                 
-                if response.status_code == 200:
-                    menu_items = response.json()
-                    if menu_items and len(menu_items) > 0:
-                        item = menu_items[0]
-                        self.log_test(
-                            "Get Business Menu",
-                            True,
-                            f"Found {len(menu_items)} menu items using {endpoint}, using: {item.get('name')} (₺{item.get('price')})"
-                        )
-                        return item
+                if response.status_code == test_case["expected_status"]:
+                    successful_error_tests.append(test_case["name"])
+                    print(f"   ✅ {test_case['name']}: Correctly returned {response.status_code}")
+                elif response.status_code == 200:
+                    # Some validation might be handled by the AI system itself
+                    data = response.json()
+                    if "error" in data.get("response", "").lower():
+                        successful_error_tests.append(test_case["name"])
+                        print(f"   ✅ {test_case['name']}: Error handled by AI system")
                     else:
-                        print(f"   Tried {endpoint}: Empty menu")
+                        failed_error_tests.append(f"{test_case['name']} (unexpected success)")
+                        print(f"   ❌ {test_case['name']}: Expected error but got success")
                 else:
-                    print(f"   Tried {endpoint}: {response.status_code}")
+                    failed_error_tests.append(f"{test_case['name']} (got {response.status_code})")
+                    print(f"   ❌ {test_case['name']}: Expected {test_case['expected_status']}, got {response.status_code}")
                     
             except Exception as e:
-                print(f"   Tried {endpoint}: Error - {str(e)}")
+                failed_error_tests.append(f"{test_case['name']} (Exception: {str(e)[:50]})")
+                print(f"   ❌ {test_case['name']}: Exception - {str(e)[:50]}")
         
-        self.log_test("Get Business Menu", False, error="No menu items found in any endpoint")
-        return None
+        # Test unauthenticated access
+        try:
+            unauth_session = requests.Session()
+            response = unauth_session.post(
+                f"{BACKEND_URL}/api/admin/ai/assist",
+                json={"panel": "müşteri", "message": "test"},
+                timeout=15
+            )
+            
+            if response.status_code in [401, 403]:
+                successful_error_tests.append("Unauthenticated Access")
+                print(f"   ✅ Unauthenticated Access: Correctly blocked with {response.status_code}")
+            else:
+                failed_error_tests.append(f"Unauthenticated Access (got {response.status_code})")
+                print(f"   ❌ Unauthenticated Access: Expected 401/403, got {response.status_code}")
+                
+        except Exception as e:
+            failed_error_tests.append(f"Unauthenticated Access (Exception)")
+            print(f"   ❌ Unauthenticated Access: Exception - {str(e)[:50]}")
+        
+        total_tests = len(error_test_cases) + 1  # +1 for unauthenticated test
+        
+        if len(successful_error_tests) >= total_tests * 0.8:  # 80% success rate acceptable
+            self.log_test(
+                "Error Handling",
+                True,
+                f"{len(successful_error_tests)}/{total_tests} error handling tests passed: {', '.join(successful_error_tests)}"
+            )
+            return True
+        else:
+            self.log_test(
+                "Error Handling",
+                False,
+                error=f"Only {len(successful_error_tests)}/{total_tests} error tests passed. Failed: {', '.join(failed_error_tests)}"
+            )
+            return False
 
     def create_test_order(self, business_id, menu_item):
         """Create a test order"""
