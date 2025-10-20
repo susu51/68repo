@@ -37,7 +37,15 @@ def get_db():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database connection not initialized"
         )
-    return router.db_client.kuryecini
+    # Extract database name from environment
+    db_name = os.environ.get("DB_NAME")
+    if not db_name:
+        mongo_url = os.environ.get("MONGO_URL", "")
+        if "/" in mongo_url:
+            db_name = mongo_url.split("/")[-1].split("?")[0]
+        else:
+            db_name = "kuryecini"
+    return router.db_client[db_name]
 
 
 class AIAskRequest(BaseModel):
