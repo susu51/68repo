@@ -67,7 +67,8 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
     if (restaurant && restaurant.id) {
       fetchMenuItems();
     }
-  }, [restaurant, fetchMenuItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurant]); // Only depend on restaurant, fetchMenuItems is stable via useCallback
 
   const categories = [
     { id: 'all', name: 'Hepsi', icon: '🍽️' },
