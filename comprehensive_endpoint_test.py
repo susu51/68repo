@@ -542,7 +542,7 @@ class ComprehensiveEndpointTester:
         if self.menu_item_id:
             try:
                 update_data = {
-                    "title": "Updated Test Menu Item",
+                    "name": "Updated Test Menu Item",
                     "price": 34.99
                 }
                 
