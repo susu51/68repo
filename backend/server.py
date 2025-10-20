@@ -2373,9 +2373,7 @@ async def create_order(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Order creation error: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"❌ Order creation error: {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"Sipariş oluşturulamadı: {str(e)}"
