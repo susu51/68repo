@@ -34,12 +34,12 @@ async def _openai_client():
 
 
 async def _stream_openai(system: str, user: str, model: str) -> AsyncIterator[str]:
-    """Stream chat using OpenAI Async SDK"""
+    """Stream chat using OpenAI Async SDK with optimized parameters"""
     async with _openai_client() as client:
         response = await client.chat.completions.create(
             model=model,
-            temperature=0.4,
-            max_tokens=900,
+            temperature=0.2,  # Lower for more focused responses
+            max_tokens=1500,  # Higher for complete diffs
             top_p=1.0,
             stream=True,
             messages=[
