@@ -236,58 +236,72 @@ class AIDiagnosticsTester:
             )
             return False
 
-    async def test_websocket_role_validation(self):
-        """Test 2: Get Available Businesses by City (Aksaray)"""
-        """Test 3: WebSocket Role Validation"""
+    def test_response_format_validation(self):
+        """Test 3: Response Format Validation (CRITICAL)"""
         try:
-            # Test 1: Business role WITHOUT business_id (should fail)
-            try:
-                ws_url = f"{WS_URL}/api/ws/orders?role=business"
-                async with websockets.connect(ws_url) as websocket:
-                    # Should close immediately
-                    await asyncio.wait_for(websocket.recv(), timeout=5)
-                    self.log_test(
-                        "WebSocket Role Validation - Business without business_id",
-                        False,
-                        error="Connection should have been rejected but was accepted"
-                    )
-            except websockets.exceptions.ConnectionClosedError as e:
-                if "business_id is required" in str(e):
-                    self.log_test(
-                        "WebSocket Role Validation - Business without business_id",
-                        True,
-                        "Connection properly rejected: business_id required for business role"
-                    )
-                else:
-                    self.log_test(
-                        "WebSocket Role Validation - Business without business_id",
-                        False,
-                        error=f"Unexpected close reason: {str(e)}"
-                    )
+            test_data = {
+                "panel": "işletme",
+                "message": "sipariş sistemi çalışmıyor"
+            }
             
-            # Test 2: Admin role WITH business_id (should work, business_id ignored)
-            ws_url = f"{WS_URL}/api/ws/orders?role=admin&business_id=test-business-id"
-            async with websockets.connect(ws_url) as websocket:
-                response = await asyncio.wait_for(websocket.recv(), timeout=10)
-                data = json.loads(response)
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/api/admin/ai/assist",
+                json=test_data,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                ai_response = data.get("response", "")
                 
-                if data.get("role") == "admin":
+                # Check for 7 required sections in Turkish
+                required_sections = [
+                    "Hızlı Teşhis",
+                    "Derin RCA", 
+                    "Kontrol Komutları",
+                    "Patch",
+                    "Test",
+                    "İzleme & Alarm",
+                    "DoD"
+                ]
+                
+                found_sections = []
+                missing_sections = []
+                
+                for section in required_sections:
+                    if section in ai_response:
+                        found_sections.append(section)
+                    else:
+                        missing_sections.append(section)
+                
+                if len(found_sections) == len(required_sections):
                     self.log_test(
-                        "WebSocket Role Validation - Admin with business_id",
+                        "Response Format Validation",
                         True,
-                        "Admin connection works (business_id ignored for admin)"
+                        f"All 7 required sections found: {', '.join(found_sections)}"
                     )
+                    return True
                 else:
                     self.log_test(
-                        "WebSocket Role Validation - Admin with business_id",
+                        "Response Format Validation",
                         False,
-                        error=f"Expected admin role, got: {data.get('role')}"
+                        error=f"Missing sections: {', '.join(missing_sections)}. Found: {', '.join(found_sections)}"
                     )
-            
-            return True
-            
+                    return False
+            else:
+                self.log_test(
+                    "Response Format Validation",
+                    False,
+                    error=f"HTTP {response.status_code}: {response.text[:200]}"
+                )
+                return False
+                
         except Exception as e:
-            self.log_test("WebSocket Role Validation", False, error=f"Role validation test failed: {str(e)}")
+            self.log_test(
+                "Response Format Validation",
+                False,
+                error=f"Format validation failed: {str(e)}"
+            )
             return False
 
     def get_available_business(self):
