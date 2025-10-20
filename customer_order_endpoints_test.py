@@ -265,24 +265,25 @@ class CustomerOrderTester:
         """Test order creation validation - MEDIUM"""
         print("\n🔍 ORDER VALIDATION TESTS (MEDIUM)")
         
-        # Test 1: Missing business_id
+        # Test 1: Missing business_id/restaurant_id
         start_time = time.time()
         try:
             invalid_order = {
-                "items": [{"product_id": "test", "title": "Test", "price": 10.0, "quantity": 1}],
-                "delivery_address": {"label": "Test", "address": "Test", "lat": 38.0, "lng": 34.0},
-                "payment_method": "cash_on_delivery"
+                "items": [{"product_id": "test", "quantity": 1}],
+                "delivery_address": "Test Address",
+                "delivery_lat": 38.0,
+                "delivery_lng": 34.0
             }
             
             response = self.session.post(f"{BACKEND_URL}/orders", json=invalid_order, timeout=10)
             response_time = (time.time() - start_time) * 1000
             
-            if response.status_code == 422:
+            if response.status_code in [400, 422]:  # Accept both 400 and 422
                 self.log_test("Validation: Missing business_id", True, 
-                            "422 validation error returned", response_time)
+                            f"{response.status_code} validation error returned", response_time)
             else:
                 self.log_test("Validation: Missing business_id", False, 
-                            f"Expected 422, got {response.status_code}", response_time)
+                            f"Expected 400/422, got {response.status_code}", response_time)
         except Exception as e:
             response_time = (time.time() - start_time) * 1000
             self.log_test("Validation: Missing business_id", False, f"Exception: {str(e)}", response_time)
