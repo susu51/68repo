@@ -741,10 +741,10 @@ class AIDiagnosticsTester:
             print(f"\n🚨 VERDICT: AI Diagnostics Panel has CRITICAL ISSUES ({success_rate:.1f}% success rate)")
             print("   Major functionality is broken and needs immediate attention.")
 
-async def main():
+def main():
     """Main test runner"""
-    tester = WebSocketTester()
-    await tester.run_all_tests()
+    tester = AIDiagnosticsTester()
+    tester.run_all_tests()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
