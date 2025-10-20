@@ -54,6 +54,9 @@ from models import (
 # Import logging configuration
 from logging_config import get_loggers, log_health_check
 
+# Create logger for server operations
+logger = logging.getLogger("kuryecini.server")
+
 # Import authentication dependencies
 from auth_dependencies import get_current_user, get_business_user, get_approved_business_user
 
