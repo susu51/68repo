@@ -13,12 +13,13 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
 
-  // Set restaurant in cart context when component mounts
+  // Set restaurant in cart context when component mounts (only once)
   useEffect(() => {
     if (restaurant) {
       setRestaurant(restaurant);
     }
-  }, [restaurant, setRestaurant]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurant]); // Only depend on restaurant, not setRestaurant
 
   const fetchMenuItems = useCallback(async () => {
     if (!restaurant || !restaurant.id) {
