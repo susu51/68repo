@@ -1,0 +1,44 @@
+[
+  {
+    "name": "http_get",
+    "description": "HTTP GET ile healthcheck ve endpoint doğrulama.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "headers": { "type": "object" }
+      },
+      "required": ["url"]
+    }
+  },
+  {
+    "name": "logs_tail",
+    "description": "Uygulama loglarından son N satır/son M dakika.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "minutes": { "type": "integer", "default": 60 },
+        "limit": { "type": "integer", "default": 200 },
+        "level": { "type": "string", "enum": ["error", "warn", "info"] }
+      }
+    }
+  },
+  {
+    "name": "db_query",
+    "description": "MongoDB readonly: count / find_one / list_indexes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "collection": { "type": "string" },
+        "action": { "type": "string", "enum": ["count", "find_one", "list_indexes"] },
+        "filter": { "type": "object" }
+      },
+      "required": ["collection", "action"]
+    }
+  },
+  {
+    "name": "env_list",
+    "description": "ENV değişkenlerini maskeli döndür.",
+    "input_schema": { "type": "object", "properties": {} }
+  }
+]
