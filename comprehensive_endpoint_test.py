@@ -503,7 +503,7 @@ class ComprehensiveEndpointTester:
         # Test 3: POST /api/business/menu
         try:
             menu_item_data = {
-                "title": "Test Menu Item",
+                "name": "Test Menu Item",
                 "description": "Test description for comprehensive endpoint test",
                 "price": 29.99,
                 "category": "Yemek",
