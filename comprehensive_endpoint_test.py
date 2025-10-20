@@ -687,7 +687,7 @@ class ComprehensiveEndpointTester:
                 )
         else:
             self.log_test(
-                "Courier - POST /api/courier/tasks/{id}/accept",
+                "Courier - PUT /api/courier/tasks/{id}/accept",
                 False,
                 error="No task ID available for accept test"
             )
