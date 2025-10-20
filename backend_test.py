@@ -580,7 +580,7 @@ class AIDiagnosticsTester:
             self.log_test("Multiple Admin Connections", False, error=f"Test failed: {str(e)}")
             return False
 
-    def test_admin_orders_endpoint(self):
+    def removed_old_method_2(self):
         """Test 5: Admin Endpoint Access"""
         try:
             # Use cookie-based authentication (no headers needed if we're using the same session)
