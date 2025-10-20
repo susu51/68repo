@@ -312,25 +312,26 @@ class CustomerOrderTester:
             response_time = (time.time() - start_time) * 1000
             self.log_test("Validation: Empty items", False, f"Exception: {str(e)}", response_time)
         
-        # Test 3: Invalid payment method
+        # Test 3: Invalid product_id (non-existent product)
         start_time = time.time()
         try:
             invalid_order = {
-                "business_id": "test-business-id",
-                "items": [{"product_id": "test", "title": "Test", "price": 10.0, "quantity": 1}],
-                "delivery_address": {"label": "Test", "address": "Test", "lat": 38.0, "lng": 34.0},
-                "payment_method": "invalid_method"
+                "restaurant_id": "test-business-id",
+                "items": [{"product_id": "non-existent-product-id", "quantity": 1}],
+                "delivery_address": "Test Address",
+                "delivery_lat": 38.0,
+                "delivery_lng": 34.0
             }
             
             response = self.session.post(f"{BACKEND_URL}/orders", json=invalid_order, timeout=10)
             response_time = (time.time() - start_time) * 1000
             
-            if response.status_code == 422:
-                self.log_test("Validation: Invalid payment method", True, 
-                            "422 validation error returned", response_time)
+            if response.status_code in [400, 404, 422]:  # Accept validation errors
+                self.log_test("Validation: Invalid product_id", True, 
+                            f"{response.status_code} validation error returned", response_time)
             else:
-                self.log_test("Validation: Invalid payment method", False, 
-                            f"Expected 422, got {response.status_code}", response_time)
+                self.log_test("Validation: Invalid product_id", False, 
+                            f"Expected 400/404/422, got {response.status_code}", response_time)
         except Exception as e:
             response_time = (time.time() - start_time) * 1000
             self.log_test("Validation: Invalid payment method", False, f"Exception: {str(e)}", response_time)
