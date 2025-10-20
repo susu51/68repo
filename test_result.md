@@ -2313,6 +2313,18 @@ metadata:
 user_problem_statement: "Build a panel-aware AI Assistant inside the Admin Panel that answers questions using ONLY selected panel context (customer/business/courier/multi). Features: scope selector, time window picker, preset questions, context toggles, streaming chat in Turkish. Settings page for OpenAI key config, redaction rules, rate limits."
 
 backend:
+  - task: "Customer Order Button Flow - Siparişi Onayla ve Ver"
+    implemented: true
+    working: false
+    file: "CustomerApp.js, DiscoverPage.js, RestaurantMenu.js, CartPageEnhanced.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "🎯 CRITICAL ORDER BUTTON RCA COMPLETE - BACKEND WORKING, FRONTEND AUTH ISSUE: Comprehensive testing of 'Siparişi Onayla ve Ver' button reveals the backend order creation system is WORKING PERFECTLY but frontend authentication synchronization prevents UI access. ✅ BACKEND VERIFICATION SUCCESSFUL (100% functional): 1) Authentication API: POST /api/auth/login returns 200 OK with JWT token and user data for test@kuryecini.com/test123. 2) User Addresses: GET /api/user/addresses returns 3 addresses including default 'Aksaray Evim'. 3) Restaurant Discovery: GET /api/businesses?city=Aksaray returns 5 restaurants including working business a5339832-6493-4cec-8bde-b8d75cf2a911 'Lezzet Döner 1'. 4) Menu API: GET /api/business/public/{business_id}/menu returns 3 menu items (Jsjdj ₺200, Deneme ₺205, Şuayip ₺205). 5) ORDER CREATION API WORKING PERFECTLY: POST /api/orders successfully created order ID 94c7a51e-a41e-4a21-8f26-a161bb080430 with business_name 'Lezzet Döner 1', customer_name 'Test User', total ₺200, status 'created', proper business_id mapping. Console logs show 'handleCreateOrder STARTED' and all validation steps working. ❌ FRONTEND AUTHENTICATION SYNC ISSUE: Initial page load shows /api/me returning 401 Unauthorized despite successful login API calls, causing React authentication context (CookieAuthContext) to not properly sync with backend authentication state. This prevents customer panel from loading and blocks UI access to the order flow. The handleCreateOrder function exists in CustomerApp.js (lines 72-188) and is properly implemented with validation, API integration, and error handling. 🔍 ROOT CAUSE: Frontend authentication state management has timing/synchronization issues between login success and authentication context updates. The order button infrastructure is sound - users just can't reach it through normal UI flow due to authentication context not loading customer panel. 🎯 CONCLUSION: Order creation backend is production-ready and working excellently. Frontend authentication sync needs fixing to allow UI access to the functional order creation system."
+
   - task: "AI Settings API - Phase 1 Foundation"
     implemented: true
     working: "NA"
