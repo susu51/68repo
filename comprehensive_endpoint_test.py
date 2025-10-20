@@ -560,7 +560,7 @@ class ComprehensiveEndpointTester:
                     )
                 else:
                     self.log_test(
-                        "Business - PUT /api/business/menu/{id}",
+                        "Business - PATCH /api/business/menu/{id}",
                         False,
                         error=f"HTTP {response.status_code}: {response.text[:200]}"
                     )
