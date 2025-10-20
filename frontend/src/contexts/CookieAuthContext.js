@@ -24,18 +24,17 @@ export const CookieAuthProvider = ({ children }) => {
     const initAuth = async () => {
       try {
         console.log('🔍 Checking initial auth status...');
-        const response = await api("/me");  // Use /api/me instead of /api/auth/me
+        const result = await api.get("/me");  // Use http.js get() which returns {data: ...}
         
-        if (mounted && response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-          console.log('✅ User authenticated on mount:', userData.email, userData.role);
+        if (mounted && result?.data) {
+          setUser(result.data);
+          console.log('✅ User authenticated on mount:', result.data.email, result.data.role);
         } else {
           console.log('ℹ️ No authenticated user');
           setUser(null);
         }
       } catch (error) {
-        console.log('ℹ️ No auth cookie found');
+        console.log('ℹ️ No auth cookie found:', error.message);
         if (mounted) setUser(null);
       } finally {
         if (mounted) {
