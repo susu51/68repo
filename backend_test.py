@@ -30,10 +30,7 @@ ADMIN_CREDENTIALS_LIST = [
     {"email": "admin@kuryecini.com", "password": "6851"}
 ]
 
-CUSTOMER_CREDENTIALS = {
-    "email": "test@kuryecini.com", 
-    "password": "test123"
-}
+# Removed customer credentials - not needed for AI Diagnostics testing
 
 class AIDiagnosticsTester:
     def __init__(self):
