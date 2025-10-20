@@ -675,7 +675,7 @@ class ComprehensiveEndpointTester:
                     )
                 else:
                     self.log_test(
-                        "Courier - POST /api/courier/tasks/{id}/accept",
+                        "Courier - PUT /api/courier/tasks/{id}/accept",
                         False,
                         error=f"HTTP {response.status_code}: {response.text[:200]}"
                     )
