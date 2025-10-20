@@ -38,10 +38,9 @@ CUSTOMER_CREDENTIALS = {
     "password": "test123"
 }
 
-class WebSocketTester:
+class AIDiagnosticsTester:
     def __init__(self):
-        self.admin_token = None
-        self.customer_token = None
+        self.admin_session = None
         self.test_results = []
         
     def log_test(self, test_name, success, details="", error=""):
