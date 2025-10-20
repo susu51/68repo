@@ -669,7 +669,7 @@ class ComprehensiveEndpointTester:
                 
                 if response.status_code == 200:
                     self.log_test(
-                        "Courier - POST /api/courier/tasks/{id}/accept",
+                        "Courier - PUT /api/courier/tasks/{id}/accept",
                         True,
                         f"Task accepted successfully: {self.task_id}"
                     )
