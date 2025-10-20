@@ -566,7 +566,7 @@ class ComprehensiveEndpointTester:
                     )
             except Exception as e:
                 self.log_test(
-                    "Business - PUT /api/business/menu/{id}",
+                    "Business - PATCH /api/business/menu/{id}",
                     False,
                     error=f"Request failed: {str(e)}"
                 )
