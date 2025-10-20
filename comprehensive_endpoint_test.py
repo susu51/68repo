@@ -605,13 +605,13 @@ class ComprehensiveEndpointTester:
                     )
             except Exception as e:
                 self.log_test(
-                    "Business - POST /api/business/orders/{id}/confirm",
+                    "Business - PUT /api/business/orders/{id}/confirm",
                     False,
                     error=f"Request failed: {str(e)}"
                 )
         else:
             self.log_test(
-                "Business - POST /api/business/orders/{id}/confirm",
+                "Business - PUT /api/business/orders/{id}/confirm",
                 False,
                 error="No order ID available for confirmation test"
             )
