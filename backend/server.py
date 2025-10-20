@@ -6981,6 +6981,12 @@ async def get_public_business_menu(business_id: str):
         print(f"❌ Error getting public menu: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get menu: {str(e)}")
 
+
+@api_router.get("/business/public/{business_id}/menu")
+async def get_public_business_menu_alt(business_id: str):
+    """Alternative public endpoint (for frontend compatibility)"""
+    return await get_public_business_menu(business_id)
+
 @api_router.post("/business/menu")
 async def create_business_menu_item(
     item_data: dict,
