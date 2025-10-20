@@ -546,7 +546,7 @@ class ComprehensiveEndpointTester:
                     "price": 34.99
                 }
                 
-                response = business_session.put(
+                response = business_session.patch(
                     f"{BACKEND_URL}/api/business/menu/{self.menu_item_id}",
                     json=update_data,
                     timeout=10
