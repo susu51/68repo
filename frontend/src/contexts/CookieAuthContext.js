@@ -100,12 +100,11 @@ export const CookieAuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await api("/auth/logout", { method: "POST" });
+      await api.post("/auth/logout", {});
       setUser(null);
       console.log('✅ Logout successful - cookies cleared');
     } catch (error) {
       console.error('❌ Logout error:', error);
-      // Still clear user state
       setUser(null);
     }
   };
