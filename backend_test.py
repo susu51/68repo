@@ -639,7 +639,7 @@ class AIDiagnosticsTester:
             self.log_test("Admin Orders Endpoint Access", False, error=f"Error accessing admin orders: {str(e)}")
             return False
 
-    async def run_all_tests(self):
+    def removed_old_method_3(self):
         """Run all WebSocket tests"""
         print("🚀 Starting Admin Panel Orders Real-Time WebSocket Integration Testing")
         print("=" * 80)
