@@ -162,22 +162,19 @@ class CustomerOrderTester:
         start_time = time.time()
         
         try:
-            # Prepare order data
+            # Prepare order data according to server.py format
             order_data = {
-                "business_id": business.get('id'),
+                "restaurant_id": business.get('id'),  # server.py expects restaurant_id or business_id
                 "items": [{
                     "product_id": menu_item.get('id'),
-                    "title": menu_item.get('name', menu_item.get('title', 'Test Item')),
-                    "price": float(menu_item.get('price', 99.99)),
-                    "quantity": 1
+                    "quantity": 1,
+                    "notes": "Test item"
                 }],
-                "delivery_address": {
-                    "label": address.get('label', 'Test Address'),
-                    "address": address.get('full', address.get('acik_adres', 'Test Address')),
-                    "lat": float(address.get('lat', 38.3687)),
-                    "lng": float(address.get('lng', 34.0254))
-                },
-                "payment_method": "cash_on_delivery",
+                "delivery_address": address.get('full', address.get('acik_adres', 'Test Address')),
+                "delivery_lat": float(address.get('lat', 38.3687)) if address.get('lat') else 38.3687,
+                "delivery_lng": float(address.get('lng', 34.0254)) if address.get('lng') else 34.0254,
+                "city": address.get('city', address.get('il', 'Aksaray')),
+                "district": address.get('district', address.get('ilce', 'Merkez')),
                 "notes": "Test order from backend testing"
             }
             
