@@ -482,49 +482,36 @@ class AIDiagnosticsTester:
             )
             return False
 
-    def create_test_order(self, business_id, menu_item):
-        """Create a test order"""
-        try:
-            order_data = {
-                "delivery_address": "Test Address, Aksaray Merkez",
-                "delivery_lat": 38.3687,
-                "delivery_lng": 34.0254,
-                "items": [{
-                    "product_id": menu_item["id"],
-                    "product_name": menu_item["name"],
-                    "product_price": menu_item["price"],
-                    "quantity": 1,
-                    "subtotal": menu_item["price"]
-                }],
-                "total_amount": menu_item["price"],
-                "notes": "WebSocket test order"
-            }
-            
-            headers = {"Authorization": f"Bearer {self.customer_token}"}
-            response = requests.post(
-                f"{BACKEND_URL}/api/orders",
-                json=order_data,
-                headers=headers,
-                timeout=10
-            )
-            
-            if response.status_code == 201:
-                order = response.json()
-                order_id = order.get("id")
-                
-                self.log_test(
-                    "Create Test Order",
-                    True,
-                    f"Order created successfully: ID={order_id}, Total=₺{order.get('total_amount')}"
-                )
-                return order_id, order
-            else:
-                self.log_test("Create Test Order", False, error=f"Order creation failed: {response.status_code} - {response.text}")
-                return None, None
-                
-        except Exception as e:
-            self.log_test("Create Test Order", False, error=f"Error creating order: {str(e)}")
-            return None, None
+    def run_all_tests(self):
+        """Run all AI Diagnostics tests"""
+        print("🚀 Starting Kuryecini Ops Co-Pilot AI Diagnostics Panel Testing")
+        print("=" * 80)
+        
+        # Authentication
+        if not self.authenticate_admin():
+            print("❌ Admin authentication failed - cannot proceed with tests")
+            return
+        
+        print("\n🤖 Testing AI Diagnostics Panel Functionality...")
+        print("-" * 50)
+        
+        # Test 1: Endpoint Availability & Structure (CRITICAL)
+        success, sample_response = self.test_endpoint_availability_and_structure()
+        
+        # Test 2: Panel Switching (HIGH)
+        self.test_panel_switching()
+        
+        # Test 3: Response Format Validation (CRITICAL)
+        self.test_response_format_validation()
+        
+        # Test 4: Tool Endpoints (MEDIUM)
+        self.test_tool_endpoints()
+        
+        # Test 5: Error Handling (HIGH)
+        self.test_error_handling()
+        
+        # Summary
+        self.print_summary()
 
     async def test_order_creation_and_admin_notification(self):
         """Test 2: Order Creation & Admin Notification"""
