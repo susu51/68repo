@@ -188,10 +188,18 @@ class CustomerOrderTester:
             
             if response.status_code in [200, 201]:
                 data = response.json()
-                order_id = data.get('order_id') or data.get('id')
-                business_name = data.get('business_name') or data.get('restaurant_name')
-                total_amount = data.get('total_amount') or data.get('totals', {}).get('grand')
-                status = data.get('status')
+                # Check different possible response formats
+                order_id = (data.get('order_id') or 
+                           data.get('id') or 
+                           (data.get('order', {}).get('id') if isinstance(data.get('order'), dict) else None))
+                
+                order_data = data.get('order', data)  # Get order data from nested or root
+                business_name = (order_data.get('business_name') or 
+                               order_data.get('restaurant_name') or
+                               data.get('business_name'))
+                total_amount = (order_data.get('total_amount') or 
+                              (order_data.get('totals', {}).get('grand') if isinstance(order_data.get('totals'), dict) else None))
+                status = order_data.get('status')
                 
                 if order_id:
                     self.log_test("POST /api/orders", True, 
