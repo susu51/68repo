@@ -461,7 +461,7 @@ class ComprehensiveEndpointTester:
                 )
             else:
                 self.log_test(
-                    "Business - GET /api/business/orders",
+                    "Business - GET /api/business/orders/incoming",
                     False,
                     error=f"HTTP {response.status_code}: {response.text[:200]}"
                 )
