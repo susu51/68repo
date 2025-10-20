@@ -111,26 +111,21 @@ export const CookieAuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await api("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(userData)
-      });
+      const result = await api.post("/auth/register", userData);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Registration failed');
+      if (!result?.data) {
+        throw new Error('Registration failed');
       }
 
-      const result = await response.json();
       console.log('✅ Registration successful');
       
-      // Auto-login after registration - get user data
-      if (result.success && result.user) {
-        setUser(result.user);
+      // Auto-login after registration
+      if (result.data.user) {
+        setUser(result.data.user);
         console.log('✅ User auto-logged in after registration');
       }
       
-      return { success: true, user: result.user };
+      return { success: true, user: result.data.user };
     } catch (error) {
       console.error('❌ Registration failed:', error);
       return { success: false, error: error.message || 'Registration failed' };
