@@ -113,37 +113,72 @@ class AIDiagnosticsTester:
         self.log_test("Admin Authentication", False, error="All admin credential attempts failed")
         return False
     
-    def authenticate_customer(self):
-        """Authenticate customer user"""
+    def test_endpoint_availability_and_structure(self):
+        """Test 1: Endpoint Availability & Structure (CRITICAL)"""
         try:
-            response = requests.post(
-                f"{BACKEND_URL}/api/auth/login",
-                json=CUSTOMER_CREDENTIALS,
-                timeout=10
+            # Test POST to /api/admin/ai/assist
+            test_data = {
+                "panel": "müşteri",
+                "message": "restoranlar gözükmüyor"
+            }
+            
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/api/admin/ai/assist",
+                json=test_data,
+                timeout=30
             )
             
             if response.status_code == 200:
                 data = response.json()
-                self.customer_token = data.get("access_token")
-                user_role = data.get("user", {}).get("role")
                 
-                if user_role == "customer":
-                    self.log_test(
-                        "Customer Authentication",
-                        True,
-                        f"Customer login successful, role: {user_role}"
-                    )
-                    return True
+                # Check if response contains required fields
+                if "response" in data and "panel" in data:
+                    # Check if response is a string (the AI response)
+                    if isinstance(data["response"], str) and len(data["response"]) > 0:
+                        # Check if panel matches request
+                        if data["panel"] == test_data["panel"]:
+                            self.log_test(
+                                "Endpoint Availability & Structure",
+                                True,
+                                f"Endpoint accessible, response length: {len(data['response'])} chars, panel: {data['panel']}"
+                            )
+                            return True, data
+                        else:
+                            self.log_test(
+                                "Endpoint Availability & Structure",
+                                False,
+                                error=f"Panel mismatch: expected {test_data['panel']}, got {data['panel']}"
+                            )
+                            return False, None
+                    else:
+                        self.log_test(
+                            "Endpoint Availability & Structure",
+                            False,
+                            error=f"Invalid response format: {type(data['response'])}"
+                        )
+                        return False, None
                 else:
-                    self.log_test("Customer Authentication", False, error=f"Expected customer role, got: {user_role}")
-                    return False
+                    self.log_test(
+                        "Endpoint Availability & Structure",
+                        False,
+                        error=f"Missing required fields in response: {list(data.keys())}"
+                    )
+                    return False, None
             else:
-                self.log_test("Customer Authentication", False, error=f"Login failed: {response.status_code}")
-                return False
+                self.log_test(
+                    "Endpoint Availability & Structure",
+                    False,
+                    error=f"HTTP {response.status_code}: {response.text[:200]}"
+                )
+                return False, None
                 
         except Exception as e:
-            self.log_test("Customer Authentication", False, error=f"Authentication error: {str(e)}")
-            return False
+            self.log_test(
+                "Endpoint Availability & Structure",
+                False,
+                error=f"Request failed: {str(e)}"
+            )
+            return False, None
 
     async def test_admin_websocket_connection(self):
         """Test 1: Admin WebSocket Connection"""
