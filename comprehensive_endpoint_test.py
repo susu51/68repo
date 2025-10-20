@@ -599,7 +599,7 @@ class ComprehensiveEndpointTester:
                     )
                 else:
                     self.log_test(
-                        "Business - POST /api/business/orders/{id}/confirm",
+                        "Business - PUT /api/business/orders/{id}/confirm",
                         False,
                         error=f"HTTP {response.status_code}: {response.text[:200]}"
                     )
