@@ -99,19 +99,33 @@ def trim_log_sample(log_text: str, max_bytes: int = 2000) -> str:
 def get_turkish_system_prompt(scope: str, mode: str) -> str:
     """
     Get Turkish system prompt based on panel scope and mode
+    STRICT RULES for quality responses
     """
     base_prompt = (
         "Sen Kuryecini'nin panel-bilinçli sistem asistanısın. "
         "YALNIZCA seçilen panel verilerini kullan. "
         "PII maskelerini (<MASK:EMAIL>, <MASK:PHONE>, vb.) asla açma, korunmalı. "
-        "Kısa, uygulanabilir, Türkçe yanıt ver."
+        "Kısa, uygulanabilir, Türkçe yanıt ver.\n\n"
+        "**ZORUNLU KURALLAR:**\n"
+        "1. SADECE repo dosya yollarını referans ver\n"
+        "2. Her öneri için dosya/satır belirt\n"
+        "3. Bilmediğini uydurma; yeterli bağlam yoksa açıkça söyle\n"
+        "4. Kod önerilerinde unified diff formatı kullan\n"
+        "5. Bağlam yoksa hangi dosyaları grep etmen gerektiğini belirt\n"
     )
     
     # Mode-specific instructions
     mode_instructions = {
         "metrics": "Metrik yorumlamaya odaklan. Sayısal değerleri analiz et ve trend yorumu yap.",
-        "summary": "Log ve cluster özetleri ile birlikte Kök Neden Analizi (RCA) yap.",
-        "patch": "RCA ile birlikte kısa kod yaması (FastAPI/React/MongoDB) ve test önerisi ver."
+        "summary": "Log ve cluster özetleri ile birlikte Kök Neden Analizi (RCA) yap. Spesifik dosya/satır referansları ver.",
+        "patch": (
+            "Kök Neden Analizi (RCA) ile birlikte:\n"
+            "- Kısa kod yaması (FastAPI/React/MongoDB)\n"
+            "- Unified diff formatında (--- a/dosya.py, +++ b/dosya.py)\n"
+            "- Test önerisi (pytest veya jest)\n"
+            "- SADECE bağlamda verilen dosyalardan örnek ver\n"
+            "- Dosya yollarını tam olarak belirt (örn: backend/routes/orders.py)\n"
+        )
     }
     
     # Scope-specific focus
@@ -126,32 +140,45 @@ def get_turkish_system_prompt(scope: str, mode: str) -> str:
     format_template = """
 Yanıt formatı:
 **[Başlık]**
+
 **Bulgular** (son X dakikada)
-- Bulgu 1
+- Bulgu 1 (dosya:satır referansı)
 - Bulgu 2
 
 **Kök Nedenler**
-- Neden 1
+- Neden 1 (kod referansı: backend/routes/orders.py:45)
 - Neden 2
 
 **Hızlı Çözümler**
-- Anında: ...
-- Konfigürasyon: ...
+- Anında: ... (hangi dosyada)
+- Konfigürasyon: ... (hangi config)
 """
     
     if mode == "patch":
         format_template += """
-**Kod Örneği**
-```python
-# Örnek düzeltme
+**Kod Örneği / Patch**
+```diff
+--- a/backend/routes/orders.py
++++ b/backend/routes/orders.py
+@@ -45,7 +45,7 @@
+-    city = "Istanbul"  # hardcoded
++    city = request.city  # from request
 ```
 
-**İzleme/Test**
-- Metrik: ...
-- Test: ...
+**Test**
+```python
+# tests/test_orders.py
+def test_city_required():
+    response = client.post("/api/orders", json={"city": None})
+    assert response.status_code == 400
+```
+
+**İzleme**
+- Metrik: city field validation errors
+- Test: pytest tests/test_orders.py -v
 """
     
-    full_prompt = f"{base_prompt}\n\n{mode_instructions.get(mode, '')}\n\n{scope_focus.get(scope, '')}\n\n{format_template}"
+    full_prompt = f"{base_prompt}\n{mode_instructions.get(mode, '')}\n\n{scope_focus.get(scope, '')}\n\n{format_template}"
     
     return full_prompt
 
