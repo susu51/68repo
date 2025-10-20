@@ -24,6 +24,7 @@ import { CategoryAnalytics } from "./components/CategoryAnalytics";
 import { PlatformSettings } from "./components/PlatformSettings";
 import AdminSettings from "./components/AdminSettings";
 import PanelAIAssistant from "./components/PanelAIAssistant";
+import OpsCoPilot from "./components/OpsCoPilot";
 import AdminKYC from "./components/AdminKYC";
 import AdminAdvertisements from "./components/AdminAdvertisements";
 import UserProfileWithDocuments from "./components/UserProfileWithDocuments";
