@@ -739,3 +739,161 @@ async def dev_ast_outline(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"AST analizi başarısız: {str(e)}"
         )
+
+
+
+# ==================== KURYECINI OPS CO-PILOT ====================
+
+class AssistRequest(BaseModel):
+    """Kuryecini Ops Co-Pilot request"""
+    panel: Literal["müşteri", "işletme", "kurye", "admin", "multi"] = Field(default="müşteri", description="Panel scope")
+    message: str = Field(..., min_length=1, max_length=2000, description="User question in Turkish")
+    model: Optional[str] = Field(None, description="Model name (default: gpt-4o-mini)")
+
+
+@router.post("/assist", summary="Kuryecini Ops Co-Pilot - 7-Block Structured Response")
+async def ai_assist(
+    request: AssistRequest,
+    current_user: dict = Depends(get_admin_user)
+):
+    """
+    Kuryecini Ops Co-Pilot - Structured diagnostic assistant
+    
+    **RBAC**: SuperAdmin & Operasyon only
+    
+    **Panel options**:
+    - müşteri: Customer panel diagnostics
+    - işletme: Business panel diagnostics
+    - kurye: Courier panel diagnostics
+    - admin: Admin panel diagnostics
+    - multi: Cross-panel analysis
+    
+    **Response format** (7 blocks - ENFORCED):
+    1. Hızlı Teşhis (Quick Diagnosis)
+    2. Derin RCA (Root Cause Analysis)
+    3. Kontrol Komutları (Verification Commands)
+    4. Patch (Mini Code Fix)
+    5. Test (Test Cases)
+    6. İzleme & Alarm (Monitoring)
+    7. DoD (Definition of Done)
+    
+    Returns plain text (Markdown) with structured sections.
+    """
+    try:
+        # Import utilities
+        from routes.ai_utils import load_system_prompt, build_and_inject_context, ask_llm
+        
+        # Load and prepare system prompt
+        system_prompt = load_system_prompt()
+        system_prompt_with_ctx = build_and_inject_context(system_prompt, request.panel)
+        
+        # Log request (no PII)
+        print(f"🛠️ Ops Co-Pilot: user={current_user.get('email')}, panel={request.panel}, model={request.model or 'gpt-4o-mini'}")
+        
+        # Get LLM response
+        answer = ask_llm(system_prompt_with_ctx, request.message, request.model)
+        
+        # Audit log
+        try:
+            db = get_db()
+            await db.ai_audit_logs.insert_one({
+                "user_id": current_user.get("id", current_user.get("_id")),
+                "user_email": current_user.get("email"),
+                "question": request.message[:200],
+                "panel": request.panel,
+                "mode": "co-pilot",
+                "timestamp": datetime.now(timezone.utc)
+            })
+        except Exception as e:
+            print(f"⚠️ Audit log error: {str(e)}")
+        
+        # Return plain text response
+        return {"response": answer, "panel": request.panel}
+    
+    except Exception as e:
+        error_msg = str(e)
+        print(f"❌ Ops Co-Pilot Error: {error_msg}")
+        
+        # Return error in 7-block format
+        error_response = f"""# Hızlı Teşhis
+• Durum: Asistan çağrısı hata verdi.
+• Etki: Yanıt üretilemedi.
+• Öncelik: P1
+
+# Derin RCA (olasılık matrisi)
+| Neden | Panel | Kanıt/İpucu | Olasılık | Nasıl Doğrularım |
+|---|---|---|---|---|
+| API anahtarı eksik | tüm | OPENAI_API_KEY yok | Yüksek | env_list |
+| Ağ/timeout | tüm | ECONNRESET/ETIMEDOUT | Orta | tekrar dene |
+| Model hatası | tüm | {error_msg[:100]} | Yüksek | logs |
+
+# Kontrol Komutları (Kopyala-Çalıştır)
+```bash
+echo "CHECK OPENAI_API_KEY && network"
+tail -n 50 /var/log/supervisor/backend.err.log
+```
+
+# Patch (Mini)
+— 
+
+# Test
+```bash
+curl -X POST /api/admin/ai/assist -d '{{"panel":"müşteri","message":"ping"}}'
+```
+
+# İzleme & Alarm
+- Sentry: event.type:error route:/admin/ai/assist
+
+# DoD
+- 200 yanıt dönmeli.
+"""
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"response": error_response, "error": error_msg}
+        )
+
+
+# ==================== TOOL ENDPOINTS ====================
+
+@router.post("/tools/http_get", summary="Tool: HTTP GET")
+async def tool_http_get_endpoint(
+    url: str,
+    headers: Optional[Dict[str, str]] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Execute HTTP GET tool (for manual tool usage)"""
+    from routes.ai_utils import tool_http_get
+    return tool_http_get(url, headers)
+
+
+@router.post("/tools/logs_tail", summary="Tool: Logs Tail")
+async def tool_logs_tail_endpoint(
+    path: str = "/var/log/supervisor/backend.out.log",
+    limit: int = 200,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Execute logs tail tool (for manual tool usage)"""
+    from routes.ai_utils import tool_logs_tail
+    return tool_logs_tail(path, limit)
+
+
+@router.post("/tools/db_query", summary="Tool: DB Query")
+async def tool_db_query_endpoint(
+    collection: str,
+    action: str,
+    filter: Optional[Dict[str, Any]] = None,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Execute DB query tool (for manual tool usage)"""
+    from routes.ai_utils import tool_db_query
+    return tool_db_query(collection, action, filter)
+
+
+@router.get("/tools/env_list", summary="Tool: Env List")
+async def tool_env_list_endpoint(
+    mask: bool = True,
+    current_user: dict = Depends(get_admin_user)
+):
+    """Execute env list tool (for manual tool usage)"""
+    from routes.ai_utils import tool_env_list
+    return tool_env_list(mask)
