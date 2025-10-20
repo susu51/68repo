@@ -659,10 +659,10 @@ class ComprehensiveEndpointTester:
                 error=f"Request failed: {str(e)}"
             )
         
-        # Test 2: POST /api/courier/tasks/{id}/accept
+        # Test 2: PUT /api/courier/tasks/{id}/accept
         if self.task_id:
             try:
-                response = courier_session.post(
+                response = courier_session.put(
                     f"{BACKEND_URL}/api/courier/tasks/{self.task_id}/accept",
                     timeout=10
                 )
