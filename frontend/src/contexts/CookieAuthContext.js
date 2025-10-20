@@ -76,27 +76,24 @@ export const CookieAuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password })
-      });
+      const loginResult = await api.post("/auth/login", { email, password });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || error.message || 'Login failed');
+      if (!loginResult?.data) {
+        throw new Error('Login failed');
       }
 
       // Get user data after successful login
-      const meResponse = await api("/me");  // Use /api/me instead of /api/auth/me
-      const userData = await meResponse.json();
+      const meResult = await api.get("/me");
       
-      setUser(userData);
-      console.log('✅ Login successful via cookie');
-      
-      return { success: true, user: userData };
+      if (meResult?.data) {
+        setUser(meResult.data);
+        console.log('✅ Login successful via cookie:', meResult.data.email);
+        return { success: true, user: meResult.data };
+      } else {
+        throw new Error('Failed to fetch user data after login');
+      }
     } catch (error) {
       console.error('❌ Login failed:', error);
-      // Return error in a format that UI can handle
       return { success: false, error: error.message || 'Login failed' };
     }
   };
