@@ -230,15 +230,21 @@ class CustomerOrderTester:
                     # Check order structure
                     if orders:
                         order = orders[0]
-                        required_fields = ['id', 'business_id', 'status', 'total_amount']
-                        missing_fields = [field for field in required_fields if field not in order]
+                        # Check for different possible field names based on server.py
+                        required_fields = ['id', 'business_id', 'status']
+                        optional_fields = ['total_amount', 'totals']  # totals.grand might be used instead
                         
-                        if not missing_fields:
+                        missing_fields = [field for field in required_fields if field not in order]
+                        has_total = 'total_amount' in order or 'totals' in order
+                        
+                        if not missing_fields and has_total:
                             self.log_test("Order Structure Validation", True, 
-                                        f"All required fields present: {required_fields}")
+                                        f"All required fields present: {required_fields} + total field")
                         else:
-                            self.log_test("Order Structure Validation", False, 
-                                        f"Missing fields: {missing_fields}")
+                            missing_info = f"Missing fields: {missing_fields}"
+                            if not has_total:
+                                missing_info += ", No total_amount or totals field"
+                            self.log_test("Order Structure Validation", False, missing_info)
                     
                     return orders
                 else:
