@@ -554,7 +554,7 @@ class ComprehensiveEndpointTester:
                 
                 if response.status_code == 200:
                     self.log_test(
-                        "Business - PUT /api/business/menu/{id}",
+                        "Business - PATCH /api/business/menu/{id}",
                         True,
                         f"Menu item updated successfully: {self.menu_item_id}"
                     )
