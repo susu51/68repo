@@ -21,7 +21,6 @@ import sys
 
 # Configuration
 BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com"
-WS_URL = "wss://food-dash-87.preview.emergentagent.com"
 
 # Test credentials - try multiple admin credentials
 ADMIN_CREDENTIALS_LIST = [
