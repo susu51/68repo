@@ -577,15 +577,14 @@ class ComprehensiveEndpointTester:
                 error="No menu item ID available for update test"
             )
         
-        # Test 5: POST /api/business/orders/{id}/confirm
+        # Test 5: PUT /api/business/orders/{id}/confirm
         if self.order_id:
             try:
                 confirm_data = {
-                    "unit_delivery_fee": 15.0,
-                    "estimated_preparation_time": 30
+                    "unit_delivery_fee": 15.0
                 }
                 
-                response = business_session.post(
+                response = business_session.put(
                     f"{BACKEND_URL}/api/business/orders/{self.order_id}/confirm",
                     json=confirm_data,
                     timeout=10
