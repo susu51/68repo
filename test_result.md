@@ -1980,9 +1980,9 @@ frontend:
 
 test_plan:
   current_focus:
-    - "Customer Panel Address Selection Functionality"
+    - "All Panel Authentication and Routing"
   stuck_tasks: 
-    - "Customer Panel Address Selection Functionality"
+    - "Business/Courier/Admin Panel Role-based Routing"
   test_all: false
   test_priority: "critical_first"
 
