@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Admin Panel Orders Real-Time WebSocket Integration Testing
+Kuryecini Ops Co-Pilot AI Diagnostics Panel Testing
 
-CRITICAL: Test the newly implemented admin WebSocket system for real-time order notifications.
+CRITICAL: Test the newly implemented AI Diagnostics panel endpoint "/admin/ai/assist" for the AI Diagnostics panel.
 
 Test Scenarios:
-1. Admin WebSocket Connection
-2. Order Creation & Admin Notification  
-3. WebSocket Role Validation
-4. Multiple Admin Connections
-5. Admin Endpoint Access
+1. Endpoint Availability & Structure (CRITICAL)
+2. Panel Switching (HIGH)
+3. Response Format Validation (CRITICAL)
+4. Tool Endpoints (MEDIUM)
+5. Error Handling (HIGH)
 """
 
 import asyncio
