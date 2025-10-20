@@ -1499,7 +1499,35 @@ const AdminDashboard = ({ user }) => {
 
           {/* Tools Tab */}
           <TabsContent value="tools" className="space-y-6">
-            <PanelAIAssistant />
+            {/* Sub-tabs for different AI tools */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex space-x-4 border-b border-gray-200 mb-6">
+                <button
+                  onClick={() => setActiveAITool('ops-copilot')}
+                  className={`pb-3 px-4 font-medium transition-colors ${
+                    (activeAITool || 'ops-copilot') === 'ops-copilot'
+                      ? 'border-b-2 border-orange-500 text-orange-600'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  🛠️ Ops Co-Pilot
+                </button>
+                <button
+                  onClick={() => setActiveAITool('panel-assistant')}
+                  className={`pb-3 px-4 font-medium transition-colors ${
+                    activeAITool === 'panel-assistant'
+                      ? 'border-b-2 border-blue-500 text-blue-600'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  🤖 Panel AI Asistanı
+                </button>
+              </div>
+              
+              {/* Render selected tool */}
+              {(activeAITool || 'ops-copilot') === 'ops-copilot' && <OpsCoPilot />}
+              {activeAITool === 'panel-assistant' && <PanelAIAssistant />}
+            </div>
           </TabsContent>
             </Tabs>
           </div>
