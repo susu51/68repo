@@ -48,7 +48,16 @@ def set_db_client(client: AsyncIOMotorClient):
 def get_db():
     if not db_client:
         raise HTTPException(500, "Database not initialized")
-    return db_client.kuryecini
+    # Extract database name from MONGO_URL or use environment variable
+    db_name = os.getenv("DB_NAME")
+    if not db_name:
+        # Extract from MONGO_URL
+        mongo_url = os.getenv("MONGO_URL", "")
+        if "/" in mongo_url:
+            db_name = mongo_url.split("/")[-1].split("?")[0]
+        else:
+            db_name = "kuryecini"  # fallback
+    return db_client[db_name]
 
 # Models
 class LoginRequest(BaseModel):
