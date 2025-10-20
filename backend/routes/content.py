@@ -14,7 +14,14 @@ MONGO_URL = os.environ.get('MONGO_URL')
 if MONGO_URL:
     from motor.motor_asyncio import AsyncIOMotorClient
     client = AsyncIOMotorClient(MONGO_URL)
-    db = client.kuryecini
+    # Extract database name from MONGO_URL or environment
+    db_name = os.environ.get("DB_NAME")
+    if not db_name:
+        if "/" in MONGO_URL:
+            db_name = MONGO_URL.split("/")[-1].split("?")[0]
+        else:
+            db_name = "kuryecini"
+    db = client[db_name]
 else:
     raise RuntimeError("MONGO_URL environment variable required")
 
