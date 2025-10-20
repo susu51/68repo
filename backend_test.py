@@ -513,64 +513,7 @@ class AIDiagnosticsTester:
         # Summary
         self.print_summary()
 
-    async def test_order_creation_and_admin_notification(self):
-        """Test 2: Order Creation & Admin Notification"""
-        try:
-            # Get available business and menu
-            business_id, business_name = self.get_available_business()
-            if not business_id:
-                return False
-                
-            menu_item = self.get_business_menu(business_id)
-            if not menu_item:
-                return False
-            
-            # Start admin WebSocket connection
-            ws_url = f"{WS_URL}/api/ws/orders?role=admin"
-            
-            async with websockets.connect(ws_url) as websocket:
-                # Wait for connection confirmation
-                await asyncio.wait_for(websocket.recv(), timeout=10)
-                
-                # Create order (this should trigger event_bus publication)
-                order_id, order = self.create_test_order(business_id, menu_item)
-                if not order_id:
-                    return False
-                
-                # Wait for WebSocket notification
-                try:
-                    notification = await asyncio.wait_for(websocket.recv(), timeout=15)
-                    data = json.loads(notification)
-                    
-                    if (data.get("type") == "order_notification" and
-                        data.get("data", {}).get("event_type") == "order.created"):
-                        
-                        event_data = data.get("data", {})
-                        self.log_test(
-                            "Order Creation & Admin Notification",
-                            True,
-                            f"Admin received order notification: order_id={event_data.get('order_id')}, business_id={event_data.get('business_id')}"
-                        )
-                        return True
-                    else:
-                        self.log_test(
-                            "Order Creation & Admin Notification",
-                            False,
-                            error=f"Unexpected notification format: {data}"
-                        )
-                        return False
-                        
-                except asyncio.TimeoutError:
-                    self.log_test(
-                        "Order Creation & Admin Notification",
-                        False,
-                        error="No WebSocket notification received within 15 seconds"
-                    )
-                    return False
-                    
-        except Exception as e:
-            self.log_test("Order Creation & Admin Notification", False, error=f"Test failed: {str(e)}")
-            return False
+    # Removed old async methods - replaced with AI Diagnostics tests
 
     async def test_multiple_admin_connections(self):
         """Test 4: Multiple Admin Connections"""
