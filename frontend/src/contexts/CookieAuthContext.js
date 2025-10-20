@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { api } from "../api/http";
+import api from "../api/http";
 
 // Cookie-based Auth Context - NO localStorage
 const CookieAuthContext = createContext(null);
