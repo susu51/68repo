@@ -189,8 +189,8 @@ class CustomerOrderTester:
             if response.status_code in [200, 201]:
                 data = response.json()
                 order_id = data.get('order_id') or data.get('id')
-                business_name = data.get('business_name')
-                total_amount = data.get('total_amount')
+                business_name = data.get('business_name') or data.get('restaurant_name')
+                total_amount = data.get('total_amount') or data.get('totals', {}).get('grand')
                 status = data.get('status')
                 
                 if order_id:
