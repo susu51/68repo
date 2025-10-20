@@ -681,7 +681,7 @@ class ComprehensiveEndpointTester:
                     )
             except Exception as e:
                 self.log_test(
-                    "Courier - POST /api/courier/tasks/{id}/accept",
+                    "Courier - PUT /api/courier/tasks/{id}/accept",
                     False,
                     error=f"Request failed: {str(e)}"
                 )
