@@ -347,10 +347,11 @@ class CustomerOrderTester:
         start_time = time.time()
         try:
             order_data = {
-                "business_id": "test",
-                "items": [{"product_id": "test", "title": "Test", "price": 10.0, "quantity": 1}],
-                "delivery_address": {"label": "Test", "address": "Test", "lat": 38.0, "lng": 34.0},
-                "payment_method": "cash_on_delivery"
+                "restaurant_id": "test",
+                "items": [{"product_id": "test", "quantity": 1}],
+                "delivery_address": "Test Address",
+                "delivery_lat": 38.0,
+                "delivery_lng": 34.0
             }
             
             response = unauth_session.post(f"{BACKEND_URL}/orders", json=order_data, timeout=10)
