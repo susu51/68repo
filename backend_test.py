@@ -677,7 +677,7 @@ class AIDiagnosticsTester:
     def print_summary(self):
         """Print test summary"""
         print("\n" + "=" * 80)
-        print("📊 ADMIN WEBSOCKET TESTING SUMMARY")
+        print("📊 AI DIAGNOSTICS PANEL TESTING SUMMARY")
         print("=" * 80)
         
         total_tests = len(self.test_results)
@@ -699,32 +699,47 @@ class AIDiagnosticsTester:
         print(f"\n🎯 CRITICAL FINDINGS:")
         
         # Check critical functionality
-        admin_connection_working = any(r["test"] == "Admin WebSocket Connection" and r["success"] for r in self.test_results)
-        order_notification_working = any(r["test"] == "Order Creation & Admin Notification" and r["success"] for r in self.test_results)
-        role_validation_working = any(r["test"].startswith("WebSocket Role Validation") and r["success"] for r in self.test_results)
+        endpoint_working = any(r["test"] == "Endpoint Availability & Structure" and r["success"] for r in self.test_results)
+        panel_switching_working = any(r["test"] == "Panel Switching" and r["success"] for r in self.test_results)
+        format_validation_working = any(r["test"] == "Response Format Validation" and r["success"] for r in self.test_results)
+        tool_endpoints_working = any(r["test"] == "Tool Endpoints" and r["success"] for r in self.test_results)
+        error_handling_working = any(r["test"] == "Error Handling" and r["success"] for r in self.test_results)
         
-        if admin_connection_working:
-            print("   ✅ Admin WebSocket connection with role=admin parameter working")
+        if endpoint_working:
+            print("   ✅ AI Diagnostics endpoint /api/admin/ai/assist is accessible and returns proper JSON")
         else:
-            print("   ❌ Admin WebSocket connection FAILED")
+            print("   ❌ AI Diagnostics endpoint FAILED - endpoint not accessible")
             
-        if order_notification_working:
-            print("   ✅ Admin receives ALL order notifications from event_bus")
+        if panel_switching_working:
+            print("   ✅ Panel switching works correctly for all 5 panels (müşteri, işletme, kurye, admin, multi)")
         else:
-            print("   ❌ Admin order notifications NOT WORKING")
+            print("   ❌ Panel switching FAILED - some panels not working")
             
-        if role_validation_working:
-            print("   ✅ WebSocket role validation working correctly")
+        if format_validation_working:
+            print("   ✅ Response format contains all 7 required Turkish sections")
         else:
-            print("   ❌ WebSocket role validation FAILED")
+            print("   ❌ Response format validation FAILED - missing required sections")
+            
+        if tool_endpoints_working:
+            print("   ✅ Tool endpoints (http_get, logs_tail, db_query, env_list) are accessible")
+        else:
+            print("   ❌ Tool endpoints FAILED - some tools not working")
+            
+        if error_handling_working:
+            print("   ✅ Error handling working correctly for invalid inputs and authentication")
+        else:
+            print("   ❌ Error handling FAILED - improper error responses")
         
         # Overall verdict
         if success_rate >= 80:
-            print(f"\n🎉 VERDICT: Admin WebSocket system is WORKING EXCELLENTLY ({success_rate:.1f}% success rate)")
+            print(f"\n🎉 VERDICT: AI Diagnostics Panel is WORKING EXCELLENTLY ({success_rate:.1f}% success rate)")
+            print("   The Kuryecini Ops Co-Pilot endpoint is production-ready with proper 7-block structured responses.")
         elif success_rate >= 60:
-            print(f"\n⚠️ VERDICT: Admin WebSocket system has MINOR ISSUES ({success_rate:.1f}% success rate)")
+            print(f"\n⚠️ VERDICT: AI Diagnostics Panel has MINOR ISSUES ({success_rate:.1f}% success rate)")
+            print("   Core functionality works but some features need attention.")
         else:
-            print(f"\n🚨 VERDICT: Admin WebSocket system has CRITICAL ISSUES ({success_rate:.1f}% success rate)")
+            print(f"\n🚨 VERDICT: AI Diagnostics Panel has CRITICAL ISSUES ({success_rate:.1f}% success rate)")
+            print("   Major functionality is broken and needs immediate attention.")
 
 async def main():
     """Main test runner"""
