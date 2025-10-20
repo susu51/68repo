@@ -593,7 +593,7 @@ class ComprehensiveEndpointTester:
                 if response.status_code == 200:
                     data = response.json()
                     self.log_test(
-                        "Business - POST /api/business/orders/{id}/confirm",
+                        "Business - PUT /api/business/orders/{id}/confirm",
                         True,
                         f"Order confirmed successfully: {self.order_id}"
                     )
