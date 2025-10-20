@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
 ADMIN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBrdXJ5ZWNpbmkuY29tIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzU5NzQ4MTU5LCJ0eXBlIjoiYWNjZXNzIn0.LfLQZ25_9WOV05CJ40n1Ebn6WTsD3sUlJcuFY_d2IIg"
 
 def create_test_products():

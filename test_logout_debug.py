@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BASE_URL = "https://kuryecini-ai-tools.preview.emergentagent.com"
+BASE_URL = "https://kuryecini-ai.preview.emergentagent.com"
 AUTH_BASE_URL = f"{BASE_URL}/api/auth"
 
 async def test_logout_debug():

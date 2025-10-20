@@ -23,7 +23,7 @@ import os
 import sys
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com"
 
 # Test credentials
 CUSTOMER_CREDENTIALS = {

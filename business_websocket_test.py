@@ -23,7 +23,7 @@ import sys
 import subprocess
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com"
 WS_URL = "wss://admin-wsocket.preview.emergentagent.com"
 
 # Test credentials

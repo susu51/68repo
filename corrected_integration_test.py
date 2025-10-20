@@ -17,7 +17,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 class CorrectedIntegrationTester:

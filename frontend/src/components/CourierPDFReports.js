@@ -6,7 +6,7 @@ import { Label } from './ui/label';
 import { Calendar, Download, FileText, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tools.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierPDFReports = () => {

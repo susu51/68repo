@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com"
 
 # Admin credentials
 ADMIN_CREDENTIALS = {

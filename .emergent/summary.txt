@@ -1,94 +1,74 @@
 <analysis>
-The AI engineer's work primarily involved a multi-phase development effort for the Kuryecini application. Initial work focused on stabilizing real-time order notifications, particularly for the Admin Panel. This involved extensive debugging of WebSocket connections, identifying and fixing a critical  dependency issue in the frontend hook () that caused immediate disconnections. Subsequently, the focus shifted to enhancing the order flow: ensuring business panels receive real-time notifications by adding event publishing to the backend  endpoint and correctly configuring the business-side WebSocket hook. A significant portion of the work addressed customer order placement issues, fixing incorrect API endpoints, request body formats, and then a series of cascading frontend syntax errors in  and . The final stage of the trajectory began with the user providing a comprehensive requirement for an AI Diagnostics panel, which the AI engineer has broken down into phases. The current work is on Phase 1 of this AI Diagnostics panel, involving backend models, ingestion endpoints, and a frontend UI shell.
+The AI engineer's work on Kuryecini has been extensive, moving from stabilizing real-time order notifications and fixing core order placement flows to developing a sophisticated AI Diagnostics panel. Initial efforts resolved critical WebSocket disconnections, streamlined customer order creation, and implemented business order approval. The focus then shifted to the multi-phase AI Diagnostics panel, starting with backend models, ingestion endpoints, and UI shells. Development has been highly iterative, with the user providing detailed requirements and refinements, leading to the creation of an AI Settings page, a Panel AI Asistanı chat interface with streaming LLM responses, and advanced code exploration tools (grep, list, AST outline). Key issues included a Sipariş Ver button bug (double API prefix) and deployment blockers, which were addressed through refactoring database connections and cache management. The latest work involves integrating a Kuryecini Ops Co-Pilot master system prompt with structured outputs and tool calling capabilities for the AI Assistant.
 </analysis>
 
 <product_requirements>
-The Kuryecini platform is a comprehensive multi-role (Customer, Business, Courier, Admin) application built using React, FastAPI, and MongoDB. Key functionalities include address management, geocoding for restaurant discovery, role-specific registration with KYC, and advertisement display. Recent updates focused on a modern login/registration UX and menu management. A critical objective is a seamless, real-time end-to-end order flow across all user panels.
+The Kuryecini platform is a multi-role (Customer, Business, Courier, Admin) application (React, FastAPI, MongoDB) focused on seamless, real-time end-to-end order flow. Implemented features include a real-time order routing system, Admin and Business panel real-time order visibility/notifications, customer order placement, business order approval with courier task creation, and a Courier Waiting Tasks panel.
 
-**Implemented so far:**
-*   **Real-time Order Routing System**: Hardened with strict data models, indexing, API validations, WebSocket updates, RBAC, and improved notifications.
-*   **Admin Panel Real-time Order Visibility**: Integrated real-time order updates into the Admin panel, displaying live orders with filters. Initial WebSocket connection issues were resolved.
-*   **Business Panel Real-time Notifications**: Ensured new orders are pushed to the relevant business panel via WebSockets.
-*   **Customer Order Placement**: Fixed issues preventing customers from placing orders, including API endpoint correctness, request body formatting, and basic UI flow. Order ID display post-order was added.
-*   **Business Order Approval Flow**: Implemented a Confirm Order button in the Business Panel, allowing businesses to set a Paket Başına Fiyat (unit delivery fee) and confirm orders, which then creates a  and publishes an event to a global courier topic.
-*   **Courier Waiting Tasks Panel**: Added a Bekleyen Paketler (Waiting Tasks) tab to the Courier Dashboard for future map integration.
-*   **Backend Stability**: Executed MongoDB migrations for orders and restaurants, ensured correct  population.
-
-**New Feature Request (AI Diagnostics Panel):**
-A secure, multi-app AI Diagnostics panel for the Admin Panel that aggregates logs from all application sites (customer, business, courier, admin), performs PII redaction, classifies errors, conducts Root Cause Analysis (RCA), and proposes fixes with example code patches using ChatGPT. It requires backend data models (, , ), an ingestion API (), PII redaction logic, fingerprinting/clustering, and a React/Tailwind frontend UI with various tabs (Özet, Kümeler, Loglar, AI Yardımcı, Ayarlar). Strict RBAC and rate-limiting are required.
+The primary new feature request is a secure, multi-app AI Diagnostics panel for the Admin Panel. It should aggregate logs, redact PII, classify errors, perform Root Cause Analysis (RCA), and propose fixes with example code patches using an LLM. This requires backend data models (, , ), ingestion API (), PII redaction, fingerprinting/clustering, and a React/Tailwind frontend UI. The AI Assistant needs to be panel-aware (customer, business, courier, multi), support time windows, preset questions, context toggles (metrics, logs), streaming markdown output, and integrate with either an Emergent LLM Key or a custom OpenAI API key. It must provide structured responses (Diagnosis, RCA, Solutions, Patch, Tests, Monitoring, DoD) and leverage advanced code exploration tools (list_files, grep, ast_outline) for context.
 </product_requirements>
 
 <key_technical_concepts>
-- Full-stack Architecture: React (frontend), FastAPI (backend), MongoDB (database).
-- Real-time Communication: WebSockets (FastAPI, React hooks), in-memory event bus (Redis pub/sub implied by  in original plan, though  is in-memory).
-- Authentication/Authorization: JWT, secure cookies, Role-Based Access Control (RBAC).
-- UI/Styling: Tailwind CSS, React Context API, React Router DOM.
-- State Management: React hooks (, , ).
-- Logging & Diagnostics: PII Redaction, Error Clustering, AI-driven RCA (ChatGPT integration for future phases).
-- Database Management: MongoDB indexing, migration scripts.
+-   **Full-stack Architecture:** React, FastAPI, MongoDB.
+-   **Real-time Communication:** WebSockets (FastAPI, React hooks), SSE.
+-   **AI Integration:** LLMs (OpenAI, Emergent LLM Key), PII Redaction, Error Clustering, AI-driven RCA.
+-   **Frontend UI:** React Context API, React Router DOM, Tailwind CSS.
+-   **Backend Framework:** FastAPI, Pydantic for data models.
+-   **Database:** MongoDB (indexing, migrations, UUIDs for IDs).
+-   **DevOps:** backend                          RUNNING   pid 43, uptime 0:00:02
+code-server                      STOPPED   Not started
+frontend                         RUNNING   pid 44, uptime 0:00:02
+mongodb                          RUNNING   pid 47, uptime 0:00:02
+nginx-code-proxy                 RUNNING   pid 41, uptime 0:00:02
+supervisor>  for service management, Kubernetes ingress rules.
+-   **Code Quality:** Structured prompts, JSON validation, retry mechanisms, code exploration tools (grep, AST).
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: The central FastAPI application. It has been continually modified to include new routers (, , , , , ), and for WebSocket endpoint registration.
--   ****: (NEW) Created to make the  directory a Python package, resolving import issues.
--   ****: (NEW) Defines the Pydantic model for  objects, used for courier assignments.
--   ****: (NEW) Defines the Pydantic model for  objects, including fields for discount type, scope, limits, and applicability.
--   ****: (NEW) Defines Pydantic models for  and  entries, including fields for PII redaction and fingerprinting.
--   ****: Modified to publish  events to the event bus for  and  topics upon successful order creation.
--   ****: (NEW) Implements the API endpoint for businesses to confirm an order, set , update order status, and create a .
--   ****: (NEW) Implements API endpoints related to courier tasks, such as getting available tasks and accepting them.
--   ****: (NEW) Implements CRUD (Create, Read, Update, Delete) API endpoints for managing coupons by administrators.
--   ****: (NEW) Implements API endpoints for applying coupons to a customer's cart.
--   ****: (NEW) Implements a stable  endpoint for customer discovery with filtering, projection, sorting, and pagination.
--   ****: (NEW) Implements the  endpoint for ingesting application logs, including PII redaction, fingerprinting, and clustering.
--   ****: Defines backend WebSocket logic. Modified to include detailed logging for connection handling and message loops, and to ensure correct handling of admin roles.
--   ****: Modified to correctly import and use , , and  functions.
--   ****: (NEW) Script to add MongoDB indexes for  collection (, , , , ).
--   ****: (NEW) Script to backfill  and / fields in old orders records.
--   ****: Modified to include , , and  flags.
--   ****: Main application component. Modified to integrate  with real-time order updates, include the new  component, and address multiple JSX syntax errors.
--   ****: Admin dashboard component. Uses  for real-time order display and includes a new Kuponlar tab.
--   ****: Custom React hook for admin WebSocket notifications. Fixed an infinite loop issue in its  dependency array that caused immediate disconnections.
--   ****: Custom React hook for business WebSocket notifications. Modified to include the  parameter in the WebSocket URL.
--   ****: Customer application shell. Modified to correct the order creation API endpoint, adjust the request body format, display order IDs, fix several syntax errors ( blocks), and pass the  prop to child components like .
--   ****: Customer restaurant discovery page. Modified to correctly receive  prop.
--   ****: Business order management panel. Modified to display real-time created orders, include a Paket Başına Fiyat input, and an Onayla button for confirming orders. Fixed rendering logic for order data and syntax errors.
--   ****: (NEW) A new component to display waiting courier tasks with map integration (planned). Fixed an initial syntax error (Python docstring in JS).
--   ****: Courier dashboard component. Modified to include a new Bekleyen Paketler tab that renders the  component.
--   ****: (NEW) Basic CRUD UI component for admin to manage coupons. Integrated into .
--   ****: (NEW) Shell UI component for the AI Diagnostics panel, including tabs for Özet, Kümeler, Loglar, AI Yardımcı, Ayarlar.
--   ****: Modified to use  for cart management, as backend cart API endpoints were non-existent.
+-   ****: The main FastAPI application. Continuously updated to register new routers (, , ) and manage database initialization.
+-   ****: (NEW) Defines Pydantic models for AI settings (API key, redaction rules, rate limits).
+-   ****: (NEW) Implements CRUD endpoints for AI settings, including an API key test. Integrated into .
+-   ****: (NEW) Implements the  endpoint for the AI Assistant, handling context building, PII redaction, LLM calls, and SSE streaming. Also includes new routes , , .
+-   ****: (NEW) Pydantic  for managing environment variables (DB, Redis, App Name, AI flags). Used to centralize configuration.
+-   ****: (NEW) Refactored MongoDB connection to use , remove hardcoding, and add connection parameters (timeouts, appname).
+-   ****: (MODIFIED) Updated to use  for Redis enabling, URL, and default TTL. Includes  for when Redis is disabled and robust JSON serialization.
+-   ****: (NEW) Abstracted LLM provider logic, supporting both Emergent LLM Key and custom OpenAI API keys with fallback mechanisms.
+-   ****: (NEW) Contains utility functions for advanced code exploration: , , .
+-   ****: Modified to include new feature flags like , , , .
+-   ****: Main frontend component. Modified to include navigation for Admin Settings and Admin Tools, integrating the new  and  components.
+-   ****: (MODIFIED) Admin settings page. Now includes an Entegrasyonlar tab with a sub-navigation for AI Ayarları, rendering the  component.
+-   ****: (NEW) UI component for managing AI settings, including OpenAI API key input, redaction rules, time window, rate limits, and connection status widget.
+-   ****: (NEW) The core UI for the AI Assistant chat, featuring scope selection, time window, preset questions, context toggles, prompt input, streaming markdown output, and LLM metadata display.
+-   ****: (MODIFIED) Fixed a critical bug where the Sipariş Ver button was sending requests to  instead of .
+-   ****: (NEW) Client-side API functions for interacting with  and  endpoints.
+-   ****: (NEW) Client-side API functions for interacting with the streaming  endpoint.
 </code_architecture>
 
 <pending_tasks>
-- Complete order tracking features with real-time updates and map view (PHASE 2C).
-- Integrate customer rating modal post-delivery (PHASE 2C).
-- Implement Business/Restaurant analytics (PHASE 2D).
-- Add unit and E2E tests for all new features (PHASE 2D).
-- Implement Yeni Sipariş toast + badge counter in Business Panel.
-- Implement order filters in Business Panel ().
-- Implement manual refresh button + automatic WS/poll sync in Business Panel.
-- Add Observability metrics (, ) to .
-- Complete Phase 2 of AI Diagnostics: ChatGPT integration for error explanation, RCA, and patch generation.
-- Complete Phase 3 of AI Diagnostics: Admin UI for coupons.
-- Implement map-based view for courier waiting tasks.
-- Implement Accept Task button for couriers.
+-   Complete order tracking features with real-time updates and map view (PHASE 2C).
+-   Integrate customer rating modal post-delivery (PHASE 2C).
+-   Implement Business/Restaurant analytics (PHASE 2D).
+-   Add unit and E2E tests for all new features (PHASE 2D).
+-   Implement Yeni Sipariş toast + badge counter in Business Panel.
+-   Implement order filters in Business Panel.
+-   Implement manual refresh button + automatic WS/poll sync in Business Panel.
+-   Add Observability metrics (, ) to .
+-   Complete Phase 2 of AI Diagnostics: ChatGPT integration for error explanation, RCA, and patch generation.
+-   Complete Phase 3 of AI Diagnostics: Admin UI for coupons.
+-   Implement map-based view for courier waiting tasks.
+-   Implement Accept Task button for couriers.
+-   **Integrate Kuryecini Ops Co-Pilot master system prompt and tool calling for the AI Assistant.** (Current immediate next step, with 3 proposed options for integration depth).
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary request, the AI engineer was tasked with implementing a secure, multi-app AI Diagnostics panel within the Admin Panel. This is a large feature, and the user prioritized it into phases. The AI engineer is currently working on **Phase 1** of the AI Diagnostics system, which involves establishing the foundational backend and a placeholder frontend UI.
+Immediately prior to this summary, the AI engineer was working on hardening the Panel AI Asistanı feature, ensuring it provides accurate, structured, and actionable Turkish responses using a real LLM (not static templates). This involved implementing a provider abstraction () to support both the Emergent LLM Key and a custom OpenAI API key, along with fallback logic and self-test endpoints. Advanced search tools (file listing, grep, AST outline) were also added to the backend for the AI Dev Panel.
 
-Specifically, the AI has:
-1.  **Environment Setup**: Added , ,  to the backend's  file.
-2.  **MongoDB Models**: Created  to define the data structures for  and .
-3.  **Log Ingestion Endpoint**: Created  to handle incoming log entries from various applications, which will include PII redaction and error fingerprinting.
-4.  **Frontend UI Shell**: Created  as a placeholder component for the Admin UI.
-5.  **Integration**: The next immediate step is to integrate the newly created  router into the main FastAPI application ().
+A critical bug where the Sipariş Ver button on the customer panel was not working due to a double API prefix in the API call was identified and fixed. Additionally, several deployment blockers related to hardcoded MongoDB URLs and Redis caching were addressed by refactoring configuration management into a new  package and modifying database/cache utilities to be environment-driven and robust.
 
-Before starting this new feature, the AI engineer successfully addressed several critical issues, including stabilizing WebSocket connections for admin and business panels, ensuring real-time order notifications were correctly routed, fixing the customer order placement flow (API calls, UI navigation, and cart handling), and correcting numerous frontend syntax errors introduced during development. The system now has functional real-time order updates for business and admin, and customer order placement is working (after many fixes).
+The most recent task involved receiving a comprehensive Master System Prompt (Kuryecini Ops Co-Pilot) for the AI Assistant from the user, detailing strict principles, context keys, answer templates, and tool interfaces. The AI engineer has reviewed this and proposed three options for its integration, ranging from full integration with tool calling to a phased or hybrid approach.
 </current_work>
 
 <optional_next_step>
-The next step is to integrate the  router into .
+Integrate the Kuryecini Ops Co-Pilot master system prompt and tool interface into the AI Assistant.
 </optional_next_step>

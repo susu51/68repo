@@ -8,7 +8,7 @@ import { Badge } from './ui/badge';
 import { MapPin, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tools.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai.preview.emergentagent.com';
 
 export const CourierWaitingTasks = ({ courierId }) => {
   const [tasks, setTasks] = useState([]);

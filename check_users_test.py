@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
 
 def check_users():
     """Check what users exist by trying different login combinations"""

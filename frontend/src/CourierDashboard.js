@@ -17,7 +17,7 @@ import { CourierReadyOrdersMap } from './components/CourierReadyOrdersMap';
 import { CourierOrderHistoryFiltered } from './components/CourierOrderHistoryFiltered';
 import { CourierWaitingTasks } from './components/CourierWaitingTasks';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai-tools.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierDashboard = ({ user, onLogout }) => {

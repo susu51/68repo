@@ -12,7 +12,7 @@ from datetime import datetime
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://kuryecini-ai-tools.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
 
 # Test credentials
 ADMIN_EMAIL = "admin@kuryecini.com"

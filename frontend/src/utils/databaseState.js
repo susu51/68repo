@@ -23,7 +23,7 @@ export const getCsrfToken = () => {
 
 // API client with CSRF protection
 class SecureApiClient {
-  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://kuryecini-ai-tools.preview.emergentagent.com') {
+  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'https://kuryecini-ai.preview.emergentagent.com') {
     this.baseURL = baseURL;
     this.retryAttempts = 3;
   }
