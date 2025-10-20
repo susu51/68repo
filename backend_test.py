@@ -304,34 +304,90 @@ class AIDiagnosticsTester:
             )
             return False
 
-    def get_available_business(self):
-        """Get available business for testing"""
-        try:
-            response = requests.get(f"{BACKEND_URL}/api/businesses?city=Aksaray", timeout=10)
-            
-            if response.status_code == 200:
-                businesses = response.json()
-                if businesses and len(businesses) > 0:
-                    business = businesses[0]
-                    business_id = business.get("id")
-                    business_name = business.get("name", "Unknown")
-                    
-                    self.log_test(
-                        "Get Available Business",
-                        True,
-                        f"Found business: {business_name} (ID: {business_id})"
+    def test_tool_endpoints(self):
+        """Test 4: Tool Endpoints (MEDIUM)"""
+        tool_endpoints = [
+            {
+                "name": "HTTP GET Tool",
+                "url": f"{BACKEND_URL}/api/admin/ai/tools/http_get",
+                "method": "POST",
+                "data": {"url": f"{BACKEND_URL}/api/health"}
+            },
+            {
+                "name": "Logs Tail Tool", 
+                "url": f"{BACKEND_URL}/api/admin/ai/tools/logs_tail",
+                "method": "POST",
+                "data": {"path": "/var/log/supervisor/backend.out.log", "limit": 10}
+            },
+            {
+                "name": "DB Query Tool",
+                "url": f"{BACKEND_URL}/api/admin/ai/tools/db_query", 
+                "method": "POST",
+                "data": {"collection": "users", "action": "count", "filter": {}}
+            },
+            {
+                "name": "Env List Tool",
+                "url": f"{BACKEND_URL}/api/admin/ai/tools/env_list",
+                "method": "GET",
+                "data": None
+            }
+        ]
+        
+        successful_tools = []
+        failed_tools = []
+        
+        for tool in tool_endpoints:
+            try:
+                if tool["method"] == "POST":
+                    response = self.admin_session.post(
+                        tool["url"],
+                        json=tool["data"],
+                        timeout=15
                     )
-                    return business_id, business_name
                 else:
-                    self.log_test("Get Available Business", False, error="No businesses found in Aksaray")
-                    return None, None
-            else:
-                self.log_test("Get Available Business", False, error=f"API error: {response.status_code}")
-                return None, None
+                    response = self.admin_session.get(
+                        tool["url"],
+                        timeout=15
+                    )
                 
-        except Exception as e:
-            self.log_test("Get Available Business", False, error=f"Error getting business: {str(e)}")
-            return None, None
+                if response.status_code == 200:
+                    data = response.json()
+                    # Basic validation - check if response is not empty
+                    if data and isinstance(data, dict):
+                        successful_tools.append(tool["name"])
+                        print(f"   ✅ {tool['name']}: Working")
+                    else:
+                        failed_tools.append(f"{tool['name']} (empty response)")
+                        print(f"   ❌ {tool['name']}: Empty response")
+                else:
+                    failed_tools.append(f"{tool['name']} (HTTP {response.status_code})")
+                    print(f"   ❌ {tool['name']}: HTTP {response.status_code}")
+                    
+            except Exception as e:
+                failed_tools.append(f"{tool['name']} (Error: {str(e)[:50]})")
+                print(f"   ❌ {tool['name']}: Error - {str(e)[:50]}")
+        
+        if len(successful_tools) == len(tool_endpoints):
+            self.log_test(
+                "Tool Endpoints",
+                True,
+                f"All {len(tool_endpoints)} tool endpoints working: {', '.join(successful_tools)}"
+            )
+            return True
+        elif len(successful_tools) > 0:
+            self.log_test(
+                "Tool Endpoints",
+                False,
+                error=f"Only {len(successful_tools)}/{len(tool_endpoints)} tools working. Failed: {', '.join(failed_tools)}"
+            )
+            return False
+        else:
+            self.log_test(
+                "Tool Endpoints",
+                False,
+                error=f"No tool endpoints working. All failed: {', '.join(failed_tools)}"
+            )
+            return False
 
     def get_business_menu(self, business_id):
         """Get business menu items"""
