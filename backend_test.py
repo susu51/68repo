@@ -515,7 +515,7 @@ class AIDiagnosticsTester:
 
     # Removed old async methods - replaced with AI Diagnostics tests
 
-    async def test_multiple_admin_connections(self):
+    def removed_old_method_1(self):
         """Test 4: Multiple Admin Connections"""
         try:
             ws_url = f"{WS_URL}/api/ws/orders?role=admin"
