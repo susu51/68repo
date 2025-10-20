@@ -55,12 +55,16 @@ export const CookieAuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       setLoading(true);
-      const response = await api("/me");  // Use /api/me instead of /api/auth/me
-      const userData = await response.json();
+      const result = await api.get("/me");
       
-      setUser(userData);
-      console.log('✅ Auth status verified via cookie');
-      return userData;
+      if (result?.data) {
+        setUser(result.data);
+        console.log('✅ Auth status verified via cookie');
+        return result.data;
+      } else {
+        setUser(null);
+        return null;
+      }
     } catch (error) {
       console.log('❌ No valid auth cookie found');
       setUser(null);
