@@ -444,10 +444,10 @@ class ComprehensiveEndpointTester:
             
         business_session = self.sessions["business"]
         
-        # Test 1: GET /api/business/orders
+        # Test 1: GET /api/business/orders/incoming
         try:
             response = business_session.get(
-                f"{BACKEND_URL}/api/business/orders",
+                f"{BACKEND_URL}/api/business/orders/incoming",
                 timeout=10
             )
             
