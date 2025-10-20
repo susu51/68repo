@@ -36,23 +36,26 @@ export const patch = (p, b) => api(p, { method: 'PATCH', body: JSON.stringify(b)
 export const del = (p) => api(p, { method: 'DELETE' });
 
 // Legacy compatibility exports
+// Note: Named exports (get, post, patch, del) already return parsed data
 export default {
   async get(path) {
-    const res = await get(path);
-    const data = await res.json();
-    return { data };
+    // get() already returns { data: parsed }, no need to parse again
+    return await get(path);
   },
   async post(path, body) {
+    // post() returns Response object, need to parse
     const res = await post(path, body);
     const data = await res.json();
     return { data };
   },
   async patch(path, body) {
+    // patch() returns Response object, need to parse
     const res = await patch(path, body);
     const data = await res.json();
     return { data };
   },
   async delete(path) {
+    // del() returns Response object, need to parse
     const res = await del(path);
     const data = await res.json();
     return { data };
