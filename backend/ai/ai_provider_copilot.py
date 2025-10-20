@@ -2,15 +2,27 @@
 import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from openai import OpenAI
 from typing import Optional
 
-# Initialize OpenAI client (will use EMERGENT_LLM_KEY or custom key)
-api_key = os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY") or os.getenv("EMERGENT_LLM_KEY")
-if not api_key:
-    raise RuntimeError("No API key found. Set OPENAI_API_KEY, LLM_API_KEY, or EMERGENT_LLM_KEY")
+# Check which API key is available and initialize appropriate client
+emergent_key = os.getenv("EMERGENT_LLM_KEY")
+openai_key = os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY")
 
-client = OpenAI(api_key=api_key)
+if emergent_key:
+    # Use Emergent LLM integration
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    api_key = emergent_key
+    use_emergent = True
+    print(f"🤖 Using Emergent LLM API with key: {api_key[:15]}...")
+elif openai_key:
+    # Use OpenAI directly
+    from openai import OpenAI
+    api_key = openai_key
+    use_emergent = False
+    client = OpenAI(api_key=api_key)
+    print(f"🤖 Using OpenAI API with key: {api_key[:15]}...")
+else:
+    raise RuntimeError("No API key found. Set OPENAI_API_KEY, LLM_API_KEY, or EMERGENT_LLM_KEY")
 
 RESPONSE_PREFIX = (
     "Aşağıdaki ZORUNLU formatta cevapla:\n"
