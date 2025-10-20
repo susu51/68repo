@@ -163,6 +163,7 @@ const AdminDashboard = ({ user }) => {
   const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState('dashboard');
   const [reportSubTab, setReportSubTab] = useState('financial');
+  const [activeAITool, setActiveAITool] = useState('ops-copilot');
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
