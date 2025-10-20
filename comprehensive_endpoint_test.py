@@ -361,7 +361,13 @@ class ComprehensiveEndpointTester:
         
         # Test 5: POST /api/orders
         try:
+            # Use a valid business ID from the businesses we found
+            business_id = None
+            if businesses and len(businesses) > 0:
+                business_id = businesses[0].get("id")
+            
             order_data = {
+                "business_id": business_id,
                 "delivery_address": "Test Delivery Address, Aksaray",
                 "delivery_lat": 38.3687,
                 "delivery_lng": 34.0254,
