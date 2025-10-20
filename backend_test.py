@@ -180,37 +180,60 @@ class AIDiagnosticsTester:
             )
             return False, None
 
-    async def test_admin_websocket_connection(self):
-        """Test 1: Admin WebSocket Connection"""
-        try:
-            # Test admin WebSocket connection with role=admin
-            ws_url = f"{WS_URL}/api/ws/orders?role=admin"
-            
-            async with websockets.connect(ws_url) as websocket:
-                # Wait for connection confirmation
-                response = await asyncio.wait_for(websocket.recv(), timeout=10)
-                data = json.loads(response)
+    def test_panel_switching(self):
+        """Test 2: Panel Switching (HIGH)"""
+        panels_to_test = ["müşteri", "işletme", "kurye", "admin", "multi"]
+        successful_panels = []
+        
+        for panel in panels_to_test:
+            try:
+                test_data = {
+                    "panel": panel,
+                    "message": f"{panel} panelinde sorun var mı?"
+                }
                 
-                if (data.get("type") == "connected" and 
-                    data.get("role") == "admin" and
-                    data.get("client_id") == "admin"):
+                response = self.admin_session.post(
+                    f"{BACKEND_URL}/api/admin/ai/assist",
+                    json=test_data,
+                    timeout=30
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
                     
-                    self.log_test(
-                        "Admin WebSocket Connection",
-                        True,
-                        f"Connection successful: role={data.get('role')}, client_id={data.get('client_id')}, message='{data.get('message')}'"
-                    )
-                    return True
+                    if (data.get("panel") == panel and 
+                        isinstance(data.get("response"), str) and 
+                        len(data.get("response", "")) > 0):
+                        successful_panels.append(panel)
+                        print(f"   ✅ Panel '{panel}': Response length {len(data['response'])} chars")
+                    else:
+                        print(f"   ❌ Panel '{panel}': Invalid response structure")
                 else:
-                    self.log_test(
-                        "Admin WebSocket Connection",
-                        False,
-                        error=f"Unexpected connection response: {data}"
-                    )
-                    return False
+                    print(f"   ❌ Panel '{panel}': HTTP {response.status_code}")
                     
-        except Exception as e:
-            self.log_test("Admin WebSocket Connection", False, error=f"WebSocket connection failed: {str(e)}")
+            except Exception as e:
+                print(f"   ❌ Panel '{panel}': Error - {str(e)}")
+        
+        if len(successful_panels) == len(panels_to_test):
+            self.log_test(
+                "Panel Switching",
+                True,
+                f"All {len(panels_to_test)} panels working: {', '.join(successful_panels)}"
+            )
+            return True
+        elif len(successful_panels) > 0:
+            self.log_test(
+                "Panel Switching",
+                False,
+                error=f"Only {len(successful_panels)}/{len(panels_to_test)} panels working: {', '.join(successful_panels)}"
+            )
+            return False
+        else:
+            self.log_test(
+                "Panel Switching",
+                False,
+                error="No panels working"
+            )
             return False
 
     async def test_websocket_role_validation(self):
