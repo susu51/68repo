@@ -45,7 +45,11 @@ async def get_dashboard_summary(
     """
     Get dashboard summary for business
     """
-    from config.db import db
+    # Import database from main server module
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+    from server import db
     from auth_cookie import get_current_user_from_cookie_or_bearer
     
     # Get authenticated user
