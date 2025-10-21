@@ -156,18 +156,24 @@ export const CustomerApp = ({ user, onLogout }) => {
         const responseData = await response.json();
         console.log('✅ ============ SİPARİŞ BAŞARIYLA OLUŞTURULDU ============');
         console.log('✅ Sipariş Detayları:', responseData);
-        console.log('📦 Sipariş ID:', responseData.id);
-        console.log('🏪 İşletme ID:', responseData.business_id);
-        console.log('🏪 İşletme Adı:', responseData.business_name);
-        console.log('💰 Toplam Tutar:', responseData.total_amount);
-        console.log('📊 Durum:', responseData.status);
+        
+        // Extract order from response (backend returns {success, order, message})
+        const orderInfo = responseData.order || responseData;
+        const orderId = orderInfo.id || orderInfo.order_id;
+        const businessName = orderInfo.business_name;
+        const totalAmount = orderInfo.totals?.grand || orderInfo.total_amount;
+        
+        console.log('📦 Sipariş ID:', orderId);
+        console.log('🏪 İşletme Adı:', businessName);
+        console.log('💰 Toplam Tutar:', totalAmount);
+        console.log('📊 Durum:', orderInfo.status);
         
         // Show BIG success message
         toast.success(
           `🎉 Siparişiniz Başarıyla Alındı!\n\n` +
-          `📋 Sipariş No: ${responseData.id.substring(0, 8).toUpperCase()}\n` +
-          `🏪 Restoran: ${responseData.business_name || 'Restoran'}\n` +
-          `💰 Tutar: ₺${(cartSummary.total + 10).toFixed(2)}`,
+          `📋 Sipariş No: ${orderId.substring(0, 8).toUpperCase()}\n` +
+          `🏪 Restoran: ${businessName || 'Restoran'}\n` +
+          `💰 Tutar: ₺${totalAmount?.toFixed(2) || (cartSummary.total + 10).toFixed(2)}`,
           {
             duration: 8000,
             icon: '✅',
@@ -187,12 +193,12 @@ export const CustomerApp = ({ user, onLogout }) => {
         clearCart();
         
         // Store order ID
-        setCurrentOrderId(responseData.id);
+        setCurrentOrderId(orderId);
         
         // Show business notification
         setTimeout(() => {
           toast.success(
-            `📲 ${responseData.business_name || 'Restoran'} bilgilendirildi!\nSiparişiniz hazırlanmaya başlandı.`,
+            `📲 ${businessName || 'Restoran'} bilgilendirildi!\nSiparişiniz hazırlanmaya başlandı.`,
             {
               duration: 5000,
               icon: '👨‍🍳',
