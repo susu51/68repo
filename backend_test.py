@@ -332,61 +332,60 @@ class BusinessDashboardTester:
         except Exception as e:
             self.log_test("Dashboard Summary - Revenue Calculation", False, f"Exception: {str(e)}")
 
-    def test_panel_switching(self):
-        """Test 2: Panel Switching (HIGH)"""
-        panels_to_test = ["müşteri", "işletme", "kurye", "admin", "multi"]
-        successful_panels = []
+            
+    async def run_all_tests(self):
+        """Run all dashboard summary tests"""
+        print("🎯 BUSINESS DASHBOARD SUMMARY ENDPOINT TESTING")
+        print("=" * 60)
         
-        for panel in panels_to_test:
-            try:
-                test_data = {
-                    "panel": panel,
-                    "message": f"{panel} panelinde sorun var mı?"
-                }
-                
-                response = self.admin_session.post(
-                    f"{BACKEND_URL}/api/admin/ai/assist",
-                    json=test_data,
-                    timeout=30
-                )
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    
-                    if (data.get("panel") == panel and 
-                        isinstance(data.get("response"), str) and 
-                        len(data.get("response", "")) > 0):
-                        successful_panels.append(panel)
-                        print(f"   ✅ Panel '{panel}': Response length {len(data['response'])} chars")
-                    else:
-                        print(f"   ❌ Panel '{panel}': Invalid response structure")
-                else:
-                    print(f"   ❌ Panel '{panel}': HTTP {response.status_code}")
-                    
-            except Exception as e:
-                print(f"   ❌ Panel '{panel}': Error - {str(e)}")
+        await self.setup_session()
         
-        if len(successful_panels) == len(panels_to_test):
-            self.log_test(
-                "Panel Switching",
-                True,
-                f"All {len(panels_to_test)} panels working: {', '.join(successful_panels)}"
-            )
-            return True
-        elif len(successful_panels) > 0:
-            self.log_test(
-                "Panel Switching",
-                False,
-                error=f"Only {len(successful_panels)}/{len(panels_to_test)} panels working: {', '.join(successful_panels)}"
-            )
-            return False
-        else:
-            self.log_test(
-                "Panel Switching",
-                False,
-                error="No panels working"
-            )
-            return False
+        try:
+            # Setup - Login users
+            business_login_success = await self.login_business_user()
+            customer_login_success = await self.login_customer_user()
+            
+            if not business_login_success:
+                print("❌ Cannot proceed without business user login")
+                return
+                
+            # Core functionality tests
+            await self.test_dashboard_summary_authenticated()
+            await self.test_dashboard_summary_with_date_parameter()
+            await self.test_revenue_calculation_logic()
+            
+            # Security tests
+            await self.test_dashboard_summary_unauthorized()
+            
+            if customer_login_success:
+                await self.test_dashboard_summary_wrong_role()
+            else:
+                print("⚠️  Skipping wrong role test - customer login failed")
+                
+        finally:
+            await self.cleanup_session()
+            
+        # Print summary
+        print("\n" + "=" * 60)
+        print("📊 TEST SUMMARY")
+        print("=" * 60)
+        
+        total_tests = len(self.test_results)
+        passed_tests = sum(1 for result in self.test_results if result["success"])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"Total Tests: {total_tests}")
+        print(f"✅ Passed: {passed_tests}")
+        print(f"❌ Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests*100):.1f}%")
+        
+        if failed_tests > 0:
+            print("\n🚨 FAILED TESTS:")
+            for result in self.test_results:
+                if not result["success"]:
+                    print(f"  • {result['test']}: {result['details']}")
+                    
+        return passed_tests, failed_tests
 
     def test_response_format_validation(self):
         """Test 3: Response Format Validation (CRITICAL)"""
