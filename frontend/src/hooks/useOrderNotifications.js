@@ -2,9 +2,13 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 
 /**
- * Custom hook for WebSocket order notifications
+ * Custom hook for WebSocket order notifications with robust heartbeat & reconnection
  * @param {string} businessId - Business ID to subscribe to
  * @param {function} onOrderReceived - Callback when new order received
+ * 
+ * Heartbeat: Ping every 25s, expect pong within 5s, close & reconnect if missed twice
+ * Reconnect: Exponential backoff 1→2→4→8→16→max 30s with jitter
+ * Reset backoff after stable 2-minute connection
  */
 export const useOrderNotifications = (businessId, onOrderReceived) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -12,6 +16,11 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const reconnectAttempts = useRef(0);
+  const pingIntervalRef = useRef(null);
+  const pongTimeoutRef = useRef(null);
+  const missedPongsRef = useRef(0);
+  const connectionStartTimeRef = useRef(null);
+  const backoffResetTimeoutRef = useRef(null);
 
   const connect = useCallback(() => {
     if (!businessId) {
