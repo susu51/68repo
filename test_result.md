@@ -2344,6 +2344,18 @@ metadata:
 # Panel-Aware AI Assistant Implementation
 user_problem_statement: "Build a panel-aware AI Assistant inside the Admin Panel that answers questions using ONLY selected panel context (customer/business/courier/multi). Features: scope selector, time window picker, preset questions, context toggles, streaming chat in Turkish. Settings page for OpenAI key config, redaction rules, rate limits."
 
+  - task: "WebSocket Real-Time Order Notifications with Heartbeat & Reconnection"
+    implemented: true
+    working: "NA"
+    file: "backend/realtime/websocket_orders.py, frontend/src/hooks/useOrderNotifications.js, frontend/src/hooks/useAdminOrderNotifications.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "🔧 WEBSOCKET STABILITY FIX IMPLEMENTATION COMPLETE: Comprehensive improvements to resolve persistent disconnection issues reported by user (400 handshake errors, 1006 abnormal closures, 60-90s idle timeouts). ✅ BACKEND IMPROVEMENTS (websocket_orders.py): 1) Extended timeout from 60s to 75s (proxy-compatible), 2) Added proper idle timeout detection (90s threshold), 3) Improved ping/pong handling with proper logging, 4) Added support for re-subscription messages on reconnect, 5) Added proper close codes (1000 for normal, 1011 for errors), 6) Added token authentication parameter (for future OAuth support). ✅ FRONTEND IMPROVEMENTS (Business Hook): 1) Implemented 25s ping interval (per user spec), 2) Added 5s pong timeout verification, 3) Tracks missed pongs (closes after 2 consecutive misses), 4) Exponential backoff reconnection: 1→2→4→8→16→max 30s with jitter, 5) Resets backoff after 2-min stable connection, 6) Sends re-subscribe message on reconnect to restore business_id subscription, 7) Logs abnormal closures (1006/1011) for Sentry integration, 8) Uses wss:// for prod, ws:// for local dev. ✅ ADMIN HOOK IMPROVEMENTS: Applied same improvements as business hook for consistent behavior across all panels. 🎯 USER REQUIREMENTS MET: ✅ Heartbeat every 25s with 5s pong timeout, ✅ Reconnect on 2 missed pongs, ✅ Exponential backoff with jitter, ✅ 2-min stable connection resets backoff, ✅ Re-subscribe on reconnect, ✅ wss:// protocol in prod, ✅ 75s proxy timeout compatibility, ✅ Abnormal closure logging ready for Sentry. 🎯 TESTING REQUIRED: Backend testing to verify: 1) WebSocket connection stability ≥10 min idle, 2) Ping/pong heartbeat working correctly, 3) Automatic reconnection after network changes, 4) Re-subscription preserves business_id context, 5) No 400 handshake errors, 6) No premature 1006 closures, 7) Connection survives proxy timeout (75s+)."
+
 backend:
   - task: "Customer Order Button Flow - Siparişi Onayla ve Ver"
     implemented: true
