@@ -188,18 +188,15 @@ const useAdminOrderNotifications = (onNewOrder) => {
         clearTimeout(reconnectTimeoutRef.current);
       }
       
+      cleanupTimers();
+      
       if (wsRef.current) {
-        // Clear ping interval
-        if (wsRef.current.pingInterval) {
-          clearInterval(wsRef.current.pingInterval);
-        }
-        
         wsRef.current.close();
         wsRef.current = null;
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run on mount/unmount, not when connect changes
+  }, []); // Only run on mount/unmount
 
   return { isConnected };
 };
