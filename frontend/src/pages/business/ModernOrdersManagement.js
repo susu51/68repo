@@ -118,17 +118,17 @@ export const ModernOrdersManagement = ({ businessId }) => {
       // Set orders
       setOrders(uniqueOrders);
       
-      // Calculate stats
+      // Calculate stats from unique orders
       const newStats = {
-        pending: incomingOrders.filter(o => ['created', 'pending', 'placed'].includes(o.status)).length,
-        preparing: incomingOrders.filter(o => o.status === 'preparing').length,
-        ready: incomingOrders.filter(o => o.status === 'ready').length,
-        confirmed: incomingOrders.filter(o => o.status === 'confirmed').length,
-        delivered: incomingOrders.filter(o => o.status === 'delivered').length
+        pending: uniqueOrders.filter(o => ['created', 'pending', 'placed'].includes(o.status)).length,
+        preparing: uniqueOrders.filter(o => o.status === 'preparing').length,
+        ready: uniqueOrders.filter(o => o.status === 'ready').length,
+        confirmed: uniqueOrders.filter(o => o.status === 'confirmed').length,
+        delivered: uniqueOrders.filter(o => o.status === 'delivered').length
       };
       setStats(newStats);
       
-      console.log('✅ Orders loaded:', incomingOrders.length, 'Stats:', newStats);
+      console.log('✅ Orders loaded:', uniqueOrders.length, 'Stats:', newStats);
     } catch (error) {
       console.error('❌ Orders loading error:', error);
       toast.error('Siparişler yüklenemedi');
