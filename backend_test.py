@@ -222,9 +222,9 @@ class OrderFlowTester:
         self.log("📋 Testing Business Order Retrieval...")
         
         try:
-            # Test with business_id parameter
+            # Test the business orders endpoint
             response = self.session.get(
-                f"{BACKEND_URL}/orders?business_id={self.business_id}",
+                f"{BACKEND_URL}/business/orders/incoming",
                 cookies=self.business_cookies
             )
             
