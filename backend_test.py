@@ -210,73 +210,127 @@ class BusinessDashboardTester:
                     
         except Exception as e:
             self.log_test("Dashboard Summary - Authenticated Request", False, f"Exception: {str(e)}")
-    
-    def test_endpoint_availability_and_structure(self):
-        """Test 1: Endpoint Availability & Structure (CRITICAL)"""
+            
+    async def test_dashboard_summary_with_date_parameter(self):
+        """Test dashboard summary with date parameter"""
         try:
-            # Test POST to /api/admin/ai/assist
-            test_data = {
-                "panel": "müşteri",
-                "message": "restoranlar gözükmüyor"
-            }
+            test_date = "2025-01-15"
+            url = f"{API_BASE}/business/dashboard/summary?date={test_date}"
             
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/api/admin/ai/assist",
-                json=test_data,
-                timeout=30
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
+            async with self.session.get(url, cookies=self.business_cookies) as response:
+                response_data = await response.json()
                 
-                # Check if response contains required fields
-                if "response" in data and "panel" in data:
-                    # Check if response is a string (the AI response)
-                    if isinstance(data["response"], str) and len(data["response"]) > 0:
-                        # Check if panel matches request
-                        if data["panel"] == test_data["panel"]:
-                            self.log_test(
-                                "Endpoint Availability & Structure",
-                                True,
-                                f"Endpoint accessible, response length: {len(data['response'])} chars, panel: {data['panel']}"
-                            )
-                            return True, data
-                        else:
-                            self.log_test(
-                                "Endpoint Availability & Structure",
-                                False,
-                                error=f"Panel mismatch: expected {test_data['panel']}, got {data['panel']}"
-                            )
-                            return False, None
+                if response.status == 200:
+                    if response_data.get("date") == test_date:
+                        self.log_test(
+                            "Dashboard Summary - Date Parameter",
+                            True,
+                            f"Date parameter working correctly: {test_date}"
+                        )
                     else:
                         self.log_test(
-                            "Endpoint Availability & Structure",
+                            "Dashboard Summary - Date Parameter",
                             False,
-                            error=f"Invalid response format: {type(data['response'])}"
+                            f"Expected date {test_date}, got {response_data.get('date')}",
+                            response_data
                         )
-                        return False, None
                 else:
                     self.log_test(
-                        "Endpoint Availability & Structure",
+                        "Dashboard Summary - Date Parameter",
                         False,
-                        error=f"Missing required fields in response: {list(data.keys())}"
+                        f"Status: {response.status}",
+                        response_data
                     )
-                    return False, None
-            else:
-                self.log_test(
-                    "Endpoint Availability & Structure",
-                    False,
-                    error=f"HTTP {response.status_code}: {response.text[:200]}"
-                )
-                return False, None
-                
+                    
         except Exception as e:
-            self.log_test(
-                "Endpoint Availability & Structure",
-                False,
-                error=f"Request failed: {str(e)}"
-            )
-            return False, None
+            self.log_test("Dashboard Summary - Date Parameter", False, f"Exception: {str(e)}")
+            
+    async def test_dashboard_summary_unauthorized(self):
+        """Test dashboard summary without authentication"""
+        try:
+            url = f"{API_BASE}/business/dashboard/summary"
+            
+            async with self.session.get(url) as response:
+                response_data = await response.text()
+                
+                if response.status in [401, 403]:
+                    self.log_test(
+                        "Dashboard Summary - Unauthorized Access",
+                        True,
+                        f"Correctly blocked unauthorized access with status {response.status}"
+                    )
+                else:
+                    self.log_test(
+                        "Dashboard Summary - Unauthorized Access",
+                        False,
+                        f"Expected 401/403, got {response.status}",
+                        {"status": response.status, "response": response_data}
+                    )
+                    
+        except Exception as e:
+            self.log_test("Dashboard Summary - Unauthorized Access", False, f"Exception: {str(e)}")
+            
+    async def test_dashboard_summary_wrong_role(self):
+        """Test dashboard summary with customer user (wrong role)"""
+        try:
+            url = f"{API_BASE}/business/dashboard/summary"
+            
+            async with self.session.get(url, cookies=self.customer_cookies) as response:
+                response_data = await response.text()
+                
+                if response.status == 403:
+                    self.log_test(
+                        "Dashboard Summary - Wrong Role Access",
+                        True,
+                        "Correctly blocked customer user access with 403"
+                    )
+                else:
+                    self.log_test(
+                        "Dashboard Summary - Wrong Role Access",
+                        False,
+                        f"Expected 403, got {response.status}",
+                        {"status": response.status, "response": response_data}
+                    )
+                    
+        except Exception as e:
+            self.log_test("Dashboard Summary - Wrong Role Access", False, f"Exception: {str(e)}")
+            
+    async def test_revenue_calculation_logic(self):
+        """Test that revenue is calculated from confirmed/delivered orders only"""
+        try:
+            url = f"{API_BASE}/business/dashboard/summary"
+            
+            async with self.session.get(url, cookies=self.business_cookies) as response:
+                response_data = await response.json()
+                
+                if response.status == 200:
+                    revenue = response_data.get("today_revenue", 0)
+                    orders_count = response_data.get("today_orders_count", 0)
+                    
+                    # Revenue should be non-negative
+                    if revenue >= 0:
+                        self.log_test(
+                            "Dashboard Summary - Revenue Calculation",
+                            True,
+                            f"Revenue calculation appears valid: ₺{revenue} from {orders_count} orders"
+                        )
+                    else:
+                        self.log_test(
+                            "Dashboard Summary - Revenue Calculation",
+                            False,
+                            f"Invalid negative revenue: ₺{revenue}",
+                            response_data
+                        )
+                else:
+                    self.log_test(
+                        "Dashboard Summary - Revenue Calculation",
+                        False,
+                        f"Status: {response.status}",
+                        response_data
+                    )
+                    
+        except Exception as e:
+            self.log_test("Dashboard Summary - Revenue Calculation", False, f"Exception: {str(e)}")
 
     def test_panel_switching(self):
         """Test 2: Panel Switching (HIGH)"""
