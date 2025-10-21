@@ -1,11 +1,14 @@
 """
-WebSocket endpoint for real-time order notifications
+WebSocket endpoint for real-time order notifications with heartbeat & reconnection support
 """
-from fastapi import WebSocket, WebSocketDisconnect, Depends, Query
-from typing import Dict, Set
+from fastapi import WebSocket, WebSocketDisconnect, Depends, Query, HTTPException
+from typing import Dict, Set, Optional
 import json
 import asyncio
 from datetime import datetime, timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ConnectionManager:
     """Manage WebSocket connections"""
