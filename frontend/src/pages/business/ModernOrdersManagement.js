@@ -176,52 +176,21 @@ export const ModernOrdersManagement = ({ businessId }) => {
 
   const confirmOrder = async (orderId) => {
     try {
-      console.log('🎯 Confirming order:', orderId);
+      console.log('🎯 Confirming order (just status, no courier yet):', orderId);
       
-      // Get unit delivery fee from input
-      const input = document.getElementById(`unit-fee-${orderId}`);
-      const unitFee = parseFloat(input?.value);
+      // Simply update status to 'confirmed'
+      await patch(`/business/orders/${orderId}/status`, { status: 'confirmed' });
       
-      console.log('💰 Unit fee:', unitFee);
-      
-      // Validation
-      if (!unitFee || unitFee <= 0) {
-        toast.error('Lütfen geçerli bir paket ücreti girin');
-        return;
-      }
-      
-      // Call confirm API
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/business/orders/${orderId}/confirm`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ unit_delivery_fee: unitFee })
+      toast.success('Sipariş onaylandı! Hazırlanmaya başlayabilirsiniz.', {
+        duration: 3000,
+        icon: '✅'
       });
       
-      console.log('📡 Response status:', response.status);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Order confirmed:', data);
-        
-        toast.success('Sipariş onaylandı. Kurye bekleniyor.', {
-          duration: 4000,
-          icon: '✅'
-        });
-        
-        // Refresh orders
-        await fetchOrders();
-        
-        // Clear input
-        if (input) input.value = '';
-      } else {
-        const error = await response.json();
-        console.error('❌ Confirm error:', error);
-        toast.error(error.detail || 'Sipariş onaylanamadı');
-      }
+      // Refresh orders
+      await fetchOrders();
     } catch (error) {
       console.error('❌ Confirm order error:', error);
-      toast.error('Bir hata oluştu');
+      toast.error('Sipariş onaylanamadı');
     }
   };
 
