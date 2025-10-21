@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { 
@@ -20,6 +20,8 @@ import {
 import { toast } from 'react-hot-toast';
 import { get } from '../../api/http';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useDashboardSummary } from '../../hooks/useDashboardSummary';
+import WSManager from '../../ws/WSManager';
 
 // Sub-components
 import { ModernMenuManagement } from './ModernMenuManagement';
