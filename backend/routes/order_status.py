@@ -64,19 +64,12 @@ async def update_order_status(
     try:
         from server import db
         
-        # Debug: Log database and collection info
-        print(f"🔍 Database name: {db.name}")
-        print(f"🔍 Looking for order_id: {order_id}")
-        print(f"🔍 Current user: {current_user.get('id')}, role: {current_user.get('role')}")
-        
-        # Find order and verify ownership/access
-        order = await db.orders.find_one({"_id": order_id})
-        print(f"🔍 Order found: {order is not None}")
+        # Find order by 'id' field (UUID) first, then try '_id' for backward compatibility
+        order = await db.orders.find_one({"id": order_id})
         
         if not order:
-            # Try with 'id' field instead of '_id'
-            order = await db.orders.find_one({"id": order_id})
-            print(f"🔍 Order found with 'id' field: {order is not None}")
+            # Fallback to '_id' for backward compatibility
+            order = await db.orders.find_one({"_id": order_id})
         
         if not order:
             raise HTTPException(
