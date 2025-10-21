@@ -409,8 +409,9 @@ export const ModernOrdersManagement = ({ businessId }) => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Order: Bekleyen → Onaylı → Hazırlanıyor → Hazır */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* 1. Bekleyen */}
         <Card className={`cursor-pointer transition-all ${statusFilter === 'pending' ? 'ring-2 ring-orange-500' : ''}`}
               onClick={() => setStatusFilter(statusFilter === 'pending' ? 'all' : 'pending')}>
           <CardContent className="p-4">
@@ -426,6 +427,23 @@ export const ModernOrdersManagement = ({ businessId }) => {
           </CardContent>
         </Card>
         
+        {/* 2. Onaylı */}
+        <Card className={`cursor-pointer transition-all ${statusFilter === 'confirmed' ? 'ring-2 ring-blue-500' : ''}`}
+              onClick={() => setStatusFilter(statusFilter === 'confirmed' ? 'all' : 'confirmed')}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Onaylı</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.confirmed}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/20">
+                <CheckCircle className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* 3. Hazırlanıyor */}
         <Card className={`cursor-pointer transition-all ${statusFilter === 'preparing' ? 'ring-2 ring-purple-500' : ''}`}
               onClick={() => setStatusFilter(statusFilter === 'preparing' ? 'all' : 'preparing')}>
           <CardContent className="p-4">
@@ -441,6 +459,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
           </CardContent>
         </Card>
         
+        {/* 4. Hazır */}
         <Card className={`cursor-pointer transition-all ${statusFilter === 'ready' ? 'ring-2 ring-green-500' : ''}`}
               onClick={() => setStatusFilter(statusFilter === 'ready' ? 'all' : 'ready')}>
           <CardContent className="p-4">
@@ -455,7 +474,10 @@ export const ModernOrdersManagement = ({ businessId }) => {
             </div>
           </CardContent>
         </Card>
-        
+      </div>
+
+      {/* Remaining old card - remove duplicate confirmed card below */}
+      <div style={{display: 'none'}}>
         <Card className={`cursor-pointer transition-all ${statusFilter === 'confirmed' ? 'ring-2 ring-blue-500' : ''}`}
               onClick={() => setStatusFilter(statusFilter === 'confirmed' ? 'all' : 'confirmed')}>
           <CardContent className="p-4">
