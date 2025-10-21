@@ -265,7 +265,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
             businessInfo={businessInfo} 
             stats={stats} 
             loading={loading}
-            onRefresh={loadStats}
+            onRefresh={refetchDashboard}
             onNavigate={setActiveView}
           />
         </div>
