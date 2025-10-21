@@ -67,6 +67,22 @@ const useAdminOrderNotifications = (onNewOrder) => {
   }, [cleanupTimers]);
 
   const connect = useCallback(() => {
+    // SINGLE-FLIGHT GUARD: Prevent multiple simultaneous connection attempts
+    if (connectingRef.current || wsRef.current) {
+      console.log('⚠️ Admin connection already in progress or active, skipping...');
+      return;
+    }
+    
+    // Pause reconnect when tab is hidden (battery-friendly)
+    if (document.visibilityState === 'hidden') {
+      console.log('📱 Admin tab hidden - pausing reconnect');
+      connectingRef.current = false;
+      return;
+    }
+
+    connectingRef.current = true;
+    closedByUs.current = false;
+
     try {
       // Get backend URL from environment
       let backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://ai-order-debug.preview.emergentagent.com';
