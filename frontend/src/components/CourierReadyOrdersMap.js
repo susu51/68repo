@@ -34,10 +34,25 @@ export const CourierReadyOrdersMap = () => {
     };
   }, [autoRefresh]); // Only depend on autoRefresh to avoid infinite loops
 
+  const [businessLocations, setBusinessLocations] = useState([]);
+  
   const fetchReadyOrders = async () => {
     try {
       setLoading(true);
       
+      // Fetch waiting tasks grouped by business location
+      const tasksResponse = await fetch(`${API}/courier/tasks/map`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (tasksResponse.ok) {
+        const locations = await tasksResponse.json();
+        setBusinessLocations(locations);
+        console.log('📍 Business locations with waiting tasks:', locations);
+      }
+      
+      // Also fetch ready orders for backward compatibility
       let url = `${API}/courier/orders/ready`;
       if (courierCity) {
         url += `?city=${courierCity}`;
