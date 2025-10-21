@@ -6312,6 +6312,8 @@ async def get_businesses(
             business_id = business.get("id")
             if business_id is None:
                 business_id = str(business.get("_id", "unknown"))
+            
+            print(f"🏪 Business: {business.get('business_name')}, _id={business.get('_id')}, id={business.get('id')}, using={business_id}")
                 
             formatted_business = {
                 "id": business_id,
