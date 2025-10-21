@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import time
 
 # Configuration
-BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com/api"
 
 # Test Credentials
 TEST_CREDENTIALS = {

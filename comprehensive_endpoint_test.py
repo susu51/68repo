@@ -54,7 +54,7 @@ import sys
 import uuid
 
 # Configuration
-BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
 
 # Test credentials for all roles
 TEST_CREDENTIALS = {

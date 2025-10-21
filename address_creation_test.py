@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com/api"
 
 # Test credentials from review request
 TEST_CUSTOMER_EMAIL = "testcustomer@example.com"

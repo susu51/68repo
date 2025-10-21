@@ -85,7 +85,7 @@ const useAdminOrderNotifications = (onNewOrder) => {
 
     try {
       // Get backend URL from environment
-      let backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://ai-order-debug.preview.emergentagent.com';
+      let backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://courier-connect-14.preview.emergentagent.com';
       
       // Ensure /api is included in the URL
       if (!backendUrl.endsWith('/api')) {

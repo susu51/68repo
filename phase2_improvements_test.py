@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Configuration
-BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 class Phase2ImprovementsTest:

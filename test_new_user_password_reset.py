@@ -10,7 +10,7 @@ import json
 import time
 
 async def test_new_user():
-    base_url = "https://ai-order-debug.preview.emergentagent.com/api"
+    base_url = "https://courier-connect-14.preview.emergentagent.com/api"
     test_email = f"testuser{int(time.time())}@example.com"  # Unique email
     test_password = "TestPassword123!"
     new_password = "NewTestPassword456!"

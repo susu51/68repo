@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 
 def test_courier_panel_apis():
-    base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://ai-order-debug.preview.emergentagent.com')
+    base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://courier-connect-14.preview.emergentagent.com')
     if not base_url.endswith('/api'):
         base_url = f"{base_url}/api"
     

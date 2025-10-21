@@ -20,7 +20,7 @@ import os
 import sys
 
 # Configuration - Use REACT_APP_BACKEND_URL from frontend/.env
-BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
 
 # Test credentials from review request
 TEST_CUSTOMER_EMAIL = "test@kuryecini.com"

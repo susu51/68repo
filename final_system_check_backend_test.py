@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
 WORKING_BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"
 
 # Test credentials

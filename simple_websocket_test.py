@@ -15,7 +15,7 @@ import os
 import sys
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
 WEBSOCKET_URL = "wss://kuryecini-ai.preview.emergentagent.com/api/ws/orders"
 
 # Test credentials

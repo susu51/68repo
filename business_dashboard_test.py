@@ -18,7 +18,7 @@ import time
 import uuid
 
 class BusinessDashboardTester:
-    def __init__(self, base_url="https://ai-order-debug.preview.emergentagent.com"):
+    def __init__(self, base_url="https://courier-connect-14.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.business_token = None

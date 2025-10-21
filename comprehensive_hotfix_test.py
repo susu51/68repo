@@ -18,7 +18,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://ai-order-debug.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://courier-connect-14.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials from review request
@@ -425,7 +425,7 @@ class ComprehensiveHotfixTester:
         try:
             # Test CORS preflight request
             headers = {
-                'Origin': 'https://ai-order-debug.preview.emergentagent.com',
+                'Origin': 'https://courier-connect-14.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'POST',
                 'Access-Control-Request-Headers': 'Content-Type'
             }

@@ -20,7 +20,7 @@ import os
 import sys
 
 # Configuration
-BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com"
+BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
 
 # Test credentials - try multiple admin credentials
 ADMIN_CREDENTIALS_LIST = [
