@@ -2429,7 +2429,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Login Authentication Fix Verification"
+    - "Business Dashboard Real Data Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
