@@ -239,6 +239,7 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
   }, [businessId, onOrderReceived, startHeartbeat, cleanupTimers]);
 
   const disconnect = useCallback(() => {
+    closedByUs.current = true; // Mark as intentional closure
     cleanupTimers();
     
     if (wsRef.current) {
@@ -246,19 +247,35 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
       wsRef.current = null;
     }
 
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-
     setIsConnected(false);
+    connectingRef.current = false;
   }, [cleanupTimers]);
 
-  // Connect on mount, disconnect on unmount
+  // Handle tab visibility changes
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !wsRef.current && !connectingRef.current) {
+        console.log('👁️ Tab visible - attempting reconnect');
+        reconnectAttempts.current = 0; // Reset for faster reconnect
+        connect();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [connect]);
+
   useEffect(() => {
     connect();
-    return () => disconnect();
-  }, [connect, disconnect]);
+
+    return () => {
+      closedByUs.current = true; // Unmounting
+      disconnect();
+    };
+  }, [businessId, connect, disconnect]);
 
   return {
     isConnected,
