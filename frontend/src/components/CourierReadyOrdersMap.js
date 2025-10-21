@@ -16,23 +16,14 @@ export const CourierReadyOrdersMap = () => {
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    fetchReadyOrders();
-
-    // Set up auto-refresh every 10 seconds
-    if (autoRefresh) {
-      intervalRef.current = setInterval(() => {
-        fetchReadyOrders();
-      }, 10000);
-    }
-
-    return () => {
-      // Cleanup interval on unmount or when autoRefresh changes
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [autoRefresh]); // Only depend on autoRefresh to avoid infinite loops
+    fetchNearbyBusinesses();
+    
+    const interval = setInterval(() => {
+      fetchNearbyBusinesses();
+    }, 15000); // 15 saniye
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const [nearbyBusinesses, setNearbyBusinesses] = useState([]);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
