@@ -108,29 +108,108 @@ class BusinessDashboardTester:
         except Exception as e:
             self.log_test("Customer User Login", False, f"Exception: {str(e)}")
             return False
-                        # JWT-based auth - store token for headers
-                        user_role = data.get("user", {}).get("role")
-                        if user_role == "admin":
-                            # Set authorization header for session
-                            self.admin_session.headers.update({
-                                "Authorization": f"Bearer {data.get('access_token')}"
-                            })
+            
+    async def test_dashboard_summary_authenticated(self):
+        """Test dashboard summary with authenticated business user"""
+        try:
+            url = f"{API_BASE}/business/dashboard/summary"
+            
+            async with self.session.get(url, cookies=self.business_cookies) as response:
+                response_data = await response.json()
+                
+                if response.status == 200:
+                    # Verify all required fields are present
+                    required_fields = [
+                        "business_id", "date", "today_orders_count", "today_revenue",
+                        "pending_orders_count", "menu_items_count", "total_customers",
+                        "rating_avg", "rating_count", "activities"
+                    ]
+                    
+                    missing_fields = []
+                    for field in required_fields:
+                        if field not in response_data:
+                            missing_fields.append(field)
+                    
+                    if missing_fields:
+                        self.log_test(
+                            "Dashboard Summary - Field Validation", 
+                            False, 
+                            f"Missing fields: {missing_fields}",
+                            response_data
+                        )
+                    else:
+                        # Verify data types
+                        type_checks = [
+                            ("business_id", str),
+                            ("date", str),
+                            ("today_orders_count", int),
+                            ("today_revenue", (int, float)),
+                            ("pending_orders_count", int),
+                            ("menu_items_count", int),
+                            ("total_customers", int),
+                            ("rating_avg", (int, float)),
+                            ("rating_count", int),
+                            ("activities", list)
+                        ]
+                        
+                        type_errors = []
+                        for field, expected_type in type_checks:
+                            if not isinstance(response_data[field], expected_type):
+                                type_errors.append(f"{field}: expected {expected_type}, got {type(response_data[field])}")
+                        
+                        if type_errors:
                             self.log_test(
-                                "Admin Authentication",
-                                True,
-                                f"Admin login successful (JWT): {credentials['email']}, role: {user_role}"
+                                "Dashboard Summary - Type Validation",
+                                False,
+                                f"Type errors: {type_errors}",
+                                response_data
                             )
-                            return True
-                    
-                    print(f"   Tried {credentials['email']}: Wrong role ({data.get('user', {}).get('role')})")
+                        else:
+                            # Verify activities structure
+                            activities_valid = True
+                            if response_data["activities"]:
+                                for activity in response_data["activities"]:
+                                    if not isinstance(activity, dict):
+                                        activities_valid = False
+                                        break
+                                    required_activity_fields = ["type", "title", "meta"]
+                                    for field in required_activity_fields:
+                                        if field not in activity:
+                                            activities_valid = False
+                                            break
+                                    if not activities_valid:
+                                        break
+                                        
+                                    # Check meta structure for order activities
+                                    if activity["type"] == "order_created":
+                                        meta = activity["meta"]
+                                        if not all(key in meta for key in ["order_code", "amount", "customer_name"]):
+                                            activities_valid = False
+                                            break
+                            
+                            if not activities_valid:
+                                self.log_test(
+                                    "Dashboard Summary - Activities Validation",
+                                    False,
+                                    "Invalid activities structure",
+                                    response_data
+                                )
+                            else:
+                                self.log_test(
+                                    "Dashboard Summary - Authenticated Request",
+                                    True,
+                                    f"All fields present and valid. Orders: {response_data['today_orders_count']}, Revenue: {response_data['today_revenue']}, Activities: {len(response_data['activities'])}"
+                                )
                 else:
-                    print(f"   Tried {credentials['email']}: {response.status_code}")
+                    self.log_test(
+                        "Dashboard Summary - Authenticated Request",
+                        False,
+                        f"Status: {response.status}",
+                        response_data
+                    )
                     
-            except Exception as e:
-                print(f"   Tried {credentials['email']}: Error - {str(e)}")
-        
-        self.log_test("Admin Authentication", False, error="All admin credential attempts failed")
-        return False
+        except Exception as e:
+            self.log_test("Dashboard Summary - Authenticated Request", False, f"Exception: {str(e)}")
     
     def test_endpoint_availability_and_structure(self):
         """Test 1: Endpoint Availability & Structure (CRITICAL)"""
