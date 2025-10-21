@@ -97,10 +97,26 @@ export const ModernOrdersManagement = ({ businessId }) => {
         }
       }
       
-      console.log(`✅ Found ${incomingOrders.length} incoming orders`);
+      // Parse active orders
+      let activeOrders = [];
+      if (activeResponse) {
+        if (Array.isArray(activeResponse)) {
+          activeOrders = activeResponse;
+        } else if (Array.isArray(activeResponse.data)) {
+          activeOrders = activeResponse.data;
+        } else if (activeResponse.data?.orders) {
+          activeOrders = activeResponse.data.orders;
+        }
+      }
+      
+      console.log(`✅ Found ${incomingOrders.length} incoming + ${activeOrders.length} active orders`);
+      
+      // Merge and deduplicate orders
+      const allOrders = [...incomingOrders, ...activeOrders];
+      const uniqueOrders = Array.from(new Map(allOrders.map(o => [o.id, o])).values());
       
       // Set orders
-      setOrders(incomingOrders);
+      setOrders(uniqueOrders);
       
       // Calculate stats
       const newStats = {
