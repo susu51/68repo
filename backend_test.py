@@ -172,7 +172,12 @@ class OrderFlowTester:
             
             if response.status_code in [200, 201]:
                 order_response = response.json()
-                self.test_order_id = order_response.get('order_id') or order_response.get('id')
+                # Try different possible field names for order ID
+                self.test_order_id = (order_response.get('order_id') or 
+                                    order_response.get('id') or 
+                                    order_response.get('order', {}).get('id') or
+                                    order_response.get('data', {}).get('id'))
+                
                 order_code = order_response.get('order_code', 'N/A')
                 status = order_response.get('status', 'N/A')
                 created_at = order_response.get('created_at', 'N/A')
@@ -182,6 +187,7 @@ class OrderFlowTester:
                 self.log(f"   Order Code: {order_code}")
                 self.log(f"   Status: {status}")
                 self.log(f"   Created: {created_at}")
+                self.log(f"   Full Response: {order_response}")
                 return True
             else:
                 self.log(f"❌ Order creation failed: {response.status_code} - {response.text}")
