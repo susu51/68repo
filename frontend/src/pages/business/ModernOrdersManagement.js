@@ -638,14 +638,24 @@ export const ModernOrdersManagement = ({ businessId }) => {
                         </Button>
                       )}
                       
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Detay
-                      </Button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Detay
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => printReceipt(order)}
+                        >
+                          <Printer className="h-4 w-4 mr-1" />
+                          Yazdır
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
