@@ -226,10 +226,10 @@ class BusinessOrderAuthorizationTest:
             return False
         
         # Test updating to "confirmed" status
-        status_data = {"to": "confirmed"}
+        status_data = {"status": "confirmed"}
         
         async with self.session.patch(
-            f"{BACKEND_URL}/orders/{order_id}/status",
+            f"{BACKEND_URL}/business/orders/{order_id}/status",
             json=status_data,
             cookies=self.business_cookies,
             headers={"Content-Type": "application/json"}
