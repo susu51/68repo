@@ -28,6 +28,20 @@ export async function api(path, init = {}) {
 
 export const get = async (p) => {
   const res = await api(p);
+  
+  // Handle non-OK responses (including 401)
+  if (!res.ok) {
+    // Try to parse error message from response
+    let errorMessage = `HTTP ${res.status}`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.detail || errorData.message || errorMessage;
+    } catch {
+      // Response body is not JSON or empty
+    }
+    throw new Error(errorMessage);
+  }
+  
   const data = await res.json();
   return { data };
 };
