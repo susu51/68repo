@@ -111,14 +111,11 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
       setLoading(true);
       console.log('🔄 Fetching menu items...');
       const response = await get('/business/menu');
-      console.log('📦 Response status:', response.status, response.ok);
+      console.log('📦 Response received:', response);
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const items = await response.json();
-      console.log('📦 Parsed JSON items:', items, 'Length:', items?.length);
+      // get() now returns { data } format
+      const items = response?.data || response;
+      console.log('📦 Menu items:', items, 'Length:', items?.length);
       
       const menuArray = Array.isArray(items) ? items : [];
       console.log('📦 Final menu array:', menuArray.length, 'items');
