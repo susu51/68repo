@@ -29,6 +29,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
   const [stats, setStats] = useState({
     pending: 0,
     preparing: 0,
