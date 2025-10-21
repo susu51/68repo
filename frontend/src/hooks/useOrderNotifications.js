@@ -203,27 +203,33 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
       };
 
       ws.onclose = (event) => {
-        console.log(`🔌 WebSocket disconnected (code: ${event.code}, reason: ${event.reason || 'none'})`);
+        console.log(`🔌 WebSocket closed (code: ${event.code}, reason: ${event.reason || 'none'})`);
         setIsConnected(false);
         cleanupTimers();
+        connectingRef.current = false; // Reset guard
+        wsRef.current = null;
 
         // Log abnormal closures for monitoring
         if (event.code === 1006 || event.code === 1011) {
           console.error(`🚨 Abnormal WebSocket closure: ${event.code} - business_id: ${businessId}`);
-          // TODO: Send to Sentry with panel & businessId tags
         }
 
-        // Exponential backoff: 1→2→4→8→16→max 30s with jitter
-        const baseDelay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-        const jitter = Math.random() * 1000; // 0-1s jitter
-        const delay = baseDelay + jitter;
-        
-        console.log(`🔄 Reconnecting in ${(delay/1000).toFixed(1)}s... (attempt ${reconnectAttempts.current + 1})`);
-        
-        reconnectTimeoutRef.current = setTimeout(() => {
-          reconnectAttempts.current += 1;
-          connect();
-        }, delay);
+        // Only reconnect if NOT intentionally closed by us
+        if (!closedByUs.current) {
+          // Exponential backoff: 1→2→4→8→16→max 30s with jitter
+          const baseDelay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
+          const jitter = Math.random() * 1000; // 0-1s jitter
+          const delay = baseDelay + jitter;
+          
+          console.log(`🔄 Reconnecting in ${(delay/1000).toFixed(1)}s... (attempt ${reconnectAttempts.current + 1})`);
+          
+          reconnectTimeoutRef.current = setTimeout(() => {
+            reconnectAttempts.current += 1;
+            connect();
+          }, delay);
+        } else {
+          console.log('🛑 Connection closed by user - not reconnecting');
+        }
       };
 
       wsRef.current = ws;
