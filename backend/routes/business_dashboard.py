@@ -2,21 +2,41 @@
 Business Dashboard Summary Endpoint
 Provides real-time metrics and activities for business panel
 """
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from datetime import datetime, timezone, timedelta
-from typing import Optional
+from fastapi import APIRouter, HTTPException, Query, Request
+from datetime import datetime, timezone
+from typing import Optional, Dict, Any, List
+from pydantic import BaseModel
 import os
 
 router = APIRouter()
 
 # Timezone configuration
 DEFAULT_TZ = "Europe/Istanbul"
-
-# Status definitions for revenue calculation
 REVENUE_STATUSES = os.getenv("CONFIRM_STATUSES", "confirmed,delivered").split(",")
 
 
-@router.get("/business/dashboard/summary")
+# Response Models
+class ActivityItem(BaseModel):
+    type: str
+    title: str
+    meta: Dict[str, Any]
+    ts: Optional[str]
+
+
+class DashboardSummaryResponse(BaseModel):
+    business_id: str
+    date: str
+    today_orders_count: int
+    today_revenue: float
+    pending_orders_count: int
+    menu_items_count: int
+    total_customers: int
+    rating_avg: float
+    rating_count: int
+    activities: List[ActivityItem]
+
+
+@router.get("/business/dashboard/summary", response_model=DashboardSummaryResponse)
 async def get_dashboard_summary(
     request: Request,
     date: Optional[str] = Query(None, description="Date in YYYY-MM-DD format"),
