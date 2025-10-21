@@ -164,18 +164,27 @@ async def websocket_order_notifications(
         print(f"🔄 Entering message loop for {role}:{client_id}")
         while True:
             try:
-                # Wait for ping/pong or client messages
-                print(f"⏳ Waiting for message from {role}:{client_id}")
-                data = await websocket.receive_text()
-                print(f"📨 Received message from {role}:{client_id}: {data}")
+                # Wait for messages with timeout to prevent blocking
+                data = await asyncio.wait_for(
+                    websocket.receive_text(),
+                    timeout=60.0  # 60 second timeout
+                )
+                print(f"📨 Received message from {role}:{client_id}: {data[:100]}")
                 
-                # Echo back for keepalive
+                # Handle different message types
                 if data == "ping":
                     await websocket.send_text("pong")
                     print(f"🏓 Sent pong to {role}:{client_id}")
+                elif data.startswith("{"):
+                    # JSON message - echo back
+                    await websocket.send_text(data)
+                    
+            except asyncio.TimeoutError:
+                # Timeout is normal - just continue
+                continue
             except Exception as loop_error:
                 print(f"❌ Error in message loop for {role}:{client_id}: {loop_error}")
-                raise
+                break
             
     except WebSocketDisconnect:
         manager.disconnect(websocket, client_id, role)
