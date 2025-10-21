@@ -182,19 +182,19 @@ export const CourierReadyOrdersMap = () => {
 
       {/* Nearby Businesses Map - Click to see orders */}
       {nearbyBusinesses.length > 0 && (
-        <Card className="border-purple-200 bg-purple-50 dark:bg-purple-900/10">
+        <Card className="border-green-200 bg-green-50 dark:bg-green-900/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+            <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
               <Store className="h-5 w-5" />
-              Hazırlanıyor - İşletme Konumları ({businessLocations.length})
+              Hazır Siparişler - İşletme Haritası ({nearbyBusinesses.length})
             </CardTitle>
             <CardDescription>
-              Hazırlanmakta olan siparişler - Teslim alınmaya hazır olduğunda bildirim gelecek
+              Teslim alınmayı bekleyen siparişler - İşletmeye tıklayın, sipariş seçip alın
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {businessLocations.map((location, index) => (
+              {nearbyBusinesses.map((business, index) => (
                 <div 
                   key={location.business_id || index}
                   className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-purple-200 dark:border-purple-800 hover:shadow-md transition-shadow"
