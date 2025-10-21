@@ -195,7 +195,9 @@ async def login(body: LoginRequest, response: Response):
             "email": user_data["email"],
             "role": user_data["role"],
             "first_name": user_data.get("first_name", ""),
-            "last_name": user_data.get("last_name", "")
+            "last_name": user_data.get("last_name", ""),
+            "kyc_status": user_data.get("kyc_status"),  # Include KYC status for business users
+            "business_name": user_data.get("business_name")  # Include business name if available
         }
     }
     
