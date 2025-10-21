@@ -206,16 +206,30 @@ const useAdminOrderNotifications = (onNewOrder) => {
     }
   }, [onNewOrder, connectionAttempts, startHeartbeat, cleanupTimers]);
 
+  // Handle tab visibility changes
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !wsRef.current && !connectingRef.current) {
+        console.log('👁️ Admin tab visible - attempting reconnect');
+        setConnectionAttempts(0); // Reset for faster reconnect
+        connect();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [connect]);
+
   useEffect(() => {
     // Connect on mount
     connect();
 
     // Cleanup on unmount
     return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      
+      closedByUs.current = true; // Unmounting
       cleanupTimers();
       
       if (wsRef.current) {
