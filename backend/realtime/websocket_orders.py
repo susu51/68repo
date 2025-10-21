@@ -11,57 +11,59 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ConnectionManager:
-    """Manage WebSocket connections"""
+    """Manage WebSocket connections with single-connection-per-business policy"""
     
     def __init__(self):
-        # business_id -> Set of WebSocket connections
-        self.active_connections: Dict[str, Set[WebSocket]] = {}
+        # business_id -> Single WebSocket connection (enforced)
+        self.active_connections: Dict[str, WebSocket] = {}
         # Admin connections (receive ALL orders)
         self.admin_connections: Set[WebSocket] = set()
     
     async def connect(self, websocket: WebSocket, client_id: str, role: str = "business"):
-        """Connect a new WebSocket client"""
+        """Connect a new WebSocket client - enforce single connection per business"""
         await websocket.accept()
         
         if role == "admin":
             self.admin_connections.add(websocket)
-            print(f"✅ WebSocket connected: role=admin, total_admins={len(self.admin_connections)}")
+            logger.info(f"✅ Admin WebSocket connected, total_admins={len(self.admin_connections)}")
         else:
-            # Business connection
-            if client_id not in self.active_connections:
-                self.active_connections[client_id] = set()
+            # Business connection - SINGLE CONNECTION POLICY
+            # If there's already a connection for this business_id, close it first
+            if client_id in self.active_connections:
+                old_socket = self.active_connections[client_id]
+                try:
+                    logger.info(f"🔄 Closing old WebSocket for business_id={client_id} (new connection opened)")
+                    await old_socket.close(code=1001, reason="New connection opened for same business_id")
+                except Exception as e:
+                    logger.warning(f"Error closing old WebSocket: {e}")
             
-            self.active_connections[client_id].add(websocket)
-            print(f"✅ WebSocket connected: business_id={client_id}, total={len(self.active_connections[client_id])}")
+            # Register new connection
+            self.active_connections[client_id] = websocket
+            logger.info(f"✅ Business WebSocket connected: business_id={client_id}, total_businesses={len(self.active_connections)}")
     
     def disconnect(self, websocket: WebSocket, client_id: str = None, role: str = "business"):
         """Disconnect a WebSocket client"""
         if role == "admin":
             self.admin_connections.discard(websocket)
-            print(f"✅ WebSocket disconnected: role=admin")
+            logger.info(f"🔌 Admin WebSocket disconnected")
         elif client_id and client_id in self.active_connections:
-            self.active_connections[client_id].discard(websocket)
-            
-            if len(self.active_connections[client_id]) == 0:
+            # Only remove if it's the current connection
+            if self.active_connections[client_id] == websocket:
                 del self.active_connections[client_id]
-            
-            print(f"✅ WebSocket disconnected: business_id={client_id}")
+                logger.info(f"🔌 Business WebSocket disconnected: business_id={client_id}")
     
     async def send_to_business(self, business_id: str, message: dict):
-        """Send message to all connections of a business"""
+        """Send message to business connection"""
         if business_id not in self.active_connections:
             return
         
-        # Make a copy to avoid modification during iteration
-        connections = self.active_connections[business_id].copy()
-        
-        for connection in connections:
-            try:
-                await connection.send_json(message)
-            except Exception as e:
-                print(f"❌ Error sending to WebSocket: {e}")
-                # Remove failed connection
-                self.disconnect(connection, business_id, role="business")
+        connection = self.active_connections[business_id]
+        try:
+            await connection.send_json(message)
+        except Exception as e:
+            logger.error(f"❌ Error sending to business WebSocket: {e}")
+            # Remove failed connection
+            self.disconnect(connection, business_id, role="business")
     
     async def send_to_admins(self, message: dict):
         """Send message to all admin connections"""
