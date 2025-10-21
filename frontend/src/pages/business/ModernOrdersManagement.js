@@ -643,24 +643,12 @@ export const ModernOrdersManagement = ({ businessId }) => {
                         </Button>
                       )}
                       
-                      {/* Diğer durumlar için normal aksiyon - preparing ve ready için */}
-                      {order.status === 'preparing' && (
-                        <Button
-                          onClick={() => updateOrderStatus(order.id, 'ready')}
-                          className="w-full bg-green-600 hover:bg-green-700 text-white"
-                          size="lg"
-                        >
-                          <Package className="h-4 w-4 mr-2" />
-                          Hazır
-                        </Button>
-                      )}
-                      
                       {/* Ready durumunda bilgi mesajı */}
                       {order.status === 'ready' && (
                         <div className="w-full p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                           <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
                             <CheckCircle className="h-5 w-5" />
-                            <span className="text-sm font-medium">Sipariş hazır - Kurye bekleniyor</span>
+                            <span className="text-sm font-medium">Sipariş hazır - Kurye bekleyebilir</span>
                           </div>
                         </div>
                       )}
