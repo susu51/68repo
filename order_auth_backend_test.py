@@ -220,11 +220,63 @@ class OrderAuthTester:
             )
             return False, None
     
+    def get_real_menu_items(self):
+        """Get real menu items from an existing business"""
+        try:
+            # First, get available businesses
+            response = self.session.get(f"{BACKEND_URL}/api/businesses", timeout=10)
+            if response.status_code == 200:
+                businesses = response.json()
+                if businesses:
+                    business = businesses[0]  # Use first business
+                    business_id = business.get("id")
+                    
+                    # Get menu items for this business
+                    menu_response = self.session.get(
+                        f"{BACKEND_URL}/api/business/public/{business_id}/menu", 
+                        timeout=10
+                    )
+                    if menu_response.status_code == 200:
+                        menu_items = menu_response.json()
+                        if menu_items:
+                            return business_id, menu_items[0]  # Return first menu item
+            return None, None
+        except:
+            return None, None
+
     def test_order_creation_with_cookie(self):
         """Test 3: Order Creation with Cookie - POST /api/orders with saved cookie"""
         try:
             print(f"🛒 Testing order creation with authentication")
-            print(f"   Order Data: {json.dumps(ORDER_DATA, indent=2)}")
+            
+            # First, try to get real menu items
+            business_id, menu_item = self.get_real_menu_items()
+            
+            if business_id and menu_item:
+                # Use real menu item
+                order_data = {
+                    "business_id": business_id,
+                    "items": [{
+                        "product_id": menu_item.get("id"),
+                        "id": menu_item.get("id"),
+                        "title": menu_item.get("name", "Test Item"),
+                        "price": float(menu_item.get("price", 50.0)),
+                        "quantity": 1
+                    }],
+                    "delivery_address": "Test Address, Aksaray",
+                    "delivery_lat": 38.3687,
+                    "delivery_lng": 34.0254,
+                    "payment_method": "cash_on_delivery",
+                    "notes": "Test order for authentication verification"
+                }
+                print(f"   Using real business: {business_id}")
+                print(f"   Using real menu item: {menu_item.get('name')} (₺{menu_item.get('price')})")
+            else:
+                # Fallback to original test data
+                order_data = ORDER_DATA
+                print(f"   Using test data (no real menu items found)")
+            
+            print(f"   Order Data: {json.dumps(order_data, indent=2)}")
             
             # Prepare headers for both cookie and JWT auth
             headers = {"Content-Type": "application/json"}
@@ -234,7 +286,7 @@ class OrderAuthTester:
             
             response = self.session.post(
                 f"{BACKEND_URL}/api/orders",
-                json=ORDER_DATA,
+                json=order_data,
                 headers=headers,
                 timeout=20
             )
@@ -278,6 +330,22 @@ class OrderAuthTester:
                     False,
                     error=f"Authorization failed (403) - insufficient permissions: {error_text}"
                 )
+                return False, None
+            elif response.status_code == 404:
+                error_text = response.text
+                # Check if it's a product not found error (not an auth error)
+                if "bulunamadı" in error_text or "not found" in error_text.lower():
+                    self.log_test(
+                        "Order Creation with Cookie",
+                        False,
+                        error=f"Product/Business not found (404) - authentication working but data issue: {error_text}"
+                    )
+                else:
+                    self.log_test(
+                        "Order Creation with Cookie",
+                        False,
+                        error=f"Endpoint not found (404) - possible routing issue: {error_text}"
+                    )
                 return False, None
             else:
                 error_text = response.text
