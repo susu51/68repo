@@ -7,7 +7,7 @@ import requests
 import json
 
 # Backend URL
-BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com/api"
 
 def debug_endpoint():
     """Debug the city catalog endpoint"""

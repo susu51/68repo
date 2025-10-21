@@ -6,7 +6,7 @@ Check the expected business from the review request
 import requests
 import json
 
-BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com/api"
 BUSINESS_EMAIL = "testbusiness@example.com"
 BUSINESS_PASSWORD = "test123"
 EXPECTED_BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"

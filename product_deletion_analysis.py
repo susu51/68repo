@@ -25,7 +25,7 @@ import subprocess
 import os
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com/api"
 TEST_BUSINESS_EMAIL = "testbusiness@example.com"
 TEST_BUSINESS_PASSWORD = "test123"
 

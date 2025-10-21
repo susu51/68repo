@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-ai.preview.emergentagent.com';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://ai-order-debug.preview.emergentagent.com';
 
 export const CustomerDiscover = ({ onSelectBusiness }) => {
   const [businesses, setBusinesses] = useState([]);

@@ -8,7 +8,7 @@ import json
 import os
 
 # Configuration
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://kuryecini-ai.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://ai-order-debug.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 BUSINESS_CREDENTIALS = {

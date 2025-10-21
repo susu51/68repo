@@ -8,7 +8,7 @@ import requests
 import json
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com/api"
 
 # Test credentials
 ADMIN_EMAIL = "admin@kuryecini.com"

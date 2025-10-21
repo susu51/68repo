@@ -16,7 +16,7 @@ import time
 import uuid
 
 class UserManagementTester:
-    def __init__(self, base_url="https://kuryecini-ai.preview.emergentagent.com"):
+    def __init__(self, base_url="https://ai-order-debug.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.admin_token = None

@@ -19,7 +19,7 @@ from datetime import datetime
 import sys
 
 # Configuration
-BACKEND_URL = "https://kuryecini-ai.preview.emergentagent.com"
+BACKEND_URL = "https://ai-order-debug.preview.emergentagent.com"
 
 # Test credentials
 BUSINESS_CREDENTIALS = [
