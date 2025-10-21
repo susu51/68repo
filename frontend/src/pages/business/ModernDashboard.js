@@ -18,51 +18,53 @@ export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNav
   const statCards = [
     {
       title: 'Bugünkü Siparişler',
-      value: stats.todayOrders,
+      value: stats.todayOrders ?? '—',
       icon: ShoppingBag,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100 dark:bg-blue-900/20',
-      change: '+12%',
-      changeType: 'increase'
+      testId: 'card-today-orders'
     },
     {
       title: 'Bugünkü Gelir',
-      value: `₺${stats.todayRevenue.toLocaleString()}`,
+      value: stats.todayRevenue >= 0 ? `₺${stats.todayRevenue.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—',
       icon: DollarSign,
       color: 'text-green-600',
       bgColor: 'bg-green-100 dark:bg-green-900/20',
-      change: '+8%',
-      changeType: 'increase'
+      testId: 'card-today-revenue'
     },
     {
       title: 'Bekleyen Siparişler',
-      value: stats.pendingOrders,
+      value: stats.pendingOrders ?? '—',
       icon: Clock,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100 dark:bg-orange-900/20',
-      urgent: stats.pendingOrders > 3
+      urgent: stats.pendingOrders > 3,
+      testId: 'card-pending'
     },
     {
       title: 'Menü Ürünleri',
-      value: stats.menuItems,
+      value: stats.menuItems ?? '—',
       icon: Package,
       color: 'text-purple-600',
-      bgColor: 'bg-purple-100 dark:bg-purple-900/20'
+      bgColor: 'bg-purple-100 dark:bg-purple-900/20',
+      testId: 'card-menu-items'
     },
     {
       title: 'Toplam Müşteri',
-      value: stats.totalCustomers,
+      value: stats.totalCustomers ?? '—',
       icon: Users,
       color: 'text-indigo-600',
-      bgColor: 'bg-indigo-100 dark:bg-indigo-900/20'
+      bgColor: 'bg-indigo-100 dark:bg-indigo-900/20',
+      testId: 'card-total-customers'
     },
     {
       title: 'Değerlendirme',
-      value: stats.rating,
+      value: stats.rating > 0 ? stats.rating.toFixed(1) : '—',
       icon: Star,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100 dark:bg-yellow-900/20',
-      suffix: '/ 5.0'
+      suffix: stats.rating > 0 ? '/ 5.0' : '',
+      testId: 'card-rating'
     }
   ];
 
