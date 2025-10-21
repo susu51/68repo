@@ -579,6 +579,48 @@ async def api_health_check():
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
+
+@api_router.get("/admin/system/status")
+async def get_system_status(current_user: dict = Depends(get_admin_user)):
+    """Get comprehensive system health and statistics (Admin only)"""
+    try:
+        # Database check
+        db_status = "connected"
+        try:
+            await db.command("ping")
+        except:
+            db_status = "disconnected"
+        
+        # Get basic stats
+        users_count = await db.users.count_documents({})
+        orders_count = await db.orders.count_documents({})
+        businesses_count = await db.users.count_documents({"role": "business", "kyc_status": "approved"})
+        couriers_count = await db.users.count_documents({"role": "courier", "kyc_status": "approved"})
+        pending_kyc_count = await db.users.count_documents({"kyc_status": "pending"})
+        
+        # Orders stats
+        from datetime import timedelta
+        today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        orders_today = await db.orders.count_documents({"created_at": {"$gte": today}})
+        
+        return {
+            "status": "ok",
+            "database": db_status,
+            "stats": {
+                "total_users": users_count,
+                "total_orders": orders_count,
+                "orders_today": orders_today,
+                "active_businesses": businesses_count,
+                "active_couriers": couriers_count,
+                "pending_kyc": pending_kyc_count
+            },
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"System status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Security
 # JWT Configuration - Real Secret Required
 JWT_SECRET = os.getenv("JWT_SECRET")
