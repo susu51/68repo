@@ -38,6 +38,50 @@ class AcceptTaskResponse(BaseModel):
     message: str
     task_id: str
 
+@router.get("/map", response_model=List[dict])
+async def get_tasks_for_map(
+    current_user: dict = Depends(get_courier_user)
+):
+    """
+    Get waiting tasks grouped by business location for map display
+    Returns business locations with count of waiting tasks
+    """
+    from server import db
+    
+    try:
+        # Get all waiting tasks
+        waiting_tasks = await db.courier_tasks.find({
+            "status": CourierTaskStatus.WAITING.value,
+            "courier_id": None
+        }).to_list(length=None)
+        
+        if not waiting_tasks:
+            return []
+        
+        # Group by restaurant_id (business_id)
+        business_groups = {}
+        for task in waiting_tasks:
+            business_id = task.get("restaurant_id")
+            if business_id:
+                if business_id not in business_groups:
+                    business_groups[business_id] = {
+                        "business_id": business_id,
+                        "business_name": task.get("restaurant_name", "İşletme"),
+                        "location": task.get("pickup_coords", {}),
+                        "address": task.get("pickup_address", ""),
+                        "task_count": 0,
+                        "task_ids": []
+                    }
+                business_groups[business_id]["task_count"] += 1
+                business_groups[business_id]["task_ids"].append(task.get("id"))
+        
+        # Return as list
+        return list(business_groups.values())
+        
+    except Exception as e:
+        print(f"❌ Error fetching tasks for map: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("", response_model=List[TaskResponse])
 async def get_courier_tasks(
     status: Optional[str] = Query(None, description="Filter by status: waiting, assigned, picked_up, delivering, delivered"),
