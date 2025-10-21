@@ -72,8 +72,16 @@ export const ModernOrdersManagement = ({ businessId }) => {
   }, []);
 
   const fetchOrders = async () => {
+    // Debounce: Don't fetch if called within last 2 seconds
+    const now = Date.now();
+    if (now - lastFetchTime < 2000) {
+      console.log('⏭️ Skipping fetch - too soon since last fetch');
+      return;
+    }
+    
     try {
       setLoading(true);
+      setLastFetchTime(now);
       
       console.log('🔄 Fetching ALL orders from business API...');
       
