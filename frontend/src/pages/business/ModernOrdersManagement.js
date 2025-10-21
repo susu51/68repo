@@ -664,33 +664,17 @@ export const ModernOrdersManagement = ({ businessId }) => {
                         </Button>
                       )}
                       
-                      {/* Onaylı siparişler için hazırlanmaya başla (kurye taskı oluşturulur) */}
+                      {/* Onaylı siparişler için hazırlanmaya başla - direkt READY olur */}
                       {order.status === 'confirmed' && (
-                        <div className="space-y-2">
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                              Paket Ücreti (₺) - Kurye için
-                            </label>
-                            <input
-                              type="number"
-                              data-testid="prep-unit-fee-input"
-                              placeholder="15.00"
-                              step="0.50"
-                              min="0"
-                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                              id={`prep-unit-fee-${order.id}`}
-                            />
-                          </div>
-                          <Button
-                            data-testid="start-preparing-btn"
-                            onClick={() => updateOrderStatus(order.id, 'preparing')}
-                            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                            size="lg"
-                          >
-                            <ChefHat className="h-4 w-4 mr-2" />
-                            Hazırlanmaya Başla
-                          </Button>
-                        </div>
+                        <Button
+                          data-testid="start-preparing-btn"
+                          onClick={() => updateOrderStatus(order.id, 'ready')}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white"
+                          size="lg"
+                        >
+                          <Package className="h-4 w-4 mr-2" />
+                          Hazırlanmaya Başla
+                        </Button>
                       )}
                       
                       {/* Diğer durumlar için normal aksiyon - preparing ve ready için */}
