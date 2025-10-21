@@ -285,32 +285,11 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
     });
     
     try {
-      const response = await patch(`/business/menu/${item.id}`, {
+      // patch now returns { data } or throws error
+      await patch(`/business/menu/${item.id}`, {
         ...item,
         is_available: newAvailability
       });
-      
-      if (!response.ok) {
-        const errText = await response.text().catch(() => '');
-        let errorMessage = `Güncelleme başarısız (HTTP ${response.status})`;
-        
-        try {
-          const errorData = JSON.parse(errText);
-          errorMessage = errorData.detail || errorMessage;
-        } catch {
-          if (errText) errorMessage += `: ${errText}`;
-        }
-        
-        // Hata olursa geri al
-        setMenuItems(prevItems => {
-          const items = Array.isArray(prevItems) ? prevItems : [];
-          return items.map(i => 
-            i.id === item.id ? { ...i, is_available: !newAvailability } : i
-          );
-        });
-        
-        throw new Error(errorMessage);
-      }
       
       toast.success(item.is_available ? 'Ürün stokta yok olarak işaretlendi' : 'Ürün tekrar stokta');
       
@@ -320,6 +299,15 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
       }
     } catch (error) {
       console.error('❌ Toggle availability error:', error);
+      
+      // Hata olursa geri al
+      setMenuItems(prevItems => {
+        const items = Array.isArray(prevItems) ? prevItems : [];
+        return items.map(i => 
+          i.id === item.id ? { ...i, is_available: !newAvailability } : i
+        );
+      });
+      
       toast.error(error.message || 'Güncelleme hatası: Lütfen tekrar deneyin');
     }
   };
