@@ -22,7 +22,45 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
   const connectionStartTimeRef = useRef(null);
   const backoffResetTimeoutRef = useRef(null);
 
-  const connect = useCallback(() => {
+  const cleanupTimers = useCallback(() => {
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
+    if (pongTimeoutRef.current) {
+      clearTimeout(pongTimeoutRef.current);
+      pongTimeoutRef.current = null;
+    }
+    if (backoffResetTimeoutRef.current) {
+      clearTimeout(backoffResetTimeoutRef.current);
+      backoffResetTimeoutRef.current = null;
+    }
+  }, []);
+
+  const startHeartbeat = useCallback((ws) => {
+    cleanupTimers();
+    missedPongsRef.current = 0;
+    
+    // Send ping every 25s
+    pingIntervalRef.current = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        console.log('📡 Sending ping');
+        ws.send('ping');
+        
+        // Wait for pong (5s timeout)
+        pongTimeoutRef.current = setTimeout(() => {
+          missedPongsRef.current += 1;
+          console.warn(`⚠️ Pong timeout (missed: ${missedPongsRef.current}/2)`);
+          
+          // Close & reconnect if missed twice
+          if (missedPongsRef.current >= 2) {
+            console.error('❌ Missed 2 pongs - closing connection');
+            ws.close(1000, 'Heartbeat failure');
+          }
+        }, 5000);
+      }
+    }, 25000);
+  }, [cleanupTimers]);
     if (!businessId) {
       console.log('⚠️ No business ID provided for WebSocket');
       console.log('businessId:', businessId);
