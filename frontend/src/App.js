@@ -28,6 +28,9 @@ import OpsCoPilot from "./components/OpsCoPilot";
 import AdminKYC from "./components/AdminKYC";
 import AdminAdvertisements from "./components/AdminAdvertisements";
 import UserProfileWithDocuments from "./components/UserProfileWithDocuments";
+
+// Backend URL configuration
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://ai-order-debug.preview.emergentagent.com';
 import { AdminMessages } from "./components/AdminMessages";
 import { BannerManager } from "./components/BannerManager";
 import MaintenancePage from "./pages/MaintenancePage";
