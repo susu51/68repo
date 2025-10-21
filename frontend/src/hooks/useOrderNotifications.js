@@ -69,10 +69,27 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
   }, [cleanupTimers]);
 
   const connect = useCallback(() => {
+    // SINGLE-FLIGHT GUARD: Prevent multiple simultaneous connection attempts
+    if (connectingRef.current || wsRef.current) {
+      console.log('⚠️ Connection already in progress or active, skipping...');
+      return;
+    }
+    
     if (!businessId) {
       console.log('⚠️ No business ID provided for WebSocket');
       return;
     }
+    
+    // Pause reconnect when tab is hidden (battery-friendly)
+    if (document.visibilityState === 'hidden') {
+      console.log('📱 Tab hidden - pausing reconnect');
+      connectingRef.current = false;
+      // Will reconnect when tab becomes visible (handled by visibility listener)
+      return;
+    }
+
+    connectingRef.current = true;
+    closedByUs.current = false;
 
     try {
       // Construct WebSocket URL
