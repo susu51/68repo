@@ -35,14 +35,31 @@ export const ModernOrdersManagement = ({ businessId }) => {
     delivered: 0
   });
 
-  // WebSocket for real-time notifications
-  const { isConnected, reconnect } = useOrderNotifications(
+  // WebSocket for real-time notifications (enabled only when businessId exists)
+  useOrderNotifications(
     businessId,
     (event) => {
       console.log('🔔 New order event received:', event);
+      
+      // Play notification sound
+      try {
+        import('../../utils/notificationSound').then(module => {
+          module.default();
+        });
+      } catch (e) {
+        console.log('Audio notification failed:', e);
+      }
+      
+      // Show toast
+      toast.success('🆕 Yeni Sipariş Alındı!', {
+        duration: 5000,
+        icon: '🔔'
+      });
+      
       // Refresh orders when new order arrives
       fetchOrders();
-    }
+    },
+    !!businessId  // enabled: only when businessId exists
   );
 
   useEffect(() => {
