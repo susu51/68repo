@@ -282,7 +282,7 @@ export const NewBusinessApp = ({ user, onLogout }) => {
           <ModernMenuManagement 
             key="menu"
             businessId={businessInfo?.id}
-            onStatsUpdate={loadStats}
+            onStatsUpdate={refetchDashboard}
           />
         </div>
 
