@@ -170,27 +170,32 @@ const useAdminOrderNotifications = (onNewOrder) => {
       };
       
       ws.onclose = (event) => {
-        console.log(`🔌 Admin WebSocket disconnected (code: ${event.code}, reason: ${event.reason || 'none'})`);
+        console.log(`🔌 Admin WebSocket closed (code: ${event.code}, reason: ${event.reason || 'none'})`);
         setIsConnected(false);
         cleanupTimers();
+        connectingRef.current = false; // Reset guard
         
         // Log abnormal closures
         if (event.code === 1006 || event.code === 1011) {
           console.error(`🚨 Admin abnormal WebSocket closure: ${event.code}`);
-          // TODO: Send to Sentry with panel=admin tag
         }
         
-        // Exponential backoff: 1→2→4→8→16→max 30s with jitter
-        const baseDelay = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
-        const jitter = Math.random() * 1000;
-        const delay = baseDelay + jitter;
-        
-        console.log(`⏳ Reconnecting admin WebSocket in ${(delay/1000).toFixed(1)}s... (attempt ${connectionAttempts + 1})`);
-        
-        reconnectTimeoutRef.current = setTimeout(() => {
-          setConnectionAttempts(prev => prev + 1);
-          connect();
-        }, delay);
+        // Only reconnect if NOT intentionally closed by us
+        if (!closedByUs.current) {
+          // Exponential backoff: 1→2→4→8→16→max 30s with jitter
+          const baseDelay = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
+          const jitter = Math.random() * 1000;
+          const delay = baseDelay + jitter;
+          
+          console.log(`🔄 Admin reconnecting in ${(delay/1000).toFixed(1)}s... (attempt ${connectionAttempts + 1})`);
+          
+          reconnectTimeoutRef.current = setTimeout(() => {
+            setConnectionAttempts(prev => prev + 1);
+            connect();
+          }, delay);
+        } else {
+          console.log('🛑 Admin connection closed by user - not reconnecting');
+        }
       };
       
       wsRef.current = ws;
