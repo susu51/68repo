@@ -379,42 +379,6 @@ async def health_check_legacy():
     except Exception as e:
         return {"status": "degraded", "db": f"error: {str(e)}"}
 
-
-@api_router.get("/admin/system/status")
-async def get_system_status(current_user: dict = Depends(get_admin_user)):
-    """Get system health and statistics"""
-    try:
-        # Database check
-        db_status = "connected"
-        try:
-            await db.command("ping")
-        except:
-            db_status = "disconnected"
-        
-        # Get basic stats
-        users_count = await db.users.count_documents({})
-        orders_count = await db.orders.count_documents({})
-        businesses_count = await db.users.count_documents({"role": "business", "kyc_status": "approved"})
-        couriers_count = await db.users.count_documents({"role": "courier", "kyc_status": "approved"})
-        pending_kyc_count = await db.users.count_documents({"kyc_status": "pending"})
-        
-        return {
-            "status": "ok",
-            "database": db_status,
-            "stats": {
-                "total_users": users_count,
-                "total_orders": orders_count,
-                "active_businesses": businesses_count,
-                "active_couriers": couriers_count,
-                "pending_kyc": pending_kyc_count
-            },
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-    except Exception as e:
-        logger.error(f"System status error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 # Add required menus endpoint
 @app.get("/menus", 
     tags=["Public", "Menus"],
