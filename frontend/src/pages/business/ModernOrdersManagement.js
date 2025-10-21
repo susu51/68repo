@@ -152,7 +152,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
           });
           
           // Then update status to preparing
-          await patch(`/business/orders/${orderId}/status`, { status: newStatus });
+          await patch(`/orders/${orderId}/status`, { to: newStatus });
           await fetchOrders();
           
           // Clear input
