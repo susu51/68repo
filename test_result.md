@@ -209,6 +209,18 @@ agent_communication:
 user_problem_statement: "ORDER BUTTON TESTING - Müşteri panelinde 'Siparişi Onayla ve Ver' butonunun çalışıp çalışmadığını test et. Test Senaryosu: 1) Login (Müşteri) - URL: https://courier-connect-14.preview.emergentagent.com, Email: test@kuryecini.com, Password: test123, Beklenen: Başarılı giriş ve müşteri paneli açılmalı. 2) Keşfet → Restoran Seçimi - Keşfet tab'ına git, Bir adres seç, Bir restoran kartına tıkla, Beklenen: Restoran menüsü açılmalı. 3) Ürün Ekleme - Menüden bir ürüne 'Sepete Ekle' tıkla, Beklenen: Ürün sepete eklenmeli, badge güncellenmeli. 4) Checkout Akışı - Sepet ikonuna/butonuna tıkla, Adres seçilmiş mi kontrol et, Ödeme yöntemi seç (Nakit/Kart), Beklenen: 'Siparişi Onayla ve Ver' butonu görünmeli. 5) 'Siparişi Onayla ve Ver' Butonu Testi (KRİTİK) - Butona tıkla, Console'da 'handleCreateOrder STARTED' log'u var mı?, Network tab'da POST /api/orders isteği gidiyor mu?, Response status ne? (200/201/400/401/422/500), Beklenen: İstek gitmeli ve sonuç gösterilmeli. 6) Network & Console Validation - POST /api/orders endpoint'i çağrılıyor mu?, Request URL doğru mu?, Request body geçerli mi?, Response başarılı mı veya hata mesajı var mı?, Console'da JavaScript hataları var mı?"
 
 frontend:
+  - task: "Business Dashboard Real Data Integration"
+    implemented: true
+    working: "NA"
+    file: "NewBusinessApp.js, ModernDashboard.js, useDashboardSummary.js, businessDashboard.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "🚀 BUSINESS DASHBOARD REAL DATA INTEGRATION COMPLETE: Implemented comprehensive real-time dashboard integration for Business Panel. Dashboard now fetches data from GET /api/business/dashboard/summary endpoint with proper loading/error states, WebSocket event handling, and real metrics display. Features: 6 dashboard cards (today orders, revenue, pending, menu items, customers, rating), activities feed with ≤20 items, loading states with '...' indicators, error handling with graceful fallbacks, refresh functionality via 'Yenile' button, timezone parameter (?tz=Europe/Istanbul). All cards display actual values from API instead of mock data. Ready for comprehensive testing with testbusiness@example.com credentials."
+
   - task: "Order Button Functionality - Siparişi Onayla ve Ver"
     implemented: true
     working: false
