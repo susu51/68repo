@@ -4,6 +4,7 @@ WebSocket endpoint for real-time order notifications
 from fastapi import WebSocket, WebSocketDisconnect, Depends, Query
 from typing import Dict, Set
 import json
+import asyncio
 from datetime import datetime, timezone
 
 class ConnectionManager:
