@@ -92,8 +92,8 @@ class ConnectionManager:
         if role == "admin":
             return len(self.admin_connections)
         if business_id:
-            return len(self.active_connections.get(business_id, set()))
-        return sum(len(conns) for conns in self.active_connections.values()) + len(self.admin_connections)
+            return 1 if business_id in self.active_connections else 0
+        return len(self.active_connections) + len(self.admin_connections)
 
 # Global connection manager
 manager = ConnectionManager()
