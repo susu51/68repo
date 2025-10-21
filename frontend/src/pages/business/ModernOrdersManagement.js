@@ -613,37 +613,50 @@ export const ModernOrdersManagement = ({ businessId }) => {
 
                     {/* Right: Action Buttons */}
                     <div className="flex flex-col gap-2 lg:w-64">
-                      {/* Bekleyen siparişler için onay UI */}
+                      {/* Bekleyen siparişler için onay butonu (sadece durum değişir) */}
                       {['created', 'pending', 'placed'].includes(order.status) && (
+                        <Button
+                          data-testid="approve-order-btn"
+                          onClick={() => confirmOrder(order.id)}
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                          size="lg"
+                        >
+                          <CheckCheck className="h-4 w-4 mr-2" />
+                          Onayla
+                        </Button>
+                      )}
+                      
+                      {/* Onaylı siparişler için hazırlanmaya başla (kurye taskı oluşturulur) */}
+                      {order.status === 'confirmed' && (
                         <div className="space-y-2">
                           <div>
                             <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                              Paket Başı Fiyat (₺)
+                              Paket Ücreti (₺) - Kurye için
                             </label>
                             <input
                               type="number"
-                              data-testid="unit-fee-input"
-                              placeholder="10.00"
+                              data-testid="prep-unit-fee-input"
+                              placeholder="15.00"
                               step="0.50"
                               min="0"
-                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
-                              id={`unit-fee-${order.id}`}
+                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                              id={`prep-unit-fee-${order.id}`}
                             />
                           </div>
                           <Button
-                            data-testid="approve-order-btn"
-                            onClick={() => confirmOrder(order.id)}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                            data-testid="start-preparing-btn"
+                            onClick={() => updateOrderStatus(order.id, 'preparing')}
+                            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                             size="lg"
                           >
-                            <CheckCheck className="h-4 w-4 mr-2" />
-                            Onayla
+                            <ChefHat className="h-4 w-4 mr-2" />
+                            Hazırlanmaya Başla
                           </Button>
                         </div>
                       )}
                       
                       {/* Diğer durumlar için normal aksiyon */}
-                      {nextAction && !['created', 'pending', 'placed'].includes(order.status) && (
+                      {nextAction && !['created', 'pending', 'placed', 'confirmed'].includes(order.status) && (
                         <Button
                           onClick={() => updateOrderStatus(order.id, nextAction.nextStatus)}
                           className={`${nextAction.color} hover:opacity-90 text-white`}
