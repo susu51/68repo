@@ -82,9 +82,7 @@ class OrderStatusTransitionTest:
         ) as response:
             if response.status == 200:
                 # Extract cookies for future requests
-                self.business_cookies = {}
-                for cookie in response.cookies:
-                    self.business_cookies[cookie.key] = cookie.value
+                self.business_cookies = response.cookies
                 
                 data = await response.json()
                 user_data = data.get('user', {})
