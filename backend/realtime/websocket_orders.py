@@ -176,30 +176,61 @@ async def websocket_order_notifications(
                 "message": "Event subscription failed, but connection maintained"
             })
         
-        # Keep connection alive
-        print(f"🔄 Entering message loop for {role}:{client_id}")
+        # Keep connection alive with heartbeat monitoring
+        logger.info(f"🔄 Entering message loop for {role}:{client_id}")
+        last_message_time = asyncio.get_event_loop().time()
+        
         while True:
             try:
-                # Wait for messages with timeout to prevent blocking
+                # Wait for messages with 75s timeout (proxy-compatible)
                 data = await asyncio.wait_for(
                     websocket.receive_text(),
-                    timeout=60.0  # 60 second timeout
+                    timeout=75.0
                 )
-                print(f"📨 Received message from {role}:{client_id}: {data[:100]}")
+                
+                last_message_time = asyncio.get_event_loop().time()
+                logger.debug(f"📨 Received message from {role}:{client_id}: {data[:100]}")
                 
                 # Handle different message types
                 if data == "ping":
                     await websocket.send_text("pong")
-                    print(f"🏓 Sent pong to {role}:{client_id}")
+                    logger.debug(f"🏓 Sent pong to {role}:{client_id}")
                 elif data.startswith("{"):
-                    # JSON message - echo back
-                    await websocket.send_text(data)
+                    # JSON message - parse and handle
+                    try:
+                        msg_data = json.loads(data)
+                        
+                        # Handle subscribe message (for re-subscription after reconnect)
+                        if msg_data.get("type") == "subscribe":
+                            logger.info(f"📡 Re-subscription request from {role}:{client_id}")
+                            await websocket.send_json({
+                                "type": "subscribed",
+                                "role": role,
+                                "client_id": client_id,
+                                "timestamp": datetime.now(timezone.utc).isoformat()
+                            })
+                    except json.JSONDecodeError:
+                        logger.warning(f"⚠️ Invalid JSON from {role}:{client_id}: {data[:100]}")
                     
             except asyncio.TimeoutError:
-                # Timeout is normal - just continue
-                continue
+                # 75s timeout - check if client is still responsive
+                current_time = asyncio.get_event_loop().time()
+                idle_time = current_time - last_message_time
+                
+                if idle_time > 90:
+                    # Client hasn't sent anything in 90s (including ping) - close connection
+                    logger.warning(f"⏱️ Idle timeout for {role}:{client_id} ({idle_time:.0f}s)")
+                    await websocket.close(code=1000, reason="Idle timeout")
+                    break
+                else:
+                    # Normal timeout - continue waiting
+                    continue
+                    
+            except WebSocketDisconnect:
+                logger.info(f"🔌 Client disconnected normally: {role}:{client_id}")
+                break
             except Exception as loop_error:
-                print(f"❌ Error in message loop for {role}:{client_id}: {loop_error}")
+                logger.error(f"❌ Error in message loop for {role}:{client_id}: {loop_error}")
                 break
             
     except WebSocketDisconnect:
