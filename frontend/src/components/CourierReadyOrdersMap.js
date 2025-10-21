@@ -247,8 +247,101 @@ export const CourierReadyOrdersMap = () => {
         </Card>
       )}
 
-      {/* Ready Orders List */}
-      {readyOrders.length === 0 ? (
+      {/* Available Orders Modal/Panel */}
+      {selectedBusiness && (
+        <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/10 mt-4">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                <ShoppingBag className="h-5 w-5" />
+                {selectedBusiness.name} - Siparişler ({availableOrders.length})
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedBusiness(null);
+                  setAvailableOrders([]);
+                }}
+              >
+                ✕
+              </Button>
+            </div>
+            <CardDescription>
+              Sipariş seçin ve alın - İlk gelen ilk alır!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {availableOrders.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Bu işletmede hazır sipariş yok</p>
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                {availableOrders.map((order) => (
+                  <div 
+                    key={order.order_id}
+                    className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-800"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h5 className="font-semibold text-sm">
+                          Sipariş #{order.order_code}
+                        </h5>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          👤 {order.customer_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          📍 {order.delivery_address}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          📦 {order.items_count} ürün
+                        </p>
+                        {order.notes && (
+                          <p className="text-xs text-yellow-600 mt-1">
+                            💬 {order.notes}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">
+                          ₺{order.grand_total.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          (₺{order.delivery_fee.toFixed(2)} teslimat)
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <Button
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      size="sm"
+                      disabled={claimingOrderId === order.order_id}
+                      onClick={() => claimOrder(order.order_id)}
+                    >
+                      {claimingOrderId === order.order_id ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Alınıyor...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Siparişi Al
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Ready Orders List (old, keep for now) */}
+      {!selectedBusiness && readyOrders.length === 0 ? (
         <Card>
           <CardContent className="py-12">
             <div className="text-center text-muted-foreground">
