@@ -180,8 +180,8 @@ export const CourierReadyOrdersMap = () => {
         </CardHeader>
       </Card>
 
-      {/* Business Locations with Waiting Tasks - MAP VIEW */}
-      {businessLocations.length > 0 && (
+      {/* Nearby Businesses Map - Click to see orders */}
+      {nearbyBusinesses.length > 0 && (
         <Card className="border-purple-200 bg-purple-50 dark:bg-purple-900/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
