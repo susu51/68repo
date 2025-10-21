@@ -179,7 +179,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
       console.log('🎯 Confirming order (just status, no courier yet):', orderId);
       
       // Simply update status to 'confirmed'
-      await patch(`/business/orders/${orderId}/status`, { status: 'confirmed' });
+      await patch(`/orders/${orderId}/status`, { to: 'confirmed' });
       
       toast.success('Sipariş onaylandı! Hazırlanmaya başlayabilirsiniz.', {
         duration: 3000,
