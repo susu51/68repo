@@ -87,10 +87,53 @@ export const NewBusinessApp = ({ user, onLogout }) => {
 
   useEffect(() => {
     loadBusinessInfo();
-    loadStats();
     // Mount all components after initial load
     setTimeout(() => setAllComponentsMounted(true), 100);
   }, []);
+
+  // WebSocket invalidation - refresh dashboard on real-time events
+  useEffect(() => {
+    const businessId = user?.id;
+    if (!businessId) return;
+
+    const handleWebSocketMessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        const eventType = message.event_type || message.type;
+        
+        console.log('📡 WebSocket event received in dashboard:', eventType);
+        
+        // Invalidate dashboard on relevant events
+        const eventsToInvalidate = [
+          'order.created',
+          'order_created',
+          'order.status_changed', 
+          'order_status_changed',
+          'rating.received',
+          'rating_received',
+          'menu.updated',
+          'menu_updated'
+        ];
+        
+        if (eventsToInvalidate.includes(eventType)) {
+          console.log('🔄 Refreshing dashboard due to:', eventType);
+          refetchDashboard();
+        }
+      } catch (error) {
+        console.error('❌ Error handling WebSocket message:', error);
+      }
+    };
+
+    // Subscribe to WebSocket events
+    const ws = WSManager.getConnection();
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.addEventListener('message', handleWebSocketMessage);
+      
+      return () => {
+        ws.removeEventListener('message', handleWebSocketMessage);
+      };
+    }
+  }, [user?.id, refetchDashboard]);
 
   const loadBusinessInfo = async () => {
     try {
@@ -114,31 +157,6 @@ export const NewBusinessApp = ({ user, onLogout }) => {
       console.log('✅ Business info loaded, ID:', businessId);
     } catch (error) {
       console.error('Business info error:', error);
-    }
-  };
-
-  const loadStats = async () => {
-    try {
-      setLoading(true);
-      // Load real stats from backend
-      const menuResult = await get('/business/menu');
-      const menuItems = Array.isArray(menuResult?.data) ? menuResult.data : (Array.isArray(menuResult) ? menuResult : []);
-      
-      console.log('📊 Menu items loaded:', menuItems.length);
-      
-      setStats(prev => ({
-        ...prev,
-        menuItems: menuItems.length,
-        todayOrders: Math.floor(Math.random() * 20) + 5,
-        todayRevenue: Math.floor(Math.random() * 5000) + 1000,
-        pendingOrders: Math.floor(Math.random() * 5) + 1,
-        rating: 4.5,
-        totalCustomers: Math.floor(Math.random() * 500) + 100
-      }));
-    } catch (error) {
-      console.error('Stats error:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
