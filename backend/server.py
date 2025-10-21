@@ -2341,24 +2341,40 @@ async def create_order(
                 detail=f"Minimum sipariş tutarı: {min_order} TL (Sepet: {subtotal} TL)"
             )
         
-        # 7. Create order document
+        # 7. Generate unique order code
+        from utils.order_code import generate_unique_order_code
+        order_code = await generate_unique_order_code(db)
+        
+        # 8. Create order document
         order_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
         
         order_doc = {
             "id": order_id,
+            "order_code": order_code,  # ✅ Sipariş kodu
             "user_id": current_user["id"],
             "customer_id": current_user["id"],
             "customer_name": f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip() or current_user.get('email', 'Müşteri'),
+            "customer_phone": current_user.get('phone', ''),  # ✅ Telefon numarası
             "restaurant_id": restaurant_id,
             "business_id": restaurant_id,  # Same as restaurant_id
             "business_name": restaurant.get('business_name', 'Restoran'),
             "address_snapshot": address_snapshot,
+            "delivery_address": address_snapshot.get('acik_adres', ''),  # ✅ Teslimat adresi (düz metin)
+            "delivery_location": {  # ✅ GeoJSON for courier assignment
+                "type": "Point",
+                "coordinates": [
+                    float(address_snapshot.get('lng', 0)),
+                    float(address_snapshot.get('lat', 0))
+                ]
+            } if address_snapshot.get('lng') and address_snapshot.get('lat') else None,
             "items_snapshot": items_snapshot,
             "totals": totals,
             "payment_method": order_data.get('payment_method', 'cash'),
             "payment_status": "paid_mock" if order_data.get('payment_method') == 'online_mock' else "unpaid",
-            "status": "created",
+            "status": "pending",  # ✅ Başlangıç durumu: bekleyen
+            "pickup_mode": "courier",  # ✅ Varsayılan: kurye ile
+            "assigned_courier_id": None,
             "timeline": [{
                 "event": "created",
                 "at": now,
@@ -2371,7 +2387,7 @@ async def create_order(
             "updated_at": now
         }
         
-        # 8. Insert order
+        # 9. Insert order
         result = await db.orders.insert_one(order_doc)
         
         if not result.acknowledged:
