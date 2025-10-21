@@ -57,14 +57,41 @@ export default {
     return await get(path);
   },
   async post(path, body) {
-    // post() returns Response object, need to parse
+    // post() returns Response object, need to parse and handle errors
     const res = await post(path, body);
+    
+    // Handle non-OK responses (including 401)
+    if (!res.ok) {
+      let errorMessage = `HTTP ${res.status}`;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.detail || errorData.message || errorMessage;
+      } catch {
+        // Response body is not JSON or empty
+        errorMessage = res.statusText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+    
     const data = await res.json();
     return { data };
   },
   async patch(path, body) {
-    // patch() returns Response object, need to parse
+    // patch() returns Response object, need to parse and handle errors
     const res = await patch(path, body);
+    
+    // Handle non-OK responses
+    if (!res.ok) {
+      let errorMessage = `HTTP ${res.status}`;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.detail || errorData.message || errorMessage;
+      } catch {
+        errorMessage = res.statusText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+    
     const data = await res.json();
     return { data };
   },
