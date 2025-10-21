@@ -164,7 +164,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
         }
       } else {
         // Regular status update
-        await patch(`/business/orders/${orderId}/status`, { status: newStatus });
+        await patch(`/orders/${orderId}/status`, { to: newStatus });
         toast.success(`Sipariş durumu güncellendi: ${getStatusLabel(newStatus)}`);
         await fetchOrders();
       }
