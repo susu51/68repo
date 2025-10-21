@@ -76,14 +76,18 @@ export const ModernOrdersManagement = ({ businessId }) => {
       
       console.log('🔄 Fetching ALL orders from business API...');
       
-      // Fetch ALL orders (not just incoming)
-      // Use /business/orders/active or /orders with business_id filter
+      // Fetch incoming orders (pending/placed)
       const incomingResponse = await get('/business/orders/incoming');
       console.log('📡 Incoming orders response:', incomingResponse);
       
-      // Also fetch active orders (confirmed, preparing, ready)
-      const activeResponse = await get('/business/orders/active');
-      console.log('📡 Active orders response:', activeResponse);
+      // Try to fetch active orders (confirmed, preparing, ready) - if fails, continue with incoming only
+      let activeResponse = null;
+      try {
+        activeResponse = await get('/business/orders/active');
+        console.log('📡 Active orders response:', activeResponse);
+      } catch (activeError) {
+        console.warn('⚠️ Could not fetch active orders, using incoming only:', activeError.message);
+      }
       
       // Parse response - backend returns array directly
       let incomingOrders = [];
