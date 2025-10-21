@@ -3,7 +3,7 @@
  * Provides real-time metrics with loading/error states
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getDashboardSummary } from '../api/businessDashboard';
 
 /**
@@ -23,12 +23,23 @@ export const useDashboardSummary = (date = null, options = {}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [fetchCount, setFetchCount] = useState(0);
+  
+  // Use refs to avoid recreating fetchData on every render
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+  
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+    onErrorRef.current = onError;
+  }, [onSuccess, onError]);
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
+      console.log('📊 Fetching dashboard summary...');
       const response = await getDashboardSummary(date, 'Europe/Istanbul');
       
       // Handle both response formats (response.data or direct response)
@@ -38,28 +49,38 @@ export const useDashboardSummary = (date = null, options = {}) => {
         throw new Error('No data received from server');
       }
 
+      console.log('✅ Dashboard data loaded:', summaryData);
       setData(summaryData);
+      setFetchCount(prev => prev + 1);
       
-      if (onSuccess) {
-        onSuccess(summaryData);
+      if (onSuccessRef.current) {
+        onSuccessRef.current(summaryData);
       }
     } catch (err) {
       console.error('❌ Dashboard summary fetch error:', err);
       const errorMessage = err?.response?.data?.detail || err?.message || 'Failed to load dashboard data';
       setError(errorMessage);
       
-      if (onError) {
-        onError(errorMessage);
+      if (onErrorRef.current) {
+        onErrorRef.current(errorMessage);
       }
     } finally {
       setLoading(false);
     }
-  }, [date, onSuccess, onError]);
+  }, [date]); // Only depend on date
 
-  // Initial fetch
+  // Initial fetch - only once on mount
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    let mounted = true;
+    
+    if (mounted) {
+      fetchData();
+    }
+    
+    return () => {
+      mounted = false;
+    };
+  }, []); // Empty deps - fetch only once on mount
 
   // Auto-refetch interval
   useEffect(() => {
@@ -80,6 +101,7 @@ export const useDashboardSummary = (date = null, options = {}) => {
     data,
     loading,
     error,
-    refetch
+    refetch,
+    fetchCount // For debugging
   };
 };
