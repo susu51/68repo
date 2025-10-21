@@ -296,7 +296,7 @@ class OrderFlowTester:
         for status in statuses_to_test:
             try:
                 response = self.session.patch(
-                    f"{BACKEND_URL}/orders/{self.test_order_id}/status",
+                    f"{BACKEND_URL}/business/orders/{self.test_order_id}/status",
                     json={"status": status},
                     cookies=self.business_cookies
                 )
