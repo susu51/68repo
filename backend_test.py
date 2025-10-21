@@ -323,9 +323,10 @@ class OrderFlowTester:
             return False
         
         try:
+            # Try the order tracking endpoint first
             response = self.session.get(
-                f"{BACKEND_URL}/business/orders/{self.test_order_id}",
-                cookies=self.business_cookies
+                f"{BACKEND_URL}/orders/{self.test_order_id}/track",
+                cookies=self.customer_cookies  # Use customer cookies for tracking
             )
             
             if response.status_code == 200:
