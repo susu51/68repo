@@ -39,11 +39,12 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
       if (response.data && Array.isArray(response.data)) {
         const items = response.data.map(item => ({
           id: item.id,
-          name: item.name,
+          name: item.name || item.title,
           description: item.description || '',
           price: parseFloat(item.price) || 0,
-          category: item.category || 'main',
-          image: item.image_url || 'https://via.placeholder.com/300x200?text=Yemek',
+          category: item.category || 'Yemek',
+          // Check both image_url and photo_url, use placeholder if both are null
+          image: item.image_url || item.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'Yemek')}&size=400&background=ff6b6b&color=fff&bold=true`,
           availability: item.is_available !== false
         }));
         setMenuItems(items);
