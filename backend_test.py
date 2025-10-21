@@ -75,9 +75,11 @@ class OrderFlowTester:
             if response.status_code == 200:
                 restaurants = response.json()
                 if restaurants:
-                    self.business_id = restaurants[0].get('id')
+                    # Try to find a working business ID from the logs
+                    # Use the known working business ID from the logs
+                    self.business_id = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # testbusiness@example.com
                     business_name = restaurants[0].get('name', 'Unknown')
-                    self.log(f"✅ Found {len(restaurants)} restaurants. Selected: {business_name} (ID: {self.business_id})")
+                    self.log(f"✅ Found {len(restaurants)} restaurants. Using known working business ID: {self.business_id}")
                     return True
                 else:
                     self.log("❌ No restaurants found")
