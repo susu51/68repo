@@ -385,6 +385,18 @@ class WSManager {
   }
   
   /**
+   * Get connection state
+   * @returns {Object} Connection state
+   */
+  getConnectionState() {
+    return {
+      isConnected: this.ws !== null && this.ws.readyState === WebSocket.OPEN,
+      isLeader: this.isLeader,
+      enabled: this.enabled
+    };
+  }
+  
+  /**
    * Reset WSManager to initial state
    */
   reset() {
