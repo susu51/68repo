@@ -2396,9 +2396,9 @@ async def create_order(
                 detail="Sipariş kaydedilemedi"
             )
         
-        logger.info(f"✅ Order created: {order_id} | Restaurant: {restaurant.get('business_name')} | Business ID: {restaurant_id} | Customer: {order_doc['customer_name']} | Total: {totals['grand']} TL")
+        logger.info(f"✅ Order created: {order_code} ({order_id}) | Restaurant: {restaurant.get('business_name')} | Business ID: {restaurant_id} | Customer: {order_doc['customer_name']} | Total: {totals['grand']} TL")
         
-        # 9. Publish real-time event
+        # 10. Publish real-time event
         try:
             from realtime.event_bus import publish_order_created
             await publish_order_created(
@@ -2406,17 +2406,22 @@ async def create_order(
                 restaurant_id=restaurant_id,
                 business_id=restaurant_id,
                 order_data={
+                    "order_code": order_code,  # ✅ Sipariş kodu
                     "customer_name": order_doc['customer_name'],
+                    "customer_phone": order_doc['customer_phone'],
+                    "delivery_address": order_doc['delivery_address'],
+                    "payment_method": order_doc['payment_method'],
                     "total": totals['grand'],
                     "items_count": len(items_snapshot),
-                    "business_name": order_doc['business_name']
+                    "business_name": order_doc['business_name'],
+                    "status": "pending"
                 }
             )
-            logger.info(f"✅ Real-time event published for order {order_id}")
+            logger.info(f"✅ Real-time event published for order {order_code}")
         except Exception as event_error:
-            logger.warning(f"⚠️ Event publish failed for order {order_id} (non-critical): {event_error}")
+            logger.warning(f"⚠️ Event publish failed for order {order_code} (non-critical): {event_error}")
         
-        # 10. Return response (serialize datetime)
+        # 11. Return response (serialize datetime)
         order_doc["created_at"] = order_doc["created_at"].isoformat()
         order_doc["updated_at"] = order_doc["updated_at"].isoformat()
         order_doc["timeline"][0]["at"] = order_doc["timeline"][0]["at"].isoformat()
