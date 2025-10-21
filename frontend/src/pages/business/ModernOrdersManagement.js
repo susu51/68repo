@@ -476,24 +476,6 @@ export const ModernOrdersManagement = ({ businessId }) => {
         </Card>
       </div>
 
-      {/* Remaining old card - remove duplicate confirmed card below */}
-      <div style={{display: 'none'}}>
-        <Card className={`cursor-pointer transition-all ${statusFilter === 'confirmed' ? 'ring-2 ring-blue-500' : ''}`}
-              onClick={() => setStatusFilter(statusFilter === 'confirmed' ? 'all' : 'confirmed')}>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Onaylı</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.confirmed}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/20">
-                <CheckCircle className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Filter Pills */}
       <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
         <Button
