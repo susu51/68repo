@@ -74,6 +74,28 @@ export const CustomerApp = ({ user, onLogout }) => {
     console.log('📍 Seçili Adres:', selectedAddress);
     console.log('💳 Seçili Ödeme:', selectedPaymentMethod);
     console.log('🛒 Sepet:', cart);
+    console.log('👤 Kullanıcı:', user);
+    
+    // CHECK IF USER IS AUTHENTICATED FIRST
+    if (!user || !user.id) {
+      console.error('❌ HATA: Kullanıcı login olmamış!');
+      toast.error(
+        '⚠️ Sipariş vermek için lütfen giriş yapın',
+        {
+          duration: 5000,
+          icon: '🔒',
+          style: {
+            fontSize: '16px',
+            fontWeight: 'bold'
+          }
+        }
+      );
+      // Redirect to login
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+      return;
+    }
     
     try {
       // Validation checks
