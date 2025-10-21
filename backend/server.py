@@ -4893,8 +4893,12 @@ async def get_public_businesses(
         
         business_list = []
         for business in businesses:
-            # Get business ID properly
-            business_id = str(business.get("_id", business.get("id", "unknown")))
+            # Get business ID properly - prefer id field over _id
+            business_id = business.get("id")
+            if business_id is None:
+                business_id = str(business.get("_id", "unknown"))
+            
+            print(f"🏪 Business: {business.get('business_name')}, id={business_id}")
             
             # Use real business location data
             business_city = business.get("city", "İstanbul")  # Use actual city from business
