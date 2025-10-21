@@ -67,6 +67,12 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
       return;
     }
 
+  const connect = useCallback(() => {
+    if (!businessId) {
+      console.log('⚠️ No business ID provided for WebSocket');
+      return;
+    }
+
     try {
       // Construct WebSocket URL
       const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
@@ -75,7 +81,7 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
       let wsUrl;
       
       if (backendUrl) {
-        // Use backend URL if provided
+        // Use backend URL if provided (prefer wss:// for prod)
         const protocol = backendUrl.startsWith('https') ? 'wss' : 'ws';
         const host = backendUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
         wsUrl = `${protocol}://${host}/api/ws/orders?business_id=${businessId}&role=business`;
@@ -87,7 +93,6 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
       }
 
       console.log('🔌 Connecting to WebSocket:', wsUrl);
-      console.log('   Business ID:', businessId);
 
       const ws = new WebSocket(wsUrl);
 
@@ -95,19 +100,40 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
         console.log('✅ WebSocket connected');
         setIsConnected(true);
         reconnectAttempts.current = 0;
+        connectionStartTimeRef.current = Date.now();
         
-        // Send ping every 30 seconds to keep connection alive
-        const pingInterval = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send('ping');
-          }
-        }, 30000);
-
-        ws.pingInterval = pingInterval;
+        // Start heartbeat
+        startHeartbeat(ws);
+        
+        // Reset backoff after 2 minutes of stable connection
+        backoffResetTimeoutRef.current = setTimeout(() => {
+          console.log('✅ 2-min stable connection - resetting backoff');
+          reconnectAttempts.current = 0;
+        }, 120000);
+        
+        // Send re-subscribe message (important after reconnect)
+        ws.send(JSON.stringify({
+          type: 'subscribe',
+          business_id: businessId,
+          role: 'business'
+        }));
       };
 
       ws.onmessage = (event) => {
         try {
+          // Handle pong response
+          if (event.data === 'pong') {
+            console.log('🏓 Received pong');
+            missedPongsRef.current = 0;
+            
+            // Clear pong timeout
+            if (pongTimeoutRef.current) {
+              clearTimeout(pongTimeoutRef.current);
+              pongTimeoutRef.current = null;
+            }
+            return;
+          }
+          
           const data = JSON.parse(event.data);
           console.log('📩 WebSocket message:', data);
 
@@ -119,7 +145,6 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
             
             // Play notification sound
             try {
-              // Use utility function for sound
               import('../utils/notificationSound').then(module => {
                 module.default();
               });
@@ -127,7 +152,7 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
               console.log('Audio notification failed:', e);
             }
 
-            // Show toast notification with enhanced styling
+            // Show toast notification
             toast.success(
               `🆕 Yeni Sipariş!\n${orderInfo.customer_name}\n${orderInfo.total} TL`,
               {
@@ -158,32 +183,35 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
         console.error('❌ WebSocket error:', error);
       };
 
-      ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected');
+      ws.onclose = (event) => {
+        console.log(`🔌 WebSocket disconnected (code: ${event.code}, reason: ${event.reason || 'none'})`);
         setIsConnected(false);
+        cleanupTimers();
 
-        // Clear ping interval
-        if (ws.pingInterval) {
-          clearInterval(ws.pingInterval);
+        // Log abnormal closures for monitoring
+        if (event.code === 1006 || event.code === 1011) {
+          console.error(`🚨 Abnormal WebSocket closure: ${event.code} - business_id: ${businessId}`);
+          // TODO: Send to Sentry with panel & businessId tags
         }
 
-        // Attempt to reconnect with exponential backoff
-        if (reconnectAttempts.current < 5) {
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-          console.log(`🔄 Reconnecting in ${delay}ms... (attempt ${reconnectAttempts.current + 1})`);
-          
-          reconnectTimeoutRef.current = setTimeout(() => {
-            reconnectAttempts.current += 1;
-            connect();
-          }, delay);
-        }
+        // Exponential backoff: 1→2→4→8→16→max 30s with jitter
+        const baseDelay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
+        const jitter = Math.random() * 1000; // 0-1s jitter
+        const delay = baseDelay + jitter;
+        
+        console.log(`🔄 Reconnecting in ${(delay/1000).toFixed(1)}s... (attempt ${reconnectAttempts.current + 1})`);
+        
+        reconnectTimeoutRef.current = setTimeout(() => {
+          reconnectAttempts.current += 1;
+          connect();
+        }, delay);
       };
 
       wsRef.current = ws;
     } catch (error) {
       console.error('❌ WebSocket connection error:', error);
     }
-  }, [businessId, onOrderReceived]);
+  }, [businessId, onOrderReceived, startHeartbeat, cleanupTimers]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
