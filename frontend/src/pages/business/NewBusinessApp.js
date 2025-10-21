@@ -32,17 +32,43 @@ import { ModernDashboard } from './ModernDashboard';
 export const NewBusinessApp = ({ user, onLogout }) => {
   const [activeView, setActiveView] = useState('dashboard');
   const [businessInfo, setBusinessInfo] = useState(null);
-  const [stats, setStats] = useState({
+  const [allComponentsMounted, setAllComponentsMounted] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  
+  // Use real dashboard data hook
+  const { 
+    data: dashboardData, 
+    loading: dashboardLoading, 
+    error: dashboardError, 
+    refetch: refetchDashboard 
+  } = useDashboardSummary(null, {
+    autoRefetch: false, // We'll handle refresh via WebSocket
+    onError: (error) => {
+      console.error('❌ Dashboard load error:', error);
+      toast.error('Dashboard verileri yüklenemedi');
+    }
+  });
+
+  // Map dashboard data to stats format
+  const stats = dashboardData ? {
+    todayOrders: dashboardData.today_orders_count || 0,
+    todayRevenue: dashboardData.today_revenue || 0,
+    pendingOrders: dashboardData.pending_orders_count || 0,
+    menuItems: dashboardData.menu_items_count || 0,
+    rating: dashboardData.rating_avg || 0,
+    totalCustomers: dashboardData.total_customers || 0,
+    activities: dashboardData.activities || []
+  } : {
     todayOrders: 0,
     todayRevenue: 0,
     pendingOrders: 0,
     menuItems: 0,
     rating: 0,
-    totalCustomers: 0
-  });
-  const [loading, setLoading] = useState(true);
-  const [allComponentsMounted, setAllComponentsMounted] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+    totalCustomers: 0,
+    activities: []
+  };
+  
+  const loading = dashboardLoading;
 
   // Force light mode for business panel
   useEffect(() => {
