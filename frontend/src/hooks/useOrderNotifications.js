@@ -214,12 +214,9 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
   }, [businessId, onOrderReceived, startHeartbeat, cleanupTimers]);
 
   const disconnect = useCallback(() => {
+    cleanupTimers();
+    
     if (wsRef.current) {
-      // Clear ping interval
-      if (wsRef.current.pingInterval) {
-        clearInterval(wsRef.current.pingInterval);
-      }
-      
       wsRef.current.close();
       wsRef.current = null;
     }
@@ -230,7 +227,7 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
     }
 
     setIsConnected(false);
-  }, []);
+  }, [cleanupTimers]);
 
   // Connect on mount, disconnect on unmount
   useEffect(() => {
