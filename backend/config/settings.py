@@ -4,7 +4,11 @@ Replaces hardcoded values with environment variables
 """
 
 import os
-from pydantic import BaseSettings, Field
+from pydantic import Field
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
