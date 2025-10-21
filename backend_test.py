@@ -56,9 +56,7 @@ class OrderStatusTransitionTest:
         ) as response:
             if response.status == 200:
                 # Extract cookies for future requests
-                self.customer_cookies = {}
-                for cookie in response.cookies:
-                    self.customer_cookies[cookie.key] = cookie.value
+                self.customer_cookies = response.cookies
                 
                 data = await response.json()
                 print(f"✅ Customer login successful: {data.get('message', 'Login successful')}")
