@@ -667,13 +667,24 @@ export const ModernOrdersManagement = ({ businessId }) => {
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Sipariş Detayları</span>
-                <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(null)}>✕</Button>
-              </CardTitle>
-              <CardDescription>
-                Sipariş #{selectedOrder.id?.slice(-8)}
-              </CardDescription>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle>Sipariş Detayları</CardTitle>
+                  <CardDescription>Sipariş #{selectedOrder.id?.slice(-8)}</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => printReceipt(selectedOrder)}
+                    className="gap-2"
+                  >
+                    <Printer className="h-4 w-4" />
+                    Yazdır
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(null)}>✕</Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
