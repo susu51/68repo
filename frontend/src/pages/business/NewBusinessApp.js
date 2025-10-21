@@ -91,50 +91,6 @@ export const NewBusinessApp = ({ user, onLogout }) => {
     setTimeout(() => setAllComponentsMounted(true), 100);
   }, []);
 
-  // WebSocket invalidation - refresh dashboard on real-time events
-  useEffect(() => {
-    const businessId = user?.id;
-    if (!businessId) return;
-
-    const handleWebSocketMessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        const eventType = message.event_type || message.type;
-        
-        console.log('📡 WebSocket event received in dashboard:', eventType);
-        
-        // Invalidate dashboard on relevant events
-        const eventsToInvalidate = [
-          'order.created',
-          'order_created',
-          'order.status_changed', 
-          'order_status_changed',
-          'rating.received',
-          'rating_received',
-          'menu.updated',
-          'menu_updated'
-        ];
-        
-        if (eventsToInvalidate.includes(eventType)) {
-          console.log('🔄 Refreshing dashboard due to:', eventType);
-          refetchDashboard();
-        }
-      } catch (error) {
-        console.error('❌ Error handling WebSocket message:', error);
-      }
-    };
-
-    // Subscribe to WebSocket events
-    const ws = WSManager.getConnection();
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.addEventListener('message', handleWebSocketMessage);
-      
-      return () => {
-        ws.removeEventListener('message', handleWebSocketMessage);
-      };
-    }
-  }, [user?.id, refetchDashboard]);
-
   const loadBusinessInfo = async () => {
     try {
       // Get business ID from authenticated user
