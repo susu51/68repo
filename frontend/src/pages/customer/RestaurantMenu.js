@@ -71,14 +71,24 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurant]); // Only depend on restaurant, fetchMenuItems is stable via useCallback
 
-  // Categories matching backend Turkish categories
+  // Category icons mapping
+  const categoryIcons = {
+    'Yemek': '🍖',
+    'Kahvaltı': '🍳',
+    'İçecek': '🥤',
+    'Atıştırmalık': '🍿',
+    'Tatlı': '🍰'
+  };
+
+  // Dynamically generate categories from menu items
+  const uniqueCategories = [...new Set(menuItems.map(item => item.category))];
   const categories = [
     { id: 'all', name: 'Hepsi', icon: '🍽️' },
-    { id: 'Yemek', name: 'Yemek', icon: '🍖' },
-    { id: 'Kahvaltı', name: 'Kahvaltı', icon: '🍳' },
-    { id: 'İçecek', name: 'İçecek', icon: '🥤' },
-    { id: 'Atıştırmalık', name: 'Atıştırmalık', icon: '🍿' },
-    { id: 'Tatlı', name: 'Tatlı', icon: '🍰' }
+    ...uniqueCategories.map(cat => ({
+      id: cat,
+      name: cat,
+      icon: categoryIcons[cat] || '🍴'
+    }))
   ];
 
   const filteredItems = selectedCategory === 'all' 
