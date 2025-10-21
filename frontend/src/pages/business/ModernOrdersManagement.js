@@ -118,9 +118,56 @@ export const ModernOrdersManagement = ({ businessId }) => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await patch(`/business/orders/${orderId}/status`, { status: newStatus });
-      toast.success(`Sipariş durumu güncellendi: ${getStatusLabel(newStatus)}`);
-      await fetchOrders();
+      console.log(`🔄 Updating order ${orderId} to status: ${newStatus}`);
+      
+      // If transitioning to 'preparing', create courier task
+      if (newStatus === 'preparing') {
+        // Get unit delivery fee from input
+        const input = document.getElementById(`prep-unit-fee-${orderId}`);
+        const unitFee = parseFloat(input?.value);
+        
+        console.log('💰 Unit fee for preparing:', unitFee);
+        
+        // Validation
+        if (!unitFee || unitFee <= 0) {
+          toast.error('Lütfen geçerli bir paket ücreti girin (Hazırlanıyor için)');
+          return;
+        }
+        
+        // Call confirm API to create courier task
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/business/orders/${orderId}/confirm`, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ unit_delivery_fee: unitFee })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Courier task created:', data);
+          
+          toast.success('Sipariş hazırlanmaya başladı. Kurye haritasına düştü!', {
+            duration: 4000,
+            icon: '👨‍🍳'
+          });
+          
+          // Then update status to preparing
+          await patch(`/business/orders/${orderId}/status`, { status: newStatus });
+          await fetchOrders();
+          
+          // Clear input
+          if (input) input.value = '';
+        } else {
+          const error = await response.json();
+          console.error('❌ Confirm error:', error);
+          toast.error(error.detail || 'Kurye ataması başarısız');
+        }
+      } else {
+        // Regular status update
+        await patch(`/business/orders/${orderId}/status`, { status: newStatus });
+        toast.success(`Sipariş durumu güncellendi: ${getStatusLabel(newStatus)}`);
+        await fetchOrders();
+      }
     } catch (error) {
       console.error('❌ Status update error:', error);
       toast.error('Durum güncellenemedi');
