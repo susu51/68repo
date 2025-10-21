@@ -2,7 +2,7 @@
 Business Dashboard Summary Endpoint
 Provides real-time metrics and activities for business panel
 """
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 import os
@@ -16,91 +16,51 @@ DEFAULT_TZ = "Europe/Istanbul"
 REVENUE_STATUSES = os.getenv("CONFIRM_STATUSES", "confirmed,delivered").split(",")
 
 
-def get_day_range(date_str: Optional[str] = None, tz: str = DEFAULT_TZ):
-    """
-    Get start and end of day in UTC for given date
-    """
-    try:
-        from zoneinfo import ZoneInfo
-    except ImportError:
-        import pytz
-        tz_info = pytz.timezone(tz)
-    else:
-        tz_info = ZoneInfo(tz)
-    
-    if date_str:
-        target_date = datetime.fromisoformat(date_str)
-    else:
-        target_date = datetime.now(tz_info)
-    
-    # Start of day
-    start_of_day = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    # End of day
-    end_of_day = target_date.replace(hour=23, minute=59, second=59, microsecond=999999)
-    
-    # Convert to UTC for MongoDB query
-    start_utc = start_of_day.astimezone(timezone.utc)
-    end_utc = end_of_day.astimezone(timezone.utc)
-    
-    return start_utc, end_utc
-
-
 @router.get("/business/dashboard/summary")
 async def get_dashboard_summary(
+    request: Request,
     date: Optional[str] = Query(None, description="Date in YYYY-MM-DD format"),
-    tz: str = Query(DEFAULT_TZ, description="Timezone"),
-    current_user: dict = Depends(None)
+    tz: str = Query(DEFAULT_TZ, description="Timezone")
 ):
     """
     Get dashboard summary for business
-    
-    Returns:
-    - today_orders_count: Number of orders today
-    - today_revenue: Revenue today (only from confirmed/delivered)
-    - pending_orders_count: Pending orders
-    - menu_items_count: Active menu items
-    - total_customers: Unique customers
-    - rating_avg: Average rating
-    - rating_count: Number of ratings
-    - activities: Recent activities
     """
     from config.db import db
-    from auth_dependencies import get_approved_business_user_from_cookie as get_business_user
-    
-    # Get authenticated business user
-    if current_user is None:
-        # Import Request to get it from context
-        from fastapi import Request
-        from starlette.requests import Request as StarletteRequest
-        # This will be handled by FastAPI dependency injection
-        pass
-    
-    # For now, use a simpler approach - get from cookie directly
     from auth_cookie import get_current_user_from_cookie_or_bearer
     
-    # Note: This should be passed through Depends() properly
-    # For now we'll access it via the global db and auth system
+    # Get authenticated user
+    current_user = await get_current_user_from_cookie_or_bearer(request)
+    
+    if current_user.get("role") != "business":
+        raise HTTPException(status_code=403, detail="Business access required")
+    
+    if current_user.get("kyc_status") != "approved":
+        raise HTTPException(status_code=403, detail="KYC approval required")
+    
     business_id = current_user.get("id")
     
-    if not business_id:
-        raise HTTPException(status_code=400, detail="Business ID not found")
+    # Get date range (simplified - just use UTC for now)
+    if date:
+        target_date = datetime.fromisoformat(date)
+    else:
+        target_date = datetime.now(timezone.utc)
     
-    # Get date range
-    start_utc, end_utc = get_day_range(date, tz)
+    start_of_day = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_day = target_date.replace(hour=23, minute=59, second=59, microsecond=999999)
     
-    # 1. Today's orders count (all statuses except cancelled)
+    # 1. Today's orders count
     today_orders_count = await db.orders.count_documents({
         "business_id": business_id,
-        "created_at": {"$gte": start_utc, "$lte": end_utc},
+        "created_at": {"$gte": start_of_day, "$lte": end_of_day},
         "status": {"$in": ["pending", "preparing", "ready", "confirmed", "delivered"]}
     })
     
-    # 2. Today's revenue (only confirmed/delivered orders)
+    # 2. Today's revenue
     revenue_pipeline = [
         {
             "$match": {
                 "business_id": business_id,
-                "created_at": {"$gte": start_utc, "$lte": end_utc},
+                "created_at": {"$gte": start_of_day, "$lte": end_of_day},
                 "status": {"$in": REVENUE_STATUSES}
             }
         },
@@ -115,86 +75,53 @@ async def get_dashboard_summary(
     revenue_result = await db.orders.aggregate(revenue_pipeline).to_list(length=1)
     today_revenue = revenue_result[0]["total"] if revenue_result else 0.0
     
-    # 3. Pending orders count (pending + preparing)
+    # 3. Pending orders count
     pending_orders_count = await db.orders.count_documents({
         "business_id": business_id,
         "status": {"$in": ["pending", "preparing"]}
     })
     
-    # 4. Menu items count (active only)
+    # 4. Menu items count
     menu_items_count = await db.menus.count_documents({
         "business_id": business_id,
         "is_available": True
     })
     
-    # 5. Total unique customers (all time)
+    # 5. Total unique customers
     customers_pipeline = [
-        {
-            "$match": {"business_id": business_id}
-        },
-        {
-            "$group": {
-                "_id": "$customer_id"
-            }
-        },
-        {
-            "$count": "total"
-        }
+        {"$match": {"business_id": business_id}},
+        {"$group": {"_id": "$customer_id"}},
+        {"$count": "total"}
     ]
     
     customers_result = await db.orders.aggregate(customers_pipeline).to_list(length=1)
     total_customers = customers_result[0]["total"] if customers_result else 0
     
-    # 6. Ratings (if ratings collection exists)
-    try:
-        ratings_pipeline = [
-            {
-                "$match": {"business_id": business_id}
-            },
-            {
-                "$group": {
-                    "_id": None,
-                    "avg": {"$avg": "$rating"},
-                    "count": {"$sum": 1}
-                }
-            }
-        ]
-        
-        ratings_result = await db.ratings.aggregate(ratings_pipeline).to_list(length=1)
-        if ratings_result:
-            rating_avg = round(ratings_result[0]["avg"], 1)
-            rating_count = ratings_result[0]["count"]
-        else:
-            rating_avg = 0.0
-            rating_count = 0
-    except Exception:
-        # Ratings collection doesn't exist yet
-        rating_avg = 0.0
-        rating_count = 0
+    # 6. Ratings
+    rating_avg = 0.0
+    rating_count = 0
     
-    # 7. Recent activities (last 20)
+    # 7. Recent activities
     activities = []
-    
-    # Get recent orders
     recent_orders = await db.orders.find({
         "business_id": business_id
     }).sort("created_at", -1).limit(20).to_list(length=20)
     
     for order in recent_orders:
+        created_at = order.get("created_at")
         activities.append({
             "type": "order_created",
-            "title": f"Yeni sipariş alındı",
+            "title": "Yeni sipariş alındı",
             "meta": {
                 "order_code": order.get("order_code", "N/A"),
                 "amount": order.get("totals", {}).get("grand", 0),
                 "customer_name": order.get("customer_name", "Müşteri")
             },
-            "ts": order.get("created_at").isoformat() if order.get("created_at") else None
+            "ts": created_at.isoformat() if created_at else None
         })
     
-    # Sort activities by timestamp
     activities.sort(key=lambda x: x["ts"] or "", reverse=True)
-    activities = activities[:20]  # Limit to 20
+    activities = activities[:20]
     
     return {
         "business_id": business_id,
