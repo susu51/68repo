@@ -3,13 +3,21 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 /**
  * Custom hook for Admin to receive real-time order notifications via WebSocket
  * Connects to backend WebSocket and listens for ALL order events
+ * 
+ * Heartbeat: Ping every 25s, expect pong within 5s, close & reconnect if missed twice
+ * Reconnect: Exponential backoff 1→2→4→8→16→max 30s with jitter
+ * Reset backoff after stable 2-minute connection
  */
 const useAdminOrderNotifications = (onNewOrder) => {
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionAttempts, setConnectionAttempts] = useState(0);
-  const maxReconnectAttempts = 5;
+  const pingIntervalRef = useRef(null);
+  const pongTimeoutRef = useRef(null);
+  const missedPongsRef = useRef(0);
+  const connectionStartTimeRef = useRef(null);
+  const backoffResetTimeoutRef = useRef(null);
 
   const connect = useCallback(() => {
     try {
