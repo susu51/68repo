@@ -137,6 +137,58 @@ export const CourierReadyOrdersMap = () => {
         </CardHeader>
       </Card>
 
+      {/* Business Locations with Waiting Tasks - MAP VIEW */}
+      {businessLocations.length > 0 && (
+        <Card className="border-purple-200 bg-purple-50 dark:bg-purple-900/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+              <Store className="h-5 w-5" />
+              Hazırlanıyor - İşletme Konumları ({businessLocations.length})
+            </CardTitle>
+            <CardDescription>
+              Hazırlanmakta olan siparişler - Teslim alınmaya hazır olduğunda bildirim gelecek
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {businessLocations.map((location, index) => (
+                <div 
+                  key={location.business_id || index}
+                  className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-purple-200 dark:border-purple-800 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm flex items-center gap-2">
+                        <Store className="h-4 w-4 text-purple-600" />
+                        {location.business_name}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                        {location.address}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                      {location.task_count} sipariş
+                    </Badge>
+                  </div>
+                  
+                  {location.location && location.location.lat && location.location.lng && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={() => openInMaps(location.location.lat, location.location.lng, location.address)}
+                    >
+                      <Navigation className="h-3 w-3 mr-2" />
+                      Haritada Göster
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Ready Orders List */}
       {readyOrders.length === 0 ? (
         <Card>
