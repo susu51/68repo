@@ -300,12 +300,23 @@ class OrderAuthTester:
                 print(f"   Order Response: {json.dumps(data, indent=2)}")
                 
                 # Verify order was created successfully
-                if data.get("id") or data.get("order_id"):
-                    order_id = data.get("id") or data.get("order_id")
+                order_id = None
+                if data.get("id"):
+                    order_id = data.get("id")
+                elif data.get("order_id"):
+                    order_id = data.get("order_id")
+                elif data.get("order", {}).get("id"):
+                    order_id = data.get("order", {}).get("id")
+                elif data.get("success") and data.get("order"):
+                    order_id = data.get("order", {}).get("id")
+                
+                if order_id:
+                    order_status = data.get("order", {}).get("status") or data.get("status")
+                    order_total = data.get("order", {}).get("totals", {}).get("grand") or data.get("total_amount")
                     self.log_test(
                         "Order Creation with Cookie",
                         True,
-                        f"Order created successfully: ID {order_id}, Status: {data.get('status')}, Total: {data.get('total_amount')}"
+                        f"Order created successfully: ID {order_id}, Status: {order_status}, Total: ₺{order_total}"
                     )
                     return True, data
                 else:
