@@ -99,12 +99,16 @@ manager = ConnectionManager()
 async def websocket_order_notifications(
     websocket: WebSocket,
     business_id: str = Query(None, description="Business ID to subscribe to (for businesses)"),
-    role: str = Query("business", description="Role: 'business' or 'admin'")
+    role: str = Query("business", description="Role: 'business' or 'admin'"),
+    token: Optional[str] = Query(None, description="Optional JWT token for authentication")
 ):
     """
-    WebSocket endpoint for real-time order notifications
-    Business: ws://domain/api/ws/orders?business_id={business_id}&role=business
-    Admin: ws://domain/api/ws/orders?role=admin
+    WebSocket endpoint for real-time order notifications with heartbeat support
+    Business: wss://domain/api/ws/orders?business_id={business_id}&role=business&token={token}
+    Admin: wss://domain/api/ws/orders?role=admin&token={token}
+    
+    Heartbeat: Client sends ping every 25s, server responds with pong
+    Timeout: Connection closes after 75s of inactivity (proxy compatibility)
     """
     client_id = business_id if role == "business" else "admin"
     
@@ -112,6 +116,14 @@ async def websocket_order_notifications(
     if role == "business" and not business_id:
         await websocket.close(code=1008, reason="business_id is required for business role")
         return
+    
+    # TODO: Add token validation if needed
+    # if token:
+    #     try:
+    #         validate_token(token)
+    #     except Exception as e:
+    #         await websocket.close(code=1008, reason="Invalid token")
+    #         return
     
     await manager.connect(websocket, client_id, role)
     
