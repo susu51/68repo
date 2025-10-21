@@ -34,43 +34,95 @@ export const CourierReadyOrdersMap = () => {
     };
   }, [autoRefresh]); // Only depend on autoRefresh to avoid infinite loops
 
-  const [businessLocations, setBusinessLocations] = useState([]);
+  const [nearbyBusinesses, setNearbyBusinesses] = useState([]);
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [availableOrders, setAvailableOrders] = useState([]);
+  const [claimingOrderId, setClaimingOrderId] = useState(null);
   
-  const fetchReadyOrders = async () => {
+  const fetchNearbyBusinesses = async () => {
     try {
       setLoading(true);
       
-      // Fetch waiting tasks grouped by business location
-      const tasksResponse = await fetch(`${API}/courier/tasks/map`, {
-        method: 'GET',
-        credentials: 'include'
-      });
+      // Get courier's current location (mock for now - should use geolocation)
+      const courierLng = 34.0254; // Aksaray, Ankara
+      const courierLat = 38.3687;
       
-      if (tasksResponse.ok) {
-        const locations = await tasksResponse.json();
-        setBusinessLocations(locations);
-        console.log('📍 Business locations with waiting tasks:', locations);
-      }
+      // Fetch nearby businesses with ready orders
+      const response = await fetch(
+        `${API}/courier/tasks/nearby-businesses?lng=${courierLng}&lat=${courierLat}&radius_m=10000`,
+        {
+          method: 'GET',
+          credentials: 'include'
+        }
+      );
       
-      // Also fetch ready orders for backward compatibility
-      let url = `${API}/courier/orders/ready`;
-      if (courierCity) {
-        url += `?city=${courierCity}`;
-      }
-
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include'
-      });
-
       if (response.ok) {
-        const orders = await response.json();
-        setReadyOrders(orders);
+        const businesses = await response.json();
+        setNearbyBusinesses(businesses);
+        console.log('📍 Nearby businesses:', businesses);
       }
     } catch (error) {
-      console.error('Hazır siparişler yükleme hatası:', error);
+      console.error('❌ Nearby businesses fetch error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const fetchAvailableOrders = async (businessId) => {
+    try {
+      const response = await fetch(
+        `${API}/courier/tasks/businesses/${businessId}/available-orders`,
+        {
+          method: 'GET',
+          credentials: 'include'
+        }
+      );
+      
+      if (response.ok) {
+        const orders = await response.json();
+        setAvailableOrders(orders);
+        console.log('📦 Available orders:', orders);
+      }
+    } catch (error) {
+      console.error('❌ Available orders fetch error:', error);
+    }
+  };
+  
+  const claimOrder = async (orderId) => {
+    try {
+      setClaimingOrderId(orderId);
+      
+      const response = await fetch(
+        `${API}/courier/tasks/orders/${orderId}/claim`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        toast.success('✅ Sipariş alındı! Teslimat başlayabilir.');
+        
+        // Refresh lists
+        await fetchNearbyBusinesses();
+        setSelectedBusiness(null);
+        setAvailableOrders([]);
+      } else if (response.status === 409) {
+        toast.error('⚠️ Bu sipariş başka bir kurye tarafından alındı');
+        // Refresh the list
+        if (selectedBusiness) {
+          await fetchAvailableOrders(selectedBusiness.business_id);
+        }
+      } else {
+        toast.error('❌ Sipariş alınamadı');
+      }
+    } catch (error) {
+      console.error('❌ Claim error:', error);
+      toast.error('Bir hata oluştu');
+    } finally {
+      setClaimingOrderId(null);
     }
   };
 
