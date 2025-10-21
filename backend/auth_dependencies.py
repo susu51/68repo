@@ -20,12 +20,15 @@ async def get_current_user(
     try:
         # Try cookie first (primary method)
         token = request.cookies.get("access_token")
+        print(f"🔍 AUTH: Cookie token present: {token is not None}")
         
         # Fallback to bearer token if no cookie
         if not token and credentials:
             token = credentials.credentials
+            print(f"🔍 AUTH: Using bearer token")
         
         if not token:
+            print("❌ AUTH: No token found")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Not authenticated - no token provided"
