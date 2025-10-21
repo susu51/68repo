@@ -61,11 +61,6 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
       }
     }, 25000);
   }, [cleanupTimers]);
-    if (!businessId) {
-      console.log('⚠️ No business ID provided for WebSocket');
-      console.log('businessId:', businessId);
-      return;
-    }
 
   const connect = useCallback(() => {
     if (!businessId) {
