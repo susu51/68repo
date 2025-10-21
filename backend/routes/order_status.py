@@ -36,8 +36,7 @@ BUSINESS_TRANSITIONS = {
     "created": ["confirmed"],  # First: Business confirms the order
     "pending": ["confirmed"],  # Pending orders can be confirmed
     "placed": ["confirmed"],   # Placed orders can be confirmed
-    "confirmed": ["preparing"],  # Then: Start preparing (creates courier task)
-    "preparing": ["ready", "ready_for_pickup"],  # Phase 1: Can go to ready or ready_for_pickup
+    "confirmed": ["ready"],  # NEW: Direct to ready (no preparing step)
     "ready": ["courier_pending", "ready_for_pickup"],  # Phase 1: Can transition to ready_for_pickup
     "ready_for_pickup": ["courier_pending"]  # Phase 1: Courier can see on map, then becomes courier_pending when accepted
 }
