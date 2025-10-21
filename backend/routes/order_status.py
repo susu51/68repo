@@ -76,8 +76,8 @@ async def update_order_status(
         user_role = current_user.get("role")
         if user_role == "business":
             # Business can only update their own orders
-            business = await db.businesses.find_one({"owner_user_id": current_user["id"]})
-            if not business or str(business["_id"]) != order["business_id"]:
+            # Business user's ID is the business_id directly
+            if current_user["id"] != order["business_id"]:
                 raise HTTPException(
                     status_code=403,
                     detail="Access denied - not your order"
