@@ -116,6 +116,7 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
 
       ws.onopen = () => {
         console.log('✅ WebSocket connected');
+        connectingRef.current = false; // Connection successful
         setIsConnected(true);
         reconnectAttempts.current = 0;
         connectionStartTimeRef.current = Date.now();
