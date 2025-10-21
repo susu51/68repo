@@ -5254,6 +5254,8 @@ const AuthRouter = () => {
 
   // If user is authenticated, show appropriate dashboard
   if (user) {
+    console.log('🎯 AuthRouter: User authenticated', { email: user.email, role: user.role });
+    
     return (
       <Routes>
         <Route path="/" element={
