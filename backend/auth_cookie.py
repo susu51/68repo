@@ -25,14 +25,17 @@ JWT_SECRET = os.environ.get("JWT_SECRET", "Kuryecini!SecretKey2025_ChangeMe")
 ACCESS_TTL = 15 * 60        # 15 minutes
 REFRESH_TTL = 7 * 24*60*60  # 7 days
 
-# Cookie configuration - production settings from environment
-COOKIE_DOMAIN = os.environ.get("COOKIE_DOMAIN")
+# Cookie configuration - staging/production settings from environment
+COOKIE_DOMAIN = os.environ.get("COOKIE_DOMAIN")  # None = host-only cookie (recommended for staging)
+COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "true").lower() == "true"  # HTTPS requirement
+COOKIE_SAMESITE = os.environ.get("COOKIE_SAMESITE", "none")  # "none" for cross-site credentials
+
 COOKIE_CONFIG = {
     "httponly": True,
-    "secure": True,  # True for production HTTPS
-    "samesite": "lax",
+    "secure": COOKIE_SECURE,  # True for HTTPS (staging/production)
+    "samesite": COOKIE_SAMESITE,  # "none" allows cross-site cookies with credentials
     "path": "/",
-    "domain": COOKIE_DOMAIN if COOKIE_DOMAIN else None
+    "domain": COOKIE_DOMAIN if COOKIE_DOMAIN else None  # None = host-only cookie
 }
 
 # Router
