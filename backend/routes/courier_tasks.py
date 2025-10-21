@@ -178,6 +178,91 @@ async def get_business_available_orders(
         print(f"❌ Error fetching available orders: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/orders/{order_id}/claim")
+async def claim_order(
+    order_id: str,
+    current_user: dict = Depends(get_courier_user)
+):
+    """
+    Courier claims a ready order (atomic operation)
+    Returns 200 if successful, 409 if already taken
+    """
+    from server import db
+    from datetime import datetime, timezone
+    
+    try:
+        courier_id = current_user["id"]
+        courier_name = f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip()
+        
+        # Atomic update: only if status=ready and no courier assigned
+        result = await db.orders.update_one(
+            {
+                "id": order_id,
+                "status": "ready",
+                "assigned_courier_id": None
+            },
+            {
+                "$set": {
+                    "assigned_courier_id": courier_id,
+                    "courier_name": courier_name,
+                    "status": "assigned",
+                    "assigned_at": datetime.now(timezone.utc),
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        if result.modified_count == 0:
+            # Already claimed by another courier
+            raise HTTPException(
+                status_code=409,
+                detail="Bu sipariş başka bir kurye tarafından alındı"
+            )
+        
+        # Get full order details
+        order = await db.orders.find_one({"id": order_id})
+        
+        # Broadcast WebSocket events
+        try:
+            from realtime.event_bus import broadcast_event
+            
+            # Notify business
+            await broadcast_event(
+                f"business:{order.get('business_id')}",
+                {
+                    "event_type": "order_assigned",
+                    "order_id": order_id,
+                    "courier_id": courier_id,
+                    "courier_name": courier_name
+                }
+            )
+            
+            # Notify courier
+            await broadcast_event(
+                f"courier:{courier_id}",
+                {
+                    "event_type": "order_claimed",
+                    "order_id": order_id,
+                    "status": "assigned"
+                }
+            )
+        except Exception as ws_error:
+            print(f"⚠️ WebSocket broadcast failed: {ws_error}")
+        
+        # Return order details
+        return {
+            "success": True,
+            "order_id": order_id,
+            "status": "assigned",
+            "message": "Sipariş başarıyla alındı"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Claim error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("", response_model=List[TaskResponse])
 async def get_courier_tasks(
     status: Optional[str] = Query(None, description="Filter by status: waiting, assigned, picked_up, delivering, delivered"),
