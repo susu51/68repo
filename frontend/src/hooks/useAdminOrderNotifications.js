@@ -105,7 +105,8 @@ const useAdminOrderNotifications = (onNewOrder) => {
       const ws = new WebSocket(websocketUrl);
       
       ws.onopen = () => {
-        console.log('✅ Admin WebSocket connected successfully');
+        console.log('✅ Admin WebSocket connected');
+        connectingRef.current = false; // Connection successful
         setIsConnected(true);
         setConnectionAttempts(0);
         connectionStartTimeRef.current = Date.now();
