@@ -70,13 +70,12 @@ const useAdminOrderNotifications = (onNewOrder) => {
         backendUrl = `${backendUrl}/api`;
       }
       
-      // Convert http/https to ws/wss
+      // Convert http/https to ws/wss (prefer wss for prod)
       const wsUrl = backendUrl
         .replace('https://', 'wss://')
         .replace('http://', 'ws://');
       
-      // Admin WebSocket connection (no business_id needed)
-      // WebSocket endpoint is at /api/ws/orders
+      // Admin WebSocket connection
       const websocketUrl = `${wsUrl}/ws/orders?role=admin`;
       
       console.log('🔌 Admin connecting to WebSocket:', websocketUrl);
@@ -87,37 +86,48 @@ const useAdminOrderNotifications = (onNewOrder) => {
         console.log('✅ Admin WebSocket connected successfully');
         setIsConnected(true);
         setConnectionAttempts(0);
+        connectionStartTimeRef.current = Date.now();
         
-        // Send ping every 30 seconds to keep connection alive
-        const pingInterval = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            console.log('📡 Sending ping to admin WebSocket');
-            ws.send('ping');
-          } else {
-            console.warn('⚠️ WebSocket not open, readyState:', ws.readyState);
-          }
-        }, 30000);
+        // Start heartbeat
+        startHeartbeat(ws);
         
-        // Store interval for cleanup
-        ws.pingInterval = pingInterval;
-        console.log('⏰ Ping interval set up for admin WebSocket');
+        // Reset backoff after 2 minutes of stable connection
+        backoffResetTimeoutRef.current = setTimeout(() => {
+          console.log('✅ Admin 2-min stable connection - resetting backoff');
+          setConnectionAttempts(0);
+        }, 120000);
+        
+        // Send re-subscribe message
+        ws.send(JSON.stringify({
+          type: 'subscribe',
+          role: 'admin'
+        }));
       };
       
       ws.onmessage = (event) => {
         try {
-          console.log('📨 Admin WebSocket raw message:', event.data);
-          
           // Handle pong response
           if (event.data === 'pong') {
-            console.log('🏓 Received pong from admin WebSocket');
+            console.log('🏓 Admin received pong');
+            missedPongsRef.current = 0;
+            
+            // Clear pong timeout
+            if (pongTimeoutRef.current) {
+              clearTimeout(pongTimeoutRef.current);
+              pongTimeoutRef.current = null;
+            }
             return;
           }
+          
+          console.log('📨 Admin WebSocket raw message:', event.data);
           
           const message = JSON.parse(event.data);
           console.log('📨 Admin received WebSocket message:', message);
           
           if (message.type === 'connected') {
             console.log('✅ Admin connection confirmed:', message.message);
+          } else if (message.type === 'subscribed') {
+            console.log('✅ Admin re-subscribed successfully');
           } else if (message.type === 'order_notification') {
             console.log('🆕 New order notification for admin:', message.data);
             
@@ -136,27 +146,28 @@ const useAdminOrderNotifications = (onNewOrder) => {
         setIsConnected(false);
       };
       
-      ws.onclose = () => {
-        console.log('🔌 Admin WebSocket disconnected');
+      ws.onclose = (event) => {
+        console.log(`🔌 Admin WebSocket disconnected (code: ${event.code}, reason: ${event.reason || 'none'})`);
         setIsConnected(false);
+        cleanupTimers();
         
-        // Clear ping interval
-        if (ws.pingInterval) {
-          clearInterval(ws.pingInterval);
+        // Log abnormal closures
+        if (event.code === 1006 || event.code === 1011) {
+          console.error(`🚨 Admin abnormal WebSocket closure: ${event.code}`);
+          // TODO: Send to Sentry with panel=admin tag
         }
         
-        // Attempt to reconnect
-        if (connectionAttempts < maxReconnectAttempts) {
-          const delay = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
-          console.log(`⏳ Reconnecting admin WebSocket in ${delay}ms...`);
-          
-          reconnectTimeoutRef.current = setTimeout(() => {
-            setConnectionAttempts(prev => prev + 1);
-            connect();
-          }, delay);
-        } else {
-          console.error('❌ Max admin WebSocket reconnection attempts reached');
-        }
+        // Exponential backoff: 1→2→4→8→16→max 30s with jitter
+        const baseDelay = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
+        const jitter = Math.random() * 1000;
+        const delay = baseDelay + jitter;
+        
+        console.log(`⏳ Reconnecting admin WebSocket in ${(delay/1000).toFixed(1)}s... (attempt ${connectionAttempts + 1})`);
+        
+        reconnectTimeoutRef.current = setTimeout(() => {
+          setConnectionAttempts(prev => prev + 1);
+          connect();
+        }, delay);
       };
       
       wsRef.current = ws;
@@ -165,7 +176,7 @@ const useAdminOrderNotifications = (onNewOrder) => {
       console.error('❌ Error creating admin WebSocket connection:', error);
       setIsConnected(false);
     }
-  }, [onNewOrder, connectionAttempts]);
+  }, [onNewOrder, connectionAttempts, startHeartbeat, cleanupTimers]);
 
   useEffect(() => {
     // Connect on mount
