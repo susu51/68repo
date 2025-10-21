@@ -1,53 +1,68 @@
 #!/usr/bin/env python3
 """
-Kuryecini Ops Co-Pilot AI Diagnostics Panel Testing
-
-CRITICAL: Test the newly implemented AI Diagnostics panel endpoint "/admin/ai/assist" for the AI Diagnostics panel.
-
-Test Scenarios:
-1. Endpoint Availability & Structure (CRITICAL)
-2. Panel Switching (HIGH)
-3. Response Format Validation (CRITICAL)
-4. Tool Endpoints (MEDIUM)
-5. Error Handling (HIGH)
+Business Dashboard Summary Endpoint Testing
+Tests the new GET /api/business/dashboard/summary endpoint per review request
 """
 
+import asyncio
+import aiohttp
 import json
-import requests
-import time
-from datetime import datetime
-import os
+from datetime import datetime, timezone
 import sys
+import os
 
-# Configuration
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
+# Test Configuration
+BASE_URL = "https://courier-connect-14.preview.emergentagent.com"
+API_BASE = f"{BASE_URL}/api"
 
-# Test credentials - try multiple admin credentials
-ADMIN_CREDENTIALS_LIST = [
-    {"email": "admin@kuryecini.com", "password": "KuryeciniAdmin2024!"},
-    {"email": "admin@kuryecini.com", "password": "admin123"},
-    {"email": "admin@demo.com", "password": "Admin!234"},
-    {"email": "admin@kuryecini.com", "password": "6851"}
-]
+# Test Credentials
+BUSINESS_USER = {
+    "email": "testbusiness@example.com",
+    "password": "test123"
+}
 
-# Removed customer credentials - not needed for AI Diagnostics testing
+CUSTOMER_USER = {
+    "email": "test@kuryecini.com", 
+    "password": "test123"
+}
 
-class AIDiagnosticsTester:
+class BusinessDashboardTester:
     def __init__(self):
-        self.admin_session = None
+        self.session = None
+        self.business_cookies = None
+        self.customer_cookies = None
         self.test_results = []
         
-    def log_test(self, test_name, success, details="", error=""):
+    async def setup_session(self):
+        """Initialize HTTP session"""
+        connector = aiohttp.TCPConnector(ssl=False)
+        timeout = aiohttp.ClientTimeout(total=30)
+        self.session = aiohttp.ClientSession(
+            connector=connector,
+            timeout=timeout,
+            headers={"User-Agent": "BusinessDashboardTester/1.0"}
+        )
+        
+    async def cleanup_session(self):
+        """Cleanup HTTP session"""
+        if self.session:
+            await self.session.close()
+            
+    def log_test(self, test_name: str, success: bool, details: str = "", response_data: dict = None):
         """Log test result"""
         status = "✅ PASS" if success else "❌ FAIL"
-        result = {
+        print(f"{status} {test_name}")
+        if details:
+            print(f"    {details}")
+        if response_data and not success:
+            print(f"    Response: {json.dumps(response_data, indent=2)}")
+        
+        self.test_results.append({
             "test": test_name,
-            "status": status,
             "success": success,
             "details": details,
-            "error": error,
-            "timestamp": datetime.now().isoformat()
-        }
+            "response": response_data
+        })
         self.test_results.append(result)
         print(f"{status}: {test_name}")
         if details:
