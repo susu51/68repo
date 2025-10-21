@@ -17,7 +17,8 @@ import {
   CheckCheck,
   AlertCircle,
   Wifi,
-  WifiOff
+  WifiOff,
+  Printer
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { get, patch } from '../../api/http';
