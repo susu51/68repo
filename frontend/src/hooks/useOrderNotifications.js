@@ -132,6 +132,13 @@ export const useOrderNotifications = (businessId, onOrderReceived, enabled = tru
     
   }, [businessId, enabled]);
   
-  // Return empty object for now (can add isConnected state later if needed)
-  return {};
+  // Return connection state and reconnect function
+  return {
+    isConnected: connectionState.isConnected,
+    isLeader: connectionState.isLeader,
+    reconnect: () => {
+      WSManager.setEnabled(false);
+      setTimeout(() => WSManager.setEnabled(true), 100);
+    }
+  };
 };
