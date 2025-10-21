@@ -245,7 +245,7 @@ class BusinessOrderAuthorizationTest:
                 try:
                     data = json.loads(response_text)
                     print(f"✅ Status update successful!")
-                    print(f"   New Status: {data.get('status', 'unknown')}")
+                    print(f"   New Status: {data.get('new_status', 'unknown')}")
                     return True
                 except json.JSONDecodeError:
                     print(f"✅ Status update successful (non-JSON response)")
