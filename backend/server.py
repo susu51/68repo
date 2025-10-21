@@ -6733,23 +6733,47 @@ async def get_business_incoming_orders(current_user: dict = Depends(get_approved
                 customer_name = f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip()
                 customer_phone = customer.get("phone", "")
             
+            # Parse delivery address properly
+            delivery_addr = order.get("delivery_address", {})
+            if isinstance(delivery_addr, dict):
+                delivery_address_formatted = {
+                    "address": delivery_addr.get("label") or delivery_addr.get("address", ""),
+                    "lat": delivery_addr.get("lat"),
+                    "lng": delivery_addr.get("lng")
+                }
+            else:
+                # Fallback for old format
+                delivery_address_formatted = {
+                    "address": str(delivery_addr) if delivery_addr else "",
+                    "lat": order.get("delivery_lat"),
+                    "lng": order.get("delivery_lng")
+                }
+            
             formatted_order = {
                 "id": order.get("id", str(order.get("_id", ""))),  # Use 'id' field first
                 "business_id": order.get("business_id"),  # Add business_id to response
                 "customer_name": customer_name,
                 "customer_phone": customer_phone,
+                "customer": {  # Add full customer object
+                    "name": customer_name,
+                    "phone": customer_phone,
+                    "id": order.get("customer_id")
+                },
                 "items": order.get("items", []),
                 "total_amount": float(order.get("total_amount", 0)),
-                "pickup_address": order.get("business_address", ""),
-                "delivery_address": {
-                    "address": order.get("delivery_address", ""),
-                    "lat": order.get("delivery_lat"),
-                    "lng": order.get("delivery_lng")
+                "delivery_fee": float(order.get("delivery_fee", 0)),
+                "totals": {  # Add totals object
+                    "subtotal": float(order.get("total_amount", 0)),
+                    "delivery": float(order.get("delivery_fee", 0)),
+                    "grand_total": float(order.get("total_amount", 0)) + float(order.get("delivery_fee", 0))
                 },
+                "pickup_address": order.get("business_address", ""),
+                "delivery_address": delivery_address_formatted,
+                "address": delivery_address_formatted,  # Alias for compatibility
                 "order_date": order.get("created_at", ""),
                 "status": order.get("status", "pending"),
                 "payment_method": order.get("payment_method", "unknown"),
-                "notes": order.get("special_instructions", "")
+                "notes": order.get("notes") or order.get("special_instructions", "")
             }
             formatted_orders.append(formatted_order)
         
