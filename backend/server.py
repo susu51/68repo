@@ -2570,53 +2570,55 @@ async def get_nearby_orders(current_user: dict = Depends(get_current_user)):
     
     return orders_for_courier
 
-@api_router.patch("/orders/{order_id}/status")
-async def update_order_status(order_id: str, new_status: OrderStatus, current_user: dict = Depends(get_current_user)):
-    """Update order status"""
-    order = await db.orders.find_one({"id": order_id})
-    if not order:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Order not found"
-        )
-    
-    # Check permissions
-    user_role = current_user.get("role")
-    if user_role == "business" and order["business_id"] != current_user["id"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    elif user_role == "courier" and order.get("courier_id") != current_user["id"] and new_status != OrderStatus.ASSIGNED:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    elif user_role not in ["admin", "business", "courier"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-    
-    update_data = {"status": new_status}
-    
-    # Update timestamps based on status
-    current_time = datetime.now(timezone.utc)
-    if new_status == OrderStatus.ASSIGNED:
-        update_data["assigned_at"] = current_time
-        update_data["courier_id"] = current_user["id"]
-        update_data["courier_name"] = f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip()
-    elif new_status == OrderStatus.ON_ROUTE:
-        update_data["picked_up_at"] = current_time
-    elif new_status == OrderStatus.DELIVERED:
-        update_data["delivered_at"] = current_time
-    
-    await db.orders.update_one(
-        {"id": order_id},
-        {"$set": update_data}
-    )
-    
-    return {"success": True, "message": f"Order status updated to {new_status}"}
+# DEPRECATED: This endpoint is replaced by routes/order_status.py router
+# Keeping commented out for reference
+# @api_router.patch("/orders/{order_id}/status")
+# async def update_order_status(order_id: str, new_status: OrderStatus, current_user: dict = Depends(get_current_user)):
+#     """Update order status"""
+#     order = await db.orders.find_one({"id": order_id})
+#     if not order:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Order not found"
+#         )
+#     
+#     # Check permissions
+#     user_role = current_user.get("role")
+#     if user_role == "business" and order["business_id"] != current_user["id"]:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Access denied"
+#         )
+#     elif user_role == "courier" and order.get("courier_id") != current_user["id"] and new_status != OrderStatus.ASSIGNED:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Access denied"
+#         )
+#     elif user_role not in ["admin", "business", "courier"]:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Access denied"
+#         )
+#     
+#     update_data = {"status": new_status}
+#     
+#     # Update timestamps based on status
+#     current_time = datetime.now(timezone.utc)
+#     if new_status == OrderStatus.ASSIGNED:
+#         update_data["assigned_at"] = current_time
+#         update_data["courier_id"] = current_user["id"]
+#         update_data["courier_name"] = f"{current_user.get('first_name', '')} {current_user.get('last_name', '')}".strip()
+#     elif new_status == OrderStatus.ON_ROUTE:
+#         update_data["picked_up_at"] = current_time
+#     elif new_status == OrderStatus.DELIVERED:
+#         update_data["delivered_at"] = current_time
+#     
+#     await db.orders.update_one(
+#         {"id": order_id},
+#         {"$set": update_data}
+#     )
+#     
+#     return {"success": True, "message": f"Order status updated to {new_status}"}
 
 @api_router.post("/orders/{order_id}/accept")
 async def accept_order(order_id: str, current_user: dict = Depends(get_current_user)):
