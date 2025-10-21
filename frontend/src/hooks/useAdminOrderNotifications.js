@@ -19,6 +19,47 @@ const useAdminOrderNotifications = (onNewOrder) => {
   const connectionStartTimeRef = useRef(null);
   const backoffResetTimeoutRef = useRef(null);
 
+
+  const cleanupTimers = useCallback(() => {
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
+    if (pongTimeoutRef.current) {
+      clearTimeout(pongTimeoutRef.current);
+      pongTimeoutRef.current = null;
+    }
+    if (backoffResetTimeoutRef.current) {
+      clearTimeout(backoffResetTimeoutRef.current);
+      backoffResetTimeoutRef.current = null;
+    }
+  }, []);
+
+  const startHeartbeat = useCallback((ws) => {
+    cleanupTimers();
+    missedPongsRef.current = 0;
+    
+    // Send ping every 25s
+    pingIntervalRef.current = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        console.log('📡 Admin sending ping');
+        ws.send('ping');
+        
+        // Wait for pong (5s timeout)
+        pongTimeoutRef.current = setTimeout(() => {
+          missedPongsRef.current += 1;
+          console.warn(`⚠️ Admin pong timeout (missed: ${missedPongsRef.current}/2)`);
+          
+          // Close & reconnect if missed twice
+          if (missedPongsRef.current >= 2) {
+            console.error('❌ Admin missed 2 pongs - closing connection');
+            ws.close(1000, 'Heartbeat failure');
+          }
+        }, 5000);
+      }
+    }, 25000);
+  }, [cleanupTimers]);
+
   const connect = useCallback(() => {
     try {
       // Get backend URL from environment
