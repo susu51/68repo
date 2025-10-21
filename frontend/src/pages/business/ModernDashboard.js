@@ -95,7 +95,7 @@ export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNav
           const Icon = stat.icon;
           
           return (
-            <Card key={index} className="card-hover-lift">
+            <Card key={index} className="card-hover-lift" data-testid={stat.testId}>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -104,7 +104,7 @@ export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNav
                     </p>
                     <div className="flex items-baseline gap-2">
                       <h3 className="text-3xl font-bold text-foreground">
-                        {stat.value}
+                        {loading ? '...' : stat.value}
                       </h3>
                       {stat.suffix && (
                         <span className="text-sm text-muted-foreground">
@@ -112,18 +112,6 @@ export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNav
                         </span>
                       )}
                     </div>
-                    {stat.change && (
-                      <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${
-                        stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {stat.changeType === 'increase' ? (
-                          <ArrowUp className="h-3 w-3" />
-                        ) : (
-                          <ArrowDown className="h-3 w-3" />
-                        )}
-                        {stat.change} dün
-                      </div>
-                    )}
                     {stat.urgent && (
                       <div className="mt-2 text-xs font-medium text-red-600 animate-pulse">
                         ⚠️ Acil sipariş var!
