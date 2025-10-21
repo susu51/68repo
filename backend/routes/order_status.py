@@ -89,10 +89,14 @@ async def update_order_status(
         if user_role == "business":
             # Business can only update their own orders
             # Business user's ID is the business_id directly
-            if current_user["id"] != order["business_id"]:
+            print(f"🔍 Authorization check:")
+            print(f"   Current user ID: {current_user['id']}")
+            print(f"   Order business_id: {order.get('business_id')}")
+            
+            if current_user["id"] != order.get("business_id"):
                 raise HTTPException(
                     status_code=403,
-                    detail="Access denied - not your order"
+                    detail=f"Access denied - User: {current_user['id']}, Order business: {order.get('business_id')}"
                 )
             
             # Check if transition is allowed for business
