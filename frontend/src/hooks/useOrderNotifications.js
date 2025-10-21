@@ -21,6 +21,8 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
   const missedPongsRef = useRef(0);
   const connectionStartTimeRef = useRef(null);
   const backoffResetTimeoutRef = useRef(null);
+  const connectingRef = useRef(false); // Single-flight guard
+  const closedByUs = useRef(false); // Track intentional closure
 
   const cleanupTimers = useCallback(() => {
     if (pingIntervalRef.current) {
@@ -34,6 +36,10 @@ export const useOrderNotifications = (businessId, onOrderReceived) => {
     if (backoffResetTimeoutRef.current) {
       clearTimeout(backoffResetTimeoutRef.current);
       backoffResetTimeoutRef.current = null;
+    }
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
   }, []);
 
