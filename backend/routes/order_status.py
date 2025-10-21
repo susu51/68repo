@@ -159,14 +159,26 @@ async def update_order_status(
         }
         
         # Use atomic findOneAndUpdate for CAS
+        # Try with 'id' field first (UUID), fallback to '_id' if needed
         result = await db.orders.find_one_and_update(
             {
-                "_id": order_id,
+                "id": order_id,  # Use 'id' field for UUID-based orders
                 "status": current_status  # CAS condition
             },
             {"$set": update_data},
             return_document=True
         )
+        
+        # If not found with 'id', try with '_id' (for backward compatibility)
+        if not result:
+            result = await db.orders.find_one_and_update(
+                {
+                    "_id": order_id,
+                    "status": current_status
+                },
+                {"$set": update_data},
+                return_document=True
+            )
         
         if not result:
             raise HTTPException(
