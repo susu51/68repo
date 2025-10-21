@@ -196,35 +196,50 @@ export const CourierReadyOrdersMap = () => {
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {nearbyBusinesses.map((business, index) => (
                 <div 
-                  key={location.business_id || index}
-                  className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-purple-200 dark:border-purple-800 hover:shadow-md transition-shadow"
+                  key={business.business_id || index}
+                  className={`p-4 bg-white dark:bg-gray-800 rounded-lg border cursor-pointer transition-all ${
+                    selectedBusiness?.business_id === business.business_id
+                      ? 'border-green-500 ring-2 ring-green-300'
+                      : 'border-green-200 dark:border-green-800 hover:shadow-md'
+                  }`}
+                  onClick={() => {
+                    setSelectedBusiness(business);
+                    fetchAvailableOrders(business.business_id);
+                  }}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <h4 className="font-semibold text-sm flex items-center gap-2">
-                        <Store className="h-4 w-4 text-purple-600" />
-                        {location.business_name}
+                        <Store className="h-4 w-4 text-green-600" />
+                        {business.name}
                       </h4>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {location.address}
+                        {business.address_short}
                       </p>
+                      {business.distance && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          📍 {(business.distance / 1000).toFixed(1)} km uzakta
+                        </p>
+                      )}
                     </div>
-                    <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-                      {location.task_count} sipariş
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                      {business.pending_ready_count} sipariş
                     </Badge>
                   </div>
                   
-                  {location.location && location.location.lat && location.location.lng && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-2"
-                      onClick={() => openInMaps(location.location.lat, location.location.lng, location.address)}
-                    >
-                      <Navigation className="h-3 w-3 mr-2" />
-                      Haritada Göster
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedBusiness(business);
+                      fetchAvailableOrders(business.business_id);
+                    }}
+                  >
+                    <Package className="h-3 w-3 mr-2" />
+                    Siparişleri Gör
+                  </Button>
                 </div>
               ))}
             </div>
