@@ -409,8 +409,8 @@ export const ModernOrdersManagement = ({ businessId }) => {
         </div>
       </div>
 
-      {/* Stats Cards - Order: Bekleyen → Onaylı → Hazırlanıyor → Hazır */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* Stats Cards - Order: Bekleyen → Onaylı → Hazır (preparing kaldırıldı) */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {/* 1. Bekleyen */}
         <Card className={`cursor-pointer transition-all ${statusFilter === 'pending' ? 'ring-2 ring-orange-500' : ''}`}
               onClick={() => setStatusFilter(statusFilter === 'pending' ? 'all' : 'pending')}>
@@ -443,23 +443,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
           </CardContent>
         </Card>
         
-        {/* 3. Hazırlanıyor */}
-        <Card className={`cursor-pointer transition-all ${statusFilter === 'preparing' ? 'ring-2 ring-purple-500' : ''}`}
-              onClick={() => setStatusFilter(statusFilter === 'preparing' ? 'all' : 'preparing')}>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Hazırlanıyor</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.preparing}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/20">
-                <ChefHat className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* 4. Hazır */}
+        {/* 3. Hazır */}
         <Card className={`cursor-pointer transition-all ${statusFilter === 'ready' ? 'ring-2 ring-green-500' : ''}`}
               onClick={() => setStatusFilter(statusFilter === 'ready' ? 'all' : 'ready')}>
           <CardContent className="p-4">
