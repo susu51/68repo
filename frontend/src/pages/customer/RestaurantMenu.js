@@ -70,13 +70,14 @@ const RestaurantMenu = ({ restaurant, onBack, onGoToCart }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurant]); // Only depend on restaurant, fetchMenuItems is stable via useCallback
 
+  // Categories matching backend Turkish categories
   const categories = [
     { id: 'all', name: 'Hepsi', icon: '🍽️' },
-    { id: 'pizza', name: 'Pizza', icon: '🍕' },
-    { id: 'main', name: 'Ana Yemek', icon: '🍖' },
-    { id: 'salad', name: 'Salata', icon: '🥗' },
-    { id: 'dessert', name: 'Tatlı', icon: '🍰' },
-    { id: 'drink', name: 'İçecek', icon: '🥤' }
+    { id: 'Yemek', name: 'Yemek', icon: '🍖' },
+    { id: 'Kahvaltı', name: 'Kahvaltı', icon: '🍳' },
+    { id: 'İçecek', name: 'İçecek', icon: '🥤' },
+    { id: 'Atıştırmalık', name: 'Atıştırmalık', icon: '🍿' },
+    { id: 'Tatlı', name: 'Tatlı', icon: '🍰' }
   ];
 
   const filteredItems = selectedCategory === 'all' 
