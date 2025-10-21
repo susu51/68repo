@@ -178,6 +178,128 @@ export const ModernOrdersManagement = ({ businessId }) => {
     }
   };
 
+  const printReceipt = (order) => {
+    try {
+      // Create a hidden iframe for printing
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = 'none';
+      document.body.appendChild(printFrame);
+      
+      const doc = printFrame.contentWindow.document;
+      
+      // Generate receipt HTML
+      const receiptHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Sipariş Fişi #${order.id?.slice(-8)}</title>
+          <style>
+            @media print {
+              @page { margin: 0.5cm; size: 80mm auto; }
+              body { margin: 0; }
+            }
+            body {
+              font-family: 'Courier New', monospace;
+              font-size: 12px;
+              line-height: 1.4;
+              max-width: 80mm;
+              margin: 0 auto;
+              padding: 10px;
+            }
+            h1 { font-size: 18px; text-align: center; margin: 10px 0; font-weight: bold; }
+            h2 { font-size: 14px; margin: 10px 0; font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 5px; }
+            .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            .info { margin: 8px 0; }
+            .label { font-weight: bold; }
+            .items { margin: 10px 0; }
+            .item { display: flex; justify-content: space-between; margin: 5px 0; padding: 3px 0; }
+            .item-name { flex: 1; }
+            .item-qty { width: 40px; text-align: center; }
+            .item-price { width: 60px; text-align: right; }
+            .total { border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 8px 0; margin: 10px 0; font-size: 14px; font-weight: bold; }
+            .footer { text-align: center; margin-top: 15px; font-size: 10px; border-top: 2px dashed #000; padding-top: 10px; }
+            .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🍽️ SİPARİŞ FİŞİ</h1>
+            <div style="font-size: 10px;">Sipariş #${order.id?.slice(-8) || 'N/A'}</div>
+            <div style="font-size: 10px;">${new Date(order.order_date || Date.now()).toLocaleString('tr-TR')}</div>
+          </div>
+
+          <div class="info">
+            <div><span class="label">Müşteri:</span> ${order.customer_name || 'Müşteri'}</div>
+            ${order.customer_phone ? `<div><span class="label">Telefon:</span> ${order.customer_phone}</div>` : ''}
+            ${order.delivery_address ? `<div><span class="label">Adres:</span> ${typeof order.delivery_address === 'string' ? order.delivery_address : order.delivery_address.address}</div>` : ''}
+            <div><span class="label">Ödeme:</span> ${order.payment_method === 'card' ? 'Kart' : 'Nakit'}</div>
+            <div><span class="label">Durum:</span> ${getStatusLabel(order.status)}</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>ÜRÜNLER</h2>
+          <div class="items">
+            ${order.items?.map(item => `
+              <div class="item">
+                <span class="item-name">${item.product_name || item.name}</span>
+                <span class="item-qty">${item.quantity}x</span>
+                <span class="item-price">₺${item.subtotal?.toFixed(2)}</span>
+              </div>
+            `).join('') || '<div>Ürün bulunamadı</div>'}
+          </div>
+
+          <div class="divider"></div>
+
+          ${order.notes ? `
+            <div class="info">
+              <div><span class="label">Not:</span> ${order.notes}</div>
+            </div>
+            <div class="divider"></div>
+          ` : ''}
+
+          <div class="total">
+            <div style="display: flex; justify-content: space-between;">
+              <span>TOPLAM:</span>
+              <span>₺${order.total_amount?.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div class="footer">
+            <div>Afiyet olsun! 🙏</div>
+            <div style="margin-top: 5px;">Kuryecini - Hızlı Teslimat</div>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      doc.open();
+      doc.write(receiptHTML);
+      doc.close();
+      
+      // Wait for content to load then print
+      printFrame.contentWindow.onload = () => {
+        setTimeout(() => {
+          printFrame.contentWindow.print();
+          setTimeout(() => {
+            document.body.removeChild(printFrame);
+          }, 100);
+        }, 250);
+      };
+      
+      toast.success('Fiş yazdırılıyor...');
+    } catch (error) {
+      console.error('❌ Print error:', error);
+      toast.error('Yazdırma hatası');
+    }
+  };
+
   const getStatusLabel = (status) => {
     const labels = {
       'pending': 'Bekliyor',
