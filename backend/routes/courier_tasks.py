@@ -38,48 +38,144 @@ class AcceptTaskResponse(BaseModel):
     message: str
     task_id: str
 
-@router.get("/map", response_model=List[dict])
-async def get_tasks_for_map(
+@router.get("/nearby-businesses")
+async def get_nearby_businesses(
+    lng: float = Query(..., description="Courier longitude"),
+    lat: float = Query(..., description="Courier latitude"),
+    radius_m: int = Query(7000, description="Search radius in meters"),
     current_user: dict = Depends(get_courier_user)
 ):
     """
-    Get waiting tasks grouped by business location for map display
-    Returns business locations with count of waiting tasks
+    Get nearby businesses with ready orders count for map display
+    Returns: [{business_id, name, location, pending_ready_count, address_short}]
     """
     from server import db
     
     try:
-        # Get all waiting tasks
-        waiting_tasks = await db.courier_tasks.find({
-            "status": CourierTaskStatus.WAITING.value,
-            "courier_id": None
-        }).to_list(length=None)
-        
-        if not waiting_tasks:
-            return []
-        
-        # Group by restaurant_id (business_id)
-        business_groups = {}
-        for task in waiting_tasks:
-            business_id = task.get("restaurant_id")
-            if business_id:
-                if business_id not in business_groups:
-                    business_groups[business_id] = {
-                        "business_id": business_id,
-                        "business_name": task.get("restaurant_name", "İşletme"),
-                        "location": task.get("pickup_coords", {}),
-                        "address": task.get("pickup_address", ""),
-                        "task_count": 0,
-                        "task_ids": []
+        # Find businesses within radius using geospatial query
+        businesses_cursor = db.businesses.aggregate([
+            {
+                "$geoNear": {
+                    "near": {
+                        "type": "Point",
+                        "coordinates": [lng, lat]
+                    },
+                    "distanceField": "distance",
+                    "spherical": True,
+                    "maxDistance": radius_m
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "orders",
+                    "let": {"bid": "$id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {"$eq": ["$business_id", "$$bid"]},
+                                "status": "ready"
+                            }
+                        },
+                        {"$count": "ready_count"}
+                    ],
+                    "as": "readyAgg"
+                }
+            },
+            {
+                "$addFields": {
+                    "pending_ready_count": {
+                        "$ifNull": [
+                            {"$arrayElemAt": ["$readyAgg.ready_count", 0]},
+                            0
+                        ]
                     }
-                business_groups[business_id]["task_count"] += 1
-                business_groups[business_id]["task_ids"].append(task.get("id"))
+                }
+            },
+            {
+                "$match": {
+                    "pending_ready_count": {"$gt": 0}  # Only businesses with ready orders
+                }
+            },
+            {
+                "$project": {
+                    "business_id": "$id",
+                    "name": "$business_name",
+                    "location": "$location",
+                    "pending_ready_count": 1,
+                    "address_short": "$address",
+                    "distance": 1,
+                    "readyAgg": 0
+                }
+            }
+        ])
         
-        # Return as list
-        return list(business_groups.values())
+        results = await businesses_cursor.to_list(length=100)
+        
+        print(f"✅ Found {len(results)} nearby businesses with ready orders")
+        return results
         
     except Exception as e:
-        print(f"❌ Error fetching tasks for map: {e}")
+        print(f"❌ Error fetching nearby businesses: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/businesses/{business_id}/available-orders")
+async def get_business_available_orders(
+    business_id: str,
+    limit: int = Query(50, description="Max orders to return"),
+    current_user: dict = Depends(get_courier_user)
+):
+    """
+    Get available (ready) orders for a specific business
+    Returns order summary for courier to select and claim
+    """
+    from server import db
+    
+    try:
+        # Get ready orders for this business
+        orders = await db.orders.find({
+            "business_id": business_id,
+            "status": "ready"
+        }).sort("created_at", -1).limit(limit).to_list(length=limit)
+        
+        # Format for courier view
+        formatted = []
+        for order in orders:
+            # Get customer info
+            customer = await db.users.find_one({"id": order.get("customer_id")})
+            customer_name = f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip() if customer else "Müşteri"
+            
+            # Parse delivery address
+            delivery_addr = order.get("delivery_address", {})
+            if isinstance(delivery_addr, dict):
+                address_text = delivery_addr.get("label") or delivery_addr.get("address", "")
+                delivery_lat = delivery_addr.get("lat")
+                delivery_lng = delivery_addr.get("lng")
+            else:
+                address_text = str(delivery_addr) if delivery_addr else ""
+                delivery_lat = order.get("delivery_lat")
+                delivery_lng = order.get("delivery_lng")
+            
+            formatted.append({
+                "order_id": order.get("id"),
+                "order_code": order.get("id")[:8],
+                "customer_name": customer_name,
+                "delivery_address": address_text,
+                "delivery_location": {
+                    "lat": delivery_lat,
+                    "lng": delivery_lng
+                },
+                "total_amount": float(order.get("total_amount", 0)),
+                "delivery_fee": float(order.get("delivery_fee", 0)),
+                "grand_total": float(order.get("total_amount", 0)) + float(order.get("delivery_fee", 0)),
+                "items_count": len(order.get("items", [])),
+                "created_at": order.get("created_at"),
+                "notes": order.get("notes") or ""
+            })
+        
+        return formatted
+        
+    except Exception as e:
+        print(f"❌ Error fetching available orders: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("", response_model=List[TaskResponse])
