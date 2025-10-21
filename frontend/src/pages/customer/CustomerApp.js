@@ -287,8 +287,35 @@ export const CustomerApp = ({ user, onLogout }) => {
               </Button>
             </div>
 
-            {/* Debug Info */}
-            {console.log('🎯 Checkout page - selectedAddress:', selectedAddress, 'selectedPaymentMethod:', selectedPaymentMethod)}
+            {/* Step Indicator */}
+            <div className="bg-gradient-to-r from-orange-50 to-pink-50 rounded-lg p-4 border border-orange-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${selectedAddress ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                    {selectedAddress ? '✓' : '1'}
+                  </div>
+                  <span className="font-medium">Adres</span>
+                </div>
+                <div className="h-1 flex-1 mx-4 bg-gray-300 rounded">
+                  <div className={`h-full rounded transition-all ${selectedAddress ? 'bg-green-500 w-full' : 'w-0'}`}></div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${selectedPaymentMethod ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                    {selectedPaymentMethod ? '✓' : '2'}
+                  </div>
+                  <span className="font-medium">Ödeme</span>
+                </div>
+                <div className="h-1 flex-1 mx-4 bg-gray-300 rounded">
+                  <div className={`h-full rounded transition-all ${selectedAddress && selectedPaymentMethod ? 'bg-green-500 w-full' : 'w-0'}`}></div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${selectedAddress && selectedPaymentMethod ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                    {selectedAddress && selectedPaymentMethod ? '✓' : '3'}
+                  </div>
+                  <span className="font-medium">Onayla</span>
+                </div>
+              </div>
+            </div>
 
             {/* Step 1: Address Selection */}
             <AddressSelectorEnhanced
@@ -296,69 +323,75 @@ export const CustomerApp = ({ user, onLogout }) => {
               onAddressSelect={(addr) => {
                 console.log('📍 Address selected:', addr);
                 setSelectedAddress(addr);
-                toast.success('Adres seçildi');
+                toast.success('✅ Adres seçildi');
               }}
             />
 
-            {/* Step 2: Payment Method (shown only if address selected) */}
-            {selectedAddress && (
-              <PaymentOptionsEnhanced
-                selectedMethod={selectedPaymentMethod}
-                onMethodSelect={(method) => {
-                  console.log('💳 Payment method selected:', method);
-                  setSelectedPaymentMethod(method);
-                  toast.success('Ödeme yöntemi seçildi');
-                }}
-              />
-            )}
+            {/* Step 2: Payment Method */}
+            <PaymentOptionsEnhanced
+              selectedMethod={selectedPaymentMethod}
+              onMethodSelect={(method) => {
+                console.log('💳 Payment method selected:', method);
+                setSelectedPaymentMethod(method);
+                toast.success('✅ Ödeme yöntemi seçildi');
+              }}
+            />
 
-            {/* Order Summary & Confirm */}
-            {selectedAddress && selectedPaymentMethod && (
-              <div className="bg-white rounded-lg shadow-sm p-6 border-2 border-green-200">
-                <h3 className="font-bold text-lg mb-4 text-green-700">✅ Sipariş Özeti</h3>
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between">
-                    <span>Ürün Toplam:</span>
-                    <span>₺{cartSummary.total?.toFixed(2)}</span>
+            {/* Order Summary - Always visible */}
+            <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-orange-200">
+              <h3 className="font-bold text-xl mb-4 text-orange-700">📋 Sipariş Özeti</h3>
+              
+              {/* Cart Items */}
+              <div className="mb-4 space-y-2">
+                {cart?.items?.map((item, idx) => (
+                  <div key={idx} className="flex justify-between text-sm">
+                    <span>{item.quantity}x {item.name || item.title}</span>
+                    <span>₺{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Teslimat:</span>
-                    <span>₺10.00</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-lg border-t pt-2">
-                    <span>Toplam:</span>
-                    <span>₺{(cartSummary.total + 10).toFixed(2)}</span>
-                  </div>
+                ))}
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="space-y-2 mb-4 pb-4 border-b">
+                <div className="flex justify-between text-sm">
+                  <span>Ürün Toplam:</span>
+                  <span className="font-medium">₺{cartSummary.total?.toFixed(2)}</span>
                 </div>
-                <Button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🎉 Create order button CLICKED!');
-                    console.log('🎉 Button event:', e);
-                    handleCreateOrder();
-                  }} 
-                  className="w-full bg-green-600 hover:bg-green-700" 
-                  type="button"
-                >
-                  🎉 Siparişi Onayla ve Ver
-                </Button>
+                <div className="flex justify-between text-sm">
+                  <span>Teslimat Ücreti:</span>
+                  <span className="font-medium">₺10.00</span>
+                </div>
               </div>
-            )}
+              
+              <div className="flex justify-between font-bold text-xl mb-6">
+                <span>Toplam:</span>
+                <span className="text-orange-600">₺{(cartSummary.total + 10).toFixed(2)}</span>
+              </div>
 
-            {/* Show hint if payment method not selected */}
-            {selectedAddress && !selectedPaymentMethod && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-yellow-800">⚠️ Ödeme yöntemi seçin</p>
-              </div>
-            )}
+              {/* Order Confirmation Button - ALWAYS VISIBLE */}
+              <Button 
+                onClick={handleCreateOrder}
+                disabled={!selectedAddress || !selectedPaymentMethod}
+                className={`w-full py-6 text-lg font-bold ${
+                  selectedAddress && selectedPaymentMethod 
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+                type="button"
+              >
+                {!selectedAddress && !selectedPaymentMethod && '❌ Adres ve Ödeme Yöntemi Seçin'}
+                {selectedAddress && !selectedPaymentMethod && '❌ Ödeme Yöntemi Seçin'}
+                {!selectedAddress && selectedPaymentMethod && '❌ Adres Seçin'}
+                {selectedAddress && selectedPaymentMethod && '🎉 Siparişi Onayla ve Ver'}
+              </Button>
 
-            {/* Show hint if address not selected */}
-            {!selectedAddress && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-800">ℹ️ Yukarıdan teslimat adresinizi seçin</p>
-              </div>
-            )}
+              {/* Helper Text */}
+              {(!selectedAddress || !selectedPaymentMethod) && (
+                <p className="text-center text-sm text-gray-500 mt-3">
+                  Sipariş vermek için yukarıdaki adımları tamamlayın
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
