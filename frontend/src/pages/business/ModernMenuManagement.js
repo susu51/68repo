@@ -178,29 +178,15 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
       let response;
       
       if (editingItem) {
-        // Güncelleme
+        // Güncelleme - patch now returns { data }
         response = await patch(`/business/menu/${editingItem.id}`, payload);
       } else {
-        // Yeni ekleme
+        // Yeni ekleme - post now returns { data }
         response = await post('/business/menu', payload);
       }
 
-      // 4) Hata yönetimi: response.ok değilse loading'i kapat + mesaj göster
-      if (!response.ok) {
-        const errText = await response.text().catch(() => '');
-        let errorMessage = `Kaydetme başarısız (HTTP ${response.status})`;
-        
-        try {
-          const errorData = JSON.parse(errText);
-          errorMessage = errorData.detail || errorMessage;
-        } catch {
-          if (errText) errorMessage += `: ${errText}`;
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      const savedItem = await response.json();
+      // Response is now { data: savedItem }
+      const savedItem = response?.data || response;
       console.log('✅ Item saved:', savedItem);
 
       // 4) Optimistic UI: Listeyi anında güncelle
