@@ -70,42 +70,46 @@ export const CustomerApp = ({ user, onLogout }) => {
   };
 
   const handleCreateOrder = async () => {
-    console.log('🎬 handleCreateOrder STARTED');
-    console.log('📍 selectedAddress:', selectedAddress);
-    console.log('💳 selectedPaymentMethod:', selectedPaymentMethod);
-    console.log('🛒 cart:', cart);
+    console.log('🎬 ============ SIPARIŞ OLUŞTURMA BAŞLADI ============');
+    console.log('📍 Seçili Adres:', selectedAddress);
+    console.log('💳 Seçili Ödeme:', selectedPaymentMethod);
+    console.log('🛒 Sepet:', cart);
     
     try {
+      // Validation checks
       if (!selectedAddress) {
-        console.error('❌ VALIDATION FAILED: No address selected');
-        toast.error('Lütfen teslimat adresi seçin');
+        console.error('❌ HATA: Adres seçilmemiş');
+        toast.error('⚠️ Lütfen teslimat adresi seçin');
         return;
       }
       if (!selectedPaymentMethod) {
-        console.error('❌ VALIDATION FAILED: No payment method selected');
-        toast.error('Lütfen ödeme yöntemi seçin');
+        console.error('❌ HATA: Ödeme yöntemi seçilmemiş');
+        toast.error('⚠️ Lütfen ödeme yöntemi seçin');
         return;
       }
 
       // Check cart items
       const cartItems = cart?.items || [];
-      console.log('🛒 Cart items:', cartItems);
+      console.log('🛒 Sepetteki ürünler:', cartItems.length, 'adet');
       
       if (!cartItems || cartItems.length === 0) {
-        console.error('❌ VALIDATION FAILED: Cart is empty');
-        toast.error('Sepetiniz boş');
+        console.error('❌ HATA: Sepet boş');
+        toast.error('⚠️ Sepetiniz boş');
         return;
       }
 
       // Get restaurant_id from cart
       const restaurant_id = cart?.restaurant?.id || cart?.businessId;
-      console.log('🏪 Restaurant ID:', restaurant_id);
+      console.log('🏪 Restoran ID:', restaurant_id);
       
       if (!restaurant_id) {
-        console.error('❌ VALIDATION FAILED: No restaurant ID');
-        toast.error('Restoran bilgisi bulunamadı');
+        console.error('❌ HATA: Restoran bilgisi bulunamadı');
+        toast.error('⚠️ Restoran bilgisi bulunamadı. Lütfen tekrar deneyin.');
         return;
       }
+
+      // Show loading toast
+      toast.loading('📦 Siparişiniz hazırlanıyor...', { id: 'creating-order' });
 
       // Prepare order data matching backend OrderCreate model
       const orderData = {
@@ -129,7 +133,7 @@ export const CustomerApp = ({ user, onLogout }) => {
         notes: cart?.notes || ''
       };
 
-      console.log('🎉 Creating order with backend API:', JSON.stringify(orderData, null, 2));
+      console.log('📤 Backend\'e gönderilen veri:', JSON.stringify(orderData, null, 2));
 
       const response = await fetch(`${API}/orders`, {
         method: 'POST',
@@ -138,52 +142,104 @@ export const CustomerApp = ({ user, onLogout }) => {
         body: JSON.stringify(orderData)
       });
 
-      console.log('📡 API Response status:', response.status);
+      console.log('📡 API Yanıt Durumu:', response.status, response.statusText);
+
+      // Dismiss loading toast
+      toast.dismiss('creating-order');
 
       if (response.ok) {
-        const orderData = await response.json();
-        console.log('✅ Order created successfully:', orderData);
+        const responseData = await response.json();
+        console.log('✅ ============ SİPARİŞ BAŞARIYLA OLUŞTURULDU ============');
+        console.log('✅ Sipariş Detayları:', responseData);
+        console.log('📦 Sipariş ID:', responseData.id);
+        console.log('🏪 İşletme ID:', responseData.business_id);
+        console.log('🏪 İşletme Adı:', responseData.business_name);
+        console.log('💰 Toplam Tutar:', responseData.total_amount);
+        console.log('📊 Durum:', responseData.status);
         
-        // Show success message with order code
-        toast.success(`✅ Siparişiniz Onaylandı!\n\nSipariş Kodu: ${orderData.id.substring(0, 8).toUpperCase()}`, {
-          duration: 6000,
-          icon: '🎉',
-          style: {
-            fontSize: '16px',
-            fontWeight: 'bold'
+        // Show BIG success message
+        toast.success(
+          `🎉 Siparişiniz Başarıyla Alındı!\n\n` +
+          `📋 Sipariş No: ${responseData.id.substring(0, 8).toUpperCase()}\n` +
+          `🏪 Restoran: ${responseData.business_name || 'Restoran'}\n` +
+          `💰 Tutar: ₺${(cartSummary.total + 10).toFixed(2)}`,
+          {
+            duration: 8000,
+            icon: '✅',
+            style: {
+              minWidth: '350px',
+              fontSize: '15px',
+              fontWeight: 'bold',
+              padding: '20px',
+              background: '#10b981',
+              color: 'white'
+            }
           }
-        });
+        );
         
-        console.log('✅ Order created:', orderData);
-        console.log('📦 Order ID:', orderData.id);
-        console.log('🏪 Business ID:', orderData.business_id);
-        console.log('👤 Business Name:', orderData.business_name);
-        console.log('💰 Total:', orderData.total_amount);
-        
-        // Clear cart and navigate
+        // Clear cart
+        console.log('🧹 Sepet temizleniyor...');
         clearCart();
-        setCurrentOrderId(orderData.id);
         
-        // Show business confirmation
+        // Store order ID
+        setCurrentOrderId(responseData.id);
+        
+        // Show business notification
         setTimeout(() => {
-          toast.success(`Siparişiniz ${orderData.business_name || 'restorana'} iletildi`, {
-            duration: 4000
-          });
-        }, 800);
+          toast.success(
+            `📲 ${responseData.business_name || 'Restoran'} bilgilendirildi!\nSiparişiniz hazırlanmaya başlandı.`,
+            {
+              duration: 5000,
+              icon: '👨‍🍳',
+              style: {
+                fontSize: '14px'
+              }
+            }
+          );
+        }, 1000);
         
-        // Navigate to orders page after a brief delay
+        // Navigate to orders page
+        console.log('📄 Siparişler sayfasına yönlendiriliyor...');
         setTimeout(() => {
           setActiveView('orders');
-        }, 1200);
+          toast.success('Siparişlerim sayfasında sipariş durumunuzu takip edebilirsiniz', {
+            duration: 4000,
+            icon: '📱'
+          });
+        }, 2000);
+        
+        console.log('✅ ============ SİPARİŞ AKIŞI TAMAMLANDI ============');
       } else {
-        const error = await response.json();
-        console.error('❌ Order creation error:', error);
-        toast.error(error.detail || 'Sipariş oluşturulamadı');
+        const errorData = await response.json();
+        console.error('❌ ============ SİPARİŞ HATASI ============');
+        console.error('❌ HTTP Durum:', response.status);
+        console.error('❌ Hata Detayı:', errorData);
+        
+        toast.error(
+          `❌ Sipariş Oluşturulamadı\n\n${errorData.detail || errorData.message || 'Bilinmeyen hata'}`,
+          {
+            duration: 6000,
+            style: {
+              minWidth: '300px'
+            }
+          }
+        );
       }
     } catch (error) {
-      console.error('❌ Sipariş oluşturma hatası:', error);
-      console.error('❌ Error stack:', error.stack);
-      toast.error('Bir hata oluştu: ' + error.message);
+      console.error('❌ ============ BEKLENMEYEN HATA ============');
+      console.error('❌ Hata:', error);
+      console.error('❌ Hata Stack:', error.stack);
+      
+      toast.dismiss('creating-order');
+      toast.error(
+        `❌ Bir hata oluştu\n\n${error.message}\n\nLütfen tekrar deneyin veya destek ile iletişime geçin.`,
+        {
+          duration: 6000,
+          style: {
+            minWidth: '300px'
+          }
+        }
+      );
     }
   };
 
