@@ -100,12 +100,31 @@ export const CookieAuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      // CRITICAL: Disable WebSocket BEFORE logout to prevent reconnection attempts
+      console.log('🔒 Disabling WebSocket before logout...');
+      try {
+        const WSManager = (await import('../ws/WSManager')).default;
+        WSManager.setEnabled(false);
+        WSManager.reset();
+      } catch (wsError) {
+        console.warn('Failed to cleanup WebSocket:', wsError);
+      }
+      
       await api.post("/auth/logout", {});
       setUser(null);
-      console.log('✅ Logout successful - cookies cleared');
+      console.log('✅ Logout successful - cookies cleared, WebSocket disabled');
     } catch (error) {
       console.error('❌ Logout error:', error);
       setUser(null);
+      
+      // Still try to cleanup WebSocket even if logout API fails
+      try {
+        const WSManager = (await import('../ws/WSManager')).default;
+        WSManager.setEnabled(false);
+        WSManager.reset();
+      } catch (wsError) {
+        console.warn('Failed to cleanup WebSocket after logout error:', wsError);
+      }
     }
   };
 
