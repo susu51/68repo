@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import WSManager from '../ws/WSManager';
 
 /**
@@ -13,15 +13,39 @@ import WSManager from '../ws/WSManager';
  * @param {string} businessId - Business ID to subscribe to
  * @param {function} onOrderReceived - Callback when order received
  * @param {boolean} enabled - Whether WebSocket should be active
+ * @returns {Object} { isConnected, isLeader }
  */
 export const useOrderNotifications = (businessId, onOrderReceived, enabled = true) => {
   const hasMountedRef = useRef(false);
   const callbackRef = useRef(onOrderReceived);
+  const [connectionState, setConnectionState] = useState({
+    isConnected: false,
+    isLeader: false
+  });
   
   // Keep callback ref updated
   useEffect(() => {
     callbackRef.current = onOrderReceived;
   }, [onOrderReceived]);
+  
+  // Update connection state periodically
+  useEffect(() => {
+    const updateState = () => {
+      const state = WSManager.getConnectionState();
+      setConnectionState({
+        isConnected: state.isConnected,
+        isLeader: state.isLeader
+      });
+    };
+    
+    // Initial update
+    updateState();
+    
+    // Update every 2 seconds to reflect connection state
+    const interval = setInterval(updateState, 2000);
+    
+    return () => clearInterval(interval);
+  }, []);
   
   // One-time initialization (StrictMode-safe)
   useEffect(() => {
