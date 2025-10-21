@@ -45,9 +45,68 @@ export const get = async (p) => {
   const data = await res.json();
   return { data };
 };
-export const post = (p, b) => api(p, { method: 'POST', body: JSON.stringify(b) });
-export const patch = (p, b) => api(p, { method: 'PATCH', body: JSON.stringify(b) });
-export const del = (p) => api(p, { method: 'DELETE' });
+
+export const post = async (p, b) => {
+  const res = await api(p, { method: 'POST', body: JSON.stringify(b) });
+  
+  // Handle non-OK responses
+  if (!res.ok) {
+    let errorMessage = `HTTP ${res.status}`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.detail || errorData.message || errorMessage;
+    } catch {
+      errorMessage = res.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+  
+  const data = await res.json();
+  return { data };
+};
+
+export const patch = async (p, b) => {
+  const res = await api(p, { method: 'PATCH', body: JSON.stringify(b) });
+  
+  // Handle non-OK responses
+  if (!res.ok) {
+    let errorMessage = `HTTP ${res.status}`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.detail || errorData.message || errorMessage;
+    } catch {
+      errorMessage = res.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+  
+  const data = await res.json();
+  return { data };
+};
+
+export const del = async (p) => {
+  const res = await api(p, { method: 'DELETE' });
+  
+  // Handle non-OK responses
+  if (!res.ok) {
+    let errorMessage = `HTTP ${res.status}`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.detail || errorData.message || errorMessage;
+    } catch {
+      errorMessage = res.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+  
+  // DELETE may not return JSON body
+  try {
+    const data = await res.json();
+    return { data };
+  } catch {
+    return { data: null };
+  }
+};
 
 // Legacy compatibility exports
 // Note: Named exports (get, post, patch, del) already return parsed data
