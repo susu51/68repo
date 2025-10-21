@@ -180,35 +180,75 @@ export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNav
           <CardTitle>Son Aktiviteler</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 pb-3 border-b border-border last:border-0">
-              <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/20">
-                <ShoppingBag className="h-4 w-4 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Yeni sipariş alındı</p>
-                <p className="text-xs text-muted-foreground">₺125.50 - 2 dakika önce</p>
-              </div>
+          {loading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
+              <p className="text-sm">Yükleniyor...</p>
             </div>
-            <div className="flex items-start gap-3 pb-3 border-b border-border last:border-0">
-              <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/20">
-                <Package className="h-4 w-4 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Menü güncellendi</p>
-                <p className="text-xs text-muted-foreground">3 ürün eklendi - 1 saat önce</p>
-              </div>
+          ) : stats.activities && stats.activities.length > 0 ? (
+            <div className="space-y-4" data-testid="activities-list">
+              {stats.activities.slice(0, 20).map((activity, index) => {
+                const getActivityIcon = (type) => {
+                  switch(type) {
+                    case 'order_created':
+                      return { Icon: ShoppingBag, bgColor: 'bg-green-100 dark:bg-green-900/20', color: 'text-green-600' };
+                    case 'menu_updated':
+                      return { Icon: Package, bgColor: 'bg-blue-100 dark:bg-blue-900/20', color: 'text-blue-600' };
+                    case 'rating_received':
+                      return { Icon: Star, bgColor: 'bg-yellow-100 dark:bg-yellow-900/20', color: 'text-yellow-600' };
+                    default:
+                      return { Icon: ShoppingBag, bgColor: 'bg-gray-100 dark:bg-gray-900/20', color: 'text-gray-600' };
+                  }
+                };
+                
+                const { Icon, bgColor, color } = getActivityIcon(activity.type);
+                
+                const getTimeAgo = (timestamp) => {
+                  if (!timestamp) return '';
+                  try {
+                    const date = new Date(timestamp);
+                    const now = new Date();
+                    const diffMs = now - date;
+                    const diffMins = Math.floor(diffMs / 60000);
+                    
+                    if (diffMins < 1) return 'Az önce';
+                    if (diffMins < 60) return `${diffMins} dakika önce`;
+                    
+                    const diffHours = Math.floor(diffMins / 60);
+                    if (diffHours < 24) return `${diffHours} saat önce`;
+                    
+                    const diffDays = Math.floor(diffHours / 24);
+                    return `${diffDays} gün önce`;
+                  } catch (e) {
+                    return '';
+                  }
+                };
+                
+                const meta = activity.meta || {};
+                const amount = meta.amount ? `₺${parseFloat(meta.amount).toFixed(2)}` : '';
+                const details = meta.customer_name || meta.order_code || '';
+                
+                return (
+                  <div key={index} className="flex items-start gap-3 pb-3 border-b border-border last:border-0">
+                    <div className={`p-2 rounded-lg ${bgColor}`}>
+                      <Icon className={`h-4 w-4 ${color}`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {amount && details ? `${amount} - ${details}` : amount || details}
+                        {activity.ts && ` - ${getTimeAgo(activity.ts)}`}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="flex items-start gap-3 pb-3 border-b border-border last:border-0">
-              <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/20">
-                <Star className="h-4 w-4 text-yellow-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Yeni değerlendirme</p>
-                <p className="text-xs text-muted-foreground">5 yıldız - 3 saat önce</p>
-              </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="text-sm">Henüz aktivite yok</p>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
