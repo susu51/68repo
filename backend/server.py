@@ -8576,11 +8576,11 @@ async def check_business_gps_status(current_user: dict = Depends(get_admin_user)
             detail=f"Error checking GPS status: {str(e)}"
         )
 
-app.include_router(api_router)
-
 # Include business dashboard routes
 from routes.business_dashboard import router as dashboard_router
 api_router.include_router(dashboard_router, tags=["business-dashboard"])
+
+app.include_router(api_router)
 
 # WebSocket endpoint for real-time order notifications
 @app.websocket("/api/ws/orders")
