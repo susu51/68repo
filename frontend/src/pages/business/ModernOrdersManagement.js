@@ -36,7 +36,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
   });
 
   // WebSocket for real-time notifications (enabled only when businessId exists)
-  useOrderNotifications(
+  const { isConnected, reconnect } = useOrderNotifications(
     businessId,
     (event) => {
       console.log('🔔 New order event received:', event);
