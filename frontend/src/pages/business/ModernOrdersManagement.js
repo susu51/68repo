@@ -362,7 +362,7 @@ export const ModernOrdersManagement = ({ businessId }) => {
   const filteredOrders = statusFilter === 'all' 
     ? orders 
     : orders.filter(order => {
-        if (statusFilter === 'pending') return ['pending', 'placed'].includes(order.status);
+        if (statusFilter === 'pending') return ['pending', 'placed', 'created'].includes(order.status);
         return order.status === statusFilter;
       });
 
