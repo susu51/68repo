@@ -111,26 +111,31 @@ export const CustomerApp = ({ user, onLogout }) => {
       // Show loading toast
       toast.loading('📦 Siparişiniz hazırlanıyor...', { id: 'creating-order' });
 
-      // Prepare order data matching backend OrderCreate model
+      // Prepare order data matching backend expectations
       const orderData = {
         business_id: restaurant_id,
+        restaurant_id: restaurant_id,
         items: cartItems.map(item => ({
           product_id: item.id,
+          id: item.id,
           title: item.name || item.title,
           price: item.price,
           quantity: item.quantity,
           notes: item.notes || ''
         })),
-        delivery_address: {
-          label: selectedAddress.label || selectedAddress.adres_basligi || 'Ev',
-          address: selectedAddress.address || selectedAddress.acik_adres || selectedAddress.full,
-          lat: selectedAddress.lat || 0,
-          lng: selectedAddress.lng || 0,
-          notes: selectedAddress.notes || ''
-        },
-        payment_method: selectedPaymentMethod === 'Nakit' ? 'cash_on_delivery' : 
-                       selectedPaymentMethod === 'Kart' ? 'pos_on_delivery' : 'online',
-        notes: cart?.notes || ''
+        // Address fields (flat structure for backend)
+        delivery_address: selectedAddress.address || selectedAddress.acik_adres || selectedAddress.full,
+        city: selectedAddress.city || selectedAddress.il || '',
+        district: selectedAddress.district || selectedAddress.ilce || '',
+        neighborhood: selectedAddress.neighborhood || selectedAddress.mahalle || '',
+        delivery_lat: selectedAddress.lat || 0,
+        delivery_lng: selectedAddress.lng || 0,
+        // Payment
+        payment_method: selectedPaymentMethod === 'Nakit' ? 'cash' : 
+                       selectedPaymentMethod === 'Kart' ? 'card' : 'online',
+        // Optional notes
+        notes: cart?.notes || '',
+        special_instructions: cart?.notes || ''
       };
 
       console.log('📤 Backend\'e gönderilen veri:', JSON.stringify(orderData, null, 2));
