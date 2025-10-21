@@ -108,56 +108,23 @@ export const del = async (p) => {
   }
 };
 
-// Legacy compatibility exports
-// Note: Named exports (get, post, patch, del) already return parsed data
+// Legacy compatibility exports  
+// Note: Named exports (get, post, patch, del) now all return { data } format
 export default {
   async get(path) {
-    // get() already returns { data: parsed }, no need to parse again
+    // get() already returns { data }, use it directly
     return await get(path);
   },
   async post(path, body) {
-    // post() returns Response object, need to parse and handle errors
-    const res = await post(path, body);
-    
-    // Handle non-OK responses (including 401)
-    if (!res.ok) {
-      let errorMessage = `HTTP ${res.status}`;
-      try {
-        const errorData = await res.json();
-        errorMessage = errorData.detail || errorData.message || errorMessage;
-      } catch {
-        // Response body is not JSON or empty
-        errorMessage = res.statusText || errorMessage;
-      }
-      throw new Error(errorMessage);
-    }
-    
-    const data = await res.json();
-    return { data };
+    // post() now returns { data } or throws error
+    return await post(path, body);
   },
   async patch(path, body) {
-    // patch() returns Response object, need to parse and handle errors
-    const res = await patch(path, body);
-    
-    // Handle non-OK responses
-    if (!res.ok) {
-      let errorMessage = `HTTP ${res.status}`;
-      try {
-        const errorData = await res.json();
-        errorMessage = errorData.detail || errorData.message || errorMessage;
-      } catch {
-        errorMessage = res.statusText || errorMessage;
-      }
-      throw new Error(errorMessage);
-    }
-    
-    const data = await res.json();
-    return { data };
+    // patch() now returns { data } or throws error
+    return await patch(path, body);
   },
   async delete(path) {
-    // del() returns Response object, need to parse
-    const res = await del(path);
-    const data = await res.json();
-    return { data };
+    // del() now returns { data } or throws error
+    return await del(path);
   }
 };
