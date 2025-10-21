@@ -58,7 +58,7 @@ from logging_config import get_loggers, log_health_check
 logger = logging.getLogger("kuryecini.server")
 
 # Import authentication dependencies
-from auth_dependencies import get_current_user, get_business_user, get_approved_business_user
+from auth_dependencies import get_current_user, get_business_user, get_approved_business_user, get_admin_user
 
 # Import cookie-based auth system
 from auth_cookie import auth_router, get_current_user_from_cookie, get_current_user_from_cookie_or_bearer, get_approved_business_user_from_cookie, set_db_client
