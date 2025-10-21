@@ -63,41 +63,51 @@ class BusinessDashboardTester:
             "details": details,
             "response": response_data
         })
-        self.test_results.append(result)
-        print(f"{status}: {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        if error:
-            print(f"   Error: {error}")
-        print()
-    
-    def authenticate_admin(self):
-        """Authenticate admin user - try multiple credentials"""
-        self.admin_session = requests.Session()
         
-        for i, credentials in enumerate(ADMIN_CREDENTIALS_LIST):
-            try:
-                response = self.admin_session.post(
-                    f"{BACKEND_URL}/api/auth/login",
-                    json=credentials,
-                    timeout=10
-                )
-                
-                if response.status_code == 200:
-                    data = response.json()
+    async def login_business_user(self):
+        """Login as business user and get cookies"""
+        try:
+            login_data = {
+                "email": BUSINESS_USER["email"],
+                "password": BUSINESS_USER["password"]
+            }
+            
+            async with self.session.post(f"{API_BASE}/auth/login", json=login_data) as response:
+                if response.status == 200:
+                    self.business_cookies = response.cookies
+                    response_data = await response.json()
+                    self.log_test("Business User Login", True, f"Logged in as {BUSINESS_USER['email']}")
+                    return True
+                else:
+                    error_data = await response.text()
+                    self.log_test("Business User Login", False, f"Status: {response.status}, Error: {error_data}")
+                    return False
                     
-                    # Check if it's cookie-based auth (success field) or JWT auth (access_token field)
-                    if data.get("success"):
-                        # Cookie-based auth
-                        user_role = data.get("user", {}).get("role")
-                        if user_role == "admin":
-                            self.log_test(
-                                "Admin Authentication",
-                                True,
-                                f"Admin login successful (cookie-based): {credentials['email']}, role: {user_role}"
-                            )
-                            return True
-                    elif data.get("access_token"):
+        except Exception as e:
+            self.log_test("Business User Login", False, f"Exception: {str(e)}")
+            return False
+            
+    async def login_customer_user(self):
+        """Login as customer user for negative testing"""
+        try:
+            login_data = {
+                "email": CUSTOMER_USER["email"],
+                "password": CUSTOMER_USER["password"]
+            }
+            
+            async with self.session.post(f"{API_BASE}/auth/login", json=login_data) as response:
+                if response.status == 200:
+                    self.customer_cookies = response.cookies
+                    self.log_test("Customer User Login", True, f"Logged in as {CUSTOMER_USER['email']}")
+                    return True
+                else:
+                    error_data = await response.text()
+                    self.log_test("Customer User Login", False, f"Status: {response.status}, Error: {error_data}")
+                    return False
+                    
+        except Exception as e:
+            self.log_test("Customer User Login", False, f"Exception: {str(e)}")
+            return False
                         # JWT-based auth - store token for headers
                         user_role = data.get("user", {}).get("role")
                         if user_role == "admin":
