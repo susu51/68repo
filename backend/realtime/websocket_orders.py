@@ -235,9 +235,18 @@ async def websocket_order_notifications(
             
     except WebSocketDisconnect:
         manager.disconnect(websocket, client_id, role)
-        print(f"🔌 Client disconnected normally: role={role}, client_id={client_id}")
+        logger.info(f"🔌 Client disconnected normally: role={role}, client_id={client_id}")
     except Exception as e:
-        print(f"❌ WebSocket error for {role}:{client_id}: {type(e).__name__}: {e}")
+        logger.error(f"❌ WebSocket error for {role}:{client_id}: {type(e).__name__}: {e}")
         import traceback
         traceback.print_exc()
         manager.disconnect(websocket, client_id, role)
+        
+        # Close with appropriate code
+        try:
+            if isinstance(e, asyncio.TimeoutError):
+                await websocket.close(code=1000, reason="Timeout")
+            else:
+                await websocket.close(code=1011, reason="Server error")
+        except:
+            pass
