@@ -252,21 +252,8 @@ export const ModernMenuManagement = ({ businessId, onStatsUpdate }) => {
     }
 
     try {
-      const response = await del(`/business/menu/${id}`);
-      
-      if (!response.ok) {
-        const errText = await response.text().catch(() => '');
-        let errorMessage = `Silme başarısız (HTTP ${response.status})`;
-        
-        try {
-          const errorData = JSON.parse(errText);
-          errorMessage = errorData.detail || errorMessage;
-        } catch {
-          if (errText) errorMessage += `: ${errText}`;
-        }
-        
-        throw new Error(errorMessage);
-      }
+      // del now returns { data } or throws error
+      await del(`/business/menu/${id}`);
       
       // Optimistic UI: Listeden hemen kaldır
       setMenuItems(prevItems => {
