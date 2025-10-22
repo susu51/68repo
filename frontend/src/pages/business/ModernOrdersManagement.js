@@ -115,7 +115,44 @@ export const ModernOrdersManagement = ({ businessId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty deps - fetchOrders doesn't depend on any props/state
+
+  // WebSocket callback - memoized to prevent infinite re-renders
+  const handleNewOrder = useCallback((event) => {
+    console.log('🔔 New order event received:', event);
+    
+    // Play notification sound
+    try {
+      import('../../utils/notificationSound').then(module => {
+        module.default();
+      });
+    } catch (e) {
+      console.log('Audio notification failed:', e);
+    }
+    
+    // Show toast
+    toast.success('🆕 Yeni Sipariş Alındı!', {
+      duration: 5000,
+      icon: '🔔'
+    });
+    
+    // Refresh orders when new order arrives
+    fetchOrders();
+  }, [fetchOrders]);
+
+  // WebSocket for real-time notifications (enabled only when businessId exists)
+  const { isConnected, reconnect } = useOrderNotifications(
+    businessId,
+    handleNewOrder,
+    !!businessId  // enabled: only when businessId exists
+  );
+
+  useEffect(() => {
+    fetchOrders();
+    // Auto-refresh every 30 seconds as fallback
+    const interval = setInterval(fetchOrders, 30000);
+    return () => clearInterval(interval);
+  }, [fetchOrders]);
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
