@@ -149,9 +149,9 @@ export const ModernOrdersManagement = ({ businessId }) => {
 
   useEffect(() => {
     fetchOrders();
-    // Auto-refresh every 30 seconds as fallback
-    const interval = setInterval(fetchOrders, 30000);
-    return () => clearInterval(interval);
+    // TEMPORARILY DISABLED: Auto-refresh to debug continuous refresh issue
+    // const interval = setInterval(fetchOrders, 30000);
+    // return () => clearInterval(interval);
   }, [fetchOrders]);
 
   const updateOrderStatus = async (orderId, newStatus) => {
