@@ -2468,7 +2468,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Business Dashboard Real Data Integration"
+    - "Courier Map Panel Backend Endpoints"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
