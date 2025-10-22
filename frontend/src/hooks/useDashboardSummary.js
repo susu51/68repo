@@ -82,9 +82,10 @@ export const useDashboardSummary = (date = null, options = {}) => {
     };
   }, []); // Empty deps - fetch only once on mount
 
-  // Auto-refetch interval - TEMPORARILY DISABLED for debugging
+  // Auto-refetch interval - DISABLED (dashboard refreshes manually)
   useEffect(() => {
-    // DISABLED: if (autoRefetch && refetchInterval > 0) {
+    // Dashboard doesn't need auto-refresh, only manual refresh via button
+    // if (autoRefetch && refetchInterval > 0) {
     //   const intervalId = setInterval(() => {
     //     fetchData();
     //   }, refetchInterval);
