@@ -103,8 +103,7 @@ async def get_nearby_businesses(
                     "location": "$location",
                     "pending_ready_count": 1,
                     "address_short": "$address",
-                    "distance": 1,
-                    "readyAgg": 0
+                    "distance": 1
                 }
             }
         ])
