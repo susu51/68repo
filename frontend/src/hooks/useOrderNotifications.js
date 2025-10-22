@@ -28,7 +28,7 @@ export const useOrderNotifications = (businessId, onOrderReceived, enabled = tru
     callbackRef.current = onOrderReceived;
   }, [onOrderReceived]);
   
-  // Update connection state periodically
+  // Update connection state periodically - TEMPORARILY DISABLED for debugging
   useEffect(() => {
     const updateState = () => {
       const state = WSManager.getConnectionState();
@@ -47,10 +47,9 @@ export const useOrderNotifications = (businessId, onOrderReceived, enabled = tru
     // Initial update
     updateState();
     
-    // Update every 5 seconds to reflect connection state (reduced frequency)
-    const interval = setInterval(updateState, 5000);
-    
-    return () => clearInterval(interval);
+    // DISABLED: Update every 5 seconds to reflect connection state
+    // const interval = setInterval(updateState, 5000);
+    // return () => clearInterval(interval);
   }, []);
   
   // One-time initialization (StrictMode-safe)
