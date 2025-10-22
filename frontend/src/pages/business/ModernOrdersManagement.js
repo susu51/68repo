@@ -37,41 +37,8 @@ export const ModernOrdersManagement = ({ businessId }) => {
     delivered: 0
   });
 
-  // WebSocket for real-time notifications (enabled only when businessId exists)
-  const { isConnected, reconnect } = useOrderNotifications(
-    businessId,
-    (event) => {
-      console.log('🔔 New order event received:', event);
-      
-      // Play notification sound
-      try {
-        import('../../utils/notificationSound').then(module => {
-          module.default();
-        });
-      } catch (e) {
-        console.log('Audio notification failed:', e);
-      }
-      
-      // Show toast
-      toast.success('🆕 Yeni Sipariş Alındı!', {
-        duration: 5000,
-        icon: '🔔'
-      });
-      
-      // Refresh orders when new order arrives
-      fetchOrders();
-    },
-    !!businessId  // enabled: only when businessId exists
-  );
-
-  useEffect(() => {
-    fetchOrders();
-    // Auto-refresh every 30 seconds as fallback
-    const interval = setInterval(fetchOrders, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchOrders = async () => {
+  // Define fetchOrders early so it can be used in callbacks
+  const fetchOrders = useCallback(async () => {
     // Debounce: Don't fetch if called within last 2 seconds
     const now = Date.now();
     if (now - lastFetchTime < 2000) {
