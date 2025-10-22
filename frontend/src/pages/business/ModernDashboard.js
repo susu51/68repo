@@ -254,3 +254,6 @@ export const ModernDashboard = ({ businessInfo, stats, loading, onRefresh, onNav
     </div>
   );
 };
+
+// Wrap with React.memo to prevent unnecessary re-renders
+export default React.memo(ModernDashboard);
