@@ -82,16 +82,15 @@ export const useDashboardSummary = (date = null, options = {}) => {
     };
   }, []); // Empty deps - fetch only once on mount
 
-  // Auto-refetch interval
+  // Auto-refetch interval - TEMPORARILY DISABLED for debugging
   useEffect(() => {
-    if (autoRefetch && refetchInterval > 0) {
-      const intervalId = setInterval(() => {
-        fetchData();
-      }, refetchInterval);
-
-      return () => clearInterval(intervalId);
-    }
-  }, [autoRefetch, refetchInterval]); // Removed fetchData to prevent infinite loop
+    // DISABLED: if (autoRefetch && refetchInterval > 0) {
+    //   const intervalId = setInterval(() => {
+    //     fetchData();
+    //   }, refetchInterval);
+    //   return () => clearInterval(intervalId);
+    // }
+  }, [autoRefetch, refetchInterval]);
 
   const refetch = useCallback(() => {
     return fetchData();
