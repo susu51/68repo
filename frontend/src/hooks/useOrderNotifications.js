@@ -32,17 +32,23 @@ export const useOrderNotifications = (businessId, onOrderReceived, enabled = tru
   useEffect(() => {
     const updateState = () => {
       const state = WSManager.getConnectionState();
-      setConnectionState({
-        isConnected: state.isConnected,
-        isLeader: state.isLeader
+      setConnectionState(prev => {
+        // Only update if state actually changed to prevent unnecessary re-renders
+        if (prev.isConnected !== state.isConnected || prev.isLeader !== state.isLeader) {
+          return {
+            isConnected: state.isConnected,
+            isLeader: state.isLeader
+          };
+        }
+        return prev;
       });
     };
     
     // Initial update
     updateState();
     
-    // Update every 2 seconds to reflect connection state
-    const interval = setInterval(updateState, 2000);
+    // Update every 5 seconds to reflect connection state (reduced frequency)
+    const interval = setInterval(updateState, 5000);
     
     return () => clearInterval(interval);
   }, []);
