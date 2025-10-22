@@ -91,7 +91,7 @@ export const useDashboardSummary = (date = null, options = {}) => {
 
       return () => clearInterval(intervalId);
     }
-  }, [autoRefetch, refetchInterval, fetchData]);
+  }, [autoRefetch, refetchInterval]); // Removed fetchData to prevent infinite loop
 
   const refetch = useCallback(() => {
     return fetchData();
