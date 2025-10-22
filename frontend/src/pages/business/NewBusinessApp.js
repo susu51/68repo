@@ -48,24 +48,26 @@ export const NewBusinessApp = ({ user, onLogout }) => {
     }
   });
 
-  // Map dashboard data to stats format
-  const stats = dashboardData ? {
-    todayOrders: dashboardData.today_orders_count || 0,
-    todayRevenue: dashboardData.today_revenue || 0,
-    pendingOrders: dashboardData.pending_orders_count || 0,
-    menuItems: dashboardData.menu_items_count || 0,
-    rating: dashboardData.rating_avg || 0,
-    totalCustomers: dashboardData.total_customers || 0,
-    activities: dashboardData.activities || []
-  } : {
-    todayOrders: 0,
-    todayRevenue: 0,
-    pendingOrders: 0,
-    menuItems: 0,
-    rating: 0,
-    totalCustomers: 0,
-    activities: []
-  };
+  // Map dashboard data to stats format - MEMOIZED to prevent re-renders
+  const stats = useMemo(() => {
+    return dashboardData ? {
+      todayOrders: dashboardData.today_orders_count || 0,
+      todayRevenue: dashboardData.today_revenue || 0,
+      pendingOrders: dashboardData.pending_orders_count || 0,
+      menuItems: dashboardData.menu_items_count || 0,
+      rating: dashboardData.rating_avg || 0,
+      totalCustomers: dashboardData.total_customers || 0,
+      activities: dashboardData.activities || []
+    } : {
+      todayOrders: 0,
+      todayRevenue: 0,
+      pendingOrders: 0,
+      menuItems: 0,
+      rating: 0,
+      totalCustomers: 0,
+      activities: []
+    };
+  }, [dashboardData]);
   
   const loading = dashboardLoading;
 
