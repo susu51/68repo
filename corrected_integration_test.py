@@ -17,7 +17,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
 TEST_TIMEOUT = 30
 
 class CorrectedIntegrationTester:

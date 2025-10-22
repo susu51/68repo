@@ -29,7 +29,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@kuryecini.com"
 ADMIN_PASSWORD = "KuryeciniAdmin2024!"  # Actual admin password from backend
 

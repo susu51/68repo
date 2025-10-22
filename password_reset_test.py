@@ -11,7 +11,7 @@ Comprehensive testing of the new password reset functionality as requested:
 4. Integration Flow (full forgot → email → reset → login)
 
 Test Environment:
-- Backend: https://courier-connect-14.preview.emergentagent.com/api
+- Backend: https://courier-dashboard-3.preview.emergentagent.com/api
 - Email provider: console (check logs for tokens)
 - Test user: admin@kuryecini.com / KuryeciniAdmin2024!
 - MongoDB: Local connection ready
@@ -27,7 +27,7 @@ from typing import Dict, List, Optional, Any
 
 class PasswordResetTester:
     def __init__(self):
-        self.base_url = "https://courier-connect-14.preview.emergentagent.com/api"
+        self.base_url = "https://courier-dashboard-3.preview.emergentagent.com/api"
         self.session = None
         self.test_results = []
         self.test_email = "admin@kuryecini.com"

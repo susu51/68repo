@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
 
 def check_users():
     """Check what users exist by trying different login combinations"""

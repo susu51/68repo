@@ -30,7 +30,7 @@ import AdminAdvertisements from "./components/AdminAdvertisements";
 import UserProfileWithDocuments from "./components/UserProfileWithDocuments";
 
 // Backend URL configuration
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-connect-14.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
 import { AdminMessages } from "./components/AdminMessages";
 import { BannerManager } from "./components/BannerManager";
 import MaintenancePage from "./pages/MaintenancePage";
@@ -50,7 +50,7 @@ import { Label } from "./components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 
 // Use REACT_APP environment variable with fallback
-const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://courier-connect-14.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://courier-dashboard-3.preview.emergentagent.com/api';
 
 // Console log for debugging
 console.log('Frontend connecting to:', API_BASE);

@@ -18,7 +18,7 @@ import uuid
 from datetime import datetime, timezone
 
 # Configuration - Use environment URL
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
 
 class CityRegistrationTester:
     def __init__(self):

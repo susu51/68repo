@@ -1,92 +1,210 @@
 <analysis>
-The AI engineer's work on the Kuryecini application has spanned several critical areas, primarily focusing on integrating an AI Diagnostics panel and subsequently stabilizing core application functionalities. Initially, the Ops Co-Pilot (AI Assistant) with its 7-block structured response format was integrated into the FastAPI backend and React frontend. This involved creating new backend modules for context building, LLM providers, and API routes, as well as new frontend components and API clients.
-
-A significant portion of the work involved debugging existing application issues, often prompted by the Ops Co-Pilot's diagnostic reports, which were frequently found to be partially accurate but lacking deep system context. This led to resolving critical frontend issues like double JSON parsing, infinite rendering loops, and authentication synchronization problems. Backend issues, such as incorrect data filtering and UUID handling for business entities, were also identified and fixed. The engineer has demonstrated an iterative problem-solving approach, utilizing testing agents and manual code inspection to address reported problems. The immediate focus is on resolving a persistent WebSocket disconnection issue, which the user reported again despite previous fixes.
+The previous AI engineer successfully initiated the Kuryecini application development, focusing on critical real-time order management features. Initially, efforts were directed towards stabilizing frontend authentication, WebSocket connections, and addressing various UI/API bugs like double JSON parsing and infinite rendering loops. A significant milestone was the robust WebSocket implementation for multi-tab support and reconnection. The recent work focused heavily on integrating a business dashboard with real data, which involved creating new backend endpoints and extensive frontend modifications. This process unveiled and resolved several critical issues, including Pydantic model errors, router registration conflicts, incorrect API response handling in the frontend, and authorization flaws (403 errors, incorrect KYC status handling, and  vs uid=0(root) gid=0(root) groups=0(root) discrepancies in MongoDB queries). A complex order status transition flow (Pending -> Confirmed -> Preparing -> Ready) was implemented, later simplified to Pending -> Confirmed -> Ready. Concurrently, efforts were made to integrate courier map features, leading to the creation of new backend geo-location endpoints and frontend map components. The work is characterized by iterative bug fixing, addressing user feedback promptly, and adapting the implementation to evolving requirements. The last task involves resolving an issue where the courier map panel is not displaying correctly.
 </analysis>
 
 <product_requirements>
-The Kuryecini platform is a multi-role (Customer, Business, Courier, Admin) application built with React, FastAPI, and MongoDB, designed for real-time, end-to-end order management. Key existing features include real-time order routing, notifications for Admin/Business panels, customer order placement, business order approval, and a Courier Waiting Tasks panel.
-
-The primary new feature is a secure, multi-app AI Diagnostics panel for the Admin Panel. This panel aims to aggregate logs, redact PII, classify errors, perform Root Cause Analysis (RCA), and propose fixes with code patches using an LLM. It requires backend models, an ingestion API, and a React/Tailwind frontend. The AI Assistant component within this panel needs to be panel-aware (customer, business, courier, multi), support time windows, preset questions, context toggles (metrics, logs), streaming markdown output, and integrate with either an Emergent LLM Key or a custom OpenAI API key. Crucially, it must provide structured responses (Diagnosis, RCA, Solutions, Patch, Tests, Monitoring, DoD) and leverage advanced code exploration tools (list_files, grep, ast_outline) for context. The current work specifically focuses on hardening the Kuryecini Ops Co-Pilot with its master system prompt and tool calling capabilities for the AI Assistant.
+The Kuryecini platform is a multi-role (Customer, Business, Courier, Admin) application for real-time order management. Core features include order placement, business approval, courier task management, and real-time notifications. A key feature is the AI Diagnostics panel for Admin, with capabilities like log aggregation, PII redaction, RCA, and LLM-generated fixes, leveraging an Ops Co-Pilot for tool calling and context awareness. Recent requirements focused on stable WebSocket connections, a functional customer Order and Confirm flow, unique order codes, a defined order status transition (initially Pending -> Preparing -> Ready -> Confirmed, later simplified to Pending -> Confirmed -> Ready), automatic nearest courier assignment, printable order slips, and real-time data integration for the business dashboard. Latest requests expanded to include a simplified order flow (Hazırlanmaya Başla directly to Ready without package fee input), complete order details in the business panel, and a comprehensive courier map showing nearby businesses with available ready orders for claiming, with real-time WS updates.
 </product_requirements>
 
 <key_technical_concepts>
+
 - **Full-stack Architecture:** React, FastAPI, MongoDB.
-- **Real-time Communication:** WebSockets (FastAPI, React hooks).
-- **AI Integration:** LLMs (OpenAI, Emergent LLM Key), PII Redaction, AI-driven RCA, structured outputs.
-- **Frontend UI:** React Context API, React Router DOM, Tailwind CSS.
-- **Backend Framework:** FastAPI, Pydantic for data models.
-- **Database:** MongoDB (UUIDs for IDs,  indexing).
-- **DevOps:** backend                          RUNNING   pid 43, uptime 0:00:02
+- **Real-time Communication:** WebSockets (FastAPI, React hooks, WSManager, BroadcastChannel).
+- **Authentication/Authorization:** JWT via HttpOnly cookies, role-based access, KYC approval.
+- **AI Integration:** LLMs, structured outputs, context building (Ops Co-Pilot).
+- **Frontend State Management:** React Context API, , , , custom hooks.
+- **Backend Data Handling:** Pydantic models, MongoDB (UUIDs, GeoJSON  indexes, aggregation pipelines).
+- **Deployment/Ops:** backend                          RUNNING   pid 43, uptime 0:00:02
 code-server                      STOPPED   Not started
-frontend                         STOPPED   Oct 21 07:26 AM
-mongodb                          RUNNING   pid 46, uptime 0:00:02
-nginx-code-proxy                 STARTING  
-supervisor>  for service management, Kubernetes ingress rules.
-- **Code Quality:** Structured prompts, JSON validation, code exploration tools (grep, AST).
+frontend                         RUNNING   pid 44, uptime 0:00:02
+mongodb                          RUNNING   pid 45, uptime 0:00:02
+nginx-code-proxy                 RUNNING   pid 41, uptime 0:00:02
+supervisor> , Kubernetes ingress, environment variables.
+- **Error Handling:** Centralized API client, comprehensive logging.
+- **Concurrency Control:** Optimistic locking for claiming orders.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: The main FastAPI application.
-    -   **Changes**: Modified to correctly handle logging using  instead of  for order creation. Crucially, a duplicate  endpoint was found and the earlier one (line 4850) was fixed to return the UUID uid=0(root) gid=0(root) groups=0(root) of businesses instead of the MongoDB  to resolve menu loading issues. Also added  endpoint.
--   ****: (NEW) Stores the Turkish Master System Prompt for the Kuryecini Ops Co-Pilot.
--   ****: (NEW) Defines the schemas for , , ,  tools.
--   ****: (NEW) Contains few-shot examples to guide the LLM's response formatting.
--   ****: (NEW) Handles building panel-aware context for the AI Assistant, including masking sensitive environment variables.
--   ****: (NEW) Implements OpenAI integration with response format enforcement for the Ops Co-Pilot.
--   ****:
-    -   **Changes**: Modified to include the new  endpoint, which uses the new Co-Pilot logic to provide 7-block structured responses.
--   ****: (NEW) Contains helper functions for loading prompts and basic stub implementations for tools like , , , .
--   ****:
-    -   **Changes**: Fixed a blocking issue within the message loop by correctly handling .
--   ****: Main frontend component.
-    -   **Changes**: Integrated the new  component into the Admin panel's Tools tab navigation.
--   ****: (NEW) UI component for the Kuryecini Ops Co-Pilot, designed to display the 7-block structured responses.
--   ****: (NEW) Client-side API functions for interacting with the  endpoint.
--   ****:
-    -   **Changes**: Verified that the Sipariş Ver button's API call (/orders) correctly appends , disproving Ops Co-Pilot's repeated double prefix diagnosis.
--   ****:
-    -   **Changes**: Fixed two  related infinite loop issues. Ensured  is memoized and state updates within effects are handled correctly.
--   ****:
-    -   **Changes**: Fixed a critical  bug caused by double JSON parsing in the legacy  export.
--   ****:
-    -   **Changes**: Fixed issues where , ,  functions were incorrectly calling  on already parsed API responses, resolving frontend authentication synchronization problems.
--   ****:
-    -   **Changes**: Fixed a backend URL parsing error that could affect WebSocket connections.
+/app/
+├── backend/
+│   ├── .env
+│   ├── server.py
+│   ├── models.py
+│   ├── models/
+│   │   ├── orders.py
+│   │   └── __init__.py
+│   ├── models_package/
+│   │   ├── courier_tasks.py
+│   │   ├── coupons.py
+│   │   ├── ai_diagnostics.py
+│   │   └── ai_settings.py
+│   ├── routes/
+│   │   ├── addresses.py
+│   │   ├── admin_kyc.py
+│   │   ├── business.py
+│   │   ├── city_catalog.py
+│   │   ├── orders.py
+│   │   ├── business_order_confirm.py
+│   │   ├── courier_tasks.py
+│   │   ├── admin_coupons.py
+│   │   ├── cart_coupons.py
+│   │   ├── stable_restaurants.py
+│   │   ├── ai_diagnostics_ingest.py
+│   │   ├── ai_settings.py
+│   │   ├── ai_assistant.py (MODIFIED)
+│   │   ├── ai_utils.py (NEW)
+│   │   ├── business_dashboard.py (NEW)
+│   │   └── order_status.py (MODIFIED)
+│   ├── realtime/
+│   │   ├── __init__.py
+│   │   ├── event_bus.py
+│   │   └── websocket_orders.py (MODIFIED)
+│   ├── migrations/
+│   │   ├── fix_order_schema.py
+│   │   ├── create_order_indexes.py (MODIFIED)
+│   │   └── fix_missing_business_ids.py
+│   ├── config/
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   └── db.py
+│   ├── utils/
+│   │   ├── cache.py
+│   │   └── order_code.py (NEW)
+│   ├── ai_provider.py
+│   ├── ai_provider_copilot.py (NEW)
+│   ├── ai_tools_extra.py
+│   ├── auth_cookie.py (MODIFIED)
+│   └── auth_dependencies.py (MODIFIED)
+│   └── ops/ (NEW)
+│       ├── system_prompt.md (NEW)
+│       ├── tools.schema.json (NEW)
+│       └── fewshots.md (NEW)
+├── frontend/
+│   ├── .env (MODIFIED)
+│   ├── public/
+│   ├── src/
+│   │   ├── App.js (MODIFIED)
+│   │   ├── ModernLogin.js
+│   │   ├── components/
+│   │   │   ├── AdminDashboard.js
+│   │   │   ├── AdminSettings.js (MODIFIED)
+│   │   │   ├── AddressSelectorEnhanced.js
+│   │   │   ├── PaymentOptionsEnhanced.js
+│   │   │   ├── BusinessMenuManager.js
+│   │   │   ├── CourierWaitingTasks.js (MODIFIED)
+│   │   │   ├── AdminCoupons.js
+│   │   │   ├── AIDiagnosticsPanel.js
+│   │   │   ├── SettingsAI.js
+│   │   │   ├── PanelAIAssistant.js
+│   │   │   ├── OpsCoPilot.js (NEW)
+│   │   │   ├── ui/
+│   │   │   │   └── label.js (NEW)
+│   │   │   └── CourierReadyOrdersMap.js (MODIFIED)
+│   │   ├── contexts/
+│   │   │   ├── CookieAuthContext.js (MODIFIED)
+│   │   │   ├── ThemeContext.js
+│   │   │   └── CartContext.js
+│   │   ├── hooks/
+│   │   │   ├── useOrderNotifications.js (MODIFIED)
+│   │   │   ├── useAdminOrderNotifications.js (MODIFIED)
+│   │   │   └── useDashboardSummary.js (NEW)
+│   │   ├── pages/
+│   │   │   ├── LandingPage.js
+│   │   │   ├── MaintenancePage.js
+│   │   │   ├── customer/
+│   │   │   │   ├── CustomerApp.js (MODIFIED)
+│   │   │   │   ├── DiscoverPage.js
+│   │   │   │   ├── CartPageEnhanced.js (MODIFIED)
+│   │   │   │   ├── OrdersPage.js
+│   │   │   │   └── RestaurantMenu.js (MODIFIED)
+│   │   │   ├── business/
+│   │   │   │   ├── ModernOrdersManagement.js (MODIFIED)
+│   │   │   │   ├── ModernBusinessSettings.js
+│   │   │   │   ├── NewBusinessApp.js (MODIFIED)
+│   │   │   │   ├── ModernDashboard.js (MODIFIED)
+│   │   │   │   └── ...
+│   │   │   └── ...
+│   │   ├── api/
+│   │   │   ├── http.js (MODIFIED)
+│   │   │   ├── aiSettings.js
+│   │   │   ├── panelAI.js
+│   │   │   ├── opsCoPilot.js (NEW)
+│   │   │   └── businessDashboard.js (NEW)
+│   │   ├── utils/
+│   │   │   ├── notificationSound.js
+│   │   │   └── cartAPI.js
+│   │   ├── ws/ (NEW)
+│   │   │   └── WSManager.js (NEW)
+│   │   └── ...
+│   ├── CourierDashboard.js (MODIFIED)
+│   └── ...
+└── tests/
+   - ****: Main FastAPI application.
+      - Summary: Manages API routing and global configurations.
+      - Changes: Included  router. Corrected order parsing for  and order item details in  and . Removed a duplicate  endpoint.
+   - ****: (NEW)
+      - Summary: Defines API endpoints for business dashboard summary data.
+      - Changes: Implemented  to provide real-time metrics.
+   - ****:
+      - Summary: Handles transitions between order statuses.
+      - Changes: Updated  for allowed status changes. Fixed ownership check () and MongoDB query field (uid=0(root) gid=0(root) groups=0(root) instead of ).
+   - ****:
+      - Summary: Manages courier-specific tasks and data.
+      - Changes: Added  for map pins and  for claiming orders.
+   - ****:
+      - Summary: Manages cookie-based authentication.
+      - Changes: Ensured  is included in the login response.
+   - ****:
+      - Summary: Centralized HTTP client for frontend API calls.
+      - Changes: Standardized API call responses (, , , ) to consistently return  objects, fixing various frontend errors.
+   - ****: (NEW)
+      - Summary: Frontend API module dedicated to business dashboard data.
+      - Changes: Created to abstract dashboard-related API requests.
+   - ****: (NEW)
+      - Summary: Custom React hook for fetching and managing business dashboard summary data.
+      - Changes: Implemented data fetching with loading/error states, fixed  dependency issue, and added a debounce mechanism.
+   - ****:
+      - Summary: Main container component for the business panel.
+      - Changes: Integrated  hook for real data, removed mock data, and removed direct  usage for dashboard updates.
+   - ****:
+      - Summary: Displays the business dashboard with key metrics and activities.
+      - Changes: Adapted to consume real data from . Removed Hazırlanıyor stats card.
+   - ****:
+      - Summary: Manages the display and interaction for business orders.
+      - Changes: Added receipt printing. Updated order status transition logic and button visibility. Corrected API endpoint paths for status updates. Modified  to retrieve all order statuses to prevent orders from disappearing. Removed package fee input and preparing button. Added debounce to .
+   - ****:
+      - Summary: Displays restaurant menus and allows customers to browse items.
+      - Changes: Enhanced category filtering to use dynamic backend data. Improved image display logic by checking multiple URL fields.
+   - ****:
+      - Summary: Component showing tasks waiting for couriers.
+      - Changes: Imported the missing  component.
+   - ****: (NEW)
+      - Summary: A generic UI Label component.
+      - Changes: Created to resolve a  runtime error.
+   - ****:
+      - Summary: Displays ready orders on a map for couriers to pick up.
+      - Changes: Updated to fetch and display nearby businesses with available ready order counts as map pins. Implemented logic to show a list of orders for a selected business and a claim button. Fixed a reference to .
 </code_architecture>
 
 <pending_tasks>
-- Complete order tracking features with real-time updates and map view (PHASE 2C).
-- Integrate customer rating modal post-delivery (PHASE 2C).
-- Implement Business/Restaurant analytics (PHASE 2D).
-- Add unit and E2E tests for all new features (PHASE 2D).
-- Implement Yeni Sipariş toast + badge counter in Business Panel.
-- Implement order filters in Business Panel.
-- Implement manual refresh button + automatic WS/poll sync in Business Panel.
-- Add Observability metrics (, ) to .
-- Complete Phase 2 of AI Diagnostics: ChatGPT integration for error explanation, RCA, and patch generation.
-- Complete Phase 3 of AI Diagnostics: Admin UI for coupons.
-- Implement map-based view for courier waiting tasks.
-- Implement Accept Task button for couriers.
+- Full order tracking features with real-time updates and map view (courier map initiated, but full tracking pending).
+- Customer rating modal post-delivery.
+- Advanced Business/Restaurant analytics.
+- Comprehensive unit and E2E tests for all new features.
+- Yeni Sipariş toast and badge counter in Business Panel.
+- Enhanced order filters and explicit manual refresh in Business Panel.
+- Observability metrics for .
+- Phase 2 & 3 of AI Diagnostics (ChatGPT, Admin UI for coupons).
+- Accept Task button for couriers and detailed courier screens.
+- Full printable order slips/receipts for businesses.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was engaged in a multi-faceted debugging effort to resolve several user-reported and test-identified issues, despite previous claims of full functionality. The primary immediate focus is on resolving a persistent WebSocket disconnection problem.
-
-The engineer addressed the following critical issues:
-1.  **Frontend Authentication Sync**: Fixed double JSON parsing in  that prevented user sessions from synchronizing correctly after login, blocking access to customer panels.
-2.  **Menu API 404 / Business ID Mismatch**:
-    *   Added a compatible backend endpoint for the menu API ().
-    *   **Crucially**, identified and fixed a bug in  where the  endpoint (specifically, the earlier-defined route) was incorrectly returning MongoDB's  as the uid=0(root) gid=0(root) groups=0(root) for businesses instead of the intended UUID uid=0(root) gid=0(root) groups=0(root) field. This caused frontend menu requests to fail as they were using the wrong ID type.
-    *   Ensured business data in the database had  fields to prevent filtering issues.
-3.  **RestaurantMenu Infinite Loop**: Fixed a rendering loop in  caused by incorrect  dependencies and state updates.
-4.  **Backend Order Logging**: Implemented proper Python logging in  for order creation, replacing previous  statements, as identified by an Ops Co-Pilot report.
-5.  **WebSocket Connection Stability**: Fixed a backend message loop issue in  and a frontend URL parsing error in .
-
-Despite these fixes, the user has explicitly reported that the Websocet bağlantısı sürekli kesiliyor (WebSocket connection is constantly disconnecting), indicating that the problem is not fully resolved. A screenshot provided by the user shows a Bağlan (Connect) button, suggesting the frontend is attempting to reconnect. The engineer's current thought process is to investigate the frontend for heartbeat/ping mechanisms, as the backend's message loop and basic WebSocket handling have already been addressed.
+Immediately before this summary request, the AI engineer was addressing a user report that the Kurye harita paneli (Courier map panel) was not displaying or functioning correctly, despite previous work on its integration. This prior work included creating backend endpoints (, ) in  and modifying  to show business locations as pins with available order counts and allow couriers to claim orders. A runtime error () was previously fixed in . However, the user's latest message indicates that the map panel still has issues. The AI engineer has just started investigating this by reviewing  to understand how the map component is integrated and where the issue might lie, specifically to find the map tab or its rendering logic within the dashboard. The system has recently undergone extensive fixes for various issues across the business dashboard, menu management, customer menu display, order status transitions, and critical authentication/authorization flaws. The order processing flow has been simplified to transition directly from confirmed to ready.
 </current_work>
 
 <optional_next_step>
-Investigate the frontend's  for WebSocket heartbeat/ping mechanisms or re-connection logic to prevent disconnections.
+Investigate  to identify why the courier map panel is not displaying correctly.
+Haklısınız! Kurye dashboardındaki harita entegrasyonunu kontrol edip düzeltelim. Önce CourierDashboardı bulalım: ... Şimdi harita sekmesini bulalım:
 </optional_next_step>

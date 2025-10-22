@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://courier-connect-14.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://courier-dashboard-3.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 def check_database_collections():

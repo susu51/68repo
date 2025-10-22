@@ -4,7 +4,7 @@ import { Button } from './ui/button.jsx';
 import { Star } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-connect-14.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const RatingModal = ({ order, onClose }) => {

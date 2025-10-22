@@ -23,7 +23,7 @@ import os
 import sys
 
 # Configuration
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
+BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com"
 
 # Test credentials
 CUSTOMER_CREDENTIALS = {

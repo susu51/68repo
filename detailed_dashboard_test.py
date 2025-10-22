@@ -8,7 +8,7 @@ import aiohttp
 import json
 from datetime import datetime
 
-BASE_URL = "https://courier-connect-14.preview.emergentagent.com"
+BASE_URL = "https://courier-dashboard-3.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 BUSINESS_USER = {

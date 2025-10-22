@@ -6,7 +6,7 @@ DETAILED BUSINESS ANALYSIS - Check specific business statuses
 import requests
 import json
 
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com/api"
+BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
 
 def analyze_businesses():
     # Admin login

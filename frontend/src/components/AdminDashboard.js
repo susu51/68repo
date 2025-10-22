@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://courier-connect-14.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com/api';
 
 export const AdminDashboardTab = () => {
   const [dashboardData, setDashboardData] = useState(null);

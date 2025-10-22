@@ -6,7 +6,7 @@ import { Label } from './ui/label.jsx';
 import { MapPin, Plus, Check, Home, Briefcase, MapPinned, Navigation } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-connect-14.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const AddressSelectorEnhanced = ({ selectedAddress, onAddressSelect }) => {

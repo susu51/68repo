@@ -23,7 +23,7 @@ import sys
 import subprocess
 
 # Configuration
-BACKEND_URL = "https://courier-connect-14.preview.emergentagent.com"
+BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com"
 WS_URL = "wss://admin-wsocket.preview.emergentagent.com"
 
 # Test credentials
