@@ -217,12 +217,22 @@ class CourierOrderFlowTester:
             if response.status_code == 200:
                 data = response.json()
                 
+                # Check for order ID in different possible locations
+                order_id = None
                 if data.get('order_id'):
-                    self.test_order_id = data['order_id']
+                    order_id = data['order_id']
+                elif data.get('order', {}).get('id'):
+                    order_id = data['order']['id']
+                elif data.get('id'):
+                    order_id = data['id']
+                
+                if order_id:
+                    self.test_order_id = order_id
+                    order_data = data.get('order', data)
                     self.log_test(
                         "Create Test Order",
                         True,
-                        f"Order created successfully. Order ID: {self.test_order_id}, Business ID: {data.get('business_id')}, Total: {data.get('total_amount')}",
+                        f"Order created successfully. Order ID: {self.test_order_id}, Business ID: {order_data.get('business_id')}, Total: {order_data.get('totals', {}).get('grand', 'N/A')}",
                         response_time
                     )
                     return True
