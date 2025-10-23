@@ -174,14 +174,13 @@ class CourierOrderFlowTester:
                 )
                 return False
             
-            menu_data = menu_response.json()
-            menu_items = menu_data.get('items', [])
+            menu_items = menu_response.json()
             
-            if not menu_items:
+            if not menu_items or not isinstance(menu_items, list):
                 self.log_test(
                     "Create Test Order",
                     False,
-                    f"No menu items found for business {TEST_BUSINESS_ID}",
+                    f"No menu items found for business {TEST_BUSINESS_ID}. Response: {menu_items}",
                     time.time() - start_time
                 )
                 return False
