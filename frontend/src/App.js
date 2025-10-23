@@ -12,7 +12,7 @@ import { CookieAuthProvider, useCookieAuth } from "./contexts/CookieAuthContext"
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { LocationControls } from "./components/LocationControls";
 import OpenStreetMap from "./components/OpenStreetMap";
-import { CourierDashboardNew as CourierDashboard } from "./CourierDashboardNew";
+import { CourierDashboard } from "./CourierDashboard";
 import { NewBusinessApp } from "./pages/business/NewBusinessApp";
 import { CustomerApp } from "./pages/customer/CustomerApp";
 import { CartProvider } from "./contexts/CartContext";
