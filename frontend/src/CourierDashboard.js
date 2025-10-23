@@ -14,6 +14,7 @@ import { CourierPDFReports } from './components/CourierPDFReports';
 import { CourierProfileUpdate } from './components/CourierProfileUpdate';
 import { CourierAvailability } from './components/CourierAvailability';
 import { CourierAdvancedTasks } from './components/CourierAdvancedTasks';
+import { CourierActiveOrders } from './components/CourierActiveOrders';
 import { CourierOrderHistoryFiltered } from './components/CourierOrderHistoryFiltered';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
