@@ -8638,6 +8638,10 @@ async def check_business_gps_status(current_user: dict = Depends(get_admin_user)
 from routes.business_dashboard import router as dashboard_router
 api_router.include_router(dashboard_router, tags=["business-dashboard"])
 
+# Include map API routes
+from routes.map_api import router as map_router
+api_router.include_router(map_router, tags=["map"])
+
 app.include_router(api_router)
 
 # WebSocket endpoint for real-time order notifications
