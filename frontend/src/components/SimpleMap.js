@@ -17,16 +17,15 @@ const SimpleMap = ({
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', height }}>
-      {/* Google Maps iframe */}
+    <div style={{ position: 'relative', width: '100%', height, background: '#f0f0f0' }}>
+      {/* OpenStreetMap iframe */}
       <iframe
         width="100%"
         height="100%"
         style={{ border: 0, borderRadius: '8px' }}
         loading="lazy"
-        allowFullScreen
-        referrerPolicy="no-referrer-when-downgrade"
         src={generateMapUrl()}
+        title="Map"
       />
       
       {/* Marker overlay - list view on side */}
