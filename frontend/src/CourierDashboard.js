@@ -1761,7 +1761,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
           <div style={{ display: activeTab === 'ready_map' ? 'block' : 'none' }}>
             <React.Fragment>
               <div className="p-6">
-                <CourierReadyOrdersMap />
+                <CourierMapWithBusinesses />
               </div>
             </React.Fragment>
           </div>
