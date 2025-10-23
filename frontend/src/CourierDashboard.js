@@ -13,9 +13,8 @@ import { CourierEarningsReport } from './components/CourierEarningsReport';
 import { CourierPDFReports } from './components/CourierPDFReports';
 import { CourierProfileUpdate } from './components/CourierProfileUpdate';
 import { CourierAvailability } from './components/CourierAvailability';
-import { CourierMapWithBusinesses } from './components/CourierMapWithBusinesses';
+import { CourierAdvancedTasks } from './components/CourierAdvancedTasks';
 import { CourierOrderHistoryFiltered } from './components/CourierOrderHistoryFiltered';
-import { CourierWaitingTasks } from './components/CourierWaitingTasks';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
