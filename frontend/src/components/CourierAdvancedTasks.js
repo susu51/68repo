@@ -219,12 +219,10 @@ export const CourierAdvancedTasks = () => {
       {viewMode === 'map' && (
         <Card>
           <CardContent className="p-0">
-            <OpenStreetMap
+            <SimpleMap
               center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [39.9334, 32.8597]}
-              zoom={13}
-              height="500px"
               markers={mapMarkers}
-              courierLocation={courierLocation}
+              height="500px"
               onMarkerClick={(marker) => {
                 if (marker.type === 'delivery') {
                   const order = availableOrders.find(o => o.order_id === marker.orderId);
