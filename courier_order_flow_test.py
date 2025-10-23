@@ -557,10 +557,19 @@ class CourierOrderFlowTester:
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                data = response.json()
+                businesses = response.json()
+                
+                # Ensure it's a list
+                if not isinstance(businesses, list):
+                    self.log_test(
+                        "Courier Map Endpoint - Nearby Businesses",
+                        False,
+                        f"Unexpected response format: {businesses}",
+                        response_time
+                    )
+                    return False
                 
                 # Look for our test business in the results
-                businesses = data.get('businesses', [])
                 test_business_found = False
                 test_business_data = None
                 
@@ -589,12 +598,21 @@ class CourierOrderFlowTester:
                         )
                         return False
                 else:
-                    self.log_test(
-                        "Courier Map Endpoint - Nearby Businesses",
-                        False,
-                        f"Test business {TEST_BUSINESS_ID} not found in nearby businesses. Found {len(businesses)} businesses: {[b.get('id') for b in businesses]}",
-                        response_time
-                    )
+                    # Check if there are any businesses at all
+                    if len(businesses) == 0:
+                        self.log_test(
+                            "Courier Map Endpoint - Nearby Businesses",
+                            False,
+                            f"No businesses found in nearby area. This could indicate the business location is outside the search radius or the endpoint is not working correctly.",
+                            response_time
+                        )
+                    else:
+                        self.log_test(
+                            "Courier Map Endpoint - Nearby Businesses",
+                            False,
+                            f"Test business {TEST_BUSINESS_ID} not found in nearby businesses. Found {len(businesses)} businesses: {[b.get('id') for b in businesses]}",
+                            response_time
+                        )
                     return False
             else:
                 self.log_test(
