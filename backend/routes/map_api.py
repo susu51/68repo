@@ -1,7 +1,7 @@
 """
 Map API for Courier - Business markers with custom icons
 """
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from typing import List, Optional
 from auth_dependencies import get_current_user
 
