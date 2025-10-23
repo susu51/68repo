@@ -289,6 +289,125 @@ export const CourierReadyOrdersMap = () => {
         </Card>
       )}
 
+      {/* My Active Orders Panel */}
+      {myActiveOrders.length > 0 && (
+        <Card className="border-purple-200 bg-purple-50 dark:bg-purple-900/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+              <Package className="h-5 w-5" />
+              Aktif Siparişlerim ({myActiveOrders.length})
+            </CardTitle>
+            <CardDescription>
+              Teslim etmekte olduğunuz siparişler
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3">
+              {myActiveOrders.map((order) => (
+                <div 
+                  key={order.order_id}
+                  className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-purple-200 dark:border-purple-800"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h5 className="font-semibold text-sm flex items-center gap-2">
+                        Sipariş #{order.order_code}
+                        {order.status === 'assigned' && (
+                          <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
+                            Bekliyor
+                          </Badge>
+                        )}
+                        {order.status === 'picked_up' && (
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                            Alındı
+                          </Badge>
+                        )}
+                        {order.status === 'delivering' && (
+                          <Badge variant="secondary" className="bg-green-100 text-green-700">
+                            Yolda
+                          </Badge>
+                        )}
+                      </h5>
+                      
+                      {/* Pickup Info */}
+                      <div className="mt-2 p-2 bg-orange-50 dark:bg-orange-900/20 rounded border border-orange-200 dark:border-orange-800">
+                        <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 mb-1">
+                          📍 Alınacak Adres:
+                        </p>
+                        <p className="text-xs font-medium">🏪 {order.business_name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          {order.business_address}
+                        </p>
+                        {order.business_location?.lat && order.business_location?.lng && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-2 bg-orange-100 hover:bg-orange-200 text-orange-700"
+                            onClick={() => openInMaps(
+                              order.business_location.lat,
+                              order.business_location.lng,
+                              order.business_address,
+                              'İşletme - Alış Noktası'
+                            )}
+                          >
+                            <Navigation className="h-3 w-3 mr-2" />
+                            Alış Noktasına Git (Maps)
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {/* Delivery Info */}
+                      <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
+                        <p className="text-xs font-semibold text-green-700 dark:text-green-300 mb-1">
+                          🚚 Teslim Edilecek Adres:
+                        </p>
+                        <p className="text-xs font-medium">👤 {order.customer_name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {order.delivery_address}
+                        </p>
+                        {order.delivery_location?.lat && order.delivery_location?.lng && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-2 bg-green-100 hover:bg-green-200 text-green-700"
+                            onClick={() => openInMaps(
+                              order.delivery_location.lat,
+                              order.delivery_location.lng,
+                              order.delivery_address,
+                              'Müşteri - Teslimat Noktası'
+                            )}
+                          >
+                            <Navigation className="h-3 w-3 mr-2" />
+                            Teslimat Noktasına Git (Maps)
+                          </Button>
+                        )}
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground mt-2">
+                        📦 {order.items_count} ürün
+                      </p>
+                      {order.notes && (
+                        <p className="text-xs text-yellow-600 mt-1">
+                          💬 Not: {order.notes}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right ml-3">
+                      <p className="font-bold text-green-600">
+                        ₺{order.grand_total.toFixed(2)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        (₺{order.delivery_fee.toFixed(2)} teslimat)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Available Orders Modal/Panel */}
       {selectedBusiness && (
         <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/10 mt-4">
