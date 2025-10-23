@@ -53,7 +53,23 @@ async def get_nearby_businesses(
     
     try:
         # Find businesses within radius using geospatial query
-        businesses_cursor = db.businesses.aggregate([
+        # Note: Businesses are stored in 'users' collection with role='business'
+        businesses_cursor = db.users.aggregate([
+            {
+                "$match": {
+                    "role": "business",
+                    "lat": {"$exists": True},
+                    "lng": {"$exists": True}
+                }
+            },
+            {
+                "$addFields": {
+                    "location": {
+                        "type": "Point",
+                        "coordinates": ["$lng", "$lat"]
+                    }
+                }
+            },
             {
                 "$geoNear": {
                     "near": {
