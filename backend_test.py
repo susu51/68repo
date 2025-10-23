@@ -284,8 +284,8 @@ class CourierNearbyBusinessesTest:
                 print("\n❌ No businesses returned - cannot run remaining tests")
                 return
                 
-            # Test 3: Expected Business Present
-            expected_business = await self.test_expected_business_present(businesses)
+            # Test 3: Business Filtering Logic
+            await self.test_business_filtering_logic(businesses)
             
             # Test 4: Business Location Data
             await self.test_business_location_data(businesses)
