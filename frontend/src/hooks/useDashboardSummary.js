@@ -71,16 +71,8 @@ export const useDashboardSummary = (date = null, options = {}) => {
 
   // Initial fetch - only once on mount
   useEffect(() => {
-    let mounted = true;
-    
-    if (mounted) {
-      fetchData();
-    }
-    
-    return () => {
-      mounted = false;
-    };
-  }, []); // Empty deps - fetch only once on mount
+    fetchData();
+  }, [fetchData]); // Depend on fetchData to ensure it's called when available
 
   // Auto-refetch interval - DISABLED (dashboard refreshes manually)
   useEffect(() => {
