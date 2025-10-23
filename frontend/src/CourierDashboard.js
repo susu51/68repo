@@ -677,12 +677,12 @@ export const CourierDashboard = ({ user, onLogout }) => {
                 onClick={() => setActiveTab('waiting')}
                 className={`flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 text-sm font-medium whitespace-nowrap ${
                   activeTab === 'waiting' 
-                    ? 'bg-orange-500 text-white shadow-md' 
-                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                    ? 'bg-green-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-green-500 hover:bg-green-50'
                 }`}
               >
-                <span className="text-lg">📦</span>
-                <span>Bekleyen Paketler</span>
+                <span className="text-lg">🗺️</span>
+                <span>Hazır Siparişler</span>
               </button>
               
               <button
