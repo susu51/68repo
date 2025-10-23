@@ -2482,7 +2482,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Business Dashboard Summary Endpoint - Loading Issue Investigation"
+    - "Courier Nearby-Businesses Endpoint Fix"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
