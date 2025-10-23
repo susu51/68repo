@@ -185,32 +185,15 @@ export const CourierAdvancedTasks = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Hazır Siparişler</h2>
+          <h2 className="text-2xl font-bold">Paket Havuzu - Hazır Siparişler</h2>
           <p className="text-muted-foreground">
-            {availableOrders.length} sipariş mevcut
+            {nearbyBusinesses.reduce((sum, b) => sum + b.pending_ready_count, 0)} hazır paket • {nearbyBusinesses.length} işletme
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant={viewMode === 'map' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('map')}
-          >
-            <Map className="h-4 w-4 mr-2" />
-            Harita
-          </Button>
-          <Button 
-            variant={viewMode === 'list' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('list')}
-          >
-            <List className="h-4 w-4 mr-2" />
-            Liste
-          </Button>
-          <Button onClick={fetchData} disabled={loading} size="sm" variant="outline">
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
+        <Button onClick={fetchData} disabled={loading} size="sm" variant="outline">
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''} mr-2`} />
+          Yenile
+        </Button>
       </div>
 
       {/* Map View */}
