@@ -17,9 +17,11 @@ export const CourierReadyOrdersMap = () => {
 
   useEffect(() => {
     fetchNearbyBusinesses();
+    fetchMyActiveOrders();
     
     const interval = setInterval(() => {
       fetchNearbyBusinesses();
+      fetchMyActiveOrders();
     }, 15000); // 15 saniye
     
     return () => clearInterval(interval);
