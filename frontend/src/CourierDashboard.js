@@ -804,7 +804,7 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
           {/* Waiting Tasks Content */}
           <div style={{ display: activeTab === 'waiting' ? 'block' : 'none' }}>
-            <CourierWaitingTasks courierId={user?.id} />
+            <CourierAdvancedTasks />
           </div>
 
           {/* Orders Content */}
