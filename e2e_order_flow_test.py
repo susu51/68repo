@@ -155,6 +155,9 @@ class E2EOrderFlowTest:
                 "delivery_address": "Kızılay Mahallesi, Atatürk Bulvarı No:123, Ankara",
                 "delivery_lat": 39.9334,
                 "delivery_lng": 32.8597,
+                "city": "Ankara",
+                "district": "Çankaya",
+                "neighborhood": "Kızılay",
                 "payment_method": "cash_on_delivery",
                 "notes": "Örnek test siparişi - lütfen çabuk getirin"
             }
