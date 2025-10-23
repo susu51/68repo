@@ -425,8 +425,8 @@ class CourierOrderFlowTester:
         
         start_time = time.time()
         try:
-            # Get order details to verify status
-            response = self.business_session.get(
+            # Get order details to verify status - use customer session since it's their order
+            response = self.customer_session.get(
                 f"{BACKEND_URL}/orders/{self.test_order_id}/track",
                 timeout=10
             )
