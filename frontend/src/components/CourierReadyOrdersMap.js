@@ -453,9 +453,30 @@ export const CourierReadyOrdersMap = () => {
                         <p className="text-xs text-muted-foreground mt-1">
                           👤 {order.customer_name}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                          📍 {order.delivery_address}
-                        </p>
+                        <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-900 rounded">
+                          <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
+                            📍 {order.delivery_address}
+                          </p>
+                          {order.delivery_location?.lat && order.delivery_location?.lng && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 text-xs p-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openInMaps(
+                                  order.delivery_location.lat,
+                                  order.delivery_location.lng,
+                                  order.delivery_address,
+                                  'Teslimat Adresi'
+                                );
+                              }}
+                            >
+                              <Navigation className="h-3 w-3 mr-1" />
+                              Maps'te Aç
+                            </Button>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground mt-1">
                           📦 {order.items_count} ürün
                         </p>
