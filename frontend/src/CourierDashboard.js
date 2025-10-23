@@ -1744,15 +1744,6 @@ export const CourierDashboard = ({ user, onLogout }) => {
             </div>
           </div>
 
-          {/* Ready Orders Map Tab - Phase 1 */}
-          <div style={{ display: activeTab === 'ready_map' ? 'block' : 'none' }}>
-            <React.Fragment>
-              <div className="p-6">
-                <CourierMapWithBusinesses />
-              </div>
-            </React.Fragment>
-          </div>
-
           {/* PDF Reports Tab - Phase 1 */}
           <div style={{ display: activeTab === 'pdf_reports' ? 'block' : 'none' }}>
             <React.Fragment>
