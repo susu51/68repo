@@ -155,7 +155,10 @@ export const CourierDashboardNew = ({ user, onLogout }) => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 whitespace-nowrap ${
                     isActive 
-                      ? `bg-${tab.color}-600 hover:bg-${tab.color}-700 text-white` 
+                      ? (tab.color === 'green' ? 'bg-green-600 hover:bg-green-700 text-white' :
+                         tab.color === 'orange' ? 'bg-orange-600 hover:bg-orange-700 text-white' :
+                         tab.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 text-white' :
+                         'bg-purple-600 hover:bg-purple-700 text-white')
                       : ''
                   }`}
                 >
