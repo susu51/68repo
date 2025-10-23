@@ -162,10 +162,28 @@ export const CourierReadyOrdersMap = () => {
     }
   };
 
-  const openInMaps = (lat, lng, address) => {
-    // Open in Google Maps
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-    window.open(url, '_blank');
+  const openInMaps = (lat, lng, address, label = 'Teslimat Adresi') => {
+    // Detect device and open appropriate maps app
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    if (isIOS) {
+      // Try Apple Maps first, fallback to Google Maps
+      const appleMapsUrl = `maps://maps.apple.com/?daddr=${lat},${lng}&q=${encodeURIComponent(label)}`;
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+      
+      // Try Apple Maps
+      window.location.href = appleMapsUrl;
+      
+      // Fallback to Google Maps after 500ms
+      setTimeout(() => {
+        window.open(googleMapsUrl, '_blank');
+      }, 500);
+    } else {
+      // Android or Desktop: Use Google Maps
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+      window.open(url, '_blank');
+    }
   };
 
   return (
