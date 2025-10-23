@@ -556,7 +556,9 @@ export const CourierReadyOrdersMap = () => {
                       {order.business_name}
                     </CardTitle>
                     <CardDescription className="text-sm">
-                      {order.business_address}
+                      {typeof order.business_address === 'string' 
+                        ? order.business_address 
+                        : order.business_address?.label || order.business_address?.address || 'Adres bilgisi yok'}
                     </CardDescription>
                   </div>
                   <Badge variant="success" className="bg-green-600">
