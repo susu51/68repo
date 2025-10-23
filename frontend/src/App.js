@@ -70,11 +70,8 @@ const LoginForm = ({ onRegisterClick }) => {
     // Hide login modal
     setShowLogin(false);
     
-    // Force reload after a short delay to ensure state is synced
-    setTimeout(() => {
-      console.log('🔄 Reloading page...');
-      window.location.reload();
-    }, 300);
+    // NO RELOAD - React will handle state updates automatically
+    // Removed window.location.reload() to fix infinite refresh loop
   };
 
   const handleClose = () => {
