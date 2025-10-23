@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 const OpenStreetMap = ({ 
   center = [41.0082, 28.9784], 
@@ -9,10 +9,9 @@ const OpenStreetMap = ({
   courierLocation = null,
   showDirectionsProp = false
 }) => {
-  const mapRef = useRef(null);
-  const [mapInstance, setMapInstance] = useState(null);
-  const [directionsVisible, setDirectionsVisible] = useState(false);
-  const [routeData, setRouteData] = useState(null);
+  const mapContainerRef = useRef(null);
+  const iframeRef = useRef(null);
+  const [selectedMarker, setSelectedMarker] = useState(null);
 
   useEffect(() => {
     // Initialize map with vanilla JavaScript (no React-leaflet dependency)
