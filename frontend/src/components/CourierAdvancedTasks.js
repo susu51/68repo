@@ -134,34 +134,21 @@ export const CourierAdvancedTasks = () => {
     }
   };
 
-  // Map markers - show delivery locations (packages)
+  // Map markers - show BUSINESS locations with PACKAGE count (not delivery locations!)
   const mapMarkers = [];
   
-  // Add delivery location markers (packages)
-  availableOrders.forEach(order => {
-    if (order.delivery_location?.lat && order.delivery_location?.lng) {
-      mapMarkers.push({
-        lat: order.delivery_location.lat,
-        lng: order.delivery_location.lng,
-        type: 'delivery',
-        orderId: order.order_id,
-        label: `📦 ${order.customer_name}`,
-        popup: `<strong>📦 Sipariş #${order.order_code}</strong><br/>${order.customer_name}<br/>₺${order.grand_total.toFixed(2)}`
-      });
-    }
-  });
-
-  // Add business markers
+  // Add business markers with package icons
   nearbyBusinesses.forEach(business => {
     const coords = business.location?.coordinates || [business.lng || 0, business.lat || 0];
-    if (coords[1] && coords[0]) {
+    if (coords[1] && coords[0] && business.pending_ready_count > 0) {
       mapMarkers.push({
         lat: coords[1],
         lng: coords[0],
         type: 'business',
         businessId: business.business_id,
-        label: `🏪 ${business.name}`,
-        popup: `<strong>🏪 ${business.name}</strong><br/>${business.pending_ready_count} hazır sipariş`
+        label: `📦 ${business.name}`,
+        count: business.pending_ready_count,
+        popup: `<strong>📦 ${business.name}</strong><br/>${business.pending_ready_count} hazır paket`
       });
     }
   });
