@@ -69,7 +69,7 @@ export const CourierAdvancedTasks = () => {
     try {
       setLoading(true);
       
-      // Fetch nearby businesses
+      // Fetch nearby businesses with ready orders
       const businessResponse = await fetch(
         `${API}/courier/tasks/nearby-businesses?lat=${courierLocation.lat}&lng=${courierLocation.lng}&radius_m=50000`,
         { method: 'GET', credentials: 'include' }
@@ -78,23 +78,30 @@ export const CourierAdvancedTasks = () => {
       if (businessResponse.ok) {
         const businesses = await businessResponse.json();
         setNearbyBusinesses(businesses);
-        
-        // Fetch all available orders from all businesses
-        const ordersPromises = businesses.map(business =>
-          fetch(`${API}/courier/tasks/businesses/${business.business_id}/available-orders`, {
-            method: 'GET',
-            credentials: 'include'
-          }).then(r => r.ok ? r.json() : [])
-        );
-        
-        const ordersArrays = await Promise.all(ordersPromises);
-        const allOrders = ordersArrays.flat();
-        setAvailableOrders(allOrders);
       }
     } catch (error) {
       console.error('❌ Fetch error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleBusinessClick = async (business) => {
+    setSelectedBusiness(business);
+    setSelectedOrder(null);
+    
+    try {
+      const response = await fetch(
+        `${API}/courier/tasks/businesses/${business.business_id}/available-orders`,
+        { method: 'GET', credentials: 'include' }
+      );
+
+      if (response.ok) {
+        const orders = await response.json();
+        setBusinessOrders(orders);
+      }
+    } catch (error) {
+      console.error('❌ Orders fetch error:', error);
     }
   };
 
