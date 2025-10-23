@@ -204,23 +204,24 @@ async def get_courier_active_orders(
             customer_info = order.get("customer_info", {})
             customer_name = customer_info.get("name") or order.get("customer_name", "Müşteri")
             
-            # Parse delivery address
-            delivery_addr = order.get("delivery_address", {})
-            if isinstance(delivery_addr, dict):
-                address_text = delivery_addr.get("label") or delivery_addr.get("address", "")
-                delivery_lat = delivery_addr.get("lat")
-                delivery_lng = delivery_addr.get("lng")
+            # Parse delivery address and coordinates
+            delivery_addr = order.get("delivery_address", "")
+            
+            # Get coordinates from delivery_location (GeoJSON format) or fallback to direct fields
+            delivery_location = order.get("delivery_location", {})
+            if delivery_location and delivery_location.get("coordinates"):
+                delivery_lng, delivery_lat = delivery_location["coordinates"]
             else:
-                address_text = str(delivery_addr) if delivery_addr else ""
                 delivery_lat = order.get("delivery_lat")
                 delivery_lng = order.get("delivery_lng")
             
-            # Parse business address for pickup
-            business = await db.users.find_one({"id": order.get("business_id")})
-            business_name = business.get("business_name", "İşletme") if business else "İşletme"
-            business_address = business.get("address", "") if business else ""
-            business_lat = business.get("lat") if business else None
-            business_lng = business.get("lng") if business else None
+            # Handle address_snapshot if delivery_address is empty
+            if not delivery_addr:
+                address_snapshot = order.get("address_snapshot", {})
+                delivery_addr = address_snapshot.get("full", "")
+                if not delivery_lat and not delivery_lng:
+                    delivery_lat = address_snapshot.get("lat")
+                    delivery_lng = address_snapshot.get("lng")
             
             formatted.append({
                 "order_id": order.get("id"),
@@ -233,7 +234,7 @@ async def get_courier_active_orders(
                     "lat": business_lat,
                     "lng": business_lng
                 },
-                "delivery_address": address_text,
+                "delivery_address": delivery_addr,
                 "delivery_location": {
                     "lat": delivery_lat,
                     "lng": delivery_lng
