@@ -82,6 +82,26 @@ export const CourierReadyOrdersMap = () => {
     }
   };
   
+  const fetchMyActiveOrders = async () => {
+    try {
+      const response = await fetch(
+        `${API}/courier/tasks/my-orders`,
+        {
+          method: 'GET',
+          credentials: 'include'
+        }
+      );
+      
+      if (response.ok) {
+        const orders = await response.json();
+        setMyActiveOrders(orders);
+        console.log('🚚 My active orders:', orders);
+      }
+    } catch (error) {
+      console.error('❌ My active orders fetch error:', error);
+    }
+  };
+  
   const claimOrder = async (orderId) => {
     try {
       setClaimingOrderId(orderId);
