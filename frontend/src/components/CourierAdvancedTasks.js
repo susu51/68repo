@@ -196,82 +196,107 @@ export const CourierAdvancedTasks = () => {
         </Button>
       </div>
 
-      {/* Map View */}
-      {viewMode === 'map' && (
-        <Card>
-          <CardContent className="p-0">
-            <SimpleMap
-              center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [39.9334, 32.8597]}
-              markers={mapMarkers}
-              height="500px"
-              onMarkerClick={(marker) => {
-                if (marker.type === 'business') {
-                  // Find business and show its orders
-                  const business = nearbyBusinesses.find(b => b.business_id === marker.businessId);
-                  if (business) {
-                    handleBusinessClick(business);
-                  }
+      {/* Map View - Always Visible */}
+      <Card>
+        <CardContent className="p-0">
+          <SimpleMap
+            center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [39.9334, 32.8597]}
+            markers={mapMarkers}
+            height="500px"
+            onMarkerClick={(marker) => {
+              if (marker.type === 'business') {
+                const business = nearbyBusinesses.find(b => b.business_id === marker.businessId);
+                if (business) {
+                  handleBusinessClick(business);
                 }
-              }}
-            />
+              }
+            }}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Selected Business Orders */}
+      {selectedBusiness && businessOrders.length > 0 && (
+        <Card className="border-2 border-green-500 bg-green-50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Store className="h-5 w-5" />
+                  {selectedBusiness.name}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  📦 {businessOrders.length} hazır paket
+                </p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  setSelectedBusiness(null);
+                  setBusinessOrders([]);
+                  setSelectedOrder(null);
+                }}
+              >
+                ✕
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3">
+              {businessOrders.map((order) => (
+                <Card 
+                  key={order.order_id}
+                  className={`cursor-pointer transition-all ${
+                    selectedOrder?.order_id === order.order_id 
+                      ? 'border-2 border-green-600 bg-white shadow-md' 
+                      : 'bg-white hover:border-green-300'
+                  }`}
+                  onClick={() => setSelectedOrder(selectedOrder?.order_id === order.order_id ? null : order)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h5 className="font-semibold flex items-center gap-2">
+                          <Package className="h-4 w-4" />
+                          Sipariş #{order.order_code}
+                        </h5>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          👤 {order.customer_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          📦 {order.items_count} ürün
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">
+                          ₺{order.grand_total?.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          (₺{order.delivery_fee?.toFixed(2)} teslimat)
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Expand when selected */}
+                    {selectedOrder?.order_id === order.order_id && (
+                      <div className="mt-3 pt-3 border-t space-y-2">
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          📍 {formatAddress(order.delivery_address)}
+                        </p>
+                        {order.notes && (
+                          <p className="text-xs text-yellow-600">
+                            💬 {order.notes}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </CardContent>
         </Card>
-      )}
-
-      {/* List View */}
-      {viewMode === 'list' && (
-        <div className="grid gap-4">
-          {availableOrders.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center text-muted-foreground">
-                <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Şu an hazır sipariş bulunmuyor</p>
-              </CardContent>
-            </Card>
-          ) : (
-            availableOrders.map((order) => (
-              <Card 
-                key={order.order_id}
-                className={`cursor-pointer transition-all ${
-                  selectedOrder?.order_id === order.order_id 
-                    ? 'border-green-500 shadow-lg' 
-                    : 'hover:border-green-300'
-                }`}
-                onClick={() => setSelectedOrder(order)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Package className="h-5 w-5 text-green-600" />
-                        <h3 className="font-bold">Sipariş #{order.order_code}</h3>
-                        <Badge className="bg-green-100 text-green-700">Hazır</Badge>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">İşletme:</p>
-                          <p className="font-medium">{order.business_name}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Müşteri:</p>
-                          <p className="font-medium">{order.customer_name}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-green-600">
-                        ₺{order.grand_total?.toFixed(2)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {order.items_count} ürün
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
       )}
 
       {/* Order Details Panel */}
