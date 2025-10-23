@@ -2468,7 +2468,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Courier Map Panel Backend Endpoints"
+    - "Business Dashboard Summary Endpoint - Loading Issue Investigation"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
