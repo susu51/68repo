@@ -52,97 +52,64 @@ async def get_nearby_businesses(
     from server import db
     
     try:
-        # Find businesses within radius using geospatial query
-        # Note: Businesses are stored in 'users' collection with role='business'
-        businesses_cursor = db.users.aggregate([
-            {
-                "$match": {
-                    "role": "business",
-                    "lat": {"$exists": True},
-                    "lng": {"$exists": True}
-                }
-            },
-            {
-                "$addFields": {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": ["$lng", "$lat"]
-                    },
-                    # Calculate distance using Haversine formula approximation
-                    "distance": {
-                        "$multiply": [
-                            6371000,  # Earth radius in meters
-                            {
-                                "$acos": {
-                                    "$add": [
-                                        {"$multiply": [
-                                            {"$sin": {"$degreesToRadians": "$lat"}},
-                                            {"$sin": {"$degreesToRadians": lat}}
-                                        ]},
-                                        {"$multiply": [
-                                            {"$cos": {"$degreesToRadians": "$lat"}},
-                                            {"$cos": {"$degreesToRadians": lat}},
-                                            {"$cos": {"$subtract": [
-                                                {"$degreesToRadians": "$lng"},
-                                                {"$degreesToRadians": lng}
-                                            ]}}
-                                        ]}
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "$match": {
-                    "distance": {"$lte": radius_m}
-                }
-            },
-            {
-                "$lookup": {
-                    "from": "orders",
-                    "let": {"bid": "$id"},
-                    "pipeline": [
-                        {
-                            "$match": {
-                                "$expr": {"$eq": ["$business_id", "$$bid"]},
-                                "status": "ready"
-                            }
-                        },
-                        {"$count": "ready_count"}
-                    ],
-                    "as": "readyAgg"
-                }
-            },
-            {
-                "$addFields": {
-                    "pending_ready_count": {
-                        "$ifNull": [
-                            {"$arrayElemAt": ["$readyAgg.ready_count", 0]},
-                            0
-                        ]
-                    }
-                }
-            },
-            {
-                "$match": {
-                    "pending_ready_count": {"$gt": 0}  # Only businesses with ready orders
-                }
-            },
-            {
-                "$project": {
-                    "business_id": "$id",
-                    "name": "$business_name",
-                    "location": "$location",
-                    "pending_ready_count": 1,
-                    "address_short": "$address",
-                    "distance": 1
-                }
-            }
-        ])
+        # Simplified approach: Get all businesses with GPS coordinates first
+        businesses = await db.users.find({
+            "role": "business",
+            "kyc_status": "approved",
+            "lat": {"$exists": True, "$ne": None},
+            "lng": {"$exists": True, "$ne": None}
+        }).to_list(length=None)
         
-        results = await businesses_cursor.to_list(length=100)
+        results = []
+        
+        for business in businesses:
+            try:
+                # Calculate distance using simple approximation
+                import math
+                
+                business_lat = float(business.get("lat", 0))
+                business_lng = float(business.get("lng", 0))
+                
+                # Haversine distance calculation
+                R = 6371000  # Earth radius in meters
+                lat1_rad = math.radians(lat)
+                lat2_rad = math.radians(business_lat)
+                delta_lat = math.radians(business_lat - lat)
+                delta_lng = math.radians(business_lng - lng)
+                
+                a = (math.sin(delta_lat/2) * math.sin(delta_lat/2) +
+                     math.cos(lat1_rad) * math.cos(lat2_rad) *
+                     math.sin(delta_lng/2) * math.sin(delta_lng/2))
+                c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+                distance = R * c
+                
+                # Skip if outside radius
+                if distance > radius_m:
+                    continue
+                
+                # Count ready orders for this business
+                ready_count = await db.orders.count_documents({
+                    "business_id": business.get("id"),
+                    "status": "ready"
+                })
+                
+                # Only include businesses with ready orders
+                if ready_count > 0:
+                    results.append({
+                        "business_id": business.get("id"),
+                        "name": business.get("business_name", "Business"),
+                        "location": {
+                            "type": "Point",
+                            "coordinates": [business_lng, business_lat]
+                        },
+                        "pending_ready_count": ready_count,
+                        "address_short": business.get("address", ""),
+                        "distance": round(distance)
+                    })
+                    
+            except Exception as business_error:
+                print(f"⚠️ Error processing business {business.get('id')}: {business_error}")
+                continue
         
         print(f"✅ Found {len(results)} nearby businesses with ready orders")
         return results
