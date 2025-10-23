@@ -363,7 +363,9 @@ export const CourierReadyOrdersMap = () => {
                         </p>
                         <p className="text-xs font-medium">👤 {order.customer_name}</p>
                         <p className="text-xs text-muted-foreground line-clamp-2">
-                          {order.delivery_address}
+                          {typeof order.delivery_address === 'string' 
+                            ? order.delivery_address 
+                            : order.delivery_address?.label || order.delivery_address?.address || 'Adres bilgisi yok'}
                         </p>
                         {order.delivery_location?.lat && order.delivery_location?.lng && (
                           <Button
