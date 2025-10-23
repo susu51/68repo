@@ -211,9 +211,12 @@ export const CourierAdvancedTasks = () => {
               markers={mapMarkers}
               height="500px"
               onMarkerClick={(marker) => {
-                if (marker.type === 'delivery') {
-                  const order = availableOrders.find(o => o.order_id === marker.orderId);
-                  if (order) setSelectedOrder(order);
+                if (marker.type === 'business') {
+                  // Find business and show its orders
+                  const business = nearbyBusinesses.find(b => b.business_id === marker.businessId);
+                  if (business) {
+                    handleBusinessClick(business);
+                  }
                 }
               }}
             />
