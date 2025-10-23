@@ -25,7 +25,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashbo
 const API = `${BACKEND_URL}/api`;
 
 export const CourierAdvancedTasks = () => {
-  const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
+  // Removed viewMode - only map view
   const [nearbyBusinesses, setNearbyBusinesses] = useState([]);
   const [availableOrders, setAvailableOrders] = useState([]);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
