@@ -223,6 +223,13 @@ async def get_courier_active_orders(
                     delivery_lat = address_snapshot.get("lat")
                     delivery_lng = address_snapshot.get("lng")
             
+            # Parse business address for pickup
+            business = await db.users.find_one({"id": order.get("business_id")})
+            business_name = business.get("business_name", "İşletme") if business else "İşletme"
+            business_address = business.get("address", "") if business else ""
+            business_lat = business.get("lat") if business else None
+            business_lng = business.get("lng") if business else None
+            
             formatted.append({
                 "order_id": order.get("id"),
                 "order_code": order.get("id")[:8],
