@@ -211,6 +211,80 @@ async def get_business_available_orders(
         print(f"❌ Error fetching available orders: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/my-orders")
+async def get_courier_active_orders(
+    current_user: dict = Depends(get_courier_user)
+):
+    """
+    Get courier's active orders (assigned, picked_up, delivering)
+    """
+    from server import db
+    
+    try:
+        courier_id = current_user["id"]
+        
+        # Find orders assigned to this courier
+        orders_cursor = db.orders.find({
+            "assigned_courier_id": courier_id,
+            "status": {"$in": ["assigned", "picked_up", "delivering"]}
+        }).sort("assigned_at", -1)
+        
+        orders = await orders_cursor.to_list(length=50)
+        
+        formatted = []
+        for order in orders:
+            # Get customer name
+            customer_info = order.get("customer_info", {})
+            customer_name = customer_info.get("name") or order.get("customer_name", "Müşteri")
+            
+            # Parse delivery address
+            delivery_addr = order.get("delivery_address", {})
+            if isinstance(delivery_addr, dict):
+                address_text = delivery_addr.get("label") or delivery_addr.get("address", "")
+                delivery_lat = delivery_addr.get("lat")
+                delivery_lng = delivery_addr.get("lng")
+            else:
+                address_text = str(delivery_addr) if delivery_addr else ""
+                delivery_lat = order.get("delivery_lat")
+                delivery_lng = order.get("delivery_lng")
+            
+            # Parse business address for pickup
+            business = await db.users.find_one({"id": order.get("business_id")})
+            business_name = business.get("business_name", "İşletme") if business else "İşletme"
+            business_address = business.get("address", "") if business else ""
+            business_lat = business.get("lat") if business else None
+            business_lng = business.get("lng") if business else None
+            
+            formatted.append({
+                "order_id": order.get("id"),
+                "order_code": order.get("id")[:8],
+                "status": order.get("status"),
+                "customer_name": customer_name,
+                "business_name": business_name,
+                "business_address": business_address,
+                "business_location": {
+                    "lat": business_lat,
+                    "lng": business_lng
+                },
+                "delivery_address": address_text,
+                "delivery_location": {
+                    "lat": delivery_lat,
+                    "lng": delivery_lng
+                },
+                "total_amount": float(order.get("total_amount", 0)),
+                "delivery_fee": float(order.get("delivery_fee", 0)),
+                "grand_total": float(order.get("total_amount", 0)) + float(order.get("delivery_fee", 0)),
+                "items_count": len(order.get("items", [])),
+                "assigned_at": order.get("assigned_at"),
+                "notes": order.get("notes") or ""
+            })
+        
+        return formatted
+        
+    except Exception as e:
+        print(f"❌ Error fetching courier orders: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/orders/{order_id}/claim")
 async def claim_order(
     order_id: str,
