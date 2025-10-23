@@ -13,7 +13,7 @@ import { CourierEarningsReport } from './components/CourierEarningsReport';
 import { CourierPDFReports } from './components/CourierPDFReports';
 import { CourierProfileUpdate } from './components/CourierProfileUpdate';
 import { CourierAvailability } from './components/CourierAvailability';
-import { CourierReadyOrdersMap } from './components/CourierReadyOrdersMap';
+import { CourierMapWithBusinesses } from './components/CourierMapWithBusinesses';
 import { CourierOrderHistoryFiltered } from './components/CourierOrderHistoryFiltered';
 import { CourierWaitingTasks } from './components/CourierWaitingTasks';
 
