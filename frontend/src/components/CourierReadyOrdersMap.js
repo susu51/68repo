@@ -121,6 +121,7 @@ export const CourierReadyOrdersMap = () => {
         
         // Refresh lists
         await fetchNearbyBusinesses();
+        await fetchMyActiveOrders();
         setSelectedBusiness(null);
         setAvailableOrders([]);
       } else if (response.status === 409) {
