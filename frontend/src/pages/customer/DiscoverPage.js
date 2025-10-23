@@ -47,6 +47,9 @@ const DiscoverPage = ({ user, onRestaurantSelect, onTabChange }) => {
     if (sortMode === 'location' && userLocation) {
       console.log('🎯 User location changed, reloading restaurants with location sorting...');
       loadRestaurants();
+    } else if (sortMode === 'city' && selectedAddress) {
+      console.log('🏙️ Sort mode changed to city, reloading restaurants...');
+      loadRestaurants();
     }
   }, [userLocation, sortMode]);
 
