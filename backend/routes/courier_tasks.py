@@ -67,18 +67,36 @@ async def get_nearby_businesses(
                     "location": {
                         "type": "Point",
                         "coordinates": ["$lng", "$lat"]
+                    },
+                    # Calculate distance using Haversine formula approximation
+                    "distance": {
+                        "$multiply": [
+                            6371000,  # Earth radius in meters
+                            {
+                                "$acos": {
+                                    "$add": [
+                                        {"$multiply": [
+                                            {"$sin": {"$degreesToRadians": "$lat"}},
+                                            {"$sin": {"$degreesToRadians": lat}}
+                                        ]},
+                                        {"$multiply": [
+                                            {"$cos": {"$degreesToRadians": "$lat"}},
+                                            {"$cos": {"$degreesToRadians": lat}},
+                                            {"$cos": {"$subtract": [
+                                                {"$degreesToRadians": "$lng"},
+                                                {"$degreesToRadians": lng}
+                                            ]}}
+                                        ]}
+                                    ]
+                                }
+                            }
+                        ]
                     }
                 }
             },
             {
-                "$geoNear": {
-                    "near": {
-                        "type": "Point",
-                        "coordinates": [lng, lat]
-                    },
-                    "distanceField": "distance",
-                    "spherical": True,
-                    "maxDistance": radius_m
+                "$match": {
+                    "distance": {"$lte": radius_m}
                 }
             },
             {
