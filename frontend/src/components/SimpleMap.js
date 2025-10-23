@@ -7,12 +7,13 @@ const SimpleMap = ({
   onMarkerClick = null,
   height = "500px"
 }) => {
-  // Generate Google Maps embed URL with markers
+  // Generate OpenStreetMap iframe URL
   const generateMapUrl = () => {
-    const baseUrl = "https://www.google.com/maps/embed/v1/view";
-    const apiKey = "AIzaSyBFw0Qbyq9zTFTd-tuwX1lcmPVi1g8i-C0"; // Free tier key for embeds
+    const lat = center[0];
+    const lng = center[1];
+    const bbox = `${lng-0.02},${lat-0.02},${lng+0.02},${lat+0.02}`;
     
-    return `${baseUrl}?key=${apiKey}&center=${center[0]},${center[1]}&zoom=13`;
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
   };
 
   return (
