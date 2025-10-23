@@ -438,10 +438,14 @@ class E2EOrderFlowTest:
                     
                     if target_order:
                         # Verify order details
-                        has_business_info = bool(target_order.get("business_name") and target_order.get("pickup_address"))
+                        has_business_info = bool(target_order.get("business_name") and target_order.get("business_address"))
                         has_customer_info = bool(target_order.get("customer_name") and target_order.get("delivery_address"))
-                        has_coordinates = bool(target_order.get("pickup_lat") and target_order.get("pickup_lng") and 
-                                             target_order.get("delivery_lat") and target_order.get("delivery_lng"))
+                        has_coordinates = bool(
+                            target_order.get("business_location", {}).get("lat") and 
+                            target_order.get("business_location", {}).get("lng") and
+                            target_order.get("delivery_location", {}).get("lat") and 
+                            target_order.get("delivery_location", {}).get("lng")
+                        )
                         is_assigned = target_order.get("status") == "assigned"
                         
                         if has_business_info and has_customer_info and has_coordinates and is_assigned:
@@ -454,10 +458,12 @@ class E2EOrderFlowTest:
                             # Print order details
                             print(f"📋 Order Details:")
                             print(f"   Business: {target_order.get('business_name')}")
-                            print(f"   Pickup: {target_order.get('pickup_address')}")
+                            print(f"   Pickup: {target_order.get('business_address')}")
                             print(f"   Customer: {target_order.get('customer_name')}")
                             print(f"   Delivery: {target_order.get('delivery_address')}")
                             print(f"   Status: {target_order.get('status')}")
+                            print(f"   Business GPS: {target_order.get('business_location')}")
+                            print(f"   Delivery GPS: {target_order.get('delivery_location')}")
                             
                             return True
                         else:
@@ -472,6 +478,17 @@ class E2EOrderFlowTest:
                                 False,
                                 f"Order {self.order_id} found but missing: {', '.join(missing_fields)}"
                             )
+                            
+                            # Debug: Print what we actually got
+                            print(f"🔍 Debug - Order data received:")
+                            print(f"   business_name: {target_order.get('business_name')}")
+                            print(f"   business_address: {target_order.get('business_address')}")
+                            print(f"   customer_name: {target_order.get('customer_name')}")
+                            print(f"   delivery_address: {target_order.get('delivery_address')}")
+                            print(f"   business_location: {target_order.get('business_location')}")
+                            print(f"   delivery_location: {target_order.get('delivery_location')}")
+                            print(f"   status: {target_order.get('status')}")
+                            
                             return False
                     else:
                         self.log_result(
