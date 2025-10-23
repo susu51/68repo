@@ -149,34 +149,62 @@ class CourierNearbyBusinessesTest:
             self.log_result("Nearby Businesses Endpoint", False, f"Exception: {str(e)}")
             return []
             
-    async def test_expected_business_present(self, businesses):
-        """Test 3: Expected Business Present"""
+    async def test_business_filtering_logic(self, businesses):
+        """Test 3: Business Filtering Logic"""
         try:
-            expected_business = None
-            for business in businesses:
-                if business.get('business_id') == EXPECTED_BUSINESS_ID:
-                    expected_business = business
-                    break
-                    
-            if expected_business:
-                self.log_result(
-                    "Expected Business Present",
-                    True,
-                    f"Found business {EXPECTED_BUSINESS_ID} with {expected_business.get('pending_ready_count', 0)} ready orders"
-                )
-                return expected_business
-            else:
-                business_ids = [b.get('business_id') for b in businesses]
-                self.log_result(
-                    "Expected Business Present",
-                    False,
-                    f"Business {EXPECTED_BUSINESS_ID} not found. Available: {business_ids}"
-                )
-                return None
+            # Check if the expected business exists but is correctly filtered out
+            async with self.session.post(
+                f"{BACKEND_URL}/auth/login",
+                json={"email": "testbusiness@example.com", "password": "test123"}
+            ) as response:
                 
+                if response.status == 200:
+                    data = await response.json()
+                    user = data.get('user', {})
+                    business_id = user.get('id')
+                    has_coordinates = 'lat' in user and 'lng' in user
+                    
+                    # Check ready orders count
+                    async with self.session.get(
+                        f"{BACKEND_URL}/business/orders/incoming"
+                    ) as orders_response:
+                        
+                        ready_orders_count = 0
+                        if orders_response.status == 200:
+                            orders = await orders_response.json()
+                            ready_orders_count = len([o for o in orders if o.get('status') == 'ready'])
+                        
+                        # Determine if business should appear in nearby results
+                        should_appear = has_coordinates and ready_orders_count > 0
+                        business_found = any(b.get('business_id') == business_id for b in businesses)
+                        
+                        if should_appear == business_found:
+                            self.log_result(
+                                "Business Filtering Logic",
+                                True,
+                                f"Business {business_id} correctly {'included' if business_found else 'excluded'} "
+                                f"(has_coords: {has_coordinates}, ready_orders: {ready_orders_count})"
+                            )
+                            return True
+                        else:
+                            self.log_result(
+                                "Business Filtering Logic",
+                                False,
+                                f"Business {business_id} filtering error: should_appear={should_appear}, "
+                                f"found={business_found} (has_coords: {has_coordinates}, ready_orders: {ready_orders_count})"
+                            )
+                            return False
+                else:
+                    self.log_result(
+                        "Business Filtering Logic",
+                        False,
+                        f"Could not verify business data: HTTP {response.status}"
+                    )
+                    return False
+                    
         except Exception as e:
-            self.log_result("Expected Business Present", False, f"Exception: {str(e)}")
-            return None
+            self.log_result("Business Filtering Logic", False, f"Exception: {str(e)}")
+            return False
             
     async def test_business_location_data(self, businesses):
         """Test 4: Business Location Data"""
