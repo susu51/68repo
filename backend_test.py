@@ -1,53 +1,147 @@
 #!/usr/bin/env python3
 """
-ORDER STATUS TRANSITIONS TEST
-Test the complete order status transition flow with the new "confirmed" status
+Business Dashboard Summary Endpoint Testing
+Testing the specific issue reported: "Yükleniyor..." (Loading...) stuck infinitely in "Son Aktiviteler" (Recent Activities) section
 
-Expected Flow: created/pending → confirmed → preparing → ready
+CRITICAL CONTEXT:
+- User video shows "Yükleniyor..." (Loading...) stuck infinitely in "Son Aktiviteler" (Recent Activities) section
+- Frontend hook useDashboardSummary is properly setting loading=false in finally block
+- Need to verify backend endpoint is responding correctly
 
-Phase 1: Create Order
-Phase 2: Business Confirms Order (NEW)
-Phase 3: Start Preparing (Creates Courier Task)
-Phase 4: Mark as Ready
+TEST REQUIREMENTS:
+1. Business Login Test - Login with testbusiness@example.com/test123
+2. Dashboard Summary Endpoint Test - GET /api/business/dashboard/summary?date=2025-10-23&timezone=Europe/Istanbul
+3. Error Handling Test - Test with invalid parameters
+
+SUCCESS CRITERIA:
+- ✅ Business authentication working
+- ✅ Dashboard summary endpoint returns data quickly (< 2s)
+- ✅ Activities array is present (even if empty)
+- ✅ No backend errors or timeouts
+
+BACKEND URL: https://courier-dashboard-3.preview.emergentagent.com/api
 """
 
-import asyncio
-import aiohttp
+import requests
 import json
+import time
+from datetime import datetime, timezone
 import sys
-from datetime import datetime
 
-# Backend URL from environment
+# Configuration
 BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
+TEST_BUSINESS_EMAIL = "testbusiness@example.com"
+TEST_BUSINESS_PASSWORD = "test123"
 
-class OrderStatusTransitionTest:
+class BusinessDashboardTester:
     def __init__(self):
-        self.session = None
-        self.customer_cookies = None
-        self.business_cookies = None
-        self.order_id = None
+        self.session = requests.Session()
+        self.session.headers.update({
+            'Content-Type': 'application/json',
+            'User-Agent': 'BusinessDashboardTester/1.0'
+        })
+        self.business_token = None
         self.business_id = None
+        self.test_results = []
         
-    async def setup_session(self):
-        """Initialize HTTP session"""
-        connector = aiohttp.TCPConnector(ssl=False)
-        self.session = aiohttp.ClientSession(connector=connector)
-        print("🔗 HTTP session initialized")
-        
-    async def cleanup_session(self):
-        """Cleanup HTTP session"""
-        if self.session:
-            await self.session.close()
-            print("🔗 HTTP session closed")
-    
-    async def login_customer(self):
-        """Phase 1.1: Login as customer"""
-        print("\n🔐 Phase 1.1: Customer Login")
-        
-        login_data = {
-            "email": "test@kuryecini.com",
-            "password": "test123"
+    def log_test(self, test_name, success, details, response_time=None):
+        """Log test results"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        result = {
+            'test': test_name,
+            'status': status,
+            'success': success,
+            'details': details,
+            'response_time': response_time,
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }
+        self.test_results.append(result)
+        
+        time_info = f" ({response_time:.2f}s)" if response_time else ""
+        print(f"{status} {test_name}{time_info}")
+        print(f"   Details: {details}")
+        print()
+        
+    def test_business_login(self):
+        """Test 1: Business Login Authentication"""
+        print("🔐 Testing Business Login Authentication...")
+        
+        start_time = time.time()
+        try:
+            login_data = {
+                "email": TEST_BUSINESS_EMAIL,
+                "password": TEST_BUSINESS_PASSWORD
+            }
+            
+            response = self.session.post(
+                f"{BACKEND_URL}/auth/login",
+                json=login_data,
+                timeout=10
+            )
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check if we have success and user data
+                if data.get('success') and data.get('user'):
+                    user = data['user']
+                    self.business_id = user.get('id')
+                    
+                    # Verify role is business
+                    if user.get('role') == 'business':
+                        # Check if cookies are set for authentication
+                        cookies = response.cookies
+                        if 'access_token' in cookies:
+                            self.log_test(
+                                "Business Login Authentication",
+                                True,
+                                f"Login successful. Business ID: {self.business_id}, Role: {user.get('role')}, Cookie auth enabled",
+                                response_time
+                            )
+                            return True
+                        else:
+                            self.log_test(
+                                "Business Login Authentication",
+                                False,
+                                "Login successful but no access_token cookie set",
+                                response_time
+                            )
+                            return False
+                    else:
+                        self.log_test(
+                            "Business Login Authentication",
+                            False,
+                            f"Wrong role returned: {user.get('role')}, expected 'business'",
+                            response_time
+                        )
+                        return False
+                else:
+                    self.log_test(
+                        "Business Login Authentication",
+                        False,
+                        f"Login response missing success/user data: {data}",
+                        response_time
+                    )
+                    return False
+            else:
+                self.log_test(
+                    "Business Login Authentication",
+                    False,
+                    f"HTTP {response.status_code}: {response.text}",
+                    response_time
+                )
+                return False
+                
+        except Exception as e:
+            response_time = time.time() - start_time
+            self.log_test(
+                "Business Login Authentication",
+                False,
+                f"Exception: {str(e)}",
+                response_time
+            )
+            return False
         
         async with self.session.post(
             f"{BACKEND_URL}/auth/login",
