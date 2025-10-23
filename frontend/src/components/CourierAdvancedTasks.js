@@ -114,9 +114,11 @@ export const CourierAdvancedTasks = () => {
       );
 
       if (response.ok) {
-        toast.success('✅ Sipariş başarıyla alındı!');
+        toast.success('✅ Sipariş başarıyla alındı! "Siparişler" sekmesine gidin.');
         await fetchData();
         setSelectedOrder(null);
+        setSelectedBusiness(null);
+        setBusinessOrders([]);
       } else {
         const error = await response.json();
         toast.error(error.detail || 'Sipariş alınamadı');
