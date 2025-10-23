@@ -798,6 +798,13 @@ export const CourierDashboard = ({ user, onLogout }) => {
 
           {/* Orders Content */}
           <div style={{ display: activeTab === 'orders' ? 'block' : 'none' }}>
+            <div className="p-6">
+              <CourierActiveOrders />
+            </div>
+          </div>
+
+          {/* Old Orders Content - Backup */}
+          <div style={{ display: 'none' }}>
             <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">🚚 Sipariş Yönetimi</h2>
