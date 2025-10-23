@@ -318,10 +318,10 @@ class CourierNearbyBusinessesTest:
         if passed == total:
             print("🎉 ALL TESTS PASSED - Courier nearby-businesses endpoint is working correctly!")
             print("✅ Courier authentication working")
-            print("✅ Nearby-businesses endpoint returns results")
-            if any("Found business" in r["details"] for r in self.test_results if r["success"]):
-                print(f"✅ Expected business {EXPECTED_BUSINESS_ID} appears in results")
+            print("✅ Nearby-businesses endpoint returns results (not empty)")
+            print("✅ Business filtering logic working correctly")
             print("✅ pending_ready_count field present")
+            print("✅ Distance calculation working")
         else:
             print("🚨 SOME TESTS FAILED - Issues identified:")
             for result in self.test_results:
