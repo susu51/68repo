@@ -522,15 +522,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
-        async with self.session.post(
-            f"{BACKEND_URL}/auth/login",
-            json=login_data,
-            headers={"Content-Type": "application/json"}
-        ) as response:
-            if response.status == 200:
-                # Extract cookies for future requests
-                self.customer_cookies = response.cookies
                 
                 data = await response.json()
                 print(f"✅ Customer login successful: {data.get('message', 'Login successful')}")
