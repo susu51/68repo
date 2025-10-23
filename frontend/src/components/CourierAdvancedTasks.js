@@ -28,6 +28,8 @@ export const CourierAdvancedTasks = () => {
   const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
   const [nearbyBusinesses, setNearbyBusinesses] = useState([]);
   const [availableOrders, setAvailableOrders] = useState([]);
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [businessOrders, setBusinessOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [claimingOrderId, setClaimingOrderId] = useState(null);
   const [courierLocation, setCourierLocation] = useState(null);
