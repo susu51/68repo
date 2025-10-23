@@ -29,6 +29,7 @@ export const CourierReadyOrdersMap = () => {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [availableOrders, setAvailableOrders] = useState([]);
   const [claimingOrderId, setClaimingOrderId] = useState(null);
+  const [myActiveOrders, setMyActiveOrders] = useState([]);
   
   const fetchNearbyBusinesses = async () => {
     try {
