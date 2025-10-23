@@ -196,24 +196,19 @@ export const CourierAdvancedTasks = () => {
         </Button>
       </div>
 
-      {/* Map View - Always Visible */}
-      <Card>
-        <CardContent className="p-0">
-          <SimpleMap
-            center={courierLocation ? [courierLocation.lat, courierLocation.lng] : [39.9334, 32.8597]}
-            markers={mapMarkers}
-            height="500px"
-            onMarkerClick={(marker) => {
-              if (marker.type === 'business') {
-                const business = nearbyBusinesses.find(b => b.business_id === marker.businessId);
-                if (business) {
-                  handleBusinessClick(business);
-                }
-              }
-            }}
-          />
-        </CardContent>
-      </Card>
+      {/* Map View with Custom Icons */}
+      <CourierMapWithCustomIcons
+        onBusinessClick={async (business) => {
+          // Convert business format from map API
+          const formattedBusiness = {
+            business_id: business.id,
+            name: business.name,
+            pending_ready_count: business.active_order_count,
+            location: business.location
+          };
+          await handleBusinessClick(formattedBusiness);
+        }}
+      />
 
       {/* Selected Business Orders */}
       {selectedBusiness && businessOrders.length > 0 && (
