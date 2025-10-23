@@ -163,6 +163,11 @@ export const CourierReadyOrdersMap = () => {
   };
 
   const openInMaps = (lat, lng, address, label = 'Teslimat Adresi') => {
+    // Convert address to string if it's an object
+    const addressStr = typeof address === 'string' 
+      ? address 
+      : address?.label || address?.address || label;
+    
     // Detect device and open appropriate maps app
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isAndroid = /Android/.test(navigator.userAgent);
