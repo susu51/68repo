@@ -152,12 +152,9 @@ class E2EOrderFlowTest:
                         "quantity": 1
                     }
                 ],
-                "delivery_address": {
-                    "label": "Test Address",
-                    "address": "Kızılay Mahallesi, Atatürk Bulvarı No:123, Ankara",
-                    "lat": 39.9334,
-                    "lng": 32.8597
-                },
+                "delivery_address": "Kızılay Mahallesi, Atatürk Bulvarı No:123, Ankara",
+                "delivery_lat": 39.9334,
+                "delivery_lng": 32.8597,
                 "payment_method": "cash_on_delivery",
                 "notes": "Örnek test siparişi - lütfen çabuk getirin"
             }
@@ -169,17 +166,20 @@ class E2EOrderFlowTest:
                 
                 if response.status == 200:
                     order_response = await response.json()
-                    self.order_id = order_response.get("order_id")
+                    # The response has nested structure: {"success": true, "order": {...}}
+                    order_data_response = order_response.get("order", {})
+                    self.order_id = order_data_response.get("id")
                     if self.order_id:
                         self.log_result(
                             "Create Order",
                             True,
                             f"Order created successfully with ID: {self.order_id}"
                         )
-                        print(f"📦 Order Details: Business ID: {BUSINESS_ID}, Total: ₺{order_response.get('total_amount', 0)}")
+                        total = order_data_response.get("totals", {}).get("grand", 0)
+                        print(f"📦 Order Details: Business ID: {BUSINESS_ID}, Total: ₺{total}")
                         return True
                     else:
-                        self.log_result("Create Order", False, "Order created but no order_id returned")
+                        self.log_result("Create Order", False, f"Order created but no order ID returned. Response: {order_response}")
                         return False
                 else:
                     error_text = await response.text()
