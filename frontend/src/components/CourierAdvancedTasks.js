@@ -196,8 +196,8 @@ export const CourierAdvancedTasks = () => {
         </Button>
       </div>
 
-      {/* Map View with Custom Icons */}
-      <CourierMapWithCustomIcons
+      {/* Leaflet Map with Custom Markers */}
+      <LeafletMapWithCustomMarkers
         onBusinessClick={async (business) => {
           // Convert business format from map API
           const formattedBusiness = {
