@@ -102,256 +102,381 @@ class KuryeciniOrderFlowTester:
 
     def test_create_order(self):
                         False, 
-                        f"HTTP {response.status}: {error_text}"
+
+    def test_create_order(self):
+        """Test 2: Yeni bir sipariş oluştur"""
+        try:
+            # First get menu items for the business
+            menu_response = self.session.get(f"{BASE_URL}/business/public/{self.business_id}/menu")
+            
+            if menu_response.status_code != 200:
+                self.log_result("Get Menu Items", False, f"Menu API failed: HTTP {menu_response.status_code}")
+                return False
+            
+            menu_data = menu_response.json()
+            menu_items = menu_data.get("items", [])
+            
+            if not menu_items:
+                self.log_result("Get Menu Items", False, "No menu items found for business")
+                return False
+            
+            # Use first menu item for order
+            test_item = menu_items[0]
+            
+            order_data = {
+                "business_id": self.business_id,
+                "items": [{
+                    "menu_item_id": test_item.get("id", "test"),
+                    "title": test_item.get("name", "Test Ürün"),
+                    "price": float(test_item.get("price", 25.0)),
+                    "quantity": 2
+                }],
+                "delivery_address": {
+                    "label": "Test Adres",
+                    "lat": 39.9334,
+                    "lng": 32.8597
+                },
+                "payment_method": "cash",
+                "delivery_fee": 10.0
+            }
+            
+            response = self.session.post(f"{BASE_URL}/orders/create", json=order_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "order_id" in data:
+                    self.order_id = data["order_id"]
+                    total_amount = data.get("total_amount", 0)
+                    self.log_result(
+                        "Create Order", 
+                        True, 
+                        f"Order created successfully. ID: {self.order_id}, Total: ₺{total_amount}"
+                    )
+                    return True
+                else:
+                    self.log_result("Create Order", False, "Order response missing order_id", data)
+                    return False
+            else:
+                self.log_result("Create Order", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Order", False, f"Exception: {str(e)}")
+            return False
+
+    def test_business_login(self):
+        """Test 3: İşletme olarak login yap (test_business@example.com / test123)"""
+        try:
+            # Clear previous session
+            self.session.cookies.clear()
+            
+            login_data = {
+                "email": "test_business@example.com",
+                "password": "test123"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and "user" in data:
+                    self.business_token = "cookie_auth"
+                    user_info = data["user"]
+                    self.log_result(
+                        "Business Login", 
+                        True, 
+                        f"Login successful for {user_info.get('email', 'N/A')}, Role: {user_info.get('role', 'N/A')}"
+                    )
+                    return True
+                else:
+                    self.log_result("Business Login", False, "Login response missing success or user data", data)
+                    return False
+            else:
+                self.log_result("Business Login", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Business Login", False, f"Exception: {str(e)}")
+            return False
+
+    def test_business_incoming_orders(self):
+        """Test 4: GET /api/business/orders/incoming - Yeni sipariş geldi mi kontrol et"""
+        try:
+            response = self.session.get(f"{BASE_URL}/business/orders/incoming")
+            
+            if response.status_code == 200:
+                data = response.json()
+                orders = data.get("orders", [])
+                
+                # Look for our test order
+                test_order_found = False
+                order_details = None
+                
+                for order in orders:
+                    if order.get("id") == self.order_id or order.get("order_id") == self.order_id:
+                        test_order_found = True
+                        order_details = order
+                        break
+                
+                if test_order_found:
+                    customer_name = order_details.get("customer_name", "N/A")
+                    customer_phone = order_details.get("customer_phone", "N/A")
+                    total_orders = len(orders)
+                    
+                    self.log_result(
+                        "Business Incoming Orders", 
+                        True, 
+                        f"Test order found! Total incoming orders: {total_orders}, Customer: {customer_name}, Phone: {customer_phone}"
+                    )
+                    return True
+                else:
+                    self.log_result(
+                        "Business Incoming Orders", 
+                        False, 
+                        f"Test order {self.order_id} not found in {len(orders)} incoming orders"
                     )
                     return False
-                    
+            else:
+                self.log_result("Business Incoming Orders", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Business Incoming Orders", False, f"Exception: {str(e)}")
+            return False
+
+    def test_confirm_order(self):
+        """Test 5: PATCH /api/orders/{order_id}/status - Siparişi onayla {"to": "confirmed"}"""
+        try:
+            if not self.order_id:
+                self.log_result("Confirm Order", False, "No order ID available")
+                return False
+            
+            status_data = {"to": "confirmed"}
+            response = self.session.patch(f"{BASE_URL}/orders/{self.order_id}/status", json=status_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                new_status = data.get("status", "unknown")
+                self.log_result(
+                    "Confirm Order", 
+                    True, 
+                    f"Order confirmed successfully. New status: {new_status}"
+                )
+                return True
+            else:
+                self.log_result("Confirm Order", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Confirm Order", False, f"Exception: {str(e)}")
+            return False
+
+    def test_ready_order(self):
+        """Test 6: PATCH /api/orders/{order_id}/status - Hazır duruma getir {"to": "ready"}"""
+        try:
+            if not self.order_id:
+                self.log_result("Ready Order", False, "No order ID available")
+                return False
+            
+            status_data = {"to": "ready"}
+            response = self.session.patch(f"{BASE_URL}/orders/{self.order_id}/status", json=status_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                new_status = data.get("status", "unknown")
+                self.log_result(
+                    "Ready Order", 
+                    True, 
+                    f"Order marked as ready. New status: {new_status}"
+                )
+                return True
+            else:
+                self.log_result("Ready Order", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Ready Order", False, f"Exception: {str(e)}")
+            return False
+
+    def test_courier_login(self):
+        """Test 7: Kurye olarak login yap (testkurye@example.com / test123)"""
+        try:
+            # Clear previous session
+            self.session.cookies.clear()
+            
+            login_data = {
+                "email": "testkurye@example.com",
+                "password": "test123"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and "user" in data:
+                    self.courier_token = "cookie_auth"
+                    user_info = data["user"]
+                    self.log_result(
+                        "Courier Login", 
+                        True, 
+                        f"Login successful for {user_info.get('email', 'N/A')}, Role: {user_info.get('role', 'N/A')}"
+                    )
+                    return True
+                else:
+                    self.log_result("Courier Login", False, "Login response missing success or user data", data)
+                    return False
+            else:
+                self.log_result("Courier Login", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
         except Exception as e:
             self.log_result("Courier Login", False, f"Exception: {str(e)}")
             return False
-            
-    async def test_nearby_businesses_endpoint(self):
-        """Test 2: Nearby Businesses Endpoint"""
+
+    def test_courier_nearby_businesses(self):
+        """Test 8: GET /api/courier/tasks/nearby-businesses - İşletme listesinde var mı?"""
         try:
-            # Test coordinates (Aksaray area)
-            params = {
-                "lng": 34.0254,
-                "lat": 38.3687,
-                "radius_m": 50000  # 50km radius to ensure we find businesses
-            }
+            response = self.session.get(f"{BASE_URL}/courier/tasks/nearby-businesses")
             
-            async with self.session.get(
-                f"{BACKEND_URL}/courier/tasks/nearby-businesses",
-                params=params
-            ) as response:
+            if response.status_code == 200:
+                data = response.json()
+                businesses = data.get("businesses", [])
                 
-                if response.status == 200:
-                    businesses = await response.json()
+                # Look for our test business
+                test_business_found = False
+                business_details = None
+                
+                for business in businesses:
+                    if business.get("id") == self.business_id or business.get("business_id") == self.business_id:
+                        test_business_found = True
+                        business_details = business
+                        break
+                
+                if test_business_found:
+                    business_name = business_details.get("name", "N/A")
+                    ready_orders = business_details.get("ready_orders_count", 0)
                     
-                    if isinstance(businesses, list):
-                        self.log_result(
-                            "Nearby Businesses Endpoint",
-                            True,
-                            f"Returned {len(businesses)} businesses"
-                        )
-                        
-                        # Print all returned businesses for verification
-                        print("\n📍 RETURNED BUSINESSES:")
-                        for i, business in enumerate(businesses, 1):
-                            print(f"  {i}. Business ID: {business.get('business_id')}")
-                            print(f"     Name: {business.get('name')}")
-                            print(f"     Ready Orders: {business.get('pending_ready_count', 0)}")
-                            print(f"     Distance: {business.get('distance', 0):.0f}m")
-                            print(f"     Address: {business.get('address_short', 'N/A')}")
-                            print()
-                        
-                        return businesses
-                    else:
-                        self.log_result(
-                            "Nearby Businesses Endpoint",
-                            False,
-                            f"Invalid response format: {type(businesses)}"
-                        )
-                        return []
-                else:
-                    error_text = await response.text()
                     self.log_result(
-                        "Nearby Businesses Endpoint",
-                        False,
-                        f"HTTP {response.status}: {error_text}"
+                        "Courier Nearby Businesses", 
+                        True, 
+                        f"Test business found! Name: {business_name}, Ready orders: {ready_orders}, Total businesses: {len(businesses)}"
                     )
-                    return []
-                    
-        except Exception as e:
-            self.log_result("Nearby Businesses Endpoint", False, f"Exception: {str(e)}")
-            return []
-            
-    async def test_business_filtering_logic(self, businesses):
-        """Test 3: Business Filtering Logic"""
-        try:
-            # Check if the expected business exists but is correctly filtered out
-            async with self.session.post(
-                f"{BACKEND_URL}/auth/login",
-                json={"email": "testbusiness@example.com", "password": "test123"}
-            ) as response:
-                
-                if response.status == 200:
-                    data = await response.json()
-                    user = data.get('user', {})
-                    business_id = user.get('id')
-                    has_coordinates = 'lat' in user and 'lng' in user
-                    
-                    # Check ready orders count
-                    async with self.session.get(
-                        f"{BACKEND_URL}/business/orders/incoming"
-                    ) as orders_response:
-                        
-                        ready_orders_count = 0
-                        if orders_response.status == 200:
-                            orders = await orders_response.json()
-                            ready_orders_count = len([o for o in orders if o.get('status') == 'ready'])
-                        
-                        # Determine if business should appear in nearby results
-                        should_appear = has_coordinates and ready_orders_count > 0
-                        business_found = any(b.get('business_id') == business_id for b in businesses)
-                        
-                        if should_appear == business_found:
-                            self.log_result(
-                                "Business Filtering Logic",
-                                True,
-                                f"Business {business_id} correctly {'included' if business_found else 'excluded'} "
-                                f"(has_coords: {has_coordinates}, ready_orders: {ready_orders_count})"
-                            )
-                            return True
-                        else:
-                            self.log_result(
-                                "Business Filtering Logic",
-                                False,
-                                f"Business {business_id} filtering error: should_appear={should_appear}, "
-                                f"found={business_found} (has_coords: {has_coordinates}, ready_orders: {ready_orders_count})"
-                            )
-                            return False
+                    return True
                 else:
                     self.log_result(
-                        "Business Filtering Logic",
-                        False,
-                        f"Could not verify business data: HTTP {response.status}"
+                        "Courier Nearby Businesses", 
+                        False, 
+                        f"Test business {self.business_id} not found in {len(businesses)} nearby businesses"
                     )
                     return False
-                    
-        except Exception as e:
-            self.log_result("Business Filtering Logic", False, f"Exception: {str(e)}")
-            return False
-            
-    async def test_business_location_data(self, businesses):
-        """Test 4: Business Location Data"""
-        try:
-            businesses_with_location = 0
-            businesses_with_distance = 0
-            
-            for business in businesses:
-                location = business.get('location')
-                if location and location.get('coordinates'):
-                    businesses_with_location += 1
-                    
-                if business.get('distance') is not None:
-                    businesses_with_distance += 1
-                    
-            success = businesses_with_location > 0 and businesses_with_distance > 0
-            
-            self.log_result(
-                "Business Location Data",
-                success,
-                f"{businesses_with_location}/{len(businesses)} have location, {businesses_with_distance}/{len(businesses)} have distance"
-            )
-            
-            return success
-            
-        except Exception as e:
-            self.log_result("Business Location Data", False, f"Exception: {str(e)}")
-            return False
-            
-    async def test_pending_ready_count_field(self, businesses):
-        """Test 5: Pending Ready Count Field"""
-        try:
-            businesses_with_count = 0
-            total_ready_orders = 0
-            
-            for business in businesses:
-                count = business.get('pending_ready_count')
-                if count is not None:
-                    businesses_with_count += 1
-                    total_ready_orders += count
-                    
-            success = businesses_with_count == len(businesses)
-            
-            self.log_result(
-                "Pending Ready Count Field",
-                success,
-                f"{businesses_with_count}/{len(businesses)} have pending_ready_count field, total ready orders: {total_ready_orders}"
-            )
-            
-            return success
-            
-        except Exception as e:
-            self.log_result("Pending Ready Count Field", False, f"Exception: {str(e)}")
-            return False
-            
-    async def run_all_tests(self):
-        """Run all tests in sequence"""
-        print("🎯 COURIER NEARBY-BUSINESSES ENDPOINT TESTING")
-        print("=" * 60)
-        print(f"Backend URL: {BACKEND_URL}")
-        print(f"Expected Business ID: {EXPECTED_BUSINESS_ID}")
-        print(f"Test Coordinates: lat=38.3687, lng=34.0254, radius=50km")
-        print()
-        
-        await self.setup_session()
-        
-        try:
-            # Test 1: Courier Login
-            login_success = await self.test_courier_login()
-            if not login_success:
-                print("\n❌ Cannot proceed without authentication")
-                return
+            else:
+                self.log_result("Courier Nearby Businesses", False, f"HTTP {response.status_code}", response.text)
+                return False
                 
-            # Test 2: Nearby Businesses Endpoint
-            businesses = await self.test_nearby_businesses_endpoint()
-            if not businesses:
-                print("\n❌ No businesses returned - cannot run remaining tests")
-                return
-                
-            # Test 3: Business Filtering Logic
-            await self.test_business_filtering_logic(businesses)
-            
-            # Test 4: Business Location Data
-            await self.test_business_location_data(businesses)
-            
-            # Test 5: Pending Ready Count Field
-            await self.test_pending_ready_count_field(businesses)
-            
-        finally:
-            await self.cleanup_session()
-            
-        # Print summary
-        print("\n" + "=" * 60)
-        print("📊 TEST SUMMARY")
-        print("=" * 60)
-        
-        passed = sum(1 for result in self.test_results if result["success"])
-        total = len(self.test_results)
-        success_rate = (passed / total * 100) if total > 0 else 0
-        
-        print(f"Tests Passed: {passed}/{total} ({success_rate:.1f}%)")
-        print()
-        
-        for result in self.test_results:
-            status = "✅" if result["success"] else "❌"
-            print(f"{status} {result['test']}: {result['details']}")
-            
-        print("\n" + "=" * 60)
-        
-        # Overall result
-        if passed == total:
-            print("🎉 ALL TESTS PASSED - Courier nearby-businesses endpoint is working correctly!")
-            print("✅ Courier authentication working")
-            print("✅ Nearby-businesses endpoint returns results (not empty)")
-            print("✅ Business filtering logic working correctly")
-            print("✅ pending_ready_count field present")
-            print("✅ Distance calculation working")
-        else:
-            print("🚨 SOME TESTS FAILED - Issues identified:")
-            for result in self.test_results:
-                if not result["success"]:
-                    print(f"❌ {result['test']}: {result['details']}")
-                    
-        return passed == total
+        except Exception as e:
+            self.log_result("Courier Nearby Businesses", False, f"Exception: {str(e)}")
+            return False
 
-async def main():
-    """Main test execution"""
-    tester = CourierNearbyBusinessesTest()
-    success = await tester.run_all_tests()
-    return success
+    def test_courier_available_orders(self):
+        """Test 9: GET /api/courier/tasks/businesses/{business_id}/available-orders - Hazır sipariş görünüyor mu?"""
+        try:
+            response = self.session.get(f"{BASE_URL}/courier/tasks/businesses/{self.business_id}/available-orders")
+            
+            if response.status_code == 200:
+                data = response.json()
+                orders = data.get("orders", [])
+                
+                # Look for our test order
+                test_order_found = False
+                order_details = None
+                
+                for order in orders:
+                    if order.get("id") == self.order_id or order.get("order_id") == self.order_id:
+                        test_order_found = True
+                        order_details = order
+                        break
+                
+                if test_order_found:
+                    customer_name = order_details.get("customer_name", "N/A")
+                    delivery_address = order_details.get("delivery_address", "N/A")
+                    total_amount = order_details.get("total_amount", 0)
+                    
+                    self.log_result(
+                        "Courier Available Orders", 
+                        True, 
+                        f"Test order found! Customer: {customer_name}, Amount: ₺{total_amount}, Address: {delivery_address}, Total available: {len(orders)}"
+                    )
+                    return True
+                else:
+                    self.log_result(
+                        "Courier Available Orders", 
+                        False, 
+                        f"Test order {self.order_id} not found in {len(orders)} available orders"
+                    )
+                    return False
+            else:
+                self.log_result("Courier Available Orders", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Courier Available Orders", False, f"Exception: {str(e)}")
+            return False
+
+    def run_all_tests(self):
+        """Run all tests in sequence"""
+        print("🚀 CRITICAL BUSINESS ORDER FLOW TESTING - Turkish Scenario")
+        print("=" * 70)
+        print()
+        
+        # Test sequence
+        tests = [
+            self.test_customer_login,
+            self.test_create_order,
+            self.test_business_login,
+            self.test_business_incoming_orders,
+            self.test_confirm_order,
+            self.test_ready_order,
+            self.test_courier_login,
+            self.test_courier_nearby_businesses,
+            self.test_courier_available_orders
+        ]
+        
+        for test in tests:
+            test()
+        
+        # Summary
+        print("=" * 70)
+        print("📊 TEST SUMMARY")
+        print("=" * 70)
+        
+        total_tests = len(tests)
+        success_rate = (self.passed / total_tests * 100) if total_tests > 0 else 0
+        
+        print(f"Total Tests: {total_tests}")
+        print(f"Passed: {self.passed} ✅")
+        print(f"Failed: {self.failed} ❌")
+        print(f"Success Rate: {success_rate:.1f}%")
+        print()
+        
+        if self.failed == 0:
+            print("🎉 ALL TESTS PASSED! Complete order flow is working perfectly.")
+            print("✅ Sipariş oluşturulmalı")
+            print("✅ İşletme incoming orders'da görmeli (detaylarla)")
+            print("✅ İşletme onaylayabilmeli (created → confirmed)")
+            print("✅ İşletme hazır duruma getirebilmeli (confirmed → ready)")
+            print("✅ Kurye haritada işletmeyi görmeli")
+            print("✅ Kurye siparişi görebilmeli")
+        else:
+            print("❌ SOME TESTS FAILED! Check the details above.")
+            print("\nFailed Tests:")
+            for result in self.results:
+                if "❌ FAIL" in result["status"]:
+                    print(f"  - {result['test']}: {result['details']}")
+        
+        print()
+        return self.failed == 0
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    tester = KuryeciniOrderFlowTester()
+    success = tester.run_all_tests()
+    sys.exit(0 if success else 1)
