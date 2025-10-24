@@ -178,19 +178,32 @@ export const CourierAdvancedTasks = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 className="text-2xl font-bold">Paket Havuzu - Hazır Siparişler</h2>
-          <p className="text-muted-foreground">
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>Paket Havuzu - Hazır Siparişler</h2>
+          <p style={{ color: '#6b7280', marginTop: '0.25rem' }}>
             {nearbyBusinesses.reduce((sum, b) => sum + b.pending_ready_count, 0)} hazır paket • {nearbyBusinesses.length} işletme
           </p>
         </div>
-        <Button onClick={fetchData} disabled={loading} size="sm" variant="outline">
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''} mr-2`} />
+        <button 
+          onClick={fetchData} 
+          disabled={loading}
+          style={{
+            padding: '0.5rem 1rem',
+            border: '1px solid #d1d5db',
+            borderRadius: '0.375rem',
+            background: 'white',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          <RefreshCw className={loading ? 'animate-spin' : ''} size={16} />
           Yenile
-        </Button>
+        </button>
       </div>
 
       {/* Simple Leaflet Map */}
@@ -208,273 +221,390 @@ export const CourierAdvancedTasks = () => {
 
       {/* Selected Business Orders */}
       {selectedBusiness && businessOrders.length > 0 && (
-        <Card className="border-2 border-green-500 bg-green-50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Store className="h-5 w-5" />
-                  {selectedBusiness.name}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  📦 {businessOrders.length} hazır paket
-                </p>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => {
-                  setSelectedBusiness(null);
-                  setBusinessOrders([]);
-                  setSelectedOrder(null);
+        <div style={{ 
+          border: '2px solid #10b981', 
+          borderRadius: '0.5rem', 
+          background: '#f0fdf4', 
+          padding: '1rem' 
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                <Store size={20} />
+                {selectedBusiness.name}
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                📦 {businessOrders.length} hazır paket
+              </p>
+            </div>
+            <button 
+              onClick={() => {
+                setSelectedBusiness(null);
+                setBusinessOrders([]);
+                setSelectedOrder(null);
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                padding: '0.25rem 0.5rem'
+              }}
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {businessOrders.map((order) => (
+              <div 
+                key={order.order_id}
+                onClick={() => setSelectedOrder(selectedOrder?.order_id === order.order_id ? null : order)}
+                style={{
+                  cursor: 'pointer',
+                  border: selectedOrder?.order_id === order.order_id ? '2px solid #059669' : '1px solid #d1d5db',
+                  borderRadius: '0.5rem',
+                  background: 'white',
+                  padding: '1rem',
+                  boxShadow: selectedOrder?.order_id === order.order_id ? '0 4px 6px rgba(0,0,0,0.1)' : 'none'
                 }}
               >
-                ✕
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3">
-              {businessOrders.map((order) => (
-                <Card 
-                  key={order.order_id}
-                  className={`cursor-pointer transition-all ${
-                    selectedOrder?.order_id === order.order_id 
-                      ? 'border-2 border-green-600 bg-white shadow-md' 
-                      : 'bg-white hover:border-green-300'
-                  }`}
-                  onClick={() => setSelectedOrder(selectedOrder?.order_id === order.order_id ? null : order)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h5 className="font-semibold flex items-center gap-2">
-                          <Package className="h-4 w-4" />
-                          Sipariş #{order.order_code}
-                        </h5>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          👤 {order.customer_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          📦 {order.items_count} ürün
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-green-600">
-                          ₺{order.grand_total?.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          (₺{order.delivery_fee?.toFixed(2)} teslimat)
-                        </p>
-                      </div>
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                  <div style={{ flex: 1 }}>
+                    <h5 style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem', 
+                      fontWeight: '600',
+                      margin: 0 
+                    }}>
+                      <Package size={16} />
+                      Sipariş #{order.order_code}
+                    </h5>
+                    <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                      👤 {order.customer_name}
+                    </p>
+                    <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                      📦 {order.items_count} ürün
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontWeight: 'bold', color: '#10b981', margin: 0 }}>
+                      ₺{order.grand_total?.toFixed(2)}
+                    </p>
+                    <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                      (₺{order.delivery_fee?.toFixed(2)} teslimat)
+                    </p>
+                  </div>
+                </div>
 
-                    {/* Expand when selected */}
-                    {selectedOrder?.order_id === order.order_id && (
-                      <div className="mt-3 pt-3 border-t space-y-2">
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          📍 {formatAddress(order.delivery_address)}
-                        </p>
-                        {order.notes && (
-                          <p className="text-xs text-yellow-600">
-                            💬 {order.notes}
-                          </p>
-                        )}
-                      </div>
+                {/* Expand when selected */}
+                {selectedOrder?.order_id === order.order_id && (
+                  <div style={{ 
+                    marginTop: '0.75rem', 
+                    paddingTop: '0.75rem', 
+                    borderTop: '1px solid #e5e7eb',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem'
+                  }}>
+                    <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>
+                      📍 {formatAddress(order.delivery_address)}
+                    </p>
+                    {order.notes && (
+                      <p style={{ fontSize: '0.75rem', color: '#ca8a04', margin: 0 }}>
+                        💬 {order.notes}
+                      </p>
                     )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Order Details Panel */}
       {selectedOrder && (
-        <Card className="border-2 border-green-500 bg-green-50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingBag className="h-5 w-5" />
-                Sipariş Detayları #{selectedOrder.order_code}
-              </CardTitle>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setSelectedOrder(null)}
-              >
-                ✕
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div style={{ 
+          border: '2px solid #10b981', 
+          borderRadius: '0.5rem', 
+          background: '#f0fdf4', 
+          padding: '1rem' 
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+              <ShoppingBag size={20} />
+              Sipariş Detayları #{selectedOrder.order_code}
+            </h3>
+            <button 
+              onClick={() => setSelectedOrder(null)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                padding: '0.25rem 0.5rem'
+              }}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {/* Business Info */}
-            <Card className="bg-orange-50 border-orange-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Store className="h-4 w-4" />
-                  Alınacak Yer (İşletme)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
+            <div style={{ 
+              background: '#fff7ed', 
+              border: '1px solid #fed7aa', 
+              borderRadius: '0.5rem', 
+              padding: '1rem' 
+            }}>
+              <h4 style={{ 
+                fontSize: '0.875rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem',
+                margin: '0 0 0.75rem 0'
+              }}>
+                <Store size={16} />
+                Alınacak Yer (İşletme)
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div>
-                  <p className="text-xs text-muted-foreground">İşletme Adı</p>
-                  <p className="font-semibold">{selectedOrder.business_name}</p>
+                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>İşletme Adı</p>
+                  <p style={{ fontWeight: '600', margin: '0.25rem 0 0 0' }}>{selectedOrder.business_name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Adres</p>
-                  <p className="text-sm">{formatAddress(selectedOrder.business_address)}</p>
+                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>Adres</p>
+                  <p style={{ fontSize: '0.875rem', margin: '0.25rem 0 0 0' }}>{formatAddress(selectedOrder.business_address)}</p>
                 </div>
                 {selectedOrder.business_location?.lat && selectedOrder.business_location?.lng && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full bg-orange-100 hover:bg-orange-200"
+                  <button
                     onClick={() => openInMaps(
                       selectedOrder.business_location.lat,
                       selectedOrder.business_location.lng,
                       'İşletme - Alış Noktası'
                     )}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      background: '#fed7aa',
+                      border: '1px solid #fdba74',
+                      borderRadius: '0.375rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500'
+                    }}
                   >
-                    <Navigation className="h-4 w-4 mr-2" />
+                    <Navigation size={16} />
                     İşletmeye Git (Maps)
-                  </Button>
+                  </button>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Customer Info */}
-            <Card className="bg-blue-50 border-blue-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Müşteri Bilgileri
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
+            <div style={{ 
+              background: '#eff6ff', 
+              border: '1px solid #bfdbfe', 
+              borderRadius: '0.5rem', 
+              padding: '1rem' 
+            }}>
+              <h4 style={{ 
+                fontSize: '0.875rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem',
+                margin: '0 0 0.75rem 0'
+              }}>
+                <User size={16} />
+                Müşteri Bilgileri
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div>
-                  <p className="text-xs text-muted-foreground">Ad Soyad</p>
-                  <p className="font-semibold">{selectedOrder.customer_name}</p>
+                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>Ad Soyad</p>
+                  <p style={{ fontWeight: '600', margin: '0.25rem 0 0 0' }}>{selectedOrder.customer_name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Teslimat Adresi</p>
-                  <p className="text-sm">{formatAddress(selectedOrder.delivery_address)}</p>
+                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>Teslimat Adresi</p>
+                  <p style={{ fontSize: '0.875rem', margin: '0.25rem 0 0 0' }}>{formatAddress(selectedOrder.delivery_address)}</p>
                 </div>
                 {selectedOrder.customer_phone && (
                   <div>
-                    <p className="text-xs text-muted-foreground">İletişim</p>
+                    <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>İletişim</p>
                     <a 
                       href={`tel:${selectedOrder.customer_phone}`}
-                      className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: '#2563eb',
+                        textDecoration: 'none',
+                        marginTop: '0.25rem'
+                      }}
                     >
-                      <Phone className="h-4 w-4" />
+                      <Phone size={16} />
                       {selectedOrder.customer_phone}
                     </a>
                   </div>
                 )}
                 {selectedOrder.delivery_location?.lat && selectedOrder.delivery_location?.lng && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full bg-blue-100 hover:bg-blue-200"
+                  <button
                     onClick={() => openInMaps(
                       selectedOrder.delivery_location.lat,
                       selectedOrder.delivery_location.lng,
                       'Müşteri - Teslimat Noktası'
                     )}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      background: '#dbeafe',
+                      border: '1px solid #93c5fd',
+                      borderRadius: '0.375rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500'
+                    }}
                   >
-                    <Navigation className="h-4 w-4 mr-2" />
+                    <Navigation size={16} />
                     Müşteriye Git (Maps)
-                  </Button>
+                  </button>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Order Details */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Package className="h-4 w-4" />
-                  Sipariş İçeriği
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Ürün Sayısı:</span>
-                  <span className="font-medium">{selectedOrder.items_count} ürün</span>
+            <div style={{ 
+              background: 'white', 
+              border: '1px solid #d1d5db', 
+              borderRadius: '0.5rem', 
+              padding: '1rem' 
+            }}>
+              <h4 style={{ 
+                fontSize: '0.875rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem',
+                margin: '0 0 0.75rem 0'
+              }}>
+                <Package size={16} />
+                Sipariş İçeriği
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                  <span style={{ color: '#6b7280' }}>Ürün Sayısı:</span>
+                  <span style={{ fontWeight: '500' }}>{selectedOrder.items_count} ürün</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Sipariş Tutarı:</span>
-                  <span className="font-medium">₺{selectedOrder.total_amount?.toFixed(2)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                  <span style={{ color: '#6b7280' }}>Sipariş Tutarı:</span>
+                  <span style={{ fontWeight: '500' }}>₺{selectedOrder.total_amount?.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Teslimat Ücreti:</span>
-                  <span className="font-medium text-green-600">₺{selectedOrder.delivery_fee?.toFixed(2)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                  <span style={{ color: '#6b7280' }}>Teslimat Ücreti:</span>
+                  <span style={{ fontWeight: '500', color: '#10b981' }}>₺{selectedOrder.delivery_fee?.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  fontSize: '1.125rem',
+                  fontWeight: 'bold',
+                  paddingTop: '0.5rem',
+                  borderTop: '1px solid #e5e7eb'
+                }}>
                   <span>Toplam:</span>
-                  <span className="text-green-600">₺{selectedOrder.grand_total?.toFixed(2)}</span>
+                  <span style={{ color: '#10b981' }}>₺{selectedOrder.grand_total?.toFixed(2)}</span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Payment Info */}
-            <Card className="bg-yellow-50 border-yellow-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  Ödeme Bilgisi
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-yellow-600" />
-                  <div>
-                    <p className="font-semibold">
-                      {selectedOrder.payment_method === 'cash' ? 'Kapıda Nakit Ödeme' : 
-                       selectedOrder.payment_method === 'card' ? 'Kredi Kartı (Ödendi)' : 
-                       'Ödeme Bilgisi Yok'}
+            <div style={{ 
+              background: '#fefce8', 
+              border: '1px solid #fde047', 
+              borderRadius: '0.5rem', 
+              padding: '1rem' 
+            }}>
+              <h4 style={{ 
+                fontSize: '0.875rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem',
+                margin: '0 0 0.75rem 0'
+              }}>
+                <CreditCard size={16} />
+                Ödeme Bilgisi
+              </h4>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <DollarSign size={20} style={{ color: '#ca8a04' }} />
+                <div>
+                  <p style={{ fontWeight: '600', margin: 0 }}>
+                    {selectedOrder.payment_method === 'cash' ? 'Kapıda Nakit Ödeme' : 
+                     selectedOrder.payment_method === 'card' ? 'Kredi Kartı (Ödendi)' : 
+                     'Ödeme Bilgisi Yok'}
+                  </p>
+                  {selectedOrder.payment_method === 'cash' && (
+                    <p style={{ fontSize: '0.75rem', color: '#a16207', margin: '0.25rem 0 0 0' }}>
+                      ⚠️ Müşteriden ₺{selectedOrder.grand_total?.toFixed(2)} tahsil edilecek
                     </p>
-                    {selectedOrder.payment_method === 'cash' && (
-                      <p className="text-xs text-yellow-700">
-                        ⚠️ Müşteriden ₺{selectedOrder.grand_total?.toFixed(2)} tahsil edilecek
-                      </p>
-                    )}
-                  </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Notes */}
             {selectedOrder.notes && (
-              <Card className="bg-purple-50 border-purple-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">📝 Notlar</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">{selectedOrder.notes}</p>
-                </CardContent>
-              </Card>
+              <div style={{ 
+                background: '#faf5ff', 
+                border: '1px solid #e9d5ff', 
+                borderRadius: '0.5rem', 
+                padding: '1rem' 
+              }}>
+                <h4 style={{ fontSize: '0.875rem', margin: '0 0 0.5rem 0' }}>📝 Notlar</h4>
+                <p style={{ fontSize: '0.875rem', margin: 0 }}>{selectedOrder.notes}</p>
+              </div>
             )}
 
             {/* Action Button */}
-            <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
+            <button
               onClick={() => handleClaimOrder(selectedOrder.order_id)}
               disabled={claimingOrderId === selectedOrder.order_id}
+              style={{
+                width: '100%',
+                padding: '1.5rem',
+                background: claimingOrderId === selectedOrder.order_id ? '#9ca3af' : '#059669',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                cursor: claimingOrderId === selectedOrder.order_id ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}
             >
               {claimingOrderId === selectedOrder.order_id ? (
                 <>🔄 Sipariş Alınıyor...</>
               ) : (
                 <>
-                  <ShoppingBag className="h-5 w-5 mr-2" />
+                  <ShoppingBag size={20} />
                   Siparişi Al ve Teslimata Başla
                 </>
               )}
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
