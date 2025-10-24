@@ -99,10 +99,8 @@ class KuryeciniOrderFlowTester:
         except Exception as e:
             self.log_result("Customer Login", False, f"Exception: {str(e)}")
             return False
-                else:
-                    error_text = await response.text()
-                    self.log_result(
-                        "Courier Login",
+
+    def test_create_order(self):
                         False, 
                         f"HTTP {response.status}: {error_text}"
                     )
