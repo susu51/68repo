@@ -127,14 +127,16 @@ export const PureLeafletMap = ({ onBusinessClick }) => {
               ${business.active_order_count > 0 ? `<span style="margin-left:8px;padding:2px 8px;border-radius:10px;background:#ef4444;color:white;font-size:11px;font-weight:700;">${business.active_order_count} paket</span>` : ''}
             </div>
           </div>
-          <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">
-            📍 ${business.district || ''}, ${business.city || ''}
+          <div style="font-size:12px;color:#6b7280;margin-bottom:8px;line-height:1.4;">
+            📍 ${business.address || ''}<br/>
+            ${business.district ? business.district + ', ' : ''}${business.city || ''}
           </div>
+          ${business.phone ? `<div style="font-size:12px;color:#6b7280;margin-bottom:8px;">📞 ${business.phone}</div>` : ''}
           <button 
             id="view-orders-${business.id}" 
-            style="width:100%;padding:8px;background:#22c55e;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;"
+            style="width:100%;padding:8px;background:#22c55e;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;"
           >
-            Siparişleri Gör
+            Siparişleri Gör (${business.active_order_count || 0})
           </button>
         </div>
       `;
