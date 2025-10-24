@@ -336,7 +336,12 @@ class KuryeciniOrderFlowTester:
     def test_courier_nearby_businesses(self):
         """Test 8: GET /api/courier/tasks/nearby-businesses - İşletme listesinde var mı?"""
         try:
-            response = self.session.get(f"{BASE_URL}/courier/tasks/nearby-businesses")
+            # Add required coordinates
+            params = {
+                "lat": 39.9334,
+                "lng": 32.8597
+            }
+            response = self.session.get(f"{BASE_URL}/courier/tasks/nearby-businesses", params=params)
             
             if response.status_code == 200:
                 data = response.json()
