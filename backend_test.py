@@ -68,30 +68,37 @@ class KuryeciniOrderFlowTester:
         print()
 
     def test_customer_login(self):
-        """Test 1: Courier Authentication"""
+        """Test 1: Müşteri olarak login yap (test@kuryecini.com / test123)"""
         try:
-            async with self.session.post(
-                f"{BACKEND_URL}/auth/login",
-                json=COURIER_CREDENTIALS
-            ) as response:
+            login_data = {
+                "email": "test@kuryecini.com",
+                "password": "test123"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and "user" in data:
+                    # Set cookie-based authentication
+                    self.customer_token = "cookie_auth"
+                    user_info = data["user"]
+                    self.log_result(
+                        "Customer Login", 
+                        True, 
+                        f"Login successful for {user_info.get('email', 'N/A')}, Role: {user_info.get('role', 'N/A')}"
+                    )
+                    return True
+                else:
+                    self.log_result("Customer Login", False, "Login response missing success or user data", data)
+                    return False
+            else:
+                self.log_result("Customer Login", False, f"HTTP {response.status_code}", response.text)
+                return False
                 
-                if response.status == 200:
-                    data = await response.json()
-                    if data.get("success"):
-                        # Cookie-based auth - token stored in cookies
-                        self.log_result(
-                            "Courier Login",
-                            True,
-                            f"Authenticated as {COURIER_CREDENTIALS['email']}"
-                        )
-                        return True
-                    else:
-                        self.log_result(
-                            "Courier Login", 
-                            False,
-                            f"Login failed: {data.get('message', 'Unknown error')}"
-                        )
-                        return False
+        except Exception as e:
+            self.log_result("Customer Login", False, f"Exception: {str(e)}")
+            return False
                 else:
                     error_text = await response.text()
                     self.log_result(
