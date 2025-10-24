@@ -1,26 +1,30 @@
 #!/usr/bin/env python3
 """
-Courier Nearby-Businesses Endpoint Testing
-Tests the fixed courier_tasks.py to verify businesses appear in nearby-businesses endpoint
+CRITICAL BUSINESS ORDER FLOW TESTING - Turkish Scenario
+Müşteri siparişinden işletme onayına ve kurye havuzuna kadar tüm akışı test et
+
+Test Senaryosu:
+1. Müşteri olarak login yap (test@kuryecini.com / test123)
+2. Yeni bir sipariş oluştur
+3. İşletme olarak login yap (test_business@example.com / test123)
+4. GET /api/business/orders/incoming - Yeni sipariş geldi mi kontrol et
+5. PATCH /api/orders/{order_id}/status - Siparişi onayla {"to": "confirmed"}
+6. PATCH /api/orders/{order_id}/status - Hazır duruma getir {"to": "ready"}
+7. Kurye olarak login yap (testkurye@example.com / test123)
+8. GET /api/courier/tasks/nearby-businesses - İşletme listesinde var mı?
+9. GET /api/courier/tasks/businesses/{business_id}/available-orders - Hazır sipariş görünüyor mu?
 """
 
-import asyncio
-import aiohttp
+import requests
 import json
+import sys
 from datetime import datetime
+import uuid
 
-# Backend URL from environment
-BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
+# Backend URL from frontend environment
+BASE_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 
-# Test credentials
-COURIER_CREDENTIALS = {
-    "email": "testkurye@example.com",
-    "password": "test123"
-}
-
-EXPECTED_BUSINESS_ID = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"
-
-class CourierNearbyBusinessesTest:
+class KuryeciniOrderFlowTester:
     def __init__(self):
         self.session = None
         self.courier_token = None
