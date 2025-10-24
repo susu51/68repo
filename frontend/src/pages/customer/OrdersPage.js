@@ -190,34 +190,100 @@ const OrdersPage = ({ user }) => {
 
                 {/* Order Items */}
                 <div className="border-t pt-3">
-                  <p className="text-sm text-gray-700">
-                    {order.items?.length || 0} ürün
+                  <p className="text-sm text-gray-700 font-medium">
+                    📦 {order.items?.length || 0} ürün
                   </p>
                   {isExpanded && (
-                    <div className="mt-2 space-y-1">
-                      {order.items?.map((item, idx) => (
-                        <p key={idx} className="text-sm text-gray-600">
-                          • {item.title || item.name} x{item.quantity}
-                        </p>
-                      ))}
+                    <div className="mt-3 space-y-3">
+                      {/* Items List */}
+                      <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                        {order.items?.map((item, idx) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-gray-700">
+                              • {item.title || item.name} <span className="text-gray-500">x{item.quantity}</span>
+                            </span>
+                            <span className="font-semibold text-gray-900">
+                              ₺{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Delivery Address */}
+                      {order.delivery_address && (
+                        <div className="flex items-start gap-2 bg-blue-50 rounded-lg p-3">
+                          <MapPin className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-gray-900 mb-1">📍 Teslimat Adresi</p>
+                            <p className="text-sm text-gray-700">
+                              {typeof order.delivery_address === 'string' 
+                                ? order.delivery_address 
+                                : (order.delivery_address.label || order.delivery_address.address || order.delivery_address.text || 'Adres belirtilmemiş')}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Customer Phone */}
+                      {order.customer_phone && (
+                        <div className="flex items-center gap-2 bg-green-50 rounded-lg p-3">
+                          <span className="text-lg">📞</span>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">İletişim Numarası</p>
+                            <p className="text-sm text-gray-700">{order.customer_phone}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Payment Method */}
+                      <div className="flex items-center gap-2 bg-yellow-50 rounded-lg p-3">
+                        <span className="text-lg">💳</span>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">Ödeme Şekli</p>
+                          <p className="text-sm text-gray-700">
+                            {order.payment_method === 'cash' || order.payment_method === 'cash_on_delivery' 
+                              ? '💵 Kapıda Nakit Ödeme' 
+                              : order.payment_method === 'card' 
+                              ? '💳 Kredi Kartı' 
+                              : order.payment_method || 'Belirtilmemiş'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Confirmation Time */}
+                      {order.confirmed_at && (
+                        <div className="flex items-center gap-2 bg-green-50 rounded-lg p-3">
+                          <Clock className="h-5 w-5 text-green-600 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900 flex items-center gap-1">
+                              <span className="text-green-600">✓</span> Onaylanma Saati
+                            </p>
+                            <p className="text-sm text-gray-700">
+                              {new Date(order.confirmed_at).toLocaleString('tr-TR', {
+                                day: '2-digit',
+                                month: 'long',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Order Notes */}
+                      {order.notes && (
+                        <div className="flex items-start gap-2 bg-purple-50 rounded-lg p-3">
+                          <span className="text-lg flex-shrink-0">📝</span>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-gray-900 mb-1">Sipariş Notu</p>
+                            <p className="text-sm text-gray-700">{order.notes}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-
-                {/* Delivery Address */}
-                {isExpanded && order.delivery_address && (
-                  <div className="border-t mt-3 pt-3">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="h-4 w-4 text-gray-500 mt-1" />
-                      <div>
-                        <p className="text-sm font-medium">Teslimat Adresi</p>
-                        <p className="text-sm text-gray-600">
-                          {order.delivery_address.address || order.delivery_address.text}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* Actions */}
                 {isExpanded && (
