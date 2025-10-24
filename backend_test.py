@@ -124,20 +124,18 @@ class KuryeciniOrderFlowTester:
             test_item = menu_items[0]
             
             order_data = {
-                "business_id": self.business_id,
+                "restaurant_id": self.business_id,
                 "items": [{
-                    "menu_item_id": test_item.get("id", "test"),
+                    "product_id": test_item.get("id", "test"),
                     "title": test_item.get("name", "Test Ürün"),
                     "price": float(test_item.get("price", 25.0)),
                     "quantity": 2
                 }],
-                "delivery_address": {
-                    "label": "Test Adres",
-                    "lat": 39.9334,
-                    "lng": 32.8597
-                },
-                "payment_method": "cash",
-                "delivery_fee": 10.0
+                "delivery_address": "Test Adres, Ankara",
+                "delivery_lat": 39.9334,
+                "delivery_lng": 32.8597,
+                "payment_method": "cash_on_delivery",
+                "notes": "Test order for flow verification"
             }
             
             response = self.session.post(f"{BASE_URL}/orders", json=order_data)
