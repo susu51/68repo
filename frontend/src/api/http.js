@@ -1,5 +1,5 @@
 // HTTP client utility with double /api prevention and cookie mandatory
-const BASE = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001/api').replace(/\/+$/, ''); // remove trailing /
+const BASE = (process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL + '/api').replace(/\/+$/, ''); // remove trailing /
 
 const sanitizePath = (p) => {
   // always start with single /

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001/api';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_BACKEND_URL + '/api';
 
 console.log('Minimal App loaded, API_BASE:', API_BASE);
 
