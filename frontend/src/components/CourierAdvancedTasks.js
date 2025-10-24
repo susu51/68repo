@@ -501,6 +501,45 @@ export const CourierAdvancedTasks = () => {
                 Sipariş İçeriği
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {/* Order Items List */}
+                {selectedOrder.items && selectedOrder.items.length > 0 && (
+                  <div style={{ 
+                    marginBottom: '0.75rem', 
+                    padding: '0.75rem', 
+                    background: '#f9fafb', 
+                    borderRadius: '0.375rem',
+                    border: '1px solid #e5e7eb'
+                  }}>
+                    <p style={{ 
+                      fontSize: '0.75rem', 
+                      fontWeight: '600', 
+                      color: '#374151', 
+                      marginBottom: '0.5rem' 
+                    }}>
+                      📦 Sipariş Detayları:
+                    </p>
+                    {selectedOrder.items.map((item, index) => (
+                      <div 
+                        key={index} 
+                        style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          fontSize: '0.8125rem',
+                          padding: '0.25rem 0',
+                          borderBottom: index < selectedOrder.items.length - 1 ? '1px solid #e5e7eb' : 'none'
+                        }}
+                      >
+                        <span style={{ color: '#4b5563' }}>
+                          {item.quantity}x {item.name}
+                        </span>
+                        <span style={{ fontWeight: '500', color: '#1f2937' }}>
+                          ₺{(item.price * item.quantity).toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                   <span style={{ color: '#6b7280' }}>Ürün Sayısı:</span>
                   <span style={{ fontWeight: '500' }}>{selectedOrder.items_count} ürün</span>
