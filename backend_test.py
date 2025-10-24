@@ -142,17 +142,18 @@ class KuryeciniOrderFlowTester:
             
             if response.status_code == 200:
                 data = response.json()
-                if "order_id" in data:
-                    self.order_id = data["order_id"]
-                    total_amount = data.get("total_amount", 0)
+                if "order" in data and "id" in data["order"]:
+                    self.order_id = data["order"]["id"]
+                    total_amount = data["order"].get("totals", {}).get("grand", 0)
+                    order_code = data["order"].get("order_code", "N/A")
                     self.log_result(
                         "Create Order", 
                         True, 
-                        f"Order created successfully. ID: {self.order_id}, Total: ₺{total_amount}"
+                        f"Order created successfully. ID: {self.order_id}, Code: {order_code}, Total: ₺{total_amount}"
                     )
                     return True
                 else:
-                    self.log_result("Create Order", False, "Order response missing order_id", data)
+                    self.log_result("Create Order", False, "Order response missing order.id", data)
                     return False
             else:
                 self.log_result("Create Order", False, f"HTTP {response.status_code}", response.text)
