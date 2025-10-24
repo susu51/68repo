@@ -142,11 +142,12 @@ const OrdersPage = ({ user }) => {
       <div className="space-y-4">
         {orders.map((order) => {
           const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG.created;
-          const isExpanded = selectedOrder?._id === order._id;
+          const orderId = order.id || order._id;
+          const isExpanded = selectedOrder?.id === orderId || selectedOrder?._id === order._id;
 
           return (
             <Card
-              key={order._id}
+              key={orderId}
               className="hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => handleOrderClick(order)}
             >
