@@ -206,8 +206,8 @@ export const CourierAdvancedTasks = () => {
         </button>
       </div>
 
-      {/* Simple Leaflet Map */}
-      <SimpleLeafletMap
+      {/* Pure Leaflet Map */}
+      <PureLeafletMap
         onBusinessClick={async (business) => {
           const formattedBusiness = {
             business_id: business.id,
