@@ -26,32 +26,46 @@ BASE_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 
 class KuryeciniOrderFlowTester:
     def __init__(self):
-        self.session = None
+        self.session = requests.Session()
+        self.session.headers.update({
+            'Content-Type': 'application/json',
+            'User-Agent': 'KuryeciniTester/1.0'
+        })
+        self.customer_token = None
+        self.business_token = None
         self.courier_token = None
-        self.test_results = []
+        self.order_id = None
+        self.business_id = "e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed"  # Test business ID
         
-    async def setup_session(self):
-        """Initialize HTTP session with proper headers"""
-        connector = aiohttp.TCPConnector(ssl=False)
-        timeout = aiohttp.ClientTimeout(total=30)
-        self.session = aiohttp.ClientSession(
-            connector=connector,
-            timeout=timeout,
-            headers={
-                "Content-Type": "application/json",
-                "User-Agent": "CourierNearbyBusinessesTest/1.0"
-            }
-        )
-        
-    async def cleanup_session(self):
-        """Clean up HTTP session"""
-        if self.session:
-            await self.session.close()
-            
-    def log_result(self, test_name: str, success: bool, details: str):
-        """Log test result"""
+        # Test results tracking
+        self.results = []
+        self.passed = 0
+        self.failed = 0
+
+    def log_result(self, test_name, success, details="", response_data=None):
+        """Log test result with details"""
         status = "✅ PASS" if success else "❌ FAIL"
-        self.test_results.append({
+        result = {
+            "test": test_name,
+            "status": status,
+            "details": details,
+            "timestamp": datetime.now().isoformat()
+        }
+        if response_data:
+            result["response"] = response_data
+        
+        self.results.append(result)
+        if success:
+            self.passed += 1
+        else:
+            self.failed += 1
+        
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   📝 {details}")
+        if not success and response_data:
+            print(f"   🔍 Response: {response_data}")
+        print()
             "test": test_name,
             "success": success,
             "details": details,
