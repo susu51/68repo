@@ -3159,6 +3159,9 @@ async def get_my_orders(current_user: dict = Depends(get_customer_user)):
             if "_id" in order:
                 del order["_id"]
             
+            # Add customer phone
+            order["customer_phone"] = current_user.get("phone", "")
+            
             # Handle datetime conversion safely
             datetime_fields = ["created_at", "confirmed_at", "preparing_at", "picked_up_at", "delivering_at", "delivered_at", "cancelled_at"]
             for field in datetime_fields:
