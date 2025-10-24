@@ -30,7 +30,7 @@ import AdminAdvertisements from "./components/AdminAdvertisements";
 import UserProfileWithDocuments from "./components/UserProfileWithDocuments";
 
 // Backend URL configuration
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 import { AdminMessages } from "./components/AdminMessages";
 import { BannerManager } from "./components/BannerManager";
 import MaintenancePage from "./pages/MaintenancePage";

@@ -3,7 +3,7 @@
  * Proper SSE parsing with UTF-8 handling and error recovery
  */
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
 /**
  * Ask AI question with streaming response

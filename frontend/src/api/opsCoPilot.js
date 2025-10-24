@@ -3,7 +3,7 @@
  * For structured 7-block diagnostic responses
  */
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
 /**
  * Ask Ops Co-Pilot for structured diagnostic response

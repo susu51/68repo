@@ -6,7 +6,7 @@ import { MapPin, Navigation, Package, Store, RefreshCw, ShoppingBag } from 'luci
 import { toast } from 'sonner';
 import OpenStreetMap from './OpenStreetMap';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierMapWithBusinesses = () => {

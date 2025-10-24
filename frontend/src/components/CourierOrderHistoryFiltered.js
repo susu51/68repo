@@ -7,7 +7,7 @@ import { Label } from './ui/label';
 import { History, Filter, ChevronLeft, ChevronRight, Package, MapPin, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
 const STATUS_LABELS = {
