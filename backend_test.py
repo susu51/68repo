@@ -113,10 +113,10 @@ class KuryeciniOrderFlowTester:
                 self.log_result("Get Menu Items", False, f"Menu API failed: HTTP {menu_response.status_code}")
                 return False
             
-            menu_data = menu_response.json()
-            menu_items = menu_data.get("items", [])
+            # Menu API returns a list directly, not an object with "items"
+            menu_items = menu_response.json()
             
-            if not menu_items:
+            if not menu_items or not isinstance(menu_items, list):
                 self.log_result("Get Menu Items", False, "No menu items found for business")
                 return False
             
