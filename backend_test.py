@@ -344,8 +344,8 @@ class KuryeciniOrderFlowTester:
             response = self.session.get(f"{BASE_URL}/courier/tasks/nearby-businesses", params=params)
             
             if response.status_code == 200:
-                data = response.json()
-                businesses = data.get("businesses", [])
+                # API returns a list directly
+                businesses = response.json()
                 
                 # Look for our test business
                 test_business_found = False
