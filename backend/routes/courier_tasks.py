@@ -137,12 +137,21 @@ async def get_business_available_orders(
             "status": "ready"
         }).sort("created_at", -1).limit(limit).to_list(length=limit)
         
+        # Get business info for address
+        business = await db.users.find_one({"id": business_id})
+        business_name = business.get("business_name", "İşletme") if business else "İşletme"
+        business_address = business.get("address", "") if business else ""
+        business_phone = business.get("phone", "") if business else ""
+        business_lat = business.get("lat") if business else None
+        business_lng = business.get("lng") if business else None
+        
         # Format for courier view
         formatted = []
         for order in orders:
-            # Get customer info
+            # Get customer info with phone
             customer = await db.users.find_one({"id": order.get("customer_id")})
             customer_name = f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip() if customer else "Müşteri"
+            customer_phone = customer.get("phone", "") if customer else ""
             
             # Parse delivery address
             delivery_addr = order.get("delivery_address", {})
@@ -155,19 +164,41 @@ async def get_business_available_orders(
                 delivery_lat = order.get("delivery_lat")
                 delivery_lng = order.get("delivery_lng")
             
+            # Get payment method
+            payment_method = order.get("payment_method", "cash")
+            
+            # Get order items with details
+            items_list = []
+            for item in order.get("items", []):
+                items_list.append({
+                    "name": item.get("title") or item.get("name", "Ürün"),
+                    "quantity": item.get("quantity", 1),
+                    "price": float(item.get("price", 0))
+                })
+            
             formatted.append({
                 "order_id": order.get("id"),
                 "order_code": order.get("id")[:8],
                 "customer_name": customer_name,
+                "customer_phone": customer_phone,
                 "delivery_address": address_text,
                 "delivery_location": {
                     "lat": delivery_lat,
                     "lng": delivery_lng
                 },
+                "business_name": business_name,
+                "business_address": business_address,
+                "business_phone": business_phone,
+                "business_location": {
+                    "lat": business_lat,
+                    "lng": business_lng
+                },
+                "payment_method": payment_method,
                 "total_amount": float(order.get("total_amount", 0)),
                 "delivery_fee": float(order.get("delivery_fee", 0)),
                 "grand_total": float(order.get("total_amount", 0)) + float(order.get("delivery_fee", 0)),
                 "items_count": len(order.get("items", [])),
+                "items": items_list,
                 "created_at": order.get("created_at"),
                 "notes": order.get("notes") or ""
             })
