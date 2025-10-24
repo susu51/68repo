@@ -251,7 +251,7 @@ class KuryeciniOrderFlowTester:
                 return False
             
             status_data = {"to": "confirmed"}
-            response = self.session.patch(f"{BASE_URL}/orders/{self.order_id}/status", json=status_data)
+            response = self.session.patch(f"{BASE_URL}/business/orders/{self.order_id}/status", json=status_data)
             
             if response.status_code == 200:
                 data = response.json()
