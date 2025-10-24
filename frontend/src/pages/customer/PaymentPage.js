@@ -20,7 +20,7 @@ const PaymentPage = ({ selectedAddress: initialAddress, onBack, onPaymentSuccess
 
   const cartSummary = getCartSummary();
 
-  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  const API = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 
   // Load user addresses and set initial address
   useEffect(() => {

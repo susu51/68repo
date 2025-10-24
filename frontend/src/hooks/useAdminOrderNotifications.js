@@ -85,7 +85,7 @@ const useAdminOrderNotifications = (onNewOrder) => {
 
     try {
       // Get backend URL from environment
-      let backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      let backendUrl = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       
       // Ensure /api is included in the URL
       if (!backendUrl.endsWith('/api')) {

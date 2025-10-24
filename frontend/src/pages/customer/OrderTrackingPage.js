@@ -21,7 +21,7 @@ const OrderTrackingPage = ({ orderId, onBack, user }) => {
 
   const fetchOrderDetails = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       const token = localStorage.getItem('kuryecini_access_token');
 
       const response = await fetch(`${BACKEND_URL}/api/orders/${orderId}/track`, {
@@ -52,7 +52,7 @@ const OrderTrackingPage = ({ orderId, onBack, user }) => {
   const fetchCourierLocation = async () => {
     try {
       setLocationLoading(true);
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
       const token = localStorage.getItem('kuryecini_access_token');
 
       const response = await fetch(`${BACKEND_URL}/api/orders/${orderId}/courier/location`, {

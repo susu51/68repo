@@ -28,7 +28,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const fetchPendingCouriers = async () => {
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/couriers?kyc_status=pending`, {
         withCredentials: true
@@ -47,7 +47,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const fetchPromotions = async () => {
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions`, {
         withCredentials: true
@@ -66,7 +66,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const fetchProducts = async () => {
     try {
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products`, {
         withCredentials: true
@@ -96,7 +96,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}/status`, {
         method: 'PATCH',
@@ -129,7 +129,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/businesses/${businessId}/status`, {
         method: 'PATCH',
@@ -163,7 +163,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/couriers/${courierId}/status`, {
         method: 'PATCH',
@@ -196,7 +196,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/couriers/${courierId}/status`, {
         method: 'PATCH',
@@ -230,7 +230,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions`, {
         method: 'POST',
@@ -260,7 +260,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}/toggle`, {
         method: 'PATCH',
@@ -290,7 +290,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/promotions/${promotionId}`, {
         method: 'DELETE',
@@ -317,7 +317,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}/toggle`, {
         method: 'PATCH',
@@ -347,7 +347,7 @@ const AdminPanel = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // CI GATE 0 COMPLIANCE - NO localStorage usage, use cookies
-      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001';
+      const API_BASE = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL;
       
       const response = await fetch(`${BACKEND_URL}/api/admin/products/${productId}`, {
         method: 'DELETE',

@@ -18,7 +18,7 @@ const OrdersPage = ({ user, onOrderSelect, onTabChange }) => {
     comment: ''
   });
 
-  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  const API = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     loadOrders();

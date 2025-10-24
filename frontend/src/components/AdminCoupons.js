@@ -6,7 +6,7 @@ import { Badge } from './ui/badge';
 import { Plus, Edit, Trash2, Ticket } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 
 export const AdminCoupons = () => {
   const [coupons, setCoupons] = useState([]);

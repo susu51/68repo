@@ -71,7 +71,7 @@ const ProfilePage = ({ user, onLogout, onTabChange, onAddressChange, selectedAdd
     promotions: false
   });
 
-  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  const API = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 
   // Address management functions
   const handleSaveAddress = async () => {

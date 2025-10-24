@@ -11,7 +11,7 @@ import StickyCart from './components/StickyCart';
 import { renderLocation } from './utils/renderSafe';
 import { SafeRender, SafeAddress } from './components/SafeRender';
 
-const API = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001'}/api`;
+const API = `${process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Restaurant Card Component
 const RestaurantCard = ({ restaurant, onClick, userLocation }) => {

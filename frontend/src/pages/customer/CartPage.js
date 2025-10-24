@@ -17,7 +17,7 @@ const CartPage = ({ onBack, onProceedToPayment, user }) => {
   const [userAddresses, setUserAddresses] = useState([]);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
 
-  const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  const API = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 
   // Load user addresses
   useEffect(() => {

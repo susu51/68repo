@@ -5,7 +5,7 @@ import { MapPin, Plus, Edit, Trash2, Home, Briefcase, CheckCircle } from 'lucide
 import { SimpleAddressFormWithMap } from '../../components/SimpleAddressFormWithMap';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export const AddressManagementPage = ({ onBack }) => {

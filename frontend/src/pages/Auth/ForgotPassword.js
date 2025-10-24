@@ -6,7 +6,7 @@ import { KuryeciniLogo } from "../../components/KuryeciniLogo";
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export const ForgotPassword = ({ onBackToLogin }) => {

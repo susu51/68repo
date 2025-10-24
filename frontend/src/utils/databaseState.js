@@ -23,7 +23,7 @@ export const getCsrfToken = () => {
 
 // API client with CSRF protection
 class SecureApiClient {
-  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8001') {
+  constructor(baseURL = process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || process.env.REACT_APP_BACKEND_URL) {
     this.baseURL = baseURL;
     this.retryAttempts = 3;
   }
