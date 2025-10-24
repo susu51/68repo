@@ -205,8 +205,8 @@ class KuryeciniOrderFlowTester:
             response = self.session.get(f"{BASE_URL}/business/orders/incoming")
             
             if response.status_code == 200:
-                data = response.json()
-                orders = data.get("orders", [])
+                # API returns a list directly
+                orders = response.json()
                 
                 # Look for our test order
                 test_order_found = False
