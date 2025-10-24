@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { 
   Package, 
   Navigation, 
@@ -51,7 +54,7 @@ export const CourierActiveOrders = () => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ to: newStatus })
+        body: JSON.stringify({ new_status: newStatus })
       });
 
       if (response.ok) {
@@ -97,114 +100,73 @@ export const CourierActiveOrders = () => {
   const getStatusInfo = (status) => {
     switch (status) {
       case 'assigned':
-        return { 
-          label: 'Atandı', 
-          bgColor: '#fef3c7', 
-          textColor: '#92400e',
-          icon: Clock 
-        };
+        return { label: 'Atandı', color: 'bg-yellow-100 text-yellow-700', icon: Clock };
       case 'picked_up':
-        return { 
-          label: 'Alındı', 
-          bgColor: '#dbeafe', 
-          textColor: '#1e40af',
-          icon: Package 
-        };
+        return { label: 'Alındı', color: 'bg-blue-100 text-blue-700', icon: Package };
       case 'delivering':
-        return { 
-          label: 'Teslimat Yolda', 
-          bgColor: '#f3e8ff', 
-          textColor: '#6b21a8',
-          icon: Navigation 
-        };
+        return { label: 'Teslimat Yolda', color: 'bg-purple-100 text-purple-700', icon: Navigation };
       default:
-        return { 
-          label: status, 
-          bgColor: '#f3f4f6', 
-          textColor: '#374151',
-          icon: Package 
-        };
+        return { label: status, color: 'bg-gray-100 text-gray-700', icon: Package };
     }
   };
 
   if (activeOrders.length === 0) {
     return (
-      <div style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '0.5rem',
-        padding: '3rem',
-        textAlign: 'center',
-        background: 'white'
-      }}>
-        <Package size={48} style={{ margin: '0 auto 1rem', opacity: 0.5, color: '#9ca3af' }} />
-        <p style={{ fontSize: '1rem', color: '#6b7280', marginBottom: '0.5rem' }}>
-          Şu an aktif teslimatınız bulunmuyor
-        </p>
-        <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>
-          Hazır siparişler sekmesinden sipariş alabilirsiniz
-        </p>
-      </div>
+      <Card>
+        <CardContent className="p-12 text-center text-muted-foreground">
+          <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p>Şu an aktif teslimatınız bulunmuyor</p>
+          <p className="text-sm mt-2">Hazır siparişler sekmesinden sipariş alabilirsiniz</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
-          Aktif Teslimatlarım ({activeOrders.length})
-        </h2>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Aktif Teslimatlarım ({activeOrders.length})</h2>
       </div>
 
       {/* Orders Grid */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="grid gap-4">
         {activeOrders.map((order) => {
           const statusInfo = getStatusInfo(order.status);
+          const StatusIcon = statusInfo.icon;
           const isSelected = selectedOrder?.order_id === order.order_id;
 
           return (
-            <div
+            <Card 
               key={order.order_id}
+              className={`cursor-pointer transition-all ${
+                isSelected ? 'border-2 border-green-500 shadow-lg' : 'hover:shadow-md'
+              }`}
               onClick={() => setSelectedOrder(isSelected ? null : order)}
-              style={{
-                border: isSelected ? '2px solid #10b981' : '1px solid #e5e7eb',
-                borderRadius: '0.5rem',
-                padding: '1rem',
-                cursor: 'pointer',
-                background: 'white',
-                boxShadow: isSelected ? '0 4px 6px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s'
-              }}
             >
-              {/* Order Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: isSelected ? '1rem' : 0 }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                    <Package size={20} />
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', margin: 0 }}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Package className="h-5 w-5" />
                       Sipariş #{order.order_code}
-                    </h3>
+                    </CardTitle>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge className={statusInfo.color}>
+                        <StatusIcon className="h-3 w-3 mr-1" />
+                        {statusInfo.label}
+                      </Badge>
+                    </div>
                   </div>
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '0.375rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                    background: statusInfo.bgColor,
-                    color: statusInfo.textColor
-                  }}>
-                    {statusInfo.icon && React.createElement(statusInfo.icon, { size: 12 })}
-                    {statusInfo.label}
-                  </span>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-green-600">
+                      ₺{order.grand_total?.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', margin: 0 }}>
-                    ₺{order.grand_total?.toFixed(2)}
-                  </p>
-                </div>
-              </div>
+              </CardHeader>
+
+              {isSelected && (
+                <CardContent className="space-y-4">
                   {/* Pickup Location */}
                   <Card className="bg-orange-50 border-orange-200">
                     <CardHeader className="pb-3">
