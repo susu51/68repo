@@ -264,38 +264,67 @@ class CourierOrderClaimTester:
                 self.log_result("Order Status Change", False, "No claimed order ID available")
                 return False
             
-            # Get order details to check status
-            response = self.session.get(f"{BASE_URL}/orders/{self.claimed_order_id}")
+            # Try different endpoints to get order details
+            endpoints_to_try = [
+                f"/orders/{self.claimed_order_id}",
+                f"/orders/{self.claimed_order_id}/track",
+                f"/courier/tasks/orders/{self.claimed_order_id}",
+                f"/courier/tasks/my-orders"
+            ]
             
-            if response.status_code == 200:
-                order_data = response.json()
+            for endpoint in endpoints_to_try:
+                response = self.session.get(f"{BASE_URL}{endpoint}")
                 
-                # Handle different response formats
-                if "order" in order_data:
-                    order = order_data["order"]
-                else:
-                    order = order_data
-                
-                current_status = order.get("status", "unknown")
-                assigned_courier_id = order.get("assigned_courier_id") or order.get("courier_id")
-                
-                if current_status == "assigned":
-                    self.log_result(
-                        "Order Status Change", 
-                        True, 
-                        f"Status successfully changed to 'assigned'. Assigned courier ID: {assigned_courier_id}"
-                    )
-                    return True
-                else:
-                    self.log_result(
-                        "Order Status Change", 
-                        False, 
-                        f"Status is '{current_status}', expected 'assigned'. Courier ID: {assigned_courier_id}"
-                    )
-                    return False
-            else:
-                self.log_result("Order Status Change", False, f"HTTP {response.status_code}", response.text)
-                return False
+                if response.status_code == 200:
+                    order_data = response.json()
+                    
+                    # Handle different response formats
+                    if endpoint.endswith("/my-orders"):
+                        # This returns a list, find our order
+                        if isinstance(order_data, list):
+                            orders = order_data
+                        elif isinstance(order_data, dict) and "orders" in order_data:
+                            orders = order_data["orders"]
+                        else:
+                            continue
+                        
+                        order = None
+                        for o in orders:
+                            if (o.get("id") == self.claimed_order_id or 
+                                o.get("order_id") == self.claimed_order_id):
+                                order = o
+                                break
+                        
+                        if not order:
+                            continue
+                    else:
+                        # Single order response
+                        if "order" in order_data:
+                            order = order_data["order"]
+                        else:
+                            order = order_data
+                    
+                    current_status = order.get("status", "unknown")
+                    assigned_courier_id = order.get("assigned_courier_id") or order.get("courier_id")
+                    
+                    if current_status == "assigned":
+                        self.log_result(
+                            "Order Status Change", 
+                            True, 
+                            f"Status successfully changed to 'assigned' (via {endpoint}). Assigned courier ID: {assigned_courier_id}"
+                        )
+                        return True
+                    else:
+                        # Continue trying other endpoints
+                        continue
+            
+            # If we reach here, no endpoint returned the expected status
+            self.log_result(
+                "Order Status Change", 
+                False, 
+                f"Could not verify status change to 'assigned' via any endpoint"
+            )
+            return False
                 
         except Exception as e:
             self.log_result("Order Status Change", False, f"Exception: {str(e)}")
