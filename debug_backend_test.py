@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 
 def test_businesses_endpoint():
     """Debug the businesses endpoint error"""

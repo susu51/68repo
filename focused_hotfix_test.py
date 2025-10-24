@@ -25,7 +25,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://courier-dashboard-3.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://kuryecini-hub.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 # Exact test data from review request

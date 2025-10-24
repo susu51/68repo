@@ -7,7 +7,7 @@ import requests
 import json
 
 # Backend URL
-BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 
 # Admin credentials
 ADMIN_EMAIL = "admin@kuryecini.com"

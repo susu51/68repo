@@ -1,31 +1,29 @@
 <analysis>
-The previous AI engineer successfully initiated the Kuryecini application development, focusing on critical real-time order management features. Initially, efforts were directed towards stabilizing frontend authentication, WebSocket connections, and addressing various UI/API bugs like double JSON parsing and infinite rendering loops. A significant milestone was the robust WebSocket implementation for multi-tab support and reconnection. The recent work focused heavily on integrating a business dashboard with real data, which involved creating new backend endpoints and extensive frontend modifications. This process unveiled and resolved several critical issues, including Pydantic model errors, router registration conflicts, incorrect API response handling in the frontend, and authorization flaws (403 errors, incorrect KYC status handling, and  vs uid=0(root) gid=0(root) groups=0(root) discrepancies in MongoDB queries). A complex order status transition flow (Pending -> Confirmed -> Preparing -> Ready) was implemented, later simplified to Pending -> Confirmed -> Ready. Concurrently, efforts were made to integrate courier map features, leading to the creation of new backend geo-location endpoints and frontend map components. The work is characterized by iterative bug fixing, addressing user feedback promptly, and adapting the implementation to evolving requirements. The last task involves resolving an issue where the courier map panel is not displaying correctly.
+The previous AI engineer diligently addressed multiple critical issues and implemented significant features in the Kuryecini application. Initial work focused on stabilizing frontend authentication, WebSockets, and resolving various UI/API bugs. Key achievements included a robust WebSocket for multi-tab support, integrating a business dashboard with real data, and refining order status transitions. The engineer tackled persistent issues like Pydantic model errors, authorization flaws, and an infinite refresh loop in the business panel, which was eventually traced to a  call in . Subsequently, efforts shifted to developing a comprehensive courier map, displaying nearby businesses with order counts, and enabling order claiming. This involved correcting backend queries to use the  collection for business data and integrating advanced map functionalities. The final challenge involves resolving a  error within the  component, indicating issues with UI component rendering, likely due to conflicts between React's reconciliation and direct DOM manipulation or improper component usage. The engineer is currently refactoring the  component to use native HTML, moving away from problematic UI libraries.
 </analysis>
 
 <product_requirements>
-The Kuryecini platform is a multi-role (Customer, Business, Courier, Admin) application for real-time order management. Core features include order placement, business approval, courier task management, and real-time notifications. A key feature is the AI Diagnostics panel for Admin, with capabilities like log aggregation, PII redaction, RCA, and LLM-generated fixes, leveraging an Ops Co-Pilot for tool calling and context awareness. Recent requirements focused on stable WebSocket connections, a functional customer Order and Confirm flow, unique order codes, a defined order status transition (initially Pending -> Preparing -> Ready -> Confirmed, later simplified to Pending -> Confirmed -> Ready), automatic nearest courier assignment, printable order slips, and real-time data integration for the business dashboard. Latest requests expanded to include a simplified order flow (Hazırlanmaya Başla directly to Ready without package fee input), complete order details in the business panel, and a comprehensive courier map showing nearby businesses with available ready orders for claiming, with real-time WS updates.
+The Kuryecini platform is a multi-role application for real-time order management (Customer, Business, Courier, Admin). Initial features included real-time notifications, a stable customer Order and Confirm flow, unique order codes, and a simplified order status transition: Pending → Confirmed → Ready (originally more complex). A business dashboard with real-time data, printable order slips, and a comprehensive courier map showing nearby businesses with ready orders for claiming were also developed.
+
+Recent requirements have focused on refining the courier experience. This includes a package pool system where all couriers can view available orders on a map, with businesses appearing as custom markers. Clicking a marker reveals a list of orders for that business. Couriers can accept an order, which then displays full details (customer info, delivery address, payment, order items). Buttons for Paketi Aldım (Picked Up) and Teslim Ettim (Delivered) are required to update order status. The system should avoid automatic courier assignment and ensure all updates are real-time via WebSockets. Business registration should allow package/cover photo uploads, generating 64x64 and 128x128 icons for map markers, with a fallback default icon. Markers must display an active order count badge.
 </product_requirements>
 
 <key_technical_concepts>
-
-- **Full-stack Architecture:** React, FastAPI, MongoDB.
-- **Real-time Communication:** WebSockets (FastAPI, React hooks, WSManager, BroadcastChannel).
-- **Authentication/Authorization:** JWT via HttpOnly cookies, role-based access, KYC approval.
-- **AI Integration:** LLMs, structured outputs, context building (Ops Co-Pilot).
-- **Frontend State Management:** React Context API, , , , custom hooks.
-- **Backend Data Handling:** Pydantic models, MongoDB (UUIDs, GeoJSON  indexes, aggregation pipelines).
-- **Deployment/Ops:** backend                          RUNNING   pid 43, uptime 0:00:02
+- **Full-stack:** React, FastAPI, MongoDB.
+- **Real-time:** WebSockets (FastAPI, React hooks).
+- **Authentication:** JWT via HttpOnly cookies, role-based access.
+- **Frontend State:** React Context API, , , .
+- **Backend Data:** Pydantic, MongoDB (UUIDs, geospatial queries/distance calculation).
+- **Mapping:** React-Leaflet, custom markers, Google Maps/Apple Maps deep linking.
+- **Deployment:** backend                          RUNNING   pid 43, uptime 0:00:02
 code-server                      STOPPED   Not started
-frontend                         RUNNING   pid 44, uptime 0:00:02
-mongodb                          RUNNING   pid 45, uptime 0:00:02
+frontend                         STOPPING  
+mongodb                          RUNNING   pid 47, uptime 0:00:02
 nginx-code-proxy                 RUNNING   pid 41, uptime 0:00:02
 supervisor> , Kubernetes ingress, environment variables.
-- **Error Handling:** Centralized API client, comprehensive logging.
-- **Concurrency Control:** Optimistic locking for claiming orders.
 </key_technical_concepts>
 
 <code_architecture>
-
 /app/
 ├── backend/
 │   ├── .env
@@ -55,7 +53,8 @@ supervisor> , Kubernetes ingress, environment variables.
 │   │   ├── ai_assistant.py (MODIFIED)
 │   │   ├── ai_utils.py (NEW)
 │   │   ├── business_dashboard.py (NEW)
-│   │   └── order_status.py (MODIFIED)
+│   │   ├── order_status.py (MODIFIED)
+│   │   └── map_api.py (NEW)
 │   ├── realtime/
 │   │   ├── __init__.py
 │   │   ├── event_bus.py
@@ -100,7 +99,15 @@ supervisor> , Kubernetes ingress, environment variables.
 │   │   │   ├── OpsCoPilot.js (NEW)
 │   │   │   ├── ui/
 │   │   │   │   └── label.js (NEW)
-│   │   │   └── CourierReadyOrdersMap.js (MODIFIED)
+│   │   │   ├── CourierReadyOrdersMap.js (MODIFIED)
+│   │   │   ├── OpenStreetMap.js (MODIFIED)
+│   │   │   ├── CourierMapWithBusinesses.js (NEW - DEPRECATED)
+│   │   │   ├── CourierMapWithCustomIcons.js (NEW - DEPRECATED)
+│   │   │   ├── SimpleMap.js (NEW - DEPRECATED)
+│   │   │   ├── LeafletMapWithCustomMarkers.js (NEW - DEPRECATED)
+│   │   │   ├── SimpleLeafletMap.js (NEW - DEPRECATED)
+│   │   │   ├── CourierActiveOrders.js (NEW)
+│   │   │   └── CourierAdvancedTasks.js (NEW, CURRENTLY BEING EDITED)
 │   │   ├── contexts/
 │   │   │   ├── CookieAuthContext.js (MODIFIED)
 │   │   │   ├── ThemeContext.js
@@ -114,7 +121,7 @@ supervisor> , Kubernetes ingress, environment variables.
 │   │   │   ├── MaintenancePage.js
 │   │   │   ├── customer/
 │   │   │   │   ├── CustomerApp.js (MODIFIED)
-│   │   │   │   ├── DiscoverPage.js
+│   │   │   │   ├── DiscoverPage.js (MODIFIED)
 │   │   │   │   ├── CartPageEnhanced.js (MODIFIED)
 │   │   │   │   ├── OrdersPage.js
 │   │   │   │   └── RestaurantMenu.js (MODIFIED)
@@ -140,71 +147,44 @@ supervisor> , Kubernetes ingress, environment variables.
 │   ├── CourierDashboard.js (MODIFIED)
 │   └── ...
 └── tests/
-   - ****: Main FastAPI application.
-      - Summary: Manages API routing and global configurations.
-      - Changes: Included  router. Corrected order parsing for  and order item details in  and . Removed a duplicate  endpoint.
-   - ****: (NEW)
-      - Summary: Defines API endpoints for business dashboard summary data.
-      - Changes: Implemented  to provide real-time metrics.
-   - ****:
-      - Summary: Handles transitions between order statuses.
-      - Changes: Updated  for allowed status changes. Fixed ownership check () and MongoDB query field (uid=0(root) gid=0(root) groups=0(root) instead of ).
-   - ****:
-      - Summary: Manages courier-specific tasks and data.
-      - Changes: Added  for map pins and  for claiming orders.
-   - ****:
-      - Summary: Manages cookie-based authentication.
-      - Changes: Ensured  is included in the login response.
-   - ****:
-      - Summary: Centralized HTTP client for frontend API calls.
-      - Changes: Standardized API call responses (, , , ) to consistently return  objects, fixing various frontend errors.
-   - ****: (NEW)
-      - Summary: Frontend API module dedicated to business dashboard data.
-      - Changes: Created to abstract dashboard-related API requests.
-   - ****: (NEW)
-      - Summary: Custom React hook for fetching and managing business dashboard summary data.
-      - Changes: Implemented data fetching with loading/error states, fixed  dependency issue, and added a debounce mechanism.
-   - ****:
-      - Summary: Main container component for the business panel.
-      - Changes: Integrated  hook for real data, removed mock data, and removed direct  usage for dashboard updates.
-   - ****:
-      - Summary: Displays the business dashboard with key metrics and activities.
-      - Changes: Adapted to consume real data from . Removed Hazırlanıyor stats card.
-   - ****:
-      - Summary: Manages the display and interaction for business orders.
-      - Changes: Added receipt printing. Updated order status transition logic and button visibility. Corrected API endpoint paths for status updates. Modified  to retrieve all order statuses to prevent orders from disappearing. Removed package fee input and preparing button. Added debounce to .
-   - ****:
-      - Summary: Displays restaurant menus and allows customers to browse items.
-      - Changes: Enhanced category filtering to use dynamic backend data. Improved image display logic by checking multiple URL fields.
-   - ****:
-      - Summary: Component showing tasks waiting for couriers.
-      - Changes: Imported the missing  component.
-   - ****: (NEW)
-      - Summary: A generic UI Label component.
-      - Changes: Created to resolve a  runtime error.
-   - ****:
-      - Summary: Displays ready orders on a map for couriers to pick up.
-      - Changes: Updated to fetch and display nearby businesses with available ready order counts as map pins. Implemented logic to show a list of orders for a selected business and a claim button. Fixed a reference to .
+
+- ****: Main FastAPI app, registers  and  routers. Fixed order parsing and removed duplicate endpoints.
+- ****: (NEW) Provides  for metrics.
+- ****: Manages order status transitions (). Updated ownership checks and MongoDB queries.
+- ****: Manages courier tasks. Added  for map pins, , and  for claimed orders. Corrected business location query logic to query the  collection instead of .
+- ****: (NEW) Created for map-related API endpoints, initially for businesses with active orders and custom icons.
+- ****: Includes  in login response.
+- ****: Standardizes API client responses to .
+- ****: (NEW) Frontend API for business dashboard data.
+- ****: (NEW) Custom hook for dashboard data, debounce mechanism, fixed  and  logic for initial fetch.
+- ****: Main business container. Integrated , removed mock data.
+- ****: Displays business dashboard. Consumes real data. Wrapped in  to prevent unnecessary re-renders.
+- ****: Manages business orders. Added receipt printing, updated status transitions, fixed API paths, added debounce, wrapped  in  and component in .
+- ****: Customer restaurant discovery page. Fixed issue where restaurants would disappear on GPS/smart sorting by correctly managing  state.
+- ****: Displays ready orders on map. Fixed missing  imports (, ), updated to show nearby businesses, and included maps links. Has been largely replaced/refactored into .
+- ****: Modified to simplify map rendering, later replaced by .
+- ****: (NEW) Displays courier's active orders with pickup/delivery actions.
+- ****: (NEW) Replaces . Designed for map and order list, currently being refactored to use native HTML due to rendering issues with UI components.
+- ****: (NEW) Introduced for React-Leaflet based map with custom markers, later replaced by .
+- ****: (NEW) A simplified Leaflet map component to address  errors, currently used by .
+- ****: Main app component. Fixed infinite page reload on login by removing .
+- ****: Main courier dashboard. Refactored to consolidate tabs, integrated  and . Fixed an issue where  objects were being rendered directly.
+
 </code_architecture>
 
 <pending_tasks>
-- Full order tracking features with real-time updates and map view (courier map initiated, but full tracking pending).
-- Customer rating modal post-delivery.
-- Advanced Business/Restaurant analytics.
-- Comprehensive unit and E2E tests for all new features.
-- Yeni Sipariş toast and badge counter in Business Panel.
-- Enhanced order filters and explicit manual refresh in Business Panel.
-- Observability metrics for .
-- Phase 2 & 3 of AI Diagnostics (ChatGPT, Admin UI for coupons).
-- Accept Task button for couriers and detailed courier screens.
-- Full printable order slips/receipts for businesses.
+- Implement package photo upload, server-side icon generation (64x64, 128x128), and integration into business model.
+- Add marker clustering for 100+ businesses on the map.
+- Improve performance with sprite/cache for icons and lazy bbox fetch for map movement.
+- Ensure all detailed order information (customer, payment, items) is consistently available in the courier panel upon claiming an order.
+- Implement Paketi Aldım and Teslim Ettim buttons for couriers, with corresponding status updates and real-time WebSocket notifications across all panels.
+- Fix the  error in .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing a user report that the Kurye harita paneli (Courier map panel) was not displaying or functioning correctly, despite previous work on its integration. This prior work included creating backend endpoints (, ) in  and modifying  to show business locations as pins with available order counts and allow couriers to claim orders. A runtime error () was previously fixed in . However, the user's latest message indicates that the map panel still has issues. The AI engineer has just started investigating this by reviewing  to understand how the map component is integrated and where the issue might lie, specifically to find the map tab or its rendering logic within the dashboard. The system has recently undergone extensive fixes for various issues across the business dashboard, menu management, customer menu display, order status transitions, and critical authentication/authorization flaws. The order processing flow has been simplified to transition directly from confirmed to ready.
+Immediately before this summary request, the AI engineer was addressing a persistent  error in the  component, specifically when using UI components from . This error indicated a conflict between React's rendering process and how these components were being handled, possibly due to direct DOM manipulation or incorrect prop usage within a context. The  component is intended to serve as the central hub for couriers, displaying a map with business markers (with active order badges), and a list of available orders for selected businesses. The engineer had previously attempted several fixes, including creating simpler map components like  and  and ensuring correct  usage, but the  error persisted. The latest approach is to completely rewrite sections of the  component using native HTML instead of  components to eliminate potential conflicts and resolve the  error. This involves reviewing the current implementation of  to identify where the problematic UI components are used and replace them with basic HTML elements to ensure stable rendering.
 </current_work>
 
 <optional_next_step>
-Investigate  to identify why the courier map panel is not displaying correctly.
-Haklısınız! Kurye dashboardındaki harita entegrasyonunu kontrol edip düzeltelim. Önce CourierDashboardı bulalım: ... Şimdi harita sekmesini bulalım:
+Completely rewrite the problematic UI sections within  using native HTML to resolve the  error.
 </optional_next_step>

@@ -19,7 +19,7 @@ from datetime import datetime
 import sys
 
 # Configuration
-BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com"
 
 # Test credentials
 BUSINESS_CREDENTIALS = [

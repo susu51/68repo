@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_BUSINESS_EMAIL = "testbusiness@example.com"

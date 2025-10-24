@@ -9,7 +9,7 @@ import { Label } from './ui/label';
 import { Home, Briefcase, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 // Fix Leaflet default icon issue with webpack

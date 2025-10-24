@@ -27,7 +27,7 @@ TEST CREDENTIALS:
 - Business: testbusiness@example.com / test123 (ID: e94a2e76-141a-4406-8ed6-d1c0ecc4d6ed)
 - Courier: testkurye@example.com / test123
 
-BACKEND URL: https://courier-dashboard-3.preview.emergentagent.com/api
+BACKEND URL: https://kuryecini-hub.preview.emergentagent.com/api
 """
 
 import requests
@@ -38,7 +38,7 @@ import sys
 import uuid
 
 # Configuration
-BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_CUSTOMER_EMAIL = "test@kuryecini.com"

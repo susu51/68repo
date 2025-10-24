@@ -8,7 +8,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
+BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 TEST_BUSINESS_EMAIL = "testbusiness@example.com"
 TEST_BUSINESS_PASSWORD = "test123"
 

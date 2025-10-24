@@ -20,7 +20,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://courier-dashboard-3.preview.emergentagent.com/api"
+BASE_URL = "https://kuryecini-hub.preview.emergentagent.com/api"
 TEST_USER_EMAIL = "testcustomer@example.com"
 TEST_USER_PASSWORD = "test123"
 

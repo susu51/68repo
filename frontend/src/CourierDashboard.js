@@ -17,7 +17,7 @@ import { CourierAdvancedTasks } from './components/CourierAdvancedTasks';
 import { CourierActiveOrders } from './components/CourierActiveOrders';
 import { CourierOrderHistoryFiltered } from './components/CourierOrderHistoryFiltered';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierDashboard = ({ user, onLogout }) => {

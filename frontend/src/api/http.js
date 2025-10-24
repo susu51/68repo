@@ -1,5 +1,5 @@
 // HTTP client utility with double /api prevention and cookie mandatory
-const BASE = (process.env.REACT_APP_API_BASE_URL || 'https://courier-dashboard-3.preview.emergentagent.com/api').replace(/\/+$/, ''); // remove trailing /
+const BASE = (process.env.REACT_APP_API_BASE_URL || 'https://kuryecini-hub.preview.emergentagent.com/api').replace(/\/+$/, ''); // remove trailing /
 
 const sanitizePath = (p) => {
   // always start with single /

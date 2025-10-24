@@ -3,7 +3,7 @@ import { Package, Store, User, Phone, Navigation, DollarSign, ShoppingBag } from
 import { toast } from 'sonner';
 import { SimpleLeafletMap } from './SimpleLeafletMap';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://courier-dashboard-3.preview.emergentagent.com';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 
 export const CourierAdvancedTasksNative = () => {

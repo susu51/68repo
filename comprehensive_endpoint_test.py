@@ -54,7 +54,7 @@ import sys
 import uuid
 
 # Configuration
-BACKEND_URL = "https://courier-dashboard-3.preview.emergentagent.com"
+BACKEND_URL = "https://kuryecini-hub.preview.emergentagent.com"
 
 # Test credentials for all roles
 TEST_CREDENTIALS = {
