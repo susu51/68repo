@@ -367,10 +367,12 @@ class KuryeciniOrderFlowTester:
                     )
                     return True
                 else:
+                    # Log all businesses for debugging
+                    business_list = [f"{b.get('name', 'N/A')} ({b.get('id', b.get('business_id', 'N/A'))})" for b in businesses[:5]]
                     self.log_result(
                         "Courier Nearby Businesses", 
                         False, 
-                        f"Test business {self.business_id} not found in {len(businesses)} nearby businesses"
+                        f"Test business {self.business_id} not found in {len(businesses)} nearby businesses. Found: {business_list}"
                     )
                     return False
             else:
