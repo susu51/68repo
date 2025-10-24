@@ -97,13 +97,33 @@ export const CourierActiveOrders = () => {
   const getStatusInfo = (status) => {
     switch (status) {
       case 'assigned':
-        return { label: 'Atandı', color: 'bg-yellow-100 text-yellow-700', icon: Clock };
+        return { 
+          label: 'Atandı', 
+          bgColor: '#fef3c7', 
+          textColor: '#92400e',
+          icon: Clock 
+        };
       case 'picked_up':
-        return { label: 'Alındı', color: 'bg-blue-100 text-blue-700', icon: Package };
+        return { 
+          label: 'Alındı', 
+          bgColor: '#dbeafe', 
+          textColor: '#1e40af',
+          icon: Package 
+        };
       case 'delivering':
-        return { label: 'Teslimat Yolda', color: 'bg-purple-100 text-purple-700', icon: Navigation };
+        return { 
+          label: 'Teslimat Yolda', 
+          bgColor: '#f3e8ff', 
+          textColor: '#6b21a8',
+          icon: Navigation 
+        };
       default:
-        return { label: status, color: 'bg-gray-100 text-gray-700', icon: Package };
+        return { 
+          label: status, 
+          bgColor: '#f3f4f6', 
+          textColor: '#374151',
+          icon: Package 
+        };
     }
   };
 
