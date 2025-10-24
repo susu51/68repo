@@ -140,7 +140,7 @@ class KuryeciniOrderFlowTester:
                 "delivery_fee": 10.0
             }
             
-            response = self.session.post(f"{BASE_URL}/orders/create", json=order_data)
+            response = self.session.post(f"{BASE_URL}/orders", json=order_data)
             
             if response.status_code == 200:
                 data = response.json()
