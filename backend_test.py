@@ -165,13 +165,13 @@ class KuryeciniOrderFlowTester:
             return False
 
     def test_business_login(self):
-        """Test 3: İşletme olarak login yap (test_business@example.com / test123)"""
+        """Test 3: İşletme olarak login yap (testbusiness@example.com / test123)"""
         try:
             # Clear previous session
             self.session.cookies.clear()
             
             login_data = {
-                "email": "test_business@example.com",
+                "email": "testbusiness@example.com",
                 "password": "test123"
             }
             
