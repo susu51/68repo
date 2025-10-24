@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://kuryecini-hub.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001/api';
 
 console.log('Minimal App loaded, API_BASE:', API_BASE);
 

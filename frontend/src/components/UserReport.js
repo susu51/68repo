@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://kuryecini-hub.preview.emergentagent.com/api';
+const API_BASE = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001/api';
 
 export const UserReport = () => {
   const [reportData, setReportData] = useState(null);
