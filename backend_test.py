@@ -277,7 +277,7 @@ class KuryeciniOrderFlowTester:
                 self.log_result("Ready Order", False, "No order ID available")
                 return False
             
-            status_data = {"to": "ready"}
+            status_data = {"status": "ready"}
             response = self.session.patch(f"{BASE_URL}/business/orders/{self.order_id}/status", json=status_data)
             
             if response.status_code == 200:
