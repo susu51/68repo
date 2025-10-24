@@ -388,8 +388,12 @@ class KuryeciniOrderFlowTester:
             response = self.session.get(f"{BASE_URL}/courier/tasks/businesses/{self.business_id}/available-orders")
             
             if response.status_code == 200:
-                data = response.json()
-                orders = data.get("orders", [])
+                # API might return a list directly or an object with orders
+                response_data = response.json()
+                if isinstance(response_data, list):
+                    orders = response_data
+                else:
+                    orders = response_data.get("orders", [])
                 
                 # Look for our test order
                 test_order_found = False
