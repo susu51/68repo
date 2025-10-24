@@ -159,12 +159,17 @@ const OrdersPage = ({ user }) => {
                       <Badge className={`${statusInfo.color} text-white`}>
                         {statusInfo.label}
                       </Badge>
+                      {['confirmed', 'preparing', 'ready', 'picked_up', 'delivering', 'delivered'].includes(order.status) && (
+                        <span className="text-green-600 font-semibold text-sm flex items-center gap-1">
+                          ✓ Onaylandı
+                        </span>
+                      )}
                     </div>
                     <h3 className="font-semibold text-lg">
-                      {order.business?.name || 'Restoran'}
+                      {order.business?.name || order.business_name || 'Restoran'}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Sipariş #{order._id?.slice(-6).toUpperCase()}
+                      Sipariş Kodu: <span className="font-mono font-semibold">#{(order.id || order._id)?.slice(0, 8).toUpperCase()}</span>
                     </p>
                   </div>
                   <div className="text-right">
@@ -172,7 +177,13 @@ const OrdersPage = ({ user }) => {
                       ₺{order.total_amount?.toFixed(2)}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString('tr-TR')}
+                      {new Date(order.created_at).toLocaleDateString('tr-TR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </p>
                   </div>
                 </div>
