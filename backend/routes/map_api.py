@@ -51,6 +51,7 @@ async def get_map_businesses(
                 "id": business.get("id"),
                 "name": business.get("business_name"),
                 "address": business.get("address", ""),
+                "phone": business.get("phone", ""),
                 "city": business.get("city", ""),
                 "district": business.get("district", ""),
                 "location": {
