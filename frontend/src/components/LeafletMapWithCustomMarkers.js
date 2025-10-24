@@ -168,10 +168,24 @@ export const LeafletMapWithCustomMarkers = ({ onBusinessClick }) => {
             {businesses.reduce((sum, b) => sum + b.active_order_count, 0)} hazır paket • {businesses.length} işletme
           </p>
         </div>
-        <Button onClick={fetchBusinesses} disabled={loading} size="sm" variant="outline">
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''} mr-2`} />
+        <button 
+          onClick={fetchBusinesses} 
+          disabled={loading}
+          style={{
+            padding: '6px 12px',
+            border: '1px solid #e5e7eb',
+            borderRadius: '6px',
+            background: 'white',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '14px'
+          }}
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Yenile
-        </Button>
+        </button>
       </div>
 
       {/* Leaflet Map */}
