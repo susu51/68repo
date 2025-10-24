@@ -275,14 +275,23 @@ export const LeafletMapWithCustomMarkers = ({ onBusinessClick }) => {
                     <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
                       📍 {business.district}, {business.city}
                     </div>
-                    <Button
+                    <button
                       onClick={() => onBusinessClick && onBusinessClick(business)}
-                      size="sm"
-                      className="w-full"
-                      style={{ marginTop: '4px' }}
+                      style={{
+                        width: '100%',
+                        padding: '8px 16px',
+                        marginTop: '8px',
+                        background: '#22c55e',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '600'
+                      }}
                     >
                       Siparişleri Gör
-                    </Button>
+                    </button>
                   </div>
                 </Popup>
               </Marker>
