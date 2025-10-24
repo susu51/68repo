@@ -66,14 +66,8 @@ class KuryeciniOrderFlowTester:
         if not success and response_data:
             print(f"   🔍 Response: {response_data}")
         print()
-            "test": test_name,
-            "success": success,
-            "details": details,
-            "timestamp": datetime.now().isoformat()
-        })
-        print(f"{status} {test_name}: {details}")
-        
-    async def test_courier_login(self):
+
+    def test_customer_login(self):
         """Test 1: Courier Authentication"""
         try:
             async with self.session.post(
