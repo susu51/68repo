@@ -231,9 +231,13 @@ async def get_courier_active_orders(
         
         formatted = []
         for order in orders:
-            # Get customer name
+            # Get customer info with phone
             customer_info = order.get("customer_info", {})
             customer_name = customer_info.get("name") or order.get("customer_name", "Müşteri")
+            
+            # Get customer phone
+            customer = await db.users.find_one({"id": order.get("customer_id")})
+            customer_phone = customer.get("phone", "") if customer else ""
             
             # Parse delivery address and coordinates
             delivery_addr = order.get("delivery_address", "")
@@ -254,20 +258,35 @@ async def get_courier_active_orders(
                     delivery_lat = address_snapshot.get("lat")
                     delivery_lng = address_snapshot.get("lng")
             
-            # Parse business address for pickup
+            # Parse business info for pickup
             business = await db.users.find_one({"id": order.get("business_id")})
             business_name = business.get("business_name", "İşletme") if business else "İşletme"
             business_address = business.get("address", "") if business else ""
+            business_phone = business.get("phone", "") if business else ""
             business_lat = business.get("lat") if business else None
             business_lng = business.get("lng") if business else None
+            
+            # Get payment method
+            payment_method = order.get("payment_method", "cash")
+            
+            # Get order items with details
+            items_list = []
+            for item in order.get("items", []):
+                items_list.append({
+                    "name": item.get("title") or item.get("name", "Ürün"),
+                    "quantity": item.get("quantity", 1),
+                    "price": float(item.get("price", 0))
+                })
             
             formatted.append({
                 "order_id": order.get("id"),
                 "order_code": order.get("id")[:8],
                 "status": order.get("status"),
                 "customer_name": customer_name,
+                "customer_phone": customer_phone,
                 "business_name": business_name,
                 "business_address": business_address,
+                "business_phone": business_phone,
                 "business_location": {
                     "lat": business_lat,
                     "lng": business_lng
@@ -277,10 +296,12 @@ async def get_courier_active_orders(
                     "lat": delivery_lat,
                     "lng": delivery_lng
                 },
+                "payment_method": payment_method,
                 "total_amount": float(order.get("total_amount", 0)),
                 "delivery_fee": float(order.get("delivery_fee", 0)),
                 "grand_total": float(order.get("total_amount", 0)) + float(order.get("delivery_fee", 0)),
                 "items_count": len(order.get("items", [])),
+                "items": items_list,
                 "assigned_at": order.get("assigned_at"),
                 "notes": order.get("notes") or ""
             })
